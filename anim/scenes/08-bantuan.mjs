@@ -23,7 +23,7 @@ const row = (y, kind, label, detail) => {
 
 // Tampilan A: bagian atas Bantuan.
 const viewTop = dlg(
-  text(DX + 20, DY + 70, "Versi 0.7.59", { size: 12 }),
+  text(DX + 20, DY + 70, "Versi 0.7.60", { size: 12 }),
   button(DX + DW - 112, DY + 54, "Cek update", { variant: "ghost", w: 92, h: 26, size: 12 }),
   text(DX + 20, DY + 94, "Sudah versi terbaru.", { size: 11, fill: C.muted }),
   rect(DX + 16, DY + 104, DW - 32, 40, { r: 6, fill: C.warnTint }),
@@ -52,7 +52,7 @@ const viewBottom = dlg(
 const hintAt = (s, o = {}) => rect(DX + 16, DY + 230, 300, 22, { r: 0, fill: C.paper }) + text(DX + 20, DY + 246, s, { size: 12, fill: o.fill ?? C.muted, weight: o.weight });
 const SALIN = [DX + 85, DY + 209], WA = [DX + 250, DY + 209], LIHAT = [DX + 80, DY + 324];
 // Tampilan C: isi laporan dibuka.
-const REPORT = ["Laporan NikahKit 0.7.59", "Waktu: 2026-10-14T03:12:45.000Z", "Halaman: /pages/365671", "Build Scalev: e5cbe30-37178432877-1",
+const REPORT = ["Laporan NikahKit 0.7.60", "Waktu: 2026-10-14T03:12:45.000Z", "Halaman: /pages/365671", "Build Scalev: e5cbe30-37178432877-1",
   "Browser: Mozilla/5.0 ... Chrome/...", "", "[OK] Aplikasi Scalev (Nuxt/Vue)", "...", "[OK] Klik di pratinjau",
   "[OK] Kode halaman cocok dengan NikahKit", "[X] Penyimpanan ucapan dan RSVP: simpan", "  halaman di Scalev dulu",
   "[OK] Izin domain di tab Security", "[OK] Penulisan ke editor"];
@@ -125,12 +125,12 @@ const waWin = browser(WX, WY, WW, WH, "wa.me/6282175274118", { tab: "WhatsApp" }
   rect(WX + 1, WY + 121, WW - 2, WH - 122, { r: 0, fill: "#efeae2" });
 const CB = { x: WX + 16, y: WY + 262, w: WW - 80, h: 190 };
 const composer = rect(CB.x, CB.y, CB.w, CB.h, { r: 10, fill: C.paper, stroke: C.line }) +
-  para(CB.x + 14, CB.y + 24, ["Halo Nikahin, NikahKit saya bermasalah.", "", "Laporan NikahKit 0.7.59", "Waktu: 2026-10-14T03:12:45.000Z", "[X] Penyimpanan ucapan dan RSVP: simpan", "halaman di Scalev dulu"], { size: 12, lh: 17 }) +
+  para(CB.x + 14, CB.y + 24, ["Halo Nikahin, NikahKit saya bermasalah.", "", "Laporan NikahKit 0.7.60", "Waktu: 2026-10-14T03:12:45.000Z", "[X] Penyimpanan ucapan dan RSVP: simpan", "halaman di Scalev dulu"], { size: 12, lh: 17 }) +
   circle(WX + WW - 34, CB.y + CB.h - 20, 18, { fill: C.waDark }) + text(WX + WW - 34, CB.y + CB.h - 15, "➤", { size: 15, fill: C.paper, anchor: "middle" });
 const extra = rect(CB.x + 10, CB.y + 124, CB.w - 20, 40, { r: 0, fill: C.paper }) +
   para(CB.x + 14, CB.y + 138, ["Saya klik Simpan, lalu muncul tanda !. Halaman:", "https://contoh.myscalev.com/rani-dimas  [screenshot]"], { size: 12, lh: 17, fill: C.svDark });
 const sent = rect(WX + WW - 300, WY + 140, 280, 64, { r: 10, fill: C.waTint }) +
-  para(WX + WW - 288, WY + 162, ["Halo Nikahin, NikahKit saya bermasalah.", "Laporan NikahKit 0.7.59 ...", "[screenshot]  ✓✓"], { size: 12, lh: 16 });
+  para(WX + WW - 288, WY + 162, ["Halo Nikahin, NikahKit saya bermasalah.", "Laporan NikahKit 0.7.60 ...", "[screenshot]  ✓✓"], { size: 12, lh: 16 });
 
 export const scenes = {
   "bantuan-salin-laporan": {

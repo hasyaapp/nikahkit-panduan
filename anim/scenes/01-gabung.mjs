@@ -8,7 +8,7 @@ const TOP = Y + 76; // browser content top
 const STAGE_H = 536;
 const ID = "48213"; // contoh ID halaman Scalev
 const EDIT_URL = `app.scalev.com/pages/${ID}`;
-const VER = "0.7.59", NEW = "0.8.0";
+const VER = "0.7.60", NEW = "0.8.0";
 const EMAIL = "rina.wo@gmail.com";
 
 // ---- Shared pieces -------------------------------------------------------------------------------------------------
