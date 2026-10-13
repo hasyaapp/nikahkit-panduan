@@ -1,0 +1,84 @@
+/* Panduan NikahKit page (panduan/html.mjs). Scoped under #svLegal like the other Nikahin pages; tokens from legal. */
+#svLegal .pd{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;width:min(calc(100% - 64px),1120px);margin:0 auto;padding:40px 0 96px}
+#svLegal .pd-side{position:sticky;top:16px;align-self:start;max-height:calc(100dvh - 32px);overflow:auto;padding-right:4px}
+#svLegal .pd-toc>summary{display:none}
+#svLegal .pd-search{display:block;margin:0 0 16px}
+#svLegal .pd-search span{display:block;margin:0 0 6px;color:var(--muted);font-size:13px;font-weight:700}
+#svLegal .pd-search input{width:100%;min-height:44px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);font:15px var(--font-body)}
+#svLegal .pd-search input:focus-visible{outline:3px solid var(--marker-dark);outline-offset:1px}
+#svLegal .pd-nav p{margin:18px 0 6px;color:var(--marker-dark);font-size:12px;font-weight:800;text-transform:uppercase}
+#svLegal .pd-nav a,#svLegal .pd-hits a{display:block;padding:7px 10px;border-radius:10px;color:var(--cocoa);font-size:14px;line-height:1.35;text-decoration:none}
+#svLegal .pd-nav a:hover,#svLegal .pd-hits a:hover{background:var(--paper-tint)}
+#svLegal .pd-nav a[aria-current="page"]{background:var(--paper-tint);font-weight:800}
+#svLegal .pd-hits{display:grid;gap:2px;margin:0 0 12px}
+#svLegal .pd-hits small{display:block;color:var(--muted);font-size:12px}
+#svLegal .pd-hits p{margin:4px 10px;color:var(--muted);font-size:14px}
+#svLegal .pd-main{min-width:0;max-width:760px}
+#svLegal .doc+.doc{margin-top:96px;padding-top:48px;border-top:2px dashed var(--dash)}
+#svLegal .doc h1:focus{outline:none}
+#svLegal .pd.js .doc{display:none}#svLegal .pd.js .doc.on{display:block}#svLegal .pd.js .doc+.doc{margin-top:0;padding-top:0;border-top:0}
+#svLegal .crumb{margin:0 0 10px;color:var(--marker-dark);font-size:13px;font-weight:800;text-transform:uppercase}
+#svLegal .doc h1{margin:0;color:var(--cocoa);font:400 clamp(34px,5vw,48px)/1.08 var(--font-gelica)}
+#svLegal .doc .lead{margin:14px 0 28px;color:var(--muted);font-size:18px}
+#svLegal .doc h2{margin:48px 0 14px;color:var(--cocoa);font:400 clamp(26px,3.4vw,32px)/1.15 var(--font-gelica)}
+#svLegal .doc h3{margin:32px 0 10px;color:var(--cocoa);font-size:20px;line-height:1.3}
+#svLegal .doc h4{margin:0 0 6px;color:var(--cocoa);font-size:17px;line-height:1.35}
+#svLegal .doc p,#svLegal .doc li{line-height:1.65}
+#svLegal .doc p{margin:0 0 14px}
+#svLegal .doc ul,#svLegal .doc ol{margin:0 0 14px;padding-left:22px}
+#svLegal .doc a{color:var(--marker-dark);text-underline-offset:3px}
+#svLegal .doc code{padding:1px 6px;border-radius:6px;background:var(--paper-tint);font:14px ui-monospace,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+#svLegal .doc pre.code{margin:0 0 16px;padding:16px;border-radius:12px;background:#2b1a07;color:#f7efe9;overflow:auto}
+#svLegal .doc pre.code code{padding:0;background:none;color:inherit;white-space:pre}
+#svLegal .doc figure{margin:24px 0}
+#svLegal .doc figure img{display:block;width:100%;height:auto;border-radius:14px;box-shadow:var(--shadow-card);background:#f8f9fa}
+#svLegal .doc figcaption{margin:8px 0 0;color:var(--muted);font-size:14px;text-align:center}
+#svLegal .note{margin:0 0 18px;padding:14px 16px;border-radius:14px;border:1.5px solid}
+#svLegal .note>*:last-child{margin-bottom:0}
+#svLegal .note-t{display:block;margin:0 0 6px;font-size:13px;text-transform:uppercase}
+#svLegal .note-info{border-color:#a8cfe0;background:#eef7fb}#svLegal .note-info .note-t{color:#0b5b7d}
+#svLegal .note-warning{border-color:#e8c27a;background:#fdf6e7}#svLegal .note-warning .note-t{color:#8a5300}
+#svLegal .note-error{border-color:#e6a39f;background:#fcefee}#svLegal .note-error .note-t{color:#a1221d}
+#svLegal .note-success{border-color:#9fd0ad;background:#eef8f1}#svLegal .note-success .note-t{color:#1d6b35}
+#svLegal ol.steps{list-style:none;counter-reset:st;margin:0 0 20px;padding:0}
+#svLegal ol.steps>li{position:relative;counter-increment:st;margin:0;padding:0 0 20px 50px}
+#svLegal ol.steps>li::before{content:counter(st);position:absolute;left:0;top:-2px;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--cocoa);color:var(--paper);font-weight:800;font-size:14px}
+#svLegal ol.steps>li::after{content:"";position:absolute;left:15px;top:36px;bottom:6px;width:2px;background:var(--dash)}
+#svLegal ol.steps>li:last-child::after{display:none}
+#svLegal .acc{margin:0 0 18px;border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+#svLegal .acc details+details{border-top:1px solid var(--line)}
+#svLegal .acc summary{padding:14px 16px;color:var(--cocoa);font-weight:700;cursor:pointer}
+#svLegal .acc summary:focus-visible{outline:3px solid var(--marker-dark);outline-offset:-3px}
+#svLegal .acc details>div{padding:0 16px 6px}
+#svLegal .tabs{margin:0 0 16px}
+#svLegal .tab-bar{display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap}
+#svLegal .tab-bar button{min-height:40px;padding:0 16px;border:1.5px solid var(--cocoa);border-radius:12px;background:var(--paper);color:var(--cocoa);font:700 14px var(--font-body);cursor:pointer}
+#svLegal .tab-bar button[aria-selected="true"]{background:var(--cocoa);color:var(--paper)}
+#svLegal .tab-bar button:focus-visible{outline:3px solid var(--marker-dark);outline-offset:2px}
+#svLegal .pd:not(.js) .tab-bar{display:none}#svLegal .pd:not(.js) .tab-panel[hidden]{display:block}
+#svLegal .pd:not(.js) .tab-panel::before{content:attr(data-label);display:block;margin:0 0 6px;font-weight:800}
+#svLegal .table{margin:0 0 18px;overflow-x:auto;border:1.5px solid var(--line);border-radius:12px}
+#svLegal .table table{width:100%;border-collapse:collapse;font-size:14.5px}
+#svLegal .table th,#svLegal .table td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+#svLegal .table th{background:var(--paper-tint);color:var(--cocoa)}
+#svLegal .table tr:last-child td{border-bottom:0}
+#svLegal .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 18px}
+#svLegal .card{display:block;padding:16px;border:1.5px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none}
+#svLegal a.card:hover{border-color:var(--cocoa);background:var(--paper-tint)}
+#svLegal .card b{display:block;margin:0 0 4px;color:var(--cocoa)}
+#svLegal .card p{margin:0;color:var(--muted);font-size:14.5px}
+#svLegal .pn{display:flex;justify-content:space-between;gap:12px;margin:56px 0 0}
+#svLegal .pn a{display:block;max-width:48%;padding:12px 16px;border:1.5px solid var(--line);border-radius:14px;color:var(--cocoa);font-weight:700;text-decoration:none}
+#svLegal .pn a.next{margin-left:auto;text-align:right}
+#svLegal .pn small{display:block;color:var(--muted);font-weight:600;font-size:12px}
+#svLegal .doc :not(h1):focus-visible{outline:3px solid var(--marker-dark);outline-offset:2px}
+@media(max-width:900px){
+  #svLegal .pd{grid-template-columns:1fr;gap:20px;width:min(calc(100% - 40px),760px);padding-top:20px}
+  #svLegal .pd-side{position:static;max-height:none;overflow:visible;padding:0}
+  #svLegal .pd-toc{border:1.5px solid var(--line);border-radius:14px;padding:0 14px}
+  #svLegal .pd-toc>summary{display:block;padding:14px 0;color:var(--cocoa);font-weight:800;cursor:pointer}
+  #svLegal .pd-toc[open]{padding-bottom:14px}
+  #svLegal .cards{grid-template-columns:1fr}
+  #svLegal .doc .lead{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){#svLegal *{scroll-behavior:auto!important}}
