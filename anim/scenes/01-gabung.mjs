@@ -1,493 +1,725 @@
 // Mulai + Gabung dan pasang: peta perjalanan, checklist, istilah alamat, pasang ekstensi, masuk, bayar, Scalev, update.
-// Labels follow nikahkit/store/pasang/pasang.html, nikahkit/ext/pin.html + pin.js, nikahkit/src/ui/App.jsx (GATE) and
-// nikahkit/src/ui/help.jsx (UpdateBox). Numbers such as versions, ID halaman and emails are examples.
-import { C, W, browser, editor, rect, text, para, line, circle, button, card, ring, note, toast, dim, badge, input } from "../lib.mjs";
+// Measured re-creations: chrome://extensions from /tmp/ref/chrome-extensions.png (labels in Bahasa Indonesia), the
+// NikahKit account dialog from editor-akun.png and nikahkit/ext/pin.html + pin.js (layout: 440 or 760 wide, 16px
+// padding, cards 8px radius), the panel gate from nikahkit/src/ui/App.jsx (AccessGate, GATE texts), the update banner
+// from nikahkit/src/ui/help.jsx and editor-metrics.json. No extension version numbers anywhere: the banner and the ZIP
+// names keep their real place, with the number left out. Example data only (Rani & Dimas, Rina WO, 365671).
+import {
+  C, CHROME_TOP, ED, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, esc, nkBtn, nkInput, nkLabel,
+  nkSeg, nkHead, nkDialogHead, nkAcc, chrome, toggleCr, nkLogo, scalevEditor, scalevApp, svMenuAt, note, ring, favScalev, favChrome
+} from "../lib.mjs";
 
-const X = 40, Y = 24, BW = 880, BH = 500; // browser frame on the stage
-const TOP = Y + 76; // browser content top
-const STAGE_H = 536;
-const ID = "48213"; // contoh ID halaman Scalev
-const EDIT_URL = `app.scalev.com/pages/${ID}`;
-const VER = "0.7.60", NEW = "0.8.0";
+const CT = CHROME_TOP; // 85: content top inside the Chrome window
+const CHROME_WORLD = { w: 1440, h: 985 };
+const ED_WORLD = { w: 1440, h: 900 };
+const ID = "365671";
+const SLUG = "rani-dimas";
+const PAGE = "Undangan Rani & Dimas";
 const EMAIL = "rina.wo@gmail.com";
+const BIZ = "Rina Wedding Organizer (@rinawo)";
+const LIC_NONE = ["Belum berlangganan. Pilih paket untuk mulai", "membuat undangan."];
+const LIC_YEAR = ["Paket Tahunan, aktif sampai 14 Oktober 2027."];
+const MAROON = "#8a2d1f", SERIF = "Georgia,'Times New Roman',serif";
 
-// ---- Shared pieces -------------------------------------------------------------------------------------------------
-const screen = (...parts) => rect(0, 0, W, STAGE_H, { r: 0, fill: C.bg }) + parts.join("");
-const gBtn = (x, y, w = 230) => `${rect(x, y, w, 40, { r: 8, fill: C.paper, stroke: "#c4c7c5" })}${circle(x + 26, y + 20, 9, { fill: "#4285f4" })}${rect(x + 26, y + 17, 9, 6, { r: 1, fill: "#4285f4" })}${circle(x + 26, y + 20, 5, { fill: C.paper })}${text(x + 46, y + 25, "Masuk dengan Google", { size: 14, weight: 600 })}`;
-const small = (x, y, label, o = {}) => button(x, y, label, { h: 28, size: 13, ...o });
-const link = (x, y, label, o = {}) => text(x, y, label, { size: 13, fill: C.svDark, weight: 600, ...o });
+// ---- Small shared pieces --------------------------------------------------------------------------------------------
+// Mixed-weight text on one line: segs = [[text, weight?, fill?], ...].
+const rich = (x, y, segs, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.strong}">${segs.map(([s, w, f]) => `<tspan font-weight="${w ?? 400}"${f ? ` fill="${f}"` : ""}>${esc(s)}</tspan>`).join("")}</text>`;
+const fit = (x, y, s, svg) => group({ transform: `translate(${x} ${y}) scale(${s})` }, svg);
+// A world-space window onto real-size UI: shows the region (sx, sy) at scale s inside the box (x, y, w, h).
+const crop = (x, y, w, h, sx, sy, s, svg) => clipped(x, y, w, h, group({ transform: `translate(${x - sx * s} ${y - sy * s}) scale(${s})` }, svg));
+// Google's four-colour G (App.jsx GOOGLE_G), size px square at (x, y).
+const gLogo = (x, y, size = 20) => `<g transform="translate(${x} ${y}) scale(${size / 48})"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.570-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.360 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.920 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></g>`;
+// "Masuk dengan Google" (.nk-gbtn: 40 high, #747775 border, 14px 500). Returns [svg, width].
+const GBTN_W = 12 + 20 + 10 + tw("Masuk dengan Google", 14, 500) + 12;
+const gBtn = (x, y, o = {}) => group({ opacity: o.disabled ? 0.38 : 1 }, rect(x + 0.5, y + 0.5, GBTN_W - 1, 39, { r: 4, fill: C.white, stroke: "#747775" }) + gLogo(x + 12, y + 10) +
+  text(x + 42, y + 25, "Masuk dengan Google", { size: 14, weight: 500, fill: "#1f1f1f" }));
+const dimEd = (x, y) => rect(x, y, 1440, 900, { fill: "rgba(15,23,42,.45)" });
+const yesIc = (cx, cy) => circle(cx, cy, 7.5, { stroke: C.ok, sw: 1.7 }) + `<path d="M${cx - 3} ${cy} l2.2 2.2 l4 -4" fill="none" stroke="${C.ok}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`;
+const noIc = (cx, cy) => circle(cx, cy, 7.5, { stroke: C.off, sw: 1.7 }) + `<path d="M${cx - 2.6} ${cy - 2.6} l5.2 5.2 M${cx + 2.6} ${cy - 2.6} l-5.2 5.2" fill="none" stroke="${C.off}" stroke-width="1.7" stroke-linecap="round"/>`;
+const PIN_ICON = '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>';
+const pinIc = (cx, cy, size, color) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${PIN_ICON}</g>`;
+// Guide annotation card (guide colours, not part of any real screen).
+const guideCard = (x, y, w, title, lines, o = {}) => { const h = 46 + lines.length * 22; return rect(x + 2, y + 4, w, h, { r: 10, fill: "rgba(43,26,7,.12)" }) + rect(x, y, w, h, { r: 10, fill: C.tint, stroke: C.accent, sw: 1.5 }) +
+  text(x + 16, y + 26, title, { size: 13, weight: 700, fill: C.accent }) + lines.map((l, i) => (Array.isArray(l) ? rich(x + 16, y + 52 + i * 22, l, { size: o.size ?? 15, fill: C.cocoa }) : text(x + 16, y + 52 + i * 22, l, { size: o.size ?? 15, fill: C.cocoa, mono: o.mono }))).join(""); };
 
-// Scalev editor (HTML Mode) in a browser frame, optional overlay over the NikahKit panel area.
-const edFrame = (o = {}) => browser(X, Y, BW, BH, o.url ?? EDIT_URL, { tab: "Scalev · Landing Page" }) + editor(X, Y, BW, BH, o);
-const panelCover = () => rect(X + 1, TOP + 85, 458, BH - 162, { r: 0, fill: C.paper });
-// The NikahKit access gate (App.jsx AccessGate): title, hint, buttons.
-function gate(title, hint, o = {}) {
-  const y = TOP + 85;
-  let s = panelCover() + text(X + 20, y + 32, "NikahKit", { size: 18, weight: 700 }) + text(X + 20, y + 52, "/rina-dimas", { size: 12, fill: C.muted });
-  if (o.chip) s += rect(X + 340, y + 16, 92, 28, { r: 14, fill: o.chipWarn ? C.warnTint : C.soft }) + text(X + 386, y + 35, o.chip, { size: 12, anchor: "middle", weight: 600, fill: o.chipWarn ? C.warn : C.ink });
-  const lines = Array.isArray(hint) ? hint : hint ? [hint] : [];
-  const h = 40 + lines.length * 20;
-  s += rect(X + 20, y + 68, 420, h, { r: 8, fill: o.warn ? C.warnTint : C.soft });
-  s += text(X + 34, y + 94, title, { size: 14, weight: 700, fill: o.warn ? C.warn : C.ink });
-  if (lines.length) s += para(X + 34, y + 116, lines, { size: 13, fill: C.ink, lh: 20 });
-  return s + (o.extra ?? "");
+// ---- NikahKit account dialog (pin.html framed by src/pin-frame.js) ---------------------------------------------------
+// Opened from the gate or the account chip ("openLogin"): no ID, so no "ID" line and no PIN dashboard card.
+// Returns { svg, h, at } in world px with the dialog at (X, Y), 440 wide. at.* = button rects [x, y, w, h].
+function pinDlg(X, Y, o = {}) {
+  const st = o.state ?? "in", at = {};
+  let s = "", c = 64;
+  const card = (top, h) => rect(X + 16.5, top + 0.5, 407, h - 1, { r: 8, fill: C.white, stroke: C.line });
+  const btn = (x, y, label, variant, key) => { const w = tw(label, 14, 500) + 24; at[key] = [x, y, w, 36]; return [nkBtn(x, y, label, { variant, size: 14, w }), w]; };
+  if (st === "checking") { s += text(X + 16, Y + c + 16, "Memeriksa login...", { size: 12, fill: C.faint }); c += 20 + 12; }
+  if (st === "out") { s += card(Y + c, 74) + gBtn(X + 33, Y + c + 17, { disabled: o.gDisabled }); at.google = [X + 33, Y + c + 17, GBTN_W, 40]; c += 74 + 12; }
+  if (st === "in") {
+    s += text(X + 16, Y + c + 12, o.email ?? EMAIL, { size: 12, weight: 700, fill: C.faint }) + text(X + 424, Y + c + 12, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
+    c += 28;
+    // Paket
+    const lic = o.license ?? LIC_NONE, top = Y + c;
+    let L = top + 40 + 20 * lic.length, inner = text(X + 33, top + 28, "Paket", { size: 12, weight: 700 }) + para(X + 33, top + 55, lic, { size: 14, fill: o.licWarn ? C.warnStrong : C.text, lh: 20 });
+    const choose = o.choose === undefined ? "Pilih paket" : o.choose;
+    let bx = X + 33;
+    if (choose || o.paid) {
+      if (choose) { const [b, w] = btn(bx, L + 8, choose, "primary", "choose"); inner += b; bx += w + 8; }
+      if (o.paid) inner += btn(bx, L + 8, "Cek pembayaran", "quiet", "paid")[0];
+      L += 44;
+    } else L += 8;
+    if (o.redeem ?? !o.active) { inner += text(X + 33, L + 20, "Punya kode uji?", { size: 12, weight: 500, fill: C.strong, underline: true }); L += 24; }
+    s += card(top, L + 17 - top) + inner;
+    c = L + 17 - Y + 12;
+    // Bisnis Scalev
+    const biz = o.biz ? [o.biz] : ["Belum terhubung."], bt = Y + c;
+    const bL = bt + 40 + 20 * biz.length + 8;
+    s += card(bt, bL + 36 + 17 - bt) + text(X + 33, bt + 28, "Bisnis Scalev", { size: 12, weight: 700 }) + para(X + 33, bt + 55, biz, { size: 14, fill: C.text, lh: 20 }) +
+      btn(X + 33, bL, o.biz ? "Hubungkan ulang" : "Hubungkan bisnis Scalev", "quiet", "connect")[0];
+    c = bL + 36 + 17 - Y + 12;
+  }
+  const msg = o.msg === undefined ? (st === "in" ? ["Sudah masuk. Kembali ke editor Scalev."] : null) : o.msg;
+  if (msg) { const h = 20 + msg.length * 18; s += rect(X + 16, Y + c, 408, h, { r: 4, fill: o.msgWarn ? C.warnSoft : C.primarySoft }) + para(X + 28, Y + c + 23, msg, { size: 12, fill: o.msgWarn ? C.warnStrong : C.strong, lh: 18 }); c += h + 16; }
+  else c += 4;
+  const h = c;
+  const head = shadow(X, Y, 440, h, 8, 3) + rect(X, Y, 440, h, { r: 8, fill: C.white }) + nkLogo(X + 32, Y + 32, 32) + text(X + 58, Y + 38, "NikahKit", { size: 16, weight: 700 }) + iconX("x", X + 410, Y + 30, 18, C.text);
+  return { svg: head + s, h, at, X, Y };
 }
-const GY = TOP + 85; // gate panel top
+// Centre a 440-wide dialog over a 1440x900 viewport at (ex, ey).
+const dlgAt = (ex, ey, o) => { const probe = pinDlg(0, 0, o); return pinDlg(ex + 500, ey + Math.round((900 - probe.h) / 2), o); };
+const mid = (r) => [r[0] + r[2] / 2, r[1] + r[3] / 2];
 
-// NikahKit account dialog (pin.html framed over the editor by pin-frame.js).
-const DX = 260, DY = 36, DW = 440;
-function dlgHead(h) {
-  return dim() + card(DX, DY, DW, h, null) + rect(DX + 20, DY + 16, 32, 32, { r: 8, fill: C.accent }) + text(DX + 36, DY + 38, "N", { size: 16, weight: 700, fill: C.paper, anchor: "middle" }) +
-    text(DX + 62, DY + 30, "NikahKit", { size: 16, weight: 700 }) + text(DX + 62, DY + 47, `ID ${ID}`, { size: 12, fill: C.muted });
+// Wide dialog: "Pilih paket" comparison (pin.html #compare, body.wide = 760). Positions for rings and pointer.
+const PLAN_ROWS = [
+  [["Masa aktif"], ["30 hari"], ["1 tahun"], ["Selama layanan", "Nikahin berjalan"]],
+  [["Jumlah undangan"], ["Tanpa batas"], ["Tanpa batas"], ["Tanpa batas"]],
+  [["Editor NikahKit di Scalev"], 1, 1, 1],
+  [[[["Buku Tamu Digital", 700, C.strong], [": RSVP, ucapan,"]], "check-in QR. Tanpa kuota tamu", "dan event"], 1, 1, 1],
+  [["Akun staff penerima tamu (kode", "check-in, tanpa membagi PIN)"], 0, 1, 1],
+  [["Impor daftar tamu CSV (kategori,", "jumlah orang, WhatsApp)"], 0, 1, 1],
+  [["PIN dashboard dan tautan tamu"], 1, 1, 1],
+  [["Semua template yang tersedia", "saat ini"], 1, 1, 1],
+  [["Saat masa aktif habis"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tidak perlu", "perpanjang"]]
+];
+const PLANS = [["", "Bulanan", "Rp79.000", ["per 30 hari"], "ghost"], ["Paling hemat", "Tahunan", "Rp299.000", ["per tahun, setara", "Rp24.917/bulan"], "primary"], ["", "Sekali Bayar", "Rp699.000", ["sekali bayar, tanpa", "perpanjang"], "ghost"]];
+function planDlg(ex, ey) {
+  const X = ex + 340, Y = ey + 16, Wd = 760, H = 868; // 868 = max-height calc(100vh - 32px); the table scrolls a little
+  const tx = X + 16, tw0 = 728, fc = 247, pc = (tw0 - fc) / 3, col = (i) => tx + fc + i * pc;
+  const t0 = Y + 112;
+  let s = shadow(X, Y, Wd, H, 8, 3) + rect(X, Y, Wd, H, { r: 8, fill: C.white }) + nkLogo(X + 32, Y + 32, 32) + text(X + 58, Y + 38, "NikahKit", { size: 16, weight: 700 }) + iconX("x", X + Wd - 30, Y + 30, 18, C.text);
+  const back = [X + Wd - 16 - (tw("Kembali", 14, 500) + 24), Y + 64, tw("Kembali", 14, 500) + 24, 36];
+  s += text(X + 16, Y + 86, "Pilih paket", { size: 12, weight: 700 }) + nkBtn(back[0], back[1], "Kembali", { variant: "quiet", size: 14, w: back[2] });
+  // rows
+  const rowsH = PLAN_ROWS.map((r) => 24 + 20 * Math.max(...r.map((v) => (Array.isArray(v) ? v.length : 1))));
+  const head = 170, tH = head + rowsH.reduce((a, b) => a + b, 0);
+  let body = rect(col(1), t0, pc, tH, { fill: C.page });
+  const btns = [];
+  PLANS.forEach(([tag, name, price, per, v], i) => {
+    const x = col(i) + 12;
+    if (tag) body += rect(x, t0 + 12, tw(tag, 10, 600) + 12, 18, { r: 4, fill: C.primarySoft }) + text(x + 6, t0 + 25, tag, { size: 10, weight: 600, fill: C.action });
+    body += text(x, t0 + 49, name, { size: 14, weight: 700 }) + text(x, t0 + 75, price, { size: 16, weight: 700, fill: C.primary }) + para(x, t0 + 94, per, { size: 12, fill: C.faint, lh: 16 });
+    btns.push([x, t0 + 122, pc - 24, 36]);
+    body += nkBtn(x, t0 + 122, "Pilih", { variant: v, size: 14, w: pc - 24 });
+  });
+  const rowY = []; let y = t0 + head;
+  PLAN_ROWS.forEach((r, i) => {
+    rowY.push(y);
+    body += line(tx + 1, y, tx + tw0 - 1, y);
+    const th = r[0];
+    th.forEach((l, k) => (body += Array.isArray(l) ? rich(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text }) : text(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text })));
+    r.slice(1).forEach((v, j) => (body += v === 1 ? yesIc(col(j) + 21, y + 22) : v === 0 ? noIc(col(j) + 21, y + 22) : para(col(j) + 12, y + 27, v, { size: 14, weight: 500, fill: C.strong, lh: 20 })));
+    y += rowsH[i];
+  });
+  s += clipped(X, Y, Wd, H, rect(tx + 0.5, t0 + 0.5, tw0 - 1, tH - 1, { r: 8, fill: C.white, stroke: C.line }) + body +
+    text(tx, t0 + tH + 8 + 12, "Harga belum termasuk biaya layanan pembayaran Scalev. Perpanjang kapan saja: sisa masa aktif tetap terhitung.", { size: 12, fill: C.faint }));
+  return { svg: s, X, Y, col, pc, t0, rowY, rowsH, btns, back, foot: t0 + tH + 8, tx };
 }
-function dlgIn(o = {}) {
-  const box = (y, h) => rect(DX + 20, DY + y, DW - 40, h, { r: 8, fill: C.paper, stroke: C.line });
-  const msgs = o.msg ? [].concat(o.msg) : [], mh = 18 + msgs.length * 16;
-  let s = dlgHead(msgs.length ? 406 + mh : 400);
-  s += text(DX + 20, DY + 80, EMAIL, { size: 13, weight: 700 }) + link(DX + DW - 70, DY + 80, "Keluar");
-  // Paket
-  s += box(92, 108) + text(DX + 36, DY + 116, "Paket", { size: 14, weight: 700 }) + text(DX + 36, DY + 136, o.lic ?? "Belum berlangganan. Pilih paket untuk mulai membuat undangan.", { size: 12, fill: o.licWarn ? C.warn : C.ink });
-  let bx = DX + 36;
-  if (o.choose !== false) { s += small(bx, DY + 148, o.choose ?? "Pilih paket"); bx += (o.choose ?? "Pilih paket").length * 7.8 + 40; }
-  if (o.paid) s += small(bx, DY + 148, "Cek pembayaran", { variant: "ghost" });
-  if (o.redeem !== false) s += link(DX + 36, DY + 192, "Punya kode uji?", { size: 12 });
-  // PIN dashboard
-  s += box(210, 80) + text(DX + 36, DY + 234, "PIN dashboard", { size: 14, weight: 700 }) + text(DX + 36, DY + 252, "Undangan ini belum punya PIN.", { size: 12, fill: C.muted }) + small(DX + 36, DY + 258, "Buat PIN", { h: 26 });
-  // Bisnis Scalev
-  s += box(300, 80) + text(DX + 36, DY + 324, "Bisnis Scalev", { size: 14, weight: 700 }) + text(DX + 36, DY + 342, o.biz ?? "Belum terhubung.", { size: 12, fill: o.biz ? C.ink : C.muted }) +
-    small(DX + 36, DY + 348, o.connect ?? "Hubungkan bisnis Scalev", { variant: "ghost", h: 26 });
-  if (msgs.length) s += rect(DX + 20, DY + 392, DW - 40, mh, { r: 6, fill: o.msgWarn ? C.warnTint : C.okTint }) + para(DX + 32, DY + 413, msgs, { size: 12, fill: o.msgWarn ? C.warn : C.ok, weight: 600, lh: 16 });
+
+// ---- NikahKit panel states inside the Scalev editor at (ex, ey) -----------------------------------------------------
+// AccessGate (App.jsx): the whole NikahKit area (0..398), header NikahKit + /slug, chip, close; note; buttons.
+function gate(ex, ey, o) {
+  let s = rect(ex, ey + 92, 399, 808, { fill: C.white }) + line(ex + 399, ey + 92, ex + 399, ey + 900, { stroke: C.svDivider }) +
+    text(ex + 16, ey + 92 + 29, "NikahKit", { size: 16, weight: 700 }) + text(ex + 16, ey + 92 + 52, "/" + SLUG, { size: 12, fill: C.text }) +
+    line(ex, ey + 158.5, ex + 399, ey + 158.5, { stroke: C.line }) + iconX("x", ex + 369, ey + 125, 18, C.text);
+  if (o.chip) { const w = 6 + 16 + 4 + tw(o.chip, 12, 500) + 8, x = ex + 343 - w; s += rect(x + 0.5, ey + 111.5, w - 1, 27, { r: 14, fill: C.white, stroke: C.field }) + icon("circle-user-round", x + 14, ey + 125, 14, C.primary) + text(x + 26, ey + 129, o.chip, { size: 12, weight: 500 }); }
+  const nh = 20 + o.lines.length * 18, ny = ey + 175;
+  s += rect(ex + 16, ny, 367, nh, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + o.lines.map((l, i) => rich(ex + 28, ny + 23 + i * 18, l, { size: 12, fill: o.warn ? C.warnStrong : C.strong })).join("");
+  const by = ny + nh + 12, at = {};
+  let bx = ex + 16;
+  for (const [label, v, key] of o.btns ?? []) {
+    if (v === "google") { s += gBtn(bx, by); at[key] = [bx, by, GBTN_W, 40]; bx += GBTN_W + 8; continue; }
+    const w = tw(label, 12, 500) + 24; s += nkBtn(bx, by, label, { variant: v, w }); at[key] = [bx, by, w, 36]; bx += w + 8;
+  }
+  return { svg: s, at };
+}
+const GATE_OUT = (ex, ey) => gate(ex, ey, { lines: [[["Masuk ke NikahKit.", 700]]], btns: [["Masuk dengan Google", "google", "google"]] });
+const GATE_NONE = (ex, ey) => gate(ex, ey, { chip: "Akun", lines: [[["Akun belum berlangganan.", 700]]], btns: [["Pilih paket", "primary", "choose"], ["Periksa lagi", "quiet", "recheck"]] });
+const GATE_BIZ = (ex, ey) => gate(ex, ey, { chip: "Tahunan", warn: true, lines: [[["Hubungkan bisnis Scalev dulu.", 700], [" Hubungkan di akun"]], [["NikahKit, lalu tekan Periksa lagi."]]], btns: [["Hubungkan bisnis Scalev", "primary", "connect"], ["Periksa lagi", "quiet", "recheck"]] });
+
+// Template panel (editor-template.png): rail, header with chip, optional update banner, Template/Marketing, cards.
+const TPL = [["Dasar", "#3d3a38"], ["Folio", "#2a2d33"], ["Galeri Putih", "#f4f1ec"], ["Modern Estetik", "#efe9e2"]];
+function thumb(x, y, dark) {
+  const fg = dark === "#f4f1ec" || dark === "#efe9e2" ? "#7a6a5c" : "#e8e2da";
+  return rect(x + 0.5, y + 0.5, 133, 166, { r: 4, fill: C.page, stroke: C.line, sw: 2 }) + rect(x + 5, y + 5, 72, 157, { r: 2, fill: dark }) +
+    text(x + 41, y + 70, "Rani & Dimas", { size: 7, fill: fg, anchor: "middle", font: SERIF }) + rect(x + 26, y + 104, 30, 6, { r: 3, fill: fg }) +
+    [0, 1, 2, 3, 4, 5, 6, 7].map((k) => rect(x + 83 + (k % 2) * 23, y + 6 + Math.floor(k / 2) * 39, 20, 35, { r: 1, fill: k % 3 ? "#ffffff" : "#ded6cc" })).join("");
+}
+function templatePanel(ex, ey, o = {}) {
+  let s = rect(ex + 72, ey + 92, 327, 808, { fill: C.white }) + nkHead(ex, ey, "Template", { account: o.chip ?? "Tahunan" }) + line(ex + 72, ey + 153.5, ex + 399, ey + 153.5, { stroke: C.line });
+  let y = ey + 169;
+  if (o.banner) y += 112 + (o.hint ? 36 : 0);
+  s += nkSeg(ex + 88, y, 279, ["Template", "Marketing"], 0);
+  TPL.forEach(([n, bg], i) => {
+    const x = ex + 88 + (i % 2) * 146, cy = y + 50 + Math.floor(i / 2) * 241;
+    if (cy + 230 > ey + 900) return;
+    s += thumb(x, cy, bg) + text(x, cy + 188, n, { size: 14, weight: 500 }) + para(x, cy + 209, ["20 bagian · HP &", "desktop · ID/EN"], { size: 12, fill: C.faint, lh: 16 });
+  });
+  return clipped(ex, ey + 92, 399, 808, s);
+}
+// Update banner (help.jsx UpdateBox, nk-note--warn at 88,169 279 wide). Version numbers are left out on purpose.
+function updateBanner(ex, ey, o = {}) {
+  const x = ex + 88, y = ey + 169, h = 100 + (o.hint ? 36 : 0);
+  const bar = (bx, by, w) => rect(bx, by - 9, w, 11, { r: 3, fill: "rgba(154,52,18,.22)" });
+  const w1 = tw("NikahKit ", 12, 700);
+  let s = rect(x, y, 279, h, { r: 4, fill: C.warnSoft }) + text(x + 12, y + 23, "NikahKit", { size: 12, weight: 700, fill: C.warnStrong }) + bar(x + 12 + w1, y + 23, 34) +
+    text(x + 12 + w1 + 40, y + 23, "tersedia.", { size: 12, weight: 700, fill: C.warnStrong }) + text(x + 12 + w1 + 40 + tw("tersedia. ", 12, 700), y + 23, "Anda memakai", { size: 12, fill: C.warnStrong }) +
+    bar(x + 12, y + 41, 34) + text(x + 48, y + 41, ".", { size: 12, fill: C.warnStrong });
+  s += nkBtn(x + 12, y + 54, "Update", { icon: "download", w: 86 }) + nkBtn(x + 106, y + 54, "Cara update", { variant: "quiet", w: 91 });
+  if (o.hint) s += para(x + 12, y + 110, ["Ekstrak ZIP, timpa isi folder NikahKit, lalu", "klik ↻ di chrome://extensions."], { size: 12, fill: C.faint, lh: 16 });
+  return s;
+}
+const UPDATE_BTN = [88 + 12 + 43, 169 + 54 + 18];
+
+// Invitation cover in the plain preview screen (template look from editor-template.png).
+function cover(ex, ey, name = "Tamu Undangan") {
+  const { x, y, w } = ED.screen, X = ex + x, Y = ey + y, cx = X + w / 2;
+  return coverAt(X, Y, cx, name);
+}
+function coverAt(X, Y, cx, name) {
+  const wave = (yy, flip) => `<path d="M${X} ${yy} h390 v${flip ? -24 : 24} ${Array.from({ length: 8 }, (_, i) => `q-${24.4} ${flip ? -16 : 16} -48.75 0`).join(" ")} z" fill="${MAROON}"/>`;
+  return rect(X, Y, 390, 784, { fill: "#fdf6ee" }) + rect(X, Y, 390, 22, { fill: MAROON }) + wave(Y + 22, false) +
+    `<path d="M${cx - 70} ${Y + 294} v-120 a70 70 0 0 1 140 0 v120 z" fill="#c9b8a6" stroke="${MAROON}" stroke-width="2"/>` +
+    `<path d="M${cx - 68} ${Y + 292} l40 -60 l25 30 l30 -45 l41 75 z" fill="#a8927e"/>` + circle(cx + 30, Y + 160, 12, { fill: "#e9dccd" }) +
+    text(cx, Y + 326, "The Wedding Of", { size: 17, fill: "#2b1a07", anchor: "middle", font: SERIF }) +
+    text(cx, Y + 398, "Rani & Dimas", { size: 44, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
+    text(cx, Y + 450, "Minggu, 14 Februari 2027", { size: 15, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
+    text(cx, Y + 471, "#RaniDimas", { size: 13, fill: "#3a3a3a", anchor: "middle", font: SERIF }) +
+    text(cx, Y + 506, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
+    coverName(cx, Y, name) +
+    rect(cx - 86, Y + 567, 172, 48, { r: 24, fill: MAROON }) + icon("mail", cx - 58, Y + 591, 16, C.white) + text(cx + 12, Y + 596, "Buka Undangan", { size: 15, fill: C.white, anchor: "middle", font: SERIF }) +
+    `<path d="M${X} ${Y + 784} v-24 ${Array.from({ length: 8 }, () => "q24.4 -16 48.75 0").join(" ")} v24 z" fill="${MAROON}"/>`;
+}
+const coverName = (cx, Y, name) => rect(cx - 120, Y + 512, 240, 30, { fill: "#fdf6ee" }) + text(cx, Y + 535, name, { size: 18, fill: MAROON, anchor: "middle", font: SERIF });
+
+// ---- chrome://extensions (measured from /tmp/ref/chrome-extensions.png, labels in Bahasa Indonesia) ------------------
+const DEV_BTNS = ["Muat yang belum dibuka", "Kemas ekstensi", "Perbarui"];
+const devBtnRects = (x, y) => { let bx = x + 24; return DEV_BTNS.map((l) => { const w = tw(l, 13, 500) + 34, r = [bx, y + 66, w, 36]; bx += w + 19; return r; }); };
+function extPage(x, y, o = {}) {
+  const dy = o.dev ? 0 : -57;
+  let s = rect(x, y, 1440, 900, { fill: C.white }) + iconX("puzzle", x + 33, y + 28, 22, "#8e918f") + text(x + 67, y + 37, "Ekstensi", { size: 22, fill: C.crText }) +
+    rect(x + 374, y + 10, 692, 36, { r: 18, fill: C.crOmni }) + iconX("search", x + 394, y + 28, 16, C.crIcon) + text(x + 410, y + 33, "Telusuri ekstensi", { size: 13, fill: C.crSub }) +
+    text(x + 1386, y + 33, "Mode developer", { size: 13, fill: C.crText, anchor: "end" }) + toggleCr(x + 1397, y + 19, !!o.dev);
+  if (o.dev) devBtnRects(x, y).forEach(([bx, by, w, h], i) => (s += rect(bx + 0.5, by + 0.5, w - 1, h - 1, { r: 18, fill: C.white, stroke: "#a8b4c4" }) + text(bx + w / 2, by + 23, DEV_BTNS[i], { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" })));
+  s += line(x, y + 113.5 + dy, x + 1440, y + 113.5 + dy, { stroke: "#e3e3e3" }) +
+    `<path d="M${x} ${y + 122 + dy} h234 a20 20 0 0 1 0 40 h-234 z" fill="${C.crBlueSoft}"/>` + iconX("puzzle", x + 34, y + 142 + dy, 17, C.crBlue) + text(x + 64, y + 147 + dy, "Ekstensi saya", { size: 14, weight: 500, fill: C.crBlue }) +
+    rect(x + 26, y + 176 + dy, 16, 11, { r: 2, stroke: C.crIcon, sw: 1.5 }) + text(x + 64, y + 187 + dy, "Pintasan keyboard", { size: 14, weight: 500, fill: C.crText }) +
+    line(x, y + 210.5 + dy, x + 256, y + 210.5 + dy, { stroke: "#e3e3e3" });
+  if (o.card) s += text(x + 384, y + 182, "Semua Ekstensi", { size: 16, fill: C.crText }) + extCardR(x + 384, y + 203);
+  return s;
+}
+const EXT_CARD = { x: 384, y: 203 };
+const extCardR = (x, y) => shadow(x, y, 400, 208, 8, 1) + rect(x + 0.5, y + 0.5, 399, 207, { r: 8, fill: C.white, stroke: "#e3e3e3" }) + nkLogo(x + 43, y + 40, 34) +
+  text(x + 92, y + 31, "NikahKit", { size: 13, weight: 500, fill: C.crText }) +
+  para(x + 92, y + 55, ["Buat undangan pernikahan digital di Scalev", "HTML Mode: pilih template, warna, font, musik,", "dan isi data."], { size: 13, fill: C.crSub, lh: 20 }) +
+  text(x + 92, y + 119, "ID: ibljeopjjcapnmcclgcggefhgnolmmeb", { size: 13, fill: C.crSub }) +
+  pillCr(x + 8, y + 166, "Detail") + pillCr(x + 8 + tw("Detail", 13, 500) + 34 + 8, y + 166, "Hapus") + iconX("rotate-cw", x + 325, y + 184, 16, C.crIcon) + toggleCr(x + 353, y + 175, true);
+const pillCr = (x, y, l) => { const w = tw(l, 13, 500) + 34; return rect(x + 0.5, y + 0.5, w - 1, 35, { r: 18, fill: C.white, stroke: "#a8b4c4" }) + text(x + w / 2, y + 23, l, { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" }); };
+const RELOAD = [EXT_CARD.x + 325, CT + EXT_CARD.y + 184];
+
+// Chrome top (tab strip + toolbar) only, to switch tabs or the address without redrawing the page.
+const crTop = (o) => clipped(0, 0, 1440, CT, chrome(0, 0, 1440, CT + 10, o));
+// Omnibox text overlay (new address in the same tab).
+const omni = (url) => rect(124, 46, 1184, 34, { r: 17, fill: C.crOmni }) + iconX("search", 146, 63, 15, C.crIcon) + text(166, 68, url, { size: 14, fill: C.crText });
+
+// ---- Desktop windows (generic: Windows Explorer and the folder picker) ----------------------------------------------
+function explorer(x, y, w, h, o = {}) {
+  let s = rect(x + 4, y + 10, w, h, { r: 10, fill: "rgba(0,0,0,.14)" }) + rect(x, y, w, h, { r: 8, fill: C.white, stroke: "#cfd3d8" }) +
+    rect(x, y, w, 36, { r: 8, fill: "#f3f3f3" }) + rect(x, y + 28, w, 8, { fill: "#f3f3f3" }) + iconX("folder", x + 22, y + 18, 15, "#e5a531") +
+    text(x + 38, y + 23, o.title, { size: 12, fill: "#1f1f1f" }) + text(x + w - 120, y + 23, "—", { size: 12, fill: "#444" }) + rect(x + w - 76, y + 13, 10, 10, { stroke: "#444" }) + iconX("x", x + w - 24, y + 18, 13, "#444") +
+    rect(x, y + 36, w, 44, { fill: "#f9f9f9" }) + iconX("arrow-left", x + 22, y + 58, 15, "#666") + iconX("arrow-right", x + 50, y + 58, 15, "#bbb") +
+    rect(x + 72, y + 44, w - 92, 28, { r: 4, fill: C.white, stroke: "#dcdcdc" }) + text(x + 84, y + 63, o.path, { size: 13, fill: "#1f1f1f" }) + line(x, y + 80.5, x + w, y + 80.5, { stroke: "#e5e5e5" }) +
+    rect(x, y + 81, 180, h - 82, { fill: "#fafafa" }) + line(x + 180.5, y + 81, x + 180.5, y + h, { stroke: "#e5e5e5" });
+  ["Desktop", "Dokumen", "Unduhan"].forEach((n, i) => (s += (n === o.side ? rect(x + 8, y + 94 + i * 32, 164, 28, { r: 4, fill: "#e5eefb" }) : "") + iconX("folder", x + 26, y + 108 + i * 32, 15, n === o.side ? "#e5a531" : "#c49a3a") + text(x + 44, y + 113 + i * 32, n, { size: 13, fill: "#1f1f1f" })));
+  return s;
+}
+const zipIcon = (x, y, label, sel) => (sel ? rect(x - 22, y - 8, 108, 112, { r: 4, fill: "#cce4f7", stroke: "#99c9ef" }) : "") + rect(x, y, 64, 72, { r: 6, fill: "#e8eaed", stroke: "#c4c7c5" }) +
+  [0, 1, 2, 3, 4].map((i) => rect(x + 26, y + i * 8, 12, 4, { fill: "#9aa0a6" })).join("") + rect(x + 24, y + 40, 16, 12, { r: 2, stroke: "#9aa0a6", sw: 1.5 }) + text(x + 32, y + 92, label, { size: 12, fill: "#1f1f1f", anchor: "middle" });
+const folderIcon = (x, y, label, sel) => (sel ? rect(x - 22, y - 8, 108, 112, { r: 4, fill: "#cce4f7", stroke: "#99c9ef" }) : "") + rect(x, y + 4, 64, 58, { r: 6, fill: "#e5a531" }) + rect(x, y, 28, 14, { r: 4, fill: "#e5a531" }) + rect(x, y + 16, 64, 46, { r: 6, fill: "#f2b84b" }) +
+  text(x + 32, y + 82, label, { size: 12, fill: "#1f1f1f", anchor: "middle", weight: label === "NikahKit" ? 600 : undefined });
+const fileIcon = (x, y, label, sel) => (sel ? rect(x - 22, y - 8, 108, 112, { r: 4, fill: "#cce4f7", stroke: "#99c9ef" }) : "") + `<path d="M${x + 12} ${y} h28 l14 14 v54 h-42 z" fill="#ffffff" stroke="#9aa0a6" stroke-width="1.5"/>` +
+  `<path d="M${x + 40} ${y} v14 h14" fill="none" stroke="#9aa0a6" stroke-width="1.5"/>` + [24, 32, 40, 48].map((d) => rect(x + 20, y + d, 26, 2, { fill: "#c4c7c5" })).join("") + text(x + 32, y + 88, label, { size: 12, fill: "#1f1f1f", anchor: "middle" });
+const NK_FILES = ["manifest.json", "nk-bg.js", "pin.html", "nk-bridge.js"];
+
+// ---- Scalev Landing Pages list (scalev-pages.png), content right of the lib sidebar --------------------------------
+const LP_ROWS = [[PAGE, "/" + SLUG], ["Promo Rina WO", "/promo"], ["Contoh Undangan", "/contoh"]];
+function lpList(x, y) {
+  let s = text(x + 280, y + 35, "Landing Pages", { size: 18, weight: 700, fill: C.ink }) + line(x + 280, y + 58.5, x + 1400, y + 58.5, { stroke: C.svDivider }) +
+    rect(x + 280, y + 78, 173, 40, { r: 4, fill: "#2f8fcf" }) + text(x + 366, y + 103, "+ Create Landing Page", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
+    rect(x + 280, y + 244, 1120, 656, { r: 6, fill: C.white, stroke: "#e6e8ec" }) + line(x + 520.5, y + 244, x + 520.5, y + 900, { stroke: "#e6e8ec" }) +
+    text(x + 297, y + 275, "Folders", { size: 14, weight: 600, fill: C.ink }) + rect(x + 297, y + 328, 207, 36, { r: 4, fill: "#eef6fc" }) + text(x + 335, y + 351, "All Landing Pages", { size: 14, weight: 500, fill: C.primary }) +
+    text(x + 537, y + 273, "All Landing Pages", { size: 14, weight: 600, fill: C.ink }) + rect(x + 521, y + 293, 879, 38, { fill: "#f5f6f8" });
+  [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].forEach(([l, tx]) => (s += text(x + tx, y + 317, l, { size: 12, fill: "#5b6675" })));
+  LP_ROWS.forEach(([n, sl], i) => {
+    const ry = y + 367 + i * 71;
+    s += rect(x + 538, ry - 7, 14, 14, { r: 3, stroke: "#9aa0a6", sw: 1.5 }) + text(x + 585, ry + 5, n, { size: 14, weight: 500, fill: C.primary }) +
+      rect(x + 787, ry - 13, 92, 26, { r: 4, fill: "#f5f6f8" }) + text(x + 812, ry + 4, "Ungrouped", { size: 12, fill: "#5b6675" }) + text(x + 925, ry + 5, sl, { size: 14, fill: C.primary }) +
+      rect(x + 1125, ry - 14, 83, 28, { r: 4, fill: "#e6f4fb" }) + text(x + 1166, ry + 4, "HTML Mode", { size: 12, weight: 600, fill: "#1f86c2", anchor: "middle" }) + text(x + 1245, ry + 5, "-", { size: 14, fill: "#5b6675" }) +
+      text(x + 1371, ry + 4, "•••", { size: 14, weight: 700, fill: "#3b4350", anchor: "middle" }) + line(x + 521, ry + 35.5, x + 1400, ry + 35.5, { stroke: "#eef0f3" });
+  });
   return s;
 }
 
-// Chrome extensions page.
-function extPage(o = {}) {
-  let s = browser(X, Y, BW, BH, "chrome://extensions", { tab: "Extensions" }) + text(X + 24, TOP + 36, "Extensions", { size: 20, weight: 500 }) +
-    text(X + BW - 200, TOP + 36, "Developer mode", { size: 13, fill: C.muted }) + line(X, TOP + 56, X + BW, TOP + 56);
-  s += o.dev === false ? toggle(X + BW - 70, TOP + 22, false) : toggle(X + BW - 70, TOP + 22, true);
-  if (o.dev !== false) s += devbar();
-  if (o.card) s += extCard(o.card === "new" ? NEW : VER);
-  return s;
-}
-const toggle = (x, y, on) => rect(x, y, 40, 20, { r: 10, fill: on ? "#1a73e8" : "#bdc1c6" }) + circle(on ? x + 30 : x + 10, y + 10, 8, { fill: C.paper });
-const devbar = () => button(X + 24, TOP + 68, "Load unpacked", { variant: "ghost", color: "#1a73e8", w: 136, h: 30, size: 13 }) +
-  button(X + 172, TOP + 68, "Pack extension", { variant: "ghost", color: "#1a73e8", w: 136, h: 30, size: 13 }) +
-  button(X + 320, TOP + 68, "Update", { variant: "ghost", color: "#1a73e8", w: 84, h: 30, size: 13 }) + line(X, TOP + 110, X + BW, TOP + 110);
-const CARD = { x: X + 24, y: TOP + 130 };
-function extCard(ver) {
-  const { x, y } = CARD;
-  return card(x, y, 420, 150, null, { shadow: false }) + rect(x + 18, y + 18, 40, 40, { r: 8, fill: C.accent }) + text(x + 38, y + 44, "N", { size: 18, weight: 700, fill: C.paper, anchor: "middle" }) +
-    text(x + 72, y + 34, `NikahKit ${ver}`, { size: 15, weight: 600 }) +
-    para(x + 72, y + 56, ["Buat undangan pernikahan digital di Scalev", "HTML Mode: pilih template, warna, font, musik…"], { size: 12, fill: C.muted, lh: 17 }) +
-    text(x + 72, y + 98, "ID: ibljeopjjcapnmcclgcggefhgnolmmeb", { size: 11, fill: C.muted }) +
-    button(x + 18, y + 112, "Details", { variant: "ghost", color: "#1a73e8", w: 76, h: 26, size: 12 }) + button(x + 104, y + 112, "Remove", { variant: "ghost", color: "#1a73e8", w: 76, h: 26, size: 12 }) +
-    text(x + 340, y + 131, "↻", { size: 20, fill: C.muted, anchor: "middle" }) + toggle(x + 362, y + 115, true);
-}
-const RELOAD = [CARD.x + 340, CARD.y + 125];
-
-// File window (Unduhan / Dokumen) with icons.
-const zipIcon = (x, y, label) => rect(x, y, 56, 66, { r: 6, fill: "#e8eaed", stroke: "#c4c7c5" }) + rect(x + 24, y, 8, 40, { r: 0, fill: "#9aa0a6" }) +
-  [0, 1, 2, 3, 4].map((i) => rect(x + 24, y + 4 + i * 8, 8, 3, { r: 0, fill: "#e8eaed" })).join("") + text(x + 28, y + 86, label, { size: 12, anchor: "middle" });
-const folderIcon = (x, y, label, o = {}) => rect(x, y + 6, 64, 52, { r: 6, fill: "#e5a531" }) + rect(x, y, 26, 12, { r: 3, fill: "#e5a531" }) + rect(x, y + 14, 64, 44, { r: 6, fill: "#f2b84b" }) +
-  text(x + 32, y + 78, label, { size: 12, anchor: "middle", weight: o.bold ? 700 : undefined });
-function fileWin(x, y, w, h, title, side = "Unduhan") {
-  return rect(x + 3, y + 6, w, h, { r: 12, fill: "rgba(0,0,0,.12)" }) + rect(x, y, w, h, { r: 12, fill: C.paper, stroke: C.line }) + rect(x, y, w, 38, { r: 12, fill: "#f3f3f3" }) + rect(x, y + 26, w, 12, { r: 0, fill: "#f3f3f3" }) +
-    circle(x + 18, y + 19, 5, { fill: "#d0d0d0" }) + circle(x + 34, y + 19, 5, { fill: "#d0d0d0" }) + circle(x + 50, y + 19, 5, { fill: "#d0d0d0" }) + text(x + 70, y + 24, title, { size: 13, weight: 600, fill: "#444" }) +
-    rect(x, y + 38, 130, h - 38, { r: 0, fill: "#f8f8f8" }) + ["Desktop", "Dokumen", "Unduhan"].map((n, i) => (n === side ? rect(x + 6, y + 50 + i * 30, 118, 26, { r: 5, fill: "#e4e4e4" }) : "") + text(x + 18, y + 68 + i * 30, n, { size: 13, fill: n === side ? C.ink : C.muted, weight: n === side ? 600 : undefined })).join("") +
-    line(x + 130, y + 38, x + 130, y + h);
-}
-
-// ---- Scenes --------------------------------------------------------------------------------------------------------
+// ---- Scenes ---------------------------------------------------------------------------------------------------------
 export const scenes = {
-  // Overview for the home page: the whole member journey in seven steps.
+  // Home page overview: eight stops, each with a real-proportion glimpse of the screen involved.
   "mulai-peta-perjalanan": (() => {
-    const N = [
-      ["Gabung", "pilih paket, bayar"], ["Pasang", "ekstensi di Chrome"], ["Scalev", "hubungkan bisnis"], ["Buat undangan", "template + Konten"],
-      ["Serahkan", "PIN ke pasangan"], ["Tamu", "tautan, RSVP, ucapan"], ["Hari-H", "check-in tamu"], ["Jualan", "landing page, pesanan"]
+    const TW = 420, TH = 330, xs = [50, 520, 990, 1460], tiles = [];
+    for (let i = 0; i < 8; i++) tiles.push(i < 4 ? [xs[i], 178] : [xs[7 - i], 670]);
+    const N = [["Gabung", "pilih paket, bayar"], ["Pasang", "ekstensi di Chrome"], ["Scalev", "hubungkan bisnis"], ["Buat undangan", "template dan Konten"],
+      ["Serahkan", "tautan, Dashboard, PIN"], ["Tamu", "tautan pribadi, RSVP"], ["Hari-H", "check-in tamu"], ["Jualan", "landing page, pesanan"]];
+    // Contents at real size, fitted into the tile body (x+10, y+10, 400 x 310).
+    const body = [
+      () => { const d = pinDlg(0, 0, { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true, biz: BIZ, msg: null }); return [d.svg, 440, d.h]; },
+      () => [extCardR(0, 0), 400, 208],
+      () => [lpRowCard(), 420, 300],
+      () => [scalevEditor(0, 0, { tab: "NikahKit", rail: "Template" }) + templatePanel(0, 0) + cover(0, 0), 1440, 900],
+      () => [pinCard(0, 0), 408, 214],
+      () => [coverAt(0, 0, 195, "Andi"), 390, 784],
+      () => [scanScreen(0, 0), 390, 844],
+      () => [nkDialogHead(0, -92, "Pesanan masuk") + text(16, 84, "Belum ada pesanan masuk.", { size: 12, fill: C.faint }) + nkAcc(16, 93, 367, "Tempel data pesanan") + nkAcc(16, 151, 367, "Link form klien (opsional)"), 399, 230]
     ];
-    const pos = N.map((_, i) => [130 + (i % 4) * 233, i < 4 ? 92 : 232]);
-    const node = (i, on) => { const [x, y] = pos[i]; return circle(x, y, 28, { fill: on ? C.accent : C.paper, stroke: on ? C.accent : C.line, sw: 2 }) + text(x, y + 6, String(i + 1), { size: 18, weight: 700, anchor: "middle", fill: on ? C.paper : C.muted }) + text(x, y + 50, N[i][0], { size: 15, weight: 700, anchor: "middle", fill: on ? C.cocoa : C.ink }) + text(x, y + 68, N[i][1], { size: 12, anchor: "middle", fill: C.muted }); };
-    const base = [text(40, 40, "Perjalanan member NikahKit", { size: 20, weight: 700, fill: C.cocoa })];
-    for (let i = 0; i < 3; i++) base.push(line(pos[i][0] + 30, pos[i][1], pos[i + 1][0] - 30, pos[i + 1][1], { stroke: C.line, sw: 3 }));
-    base.push(`<path d="M${pos[3][0]} ${pos[3][1] + 76} C ${pos[3][0]} 190, ${pos[4][0]} 150, ${pos[4][0]} ${pos[4][1] - 30}" fill="none" stroke="${C.line}" stroke-width="3" stroke-dasharray="6 6"/>`);
-    for (let i = 4; i < 7; i++) base.push(line(pos[i][0] + 30, pos[i][1], pos[i + 1][0] - 30, pos[i + 1][1], { stroke: C.line, sw: 3 }));
-    N.forEach((_, i) => base.push(node(i, false)));
+    const base = [rect(0, 0, 1920, 1072, { fill: "#f7f3ef" }), text(50, 80, "Perjalanan member NikahKit", { size: 34, weight: 700, fill: C.cocoa }),
+      text(50, 112, "Dari gabung sampai jualan, delapan titik.", { size: 18, fill: "#6f675f" })];
+    // snake connectors
+    for (let i = 0; i < 3; i++) base.push(line(tiles[i][0] + TW, 343, tiles[i + 1][0], 343, { stroke: "#d2bbad", sw: 4 }));
+    base.push(line(1670, 508, 1670, 620, { stroke: "#d2bbad", sw: 4 }));
+    for (let i = 4; i < 7; i++) base.push(line(tiles[i + 1][0] + TW, 835, tiles[i][0], 835, { stroke: "#d2bbad", sw: 4 }));
     const els = {};
-    N.forEach((_, i) => (els["on" + i] = node(i, true)));
-    // Detail panel (y 330..520)
-    const P = (title, body) => rect(40, 330, 880, 190, { r: 12, fill: C.paper, stroke: C.line }) + text(64, 362, title, { size: 16, weight: 700, fill: C.cocoa }) + body;
-    els.d1 = P("Kamu (member) gabung dan memasang NikahKit", extCardMini(64, 380) +
-      rect(520, 380, 360, 120, { r: 10, fill: C.bg, stroke: C.line }) + text(540, 410, "Paket", { size: 14, weight: 700 }) + text(540, 434, "Bulanan · Tahunan · Sekali Bayar", { size: 13, fill: C.muted }) + small(540, 450, "Pilih paket"));
-    els.d2 = P("Hubungkan bisnis Scalev, lalu buat halaman HTML Mode", rect(64, 380, 400, 120, { r: 10, fill: C.bg, stroke: C.line }) + text(84, 410, "Bisnis Scalev", { size: 14, weight: 700 }) + text(84, 432, "Rina Wedding Organizer (@rinawo)", { size: 13 }) + small(84, 448, "Hubungkan ulang", { variant: "ghost" }) +
-      rect(500, 380, 380, 120, { r: 10, fill: C.bg, stroke: C.line }) + ["Code", "Media", "Security", "Settings", "NikahKit"].map((t, i) => text(520 + i * 70, 420, t, { size: 13, weight: t === "NikahKit" ? 700 : 500, fill: t === "NikahKit" ? C.svDark : C.muted })).join("") + rect(800, 428, 60, 4, { r: 2, fill: C.sv }) + text(520, 470, "Landing Page Studio · HTML Mode", { size: 13, fill: C.muted }));
-    els.d3 = P("Pilih template dan isi Konten di panel NikahKit", ["Template", "Gaya", "Audio", "Media", "Lapisan", "Konten"].map((t, i) => rect(64 + i * 92, 384, 84, 34, { r: 8, fill: i === 5 ? C.svTint : C.bg, stroke: C.line }) + text(106 + i * 92, 406, t, { size: 13, anchor: "middle", weight: 600, fill: i === 5 ? C.svDark : C.ink })).join("") +
-      input(64, 448, 260, "", "Rina & Dimas") + input(340, 448, 200, "", "Sabtu, 12 Desember") + phoneMini(760, 372));
-    els.d4 = P("Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN", waBubble(64, 380, ["Undangan siap: https://domainmu.com/rina-dimas", "Kelola undangan (kirim ke tamu, RSVP, ucapan,", "check-in): https://domainmu.com/dashboard?w=…", "PIN: 4 8 2 1 9 0"]));
-    els.d5 = P("Pasangan mengirim tautan pribadi, tamu membuka dan mengisi RSVP", phoneMini(80, 372, "Kepada Andi") + text(200, 410, "Tautan pribadi: …/rina-dimas?to=Andi", { size: 14, weight: 600 }) + text(200, 436, "Nama tamu tampil di sampul undangan.", { size: 13, fill: C.muted }) + badge(200, 456, "Hadir · 2 orang", { fill: C.okTint, fg: C.ok }) + badge(320, 456, "Ucapan masuk", {}));
-    els.d6 = P("Hari-H: pasangan atau staff penerima tamu mencatat kedatangan", phoneMini(80, 372, "Check-in") + text(200, 410, "Masuk dengan PIN dashboard, atau kode staff", { size: 14, weight: 600 }) + text(200, 436, "Kode staff: paket Tahunan dan Sekali Bayar.", { size: 13, fill: C.muted }) + badge(200, 456, "Andi sudah datang", { fill: C.okTint, fg: C.ok }));
-    els.d7 = P("Jualan: landing page milikmu, pesanan klien masuk ke NikahKit", rect(64, 380, 400, 120, { r: 10, fill: C.bg, stroke: C.line }) + text(84, 410, "Landing page", { size: 14, weight: 700 }) + text(84, 432, "Paket dan harga, lalu form pesanan.", { size: 13, fill: C.muted }) +
-      rect(500, 380, 380, 120, { r: 10, fill: C.bg, stroke: C.line }) + text(520, 410, "Pesanan masuk", { size: 14, weight: 700 }) + text(520, 436, "Sari & Bayu", { size: 13 }) + badge(620, 422, "Baru", { fill: C.warnTint, fg: C.warn }) + text(520, 462, "Klik nama untuk mengisi semua kolom.", { size: 12, fill: C.muted }));
-    // lib.mjs uses d0.. for progress dots: move the detail panels to p1..p7.
-    for (let i = 1; i <= 7; i++) { els["p" + i] = els["d" + i]; delete els["d" + i]; }
-    const ids = ["p1", "p2", "p3", "p4", "p5", "p6", "p7"];
-    const step = (k, caption, on) => ({ caption, show: [ids[k], ...on.map((i) => "on" + i)], hide: k ? [ids[k - 1]] : [], dur: 3.4 });
+    N.forEach(([t, sub], i) => {
+      const [x, y] = tiles[i], [svg, w, h] = body[i](), s = Math.min(400 / w, 300 / h), ox = x + 10 + (400 - w * s) / 2, oy = y + 20 + (300 - h * s) / 2;
+      base.push(rect(x + 3, y + 6, TW, TH, { r: 14, fill: "rgba(43,26,7,.08)" }) + rect(x, y, TW, TH, { r: 14, fill: C.white, stroke: "#e6dcd3" }) +
+        clipped(x + 1, y + 1, TW - 2, TH - 2, fit(ox, oy, s, svg)) +
+        circle(x + 22, y - 22, 16, { fill: C.white, stroke: "#b9aa9c", sw: 2 }) + text(x + 22, y - 16, String(i + 1), { size: 16, weight: 700, fill: "#6f675f", anchor: "middle" }) +
+        text(x + 48, y - 16, t, { size: 20, weight: 700, fill: C.cocoa }) + text(x + 48 + tw(t, 20, 700) + 10, y - 16, sub, { size: 16, fill: "#6f675f" }));
+      els["veil" + i] = { svg: rect(x, y, TW, TH, { r: 14, fill: "rgba(247,243,239,.72)" }), enter: "fade" };
+      els["on" + i] = { svg: rect(x - 4, y - 4, TW + 8, TH + 8, { r: 16, stroke: C.accent, sw: 4 }) + circle(x + 22, y - 22, 16, { fill: C.accent }) + text(x + 22, y - 16, String(i + 1), { size: 16, weight: 700, fill: C.white, anchor: "middle" }), enter: "fade" };
+    });
+    const pair = (a, b) => { const x0 = Math.min(tiles[a][0], tiles[b][0]) - 30, y0 = Math.min(tiles[a][1], tiles[b][1]) - 70; return { x: x0, y: y0, w: Math.max(tiles[a][0], tiles[b][0]) + TW + 30 - x0 }; };
+    const one = (a) => ({ x: tiles[a][0] - 150, y: tiles[a][1] - 70, w: TW + 300 });
+    const reveal = (ids) => ({ hide: ids.map((i) => "veil" + i), show: ids.map((i) => "on" + i) });
+    const off = (ids) => ids.map((i) => "on" + i);
     return {
-      title: "Peta perjalanan member NikahKit",
-      base, els,
+      title: "Peta perjalanan member NikahKit", world: { w: 1920, h: 1072 }, base, els,
       steps: [
-        step(0, "1–2. Gabung: pilih paket, bayar, lalu pasang NikahKit di Chrome.", [0, 1]),
-        step(1, "3. Hubungkan bisnis Scalev dan buka halaman HTML Mode.", [2]),
-        step(2, "4. Buat undangan: pilih template, isi Konten, Simpan.", [3]),
-        step(3, "5. Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", [4]),
-        step(4, "6. Pasangan kirim tautan pribadi. Tamu membuka dan isi RSVP.", [5]),
-        step(5, "7. Hari-H: tamu dicatat lewat check-in di HP.", [6]),
-        step(6, "8. Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", [7])
+        { caption: "Gabung: pilih paket dan bayar, lalu pasang NikahKit di Chrome.", cam: pair(0, 1), ...reveal([0, 1]), dur: 3.6 },
+        { caption: "Scalev: hubungkan bisnismu, buka halaman HTML Mode.", cam: one(2), ...reveal([2]), hide: ["veil2", ...off([0, 1])] },
+        { caption: "Buat undangan: pilih template, isi Konten, lalu Simpan.", cam: one(3), show: ["on3"], hide: ["veil3", "on2"] },
+        { caption: "Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", cam: one(4), show: ["on4"], hide: ["veil4", "on3"] },
+        { caption: "Tamu membuka tautan pribadi. Hari-H, tamu dicatat lewat check-in.", cam: pair(5, 6), show: ["on5", "on6"], hide: ["veil5", "veil6", "on4"], dur: 3.6 },
+        { caption: "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", cam: one(7), show: ["on7"], hide: ["veil7", "on5", "on6"] },
+        { caption: "Delapan titik itu satu alur. Ulangi untuk setiap klien baru.", cam: "all", hide: ["on7"], dur: 3.4 }
       ]
     };
   })(),
 
-  // Checklist for /mulai/alur-lengkap.
+  // Checklist for /mulai/alur-lengkap: tick each row, the real screen of that step beside it.
   "mulai-checklist": (() => {
     const items = ["Pilih paket dan bayar membership", "Pasang NikahKit di Chrome komputer", "Hubungkan bisnis Scalev", "Buat halaman HTML Mode, lalu Simpan",
       "Pilih template dan isi Konten", "Simpan & Terbitkan, cek lewat Bagikan", "Buat PIN dan serahkan ke pasangan"];
-    const x = 180, y0 = 96;
-    const base = [card(140, 30, 680, 480, "Checklist member baru", { titleSize: 20 }), text(160, 82, "Centang satu per satu. Tiap baris punya halaman panduannya sendiri.", { size: 13, fill: C.muted })];
-    items.forEach((t, i) => base.push(rect(x - 20, y0 + i * 56, 600, 46, { r: 8, fill: C.bg }) + rect(x - 6, y0 + i * 56 + 11, 24, 24, { r: 6, fill: C.paper, stroke: "#9aa0a6", sw: 1.5 }) +
-      text(x + 34, y0 + i * 56 + 28, `${i + 1}. ${t}`, { size: 15 })));
+    const x = 40, y0 = 118, RH = 64, PX = 520, PY = 40, PW = 540, PH = 534;
+    const base = [rect(0, 0, 1100, 614, { fill: "#f7f3ef" }), text(x, 66, "Checklist member baru", { size: 26, weight: 700, fill: C.cocoa }),
+      text(x, 94, "Tiap baris punya halaman panduannya sendiri.", { size: 15, fill: "#6f675f" }),
+      rect(PX + 3, PY + 6, PW, PH, { r: 12, fill: "rgba(43,26,7,.08)" }), rect(PX, PY, PW, PH, { r: 12, fill: C.svPreview, stroke: "#e6dcd3" })];
+    items.forEach((t, i) => base.push(rect(x, y0 + i * RH, 450, 54, { r: 10, fill: C.white, stroke: "#e6dcd3" }) + rect(x + 14, y0 + i * RH + 14, 26, 26, { r: 6, fill: C.white, stroke: "#b9aa9c", sw: 1.5 }) +
+      text(x + 54, y0 + i * RH + 33, `${i + 1}. ${t}`, { size: 15, fill: C.cocoa })));
+    const box = (svg) => clipped(PX + 1, PY + 1, PW - 2, PH - 2, svg);
+    const dlgNone = pinDlg(PX + 50, PY + 60, {}), dlgBiz = pinDlg(PX + 50, PY + 30, { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true, biz: BIZ, msg: ["Bisnis Scalev terhubung."] });
+    const previews = [
+      box(dlgNone.svg + ring(...dlgNone.at.choose, { r: 6 })),
+      box(fit(PX + 20, PY + 70, 1, extPage(-364, -30, { dev: true, card: true })) + ring(PX + 40, PY + 243, 400, 208, { r: 10 })),
+      box(dlgBiz.svg + ring(PX + 66, dlgBiz.at.connect[1] - 68, 408, 121, { r: 10 })),
+      box(crop(PX, PY, PW, PH, 880, 0, 1, scalevEditor(0, 0, { tab: "Code" }) + cover(0, 0)) + ring(PX + 313, PY + 50, 82, 34, { r: 6 })),
+      box(crop(PX, PY, PW, PH, 0, 92, 1, scalevEditor(0, 0, { tab: "NikahKit", rail: "Template" }) + templatePanel(0, 0)) + ring(PX + 4, PY + 4, 64, 52, { r: 6 })),
+      box(crop(PX, PY, PW, PH, 880, 0, 1, scalevEditor(0, 0, { tab: "NikahKit", rail: "Template" }) + cover(0, 0)) + ring(PX + 403, PY + 50, 151, 34, { r: 6 })),
+      box(pinCard(PX + 66, PY + 120) + ring(PX + 66, PY + 120, 408, 214, { r: 10 }))
+    ];
     const els = {};
-    items.forEach((t, i) => (els["k" + i] = rect(x - 6, y0 + i * 56 + 11, 24, 24, { r: 6, fill: C.ok }) + `<path d="M${x} ${y0 + i * 56 + 23} l5 5 l9 -10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` +
-      text(x + 34, y0 + i * 56 + 28, `${i + 1}. ${t}`, { size: 15, fill: C.muted })));
-    els.done = toast(290, 484, "Siap jualan: undangan pertama sudah diserahkan.");
-    const caps = ["Mulai dari paket: Bulanan, Tahunan, atau Sekali Bayar.", "Pasang ekstensi lewat Load unpacked di Chrome.", "Hubungkan bisnis Scalev dari jendela akun NikahKit.",
+    items.forEach((t, i) => {
+      els["k" + i] = { svg: rect(x + 14, y0 + i * RH + 14, 26, 26, { r: 6, fill: C.ok }) + `<path d="M${x + 20} ${y0 + i * RH + 27} l5 5 l9 -10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`, enter: "pop", origin: [x + 27, y0 + i * RH + 27], delay: 1.1 };
+      els["r" + i] = { svg: rect(x - 2, y0 + i * RH - 2, 454, 58, { r: 11, stroke: C.accent, sw: 2.5 }), enter: "fade" };
+      els["p" + i] = { svg: previews[i], enter: "fade" };
+    });
+    const caps = ["Mulai dari paket: Bulanan, Tahunan, atau Sekali Bayar.", "Pasang NikahKit lewat Muat yang belum dibuka di chrome://extensions.", "Hubungkan bisnis Scalev dari jendela akun NikahKit.",
       "Buat halaman Landing Page dengan HTML Mode, lalu Simpan.", "Buka tab NikahKit, pilih template, isi Konten.", "Simpan & Terbitkan, lalu cek tampilan tamu lewat Bagikan.", "Buat PIN dashboard, salin pesan, kirim ke pasangan."];
     return {
-      title: "Checklist dari nol sampai jualan",
-      base, els,
-      steps: caps.map((c, i) => ({ caption: c, at: [x + 6, y0 + i * 56 + 23], click: true, show: ["k" + i, ...(i === 6 ? ["done"] : [])], dur: i === 6 ? 3.6 : 2.6 }))
+      title: "Checklist dari nol sampai jualan", world: { w: 1100, h: 614 }, base, els,
+      steps: caps.map((c, i) => ({ caption: c, cam: "all", at: [x + 27, y0 + i * RH + 27], click: true, show: ["k" + i, "r" + i, "p" + i], hide: i ? ["r" + (i - 1), "p" + (i - 1)] : [], dur: 3 }))
     };
   })(),
 
-  // Istilah: ID undangan, slug, alamat publik, tautan pribadi, PIN dan kode staff.
+  // Istilah: ID undangan (address bar), slug (Settings), alamat umum, tautan pribadi, tab NikahKit, PIN dan kode staff.
   "mulai-istilah-alamat": (() => {
+    const urlX = 166 + tw("app.scalev.com/pages/", 14), idW = tw(ID, 14);
+    const tabs = [{ title: PAGE, active: true, fav: favScalev }];
+    const settings = rect(0, CT + 92, 399, 808, { fill: C.white }) + [0, 1, 2].map((k) => rect(16, CT + 116 + k * 26, [220, 300, 180][k], 10, { r: 5, fill: C.mutedBg })).join("") +
+      nkLabel(16, CT + 220, "Slug") + nkInput(16, CT + 230, 367, SLUG, { focus: true }) + [0, 1, 2, 3].map((k) => rect(16, CT + 300 + k * 26, [260, 320, 200, 280][k], 10, { r: 5, fill: C.mutedBg })).join("");
     const els = {
-      idRing: ring(X + 213, Y + 47, 42, 18, { r: 6 }) + note(X + 360, TOP + 30, "ID undangan = ID halaman Scalev", X + 250, Y + 68, { w: 260 }),
-      settings: panelCover() + text(X + 20, GY + 32, "Settings", { size: 16, weight: 700 }) + input(X + 20, GY + 80, 400, "Slug (alamat halaman)", "rina-dimas", { focus: true }) +
-        text(X + 20, GY + 136, "Minimal 3 karakter. Ganti slug tidak mengubah ID.", { size: 13, fill: C.muted }),
-      slugNote: note(X + 340, GY + 30, "slug", X + 300, GY + 82, { w: 80 }),
-      pub: rect(X + 20, GY + 200, 420, 70, { r: 8, fill: C.svTint }) + text(X + 34, GY + 226, "Alamat umum undangan", { size: 12, fill: C.svDark, weight: 600 }) +
-        text(X + 34, GY + 252, "https://domainmu.com/rina-dimas", { size: 15, weight: 600 }),
-      priv: rect(X + 20, GY + 280, 420, 56, { r: 8, fill: C.tint }) + text(X + 34, GY + 302, "Tautan pribadi (nama tamu)", { size: 12, fill: C.accent, weight: 600 }) +
-        text(X + 34, GY + 324, "https://domainmu.com/rina-dimas?to=Andi", { size: 14, weight: 600 }),
-      guest: rect(612, TOP + 100, 196, 286, { r: 6, fill: "#3b2a1a" }) + text(710, TOP + 180, "Kepada Yth.", { size: 12, fill: "#e8d9c8", anchor: "middle" }) +
-        text(710, TOP + 208, "Andi", { size: 22, fill: C.paper, anchor: "middle", weight: 700 }) + text(710, TOP + 260, "Rina & Dimas", { size: 16, fill: "#e8d9c8", anchor: "middle" }) +
-        rect(660, TOP + 300, 100, 30, { r: 15, fill: C.accent }) + text(710, TOP + 320, "Buka", { size: 13, fill: C.paper, anchor: "middle", weight: 600 }),
-      keys: rect(X + 20, GY + 200, 420, 136, { r: 8, fill: C.paper, stroke: C.line }) + text(X + 34, GY + 226, "Untuk masuk Dashboard pasangan", { size: 13, weight: 700 }) +
-        text(X + 34, GY + 254, "PIN dashboard", { size: 13, weight: 600 }) + text(X + 160, GY + 254, "6 angka, untuk pasangan (pemilik)", { size: 12, fill: C.muted }) +
-        text(X + 34, GY + 284, "Kode staff", { size: 13, weight: 600 }) + text(X + 160, GY + 284, "untuk penerima tamu di hari-H", { size: 12, fill: C.muted }) +
-        text(X + 34, GY + 314, "Kode staff: paket Tahunan dan Sekali Bayar.", { size: 12, fill: C.accent })
+      idRing: ring(urlX + 2, 54, idW + 2, 20, { r: 6 }) + note(urlX + 120, 98, "ID undangan = ID halaman Scalev", urlX + idW / 2, 76, { w: 280 }),
+      settings: { svg: settings, delay: 1.2, enter: "fade" },
+      settingsTab: { svg: crop(0, CT + 44, 399, 48, 0, 44, 1, scalevEditor(0, 0, { tab: "Settings" })), delay: 1.2, enter: "fade" },
+      slugNote: { svg: note(210, CT + 296, "slug", 140, CT + 266, { w: 80 }), delay: 1.4 },
+      pub: guideCard(16, CT + 430, 690, "Alamat umum undangan", ["https://tokomu.myscalev.com/" + SLUG], { size: 18 }),
+      priv: guideCard(16, CT + 528, 690, "Tautan pribadi (nama tamu)", [[["https://tokomu.myscalev.com/" + SLUG], ["?to=Andi", 700, C.accent]]], { size: 18 }),
+      guest: { svg: coverName(ED.screen.x + 195, CT + ED.screen.y, "Andi") + ring(ED.screen.x + 195 - 70, CT + ED.screen.y + 514, 140, 28, { r: 6 }), delay: 0.6 },
+      nk: { svg: crop(0, CT + 44, 399, 856, 0, 44, 1, scalevEditor(0, 0, { tab: "NikahKit", rail: "Template" }) + templatePanel(0, 0)), delay: 1.2, enter: "fade" },
+      railRing: { svg: ring(2, CT + 104, 68, 332, { r: 8 }), delay: 1.6 },
+      keys: guideCard(ED.screen.x + 410, CT + 360, 300, "Untuk masuk Dashboard pasangan", [[["PIN dashboard", 700], [": pasangan (pemilik)"]], [["Kode staff", 700], [": penerima tamu"]], "Kode staff: Tahunan dan Sekali Bayar"], { size: 14 })
     };
     return {
-      title: "ID undangan, slug, alamat, dan tautan pribadi",
-      base: [edFrame({ tab: "Settings", phone: true })],
+      title: "ID undangan, slug, alamat, dan tautan pribadi", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs, url: "app.scalev.com/pages/" + ID }), scalevEditor(0, CT, { tab: "Code" }), cover(0, CT)],
       els,
       steps: [
-        { caption: "Angka di alamat editor adalah ID undangan (ID halaman Scalev).", at: [X + 236, Y + 58], show: ["idRing"], dur: 3.6 },
-        { caption: "Slug diisi di tab Settings Scalev. Slug membentuk alamat halaman.", at: [X + 200, GY + 97], click: true, hide: ["idRing"], show: ["settings", "slugNote"], dur: 3.6 },
-        { caption: "Alamat umum: domain atau subdomain Scalev, lalu slug.", show: ["pub"], hide: ["slugNote"] },
+        { caption: "Angka di alamat editor adalah ID undangan (ID halaman Scalev).", cam: { x: 0, y: 0, w: 760 }, at: [urlX + idW / 2, 63], show: ["idRing"], dur: 3.6 },
+        { caption: "Klik tab Settings Scalev. Kolom slug membentuk alamat halaman.", cam: { x: 0, y: 60, w: 760 }, at: [191, CT + 66], click: true, hide: ["idRing"], show: ["settings", "settingsTab", "slugNote"], dur: 3.6 },
+        { caption: "Alamat umum: domain atau subdomain Scalev, lalu slug.", cam: { x: 0, y: CT + 240, w: 1140 }, show: ["pub"], hide: ["slugNote"] },
         { caption: "Tautan pribadi menambah ?to=Nama. Nama tamu tampil di sampul.", show: ["priv", "guest"], dur: 3.8 },
-        { caption: "PIN dashboard untuk pasangan, kode staff untuk penerima tamu.", hide: ["pub", "priv"], show: ["keys"], dur: 3.8 }
+        { caption: "Tab NikahKit: rail Template, Gaya, Audio, Media, Lapisan, Konten.", cam: { x: 0, y: CT + 30, w: 820 }, at: [264, CT + 66], click: true, show: ["nk", "railRing"], hide: ["pub", "priv"], dur: 3.6 },
+        { caption: "PIN dashboard untuk pasangan, kode staff untuk penerima tamu.", cam: { x: 600, y: CT + 200, w: 860 }, show: ["keys"], hide: ["railRing"], dur: 3.8 }
       ]
     };
   })(),
 
-  // Pasang: download + extract (Windows and Mac).
+  // Pasang bagian 1: unduh dari Cara pasang NikahKit, ekstrak (Windows), folder NikahKit berisi manifest.json.
   "gabung-ekstrak-zip": (() => {
-    const FX = 150, FY = 70, FW = 660, FH = 400; // file window
+    const tabs = [{ title: "Cara pasang NikahKit · Nikahin", active: true }];
+    const DLX = 1040, DLY = CT + 56, DLW = 236; // download button (pasang.html .dl: 52 high, 16px radius, cocoa)
+    const page = rect(0, CT, 1440, 900, { fill: C.white }) + text(160, CT + 120, "Cara pasang NikahKit", { size: 56, fill: C.cocoa, font: SERIF }) +
+      text(160, CT + 160, "Untuk Google Chrome di komputer Windows atau Mac.", { size: 18, fill: "#6f675f" }) +
+      rect(DLX, DLY, DLW, 52, { r: 16, fill: C.cocoa }) + text(DLX + DLW / 2, DLY + 32, "Unduh NikahKit", { size: 16, weight: 800, fill: C.white, anchor: "middle" }) +
+      text(DLX + DLW, DLY + 78, "ZIP ±120 KB", { size: 14, fill: "#6f675f", anchor: "end" }) +
+      ["Unduh dan ekstrak", "Buka chrome://extensions", "Nyalakan Developer mode", "Klik Load unpacked", "NikahKit terpasang", "Masuk di editor Scalev"].map((t, i) =>
+        circle(175, CT + 252 + i * 74, 15, { stroke: "#6f675f", sw: 1.5 }) + text(175, CT + 257 + i * 74, String(i + 1), { size: 14, weight: 800, fill: "#6f675f", anchor: "middle" }) +
+        text(204, CT + 258 + i * 74, t, { size: 17, weight: 700, fill: C.cocoa })).join("") +
+      rect(508, CT + 230, 772, 482, { r: 16, fill: C.white, stroke: "rgba(43,26,7,.22)", sw: 1.5 });
+    const bubble = shadow(1052, 90, 340, 76, 10, 2) + rect(1052, 90, 340, 76, { r: 10, fill: C.white }) + rect(1072, 111, 28, 34, { r: 4, fill: "#e8eaed", stroke: "#c4c7c5" }) +
+      text(1114, 124, "nikahkit-….zip", { size: 14, fill: C.crText }) + text(1114, 144, "120 KB", { size: 12, fill: C.crSub }) + iconX("folder", 1362, 128, 18, C.crIcon);
+    const EX = 270, EY = 190, EW = 900, EH = 560, IX = EX + 220, IY = EY + 110;
+    const win = (title, path) => explorer(EX, EY, EW, EH, { title, path, side: "Unduhan" });
+    const menuY = IY + 40;
     const els = {
-      page: screen(browser(X, Y, BW, BH, "assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html", { tab: "Cara pasang NikahKit · Nikahin" }),
-        text(X + 40, TOP + 70, "Cara pasang NikahKit", { size: 30, weight: 700, fill: C.cocoa }), text(X + 40, TOP + 102, "Untuk Google Chrome di komputer Windows atau Mac.", { size: 15, fill: C.muted }),
-        rect(X + 560, TOP + 44, 270, 50, { r: 14, fill: C.cocoa }), text(X + 695, TOP + 75, `Unduh NikahKit ${VER}`, { size: 15, fill: C.paper, weight: 700, anchor: "middle" }),
-        text(X + 830, TOP + 116, "Rilis … · ZIP ±120 KB", { size: 12, fill: C.muted, anchor: "end" }),
-        ["1 Unduh dan ekstrak", "2 Buka chrome://extensions", "3 Nyalakan Developer mode", "4 Klik Load unpacked", "5 NikahKit terpasang", "6 Masuk di editor Scalev"].map((t, i) => text(X + 40, TOP + 170 + i * 34, t, { size: 15, weight: 600, fill: C.cocoa })).join("")),
-      dl: rect(X + 560, TOP + 140, 300, 48, { r: 10, fill: C.paper, stroke: C.line }) + rect(X + 574, TOP + 152, 24, 24, { r: 4, fill: "#e8eaed" }) + text(X + 610, TOP + 170, `nikahkit-${VER}.zip · Selesai`, { size: 13 }),
-      files: fileWin(FX, FY, FW, FH, "Unduhan") + zipIcon(FX + 200, FY + 90, `nikahkit-${VER}.zip`),
-      menu: rect(FX + 262, FY + 140, 190, 128, { r: 8, fill: C.paper, stroke: C.line }) + ["Open", "Extract All...", "Share", "Copy"].map((t, i) => (i === 1 ? rect(FX + 266, FY + 146 + i * 30, 182, 28, { r: 5, fill: C.svTint }) : "") + text(FX + 280, FY + 165 + i * 30, t, { size: 13, weight: i === 1 ? 600 : undefined })).join(""),
-      extract: card(FX + 100, FY + 90, 460, 220, "Extract Compressed (Zipped) Folders", { titleSize: 15 }) + text(FX + 120, FY + 160, "Files will be extracted to this folder:", { size: 13, fill: C.muted }) +
-        input(FX + 120, FY + 172, 420, "", `C:\\Users\\Rina\\Downloads\\nikahkit-${VER}`, { h: 32 }) + button(FX + 440, FY + 256, "Extract", { w: 100, color: "#1a73e8" }),
-      outer: folderIcon(FX + 340, FY + 92, `nikahkit-${VER}`),
-      inside: rect(FX + 131, FY + 39, FW - 132, FH - 40, { r: 0, fill: C.paper }) + text(FX + 150, FY + 66, `Unduhan › nikahkit-${VER}`, { size: 13, fill: C.muted }) + folderIcon(FX + 200, FY + 92, "NikahKit", { bold: true }) +
-        rect(FX + 320, FY + 92, 300, 96, { r: 8, fill: C.bg }) + para(FX + 336, FY + 118, ["Isi folder NikahKit:", "manifest.json, nk-bg.js, pin.html …"], { size: 13, fill: C.muted, lh: 22 }),
-      innerRing: ring(FX + 190, FY + 86, 84, 104),
-      mac: rect(FX + 140, FY + FH - 70, FW - 160, 50, { r: 8, fill: C.warnTint }) + para(FX + 156, FY + FH - 50, ["Mac: klik dua kali ZIP, folder NikahKit langsung muncul.", "Pindahkan folder NikahKit ke Dokumen, jangan dihapus."], { size: 13, fill: C.warn, lh: 18 })
+      bubble: { svg: bubble, enter: "pop", origin: [1320, 92], delay: 1.3 },
+      files: { svg: win("Unduhan", "Unduhan") + zipIcon(IX, IY, "nikahkit-….zip", true), enter: "pop", origin: [720, 470] },
+      menu: { svg: shadow(IX + 70, menuY, 220, 168, 6, 2) + rect(IX + 70, menuY, 220, 168, { r: 6, fill: C.white, stroke: "#dcdcdc" }) + rect(IX + 76, menuY + 46, 208, 30, { r: 4, fill: "#e5eefb" }) +
+        [0, 2, 3, 4].map((k) => rect(IX + 92, menuY + 22 + k * 32 - 6, [90, 0, 120, 70, 100][k], 9, { r: 4, fill: "#e3e5e8" })).join("") + text(IX + 92, menuY + 66, "Extract All...", { size: 13, fill: "#1f1f1f", weight: 500 }), enter: "pop", origin: [IX + 70, menuY], delay: 1.2 },
+      extract: { svg: shadow(EX + 160, EY + 120, 580, 300, 8, 3) + rect(EX + 160, EY + 120, 580, 300, { r: 8, fill: C.white, stroke: "#cfd3d8" }) + text(EX + 184, EY + 156, "Extract Compressed (Zipped) Folders", { size: 15, weight: 500, fill: "#1f1f1f" }) +
+        rect(EX + 184, EY + 196, 532, 32, { r: 4, fill: C.white, stroke: "#9aa0a6" }) + text(EX + 196, EY + 217, "C:\\Users\\Rina\\Downloads\\nikahkit-…", { size: 13, fill: "#1f1f1f" }) +
+        rect(EX + 520, EY + 368, 96, 32, { r: 4, fill: "#0067c0" }) + text(EX + 568, EY + 389, "Extract", { size: 13, weight: 500, fill: C.white, anchor: "middle" }) +
+        rect(EX + 624, EY + 368, 92, 32, { r: 4, fill: C.white, stroke: "#c4c7c5" }) + text(EX + 670, EY + 389, "Cancel", { size: 13, fill: "#1f1f1f", anchor: "middle" }), enter: "pop", origin: [720, EY + 270], delay: 1.2 },
+      outer: { svg: folderIcon(IX + 160, IY + 4, "nikahkit-…", true) + rect(IX - 24, IY - 10, 112, 116, { fill: C.white }) + zipIcon(IX, IY, "nikahkit-….zip", false), enter: "pop", origin: [IX + 192, IY + 40], delay: 0.3 },
+      inside: { svg: rect(EX + 181, EY + 81, EW - 182, EH - 82, { fill: C.white }) + rect(EX + 72, EY + 44, EW - 92, 28, { r: 4, fill: C.white, stroke: "#dcdcdc" }) + text(EX + 84, EY + 63, "Unduhan › nikahkit-…", { size: 13, fill: "#1f1f1f" }) +
+        folderIcon(IX, IY + 4, "NikahKit", true), enter: "fade", delay: 1.2 },
+      nkFiles: { svg: rect(EX + 181, EY + 81, EW - 182, EH - 82, { fill: C.white }) + rect(EX + 72, EY + 44, EW - 92, 28, { r: 4, fill: C.white, stroke: "#dcdcdc" }) + text(EX + 84, EY + 63, "Unduhan › nikahkit-… › NikahKit", { size: 13, fill: "#1f1f1f" }) +
+        NK_FILES.map((f, i) => fileIcon(IX + i * 130, IY, f, i === 0)).join("") + text(IX + 4 * 130 + 32, IY + 50, "…", { size: 20, fill: "#9aa0a6", anchor: "middle" }), enter: "fade", delay: 1.2 },
+      mfNote: { svg: note(IX + 60, IY + 150, "ada manifest.json: folder yang benar", IX + 32, IY + 100, { w: 300 }), delay: 1.6 },
+      mac: { svg: rect(EX + 200, EY + 380, 680, 76, { r: 10, fill: C.tint, stroke: C.accent, sw: 1.5 }) + text(EX + 220, EY + 410, "Mac: klik dua kali ZIP, folder NikahKit langsung muncul.", { size: 15, weight: 600, fill: C.cocoa }) +
+        text(EX + 220, EY + 436, "Pindahkan folder NikahKit ke Dokumen, jangan dihapus.", { size: 15, fill: C.cocoa }) }
     };
     return {
-      title: "Mengunduh dan mengekstrak ZIP NikahKit",
-      base: [], els,
+      title: "Mengunduh dan mengekstrak ZIP NikahKit", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs, url: "assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html" }), page],
+      els,
       steps: [
-        { caption: "Buka halaman Cara pasang NikahKit, klik Unduh NikahKit.", at: [X + 695, TOP + 69], click: true, show: ["page", "dl"], dur: 3.4 },
-        { caption: "Buka folder Unduhan. File ZIP NikahKit ada di sana.", hide: ["page", "dl"], show: ["files"], at: [FX + 228, FY + 124] },
-        { caption: "Windows: klik kanan ZIP, pilih Extract All...", at: [FX + 330, FY + 191], click: true, show: ["menu"] },
-        { caption: "Klik Extract. Windows membuat folder bernama sama dengan ZIP.", at: [FX + 490, FY + 273], click: true, hide: ["menu"], show: ["extract"], dur: 3.4 },
-        { caption: "Buka folder itu. Di dalamnya ada folder NikahKit berisi manifest.json.", at: [FX + 372, FY + 124], click: true, hide: ["extract"], show: ["outer"], dur: 3 },
-        { caption: "Folder NikahKit inilah yang dipilih nanti di Load unpacked.", at: [FX + 232, FY + 160], show: ["inside", "innerRing", "mac"], dur: 4.4 }
+        { caption: "Buka halaman Cara pasang NikahKit, klik Unduh NikahKit.", cam: { x: 120, y: 30, w: 1320 }, at: [DLX + DLW / 2, DLY + 26], click: true, show: ["bubble"], dur: 3.4 },
+        { caption: "Buka folder Unduhan. File ZIP NikahKit ada di sana.", cam: { x: 270, y: 186, w: 900 }, at: [IX + 32, IY + 36], show: ["files"], hide: ["bubble"] },
+        { caption: "Windows: klik kanan ZIP, pilih Extract All...", at: [IX + 150, menuY + 61], click: true, show: ["menu"] },
+        { caption: "Klik Extract. Muncul folder bernama sama dengan ZIP.", at: [EX + 568, EY + 384], click: true, show: ["extract"], hide: ["menu"], dur: 3.4 },
+        { caption: "Buka folder itu: di dalamnya ada folder NikahKit.", at: [IX + 192, IY + 40], click: true, hide: ["extract"], show: ["outer", "inside"], dur: 3.4 },
+        { caption: "Buka folder NikahKit: harus ada manifest.json. Folder inilah yang dipilih.", at: [IX + 32, IY + 40], click: true, show: ["nkFiles", "mfNote"], dur: 3.8 },
+        { caption: "Mac: klik dua kali ZIP. Simpan folder NikahKit di Dokumen.", show: ["mac"], hide: ["mfNote"], dur: 3.6 }
       ]
     };
   })(),
 
-  // Pasang: chrome://extensions, Developer mode, Load unpacked.
+  // Pasang bagian 2: chrome://extensions, Mode developer, Muat yang belum dibuka, pilih folder, kartu, sematkan.
   "pasang-load-unpacked": (() => {
-    const PX = X + 190, PY = TOP + 40; // folder picker
+    const url = "chrome://extensions", dev = devBtnRects(0, CT);
+    const PX = 340, PY = CT + 170, PW = 760, PH = 470;
+    const row = (y, label, sel, ic = "folder") => (sel ? rect(PX + 200, y, PW - 216, 30, { r: 5, fill: "#d3e3fd" }) : "") + iconX(ic, PX + 222, y + 15, 16, ic === "folder" ? "#e5a531" : "#9aa0a6") + text(PX + 242, y + 20, label, { size: 13, fill: "#1f1f1f", weight: sel ? 600 : undefined });
+    const picker = shadow(PX, PY, PW, PH, 10, 4) + rect(PX, PY, PW, PH, { r: 10, fill: C.white, stroke: "#cfd3d8" }) + rect(PX, PY, PW, 44, { r: 10, fill: "#f3f3f3" }) + rect(PX, PY + 34, PW, 10, { fill: "#f3f3f3" }) +
+      text(PX + PW / 2, PY + 27, "Pilih folder ekstensi", { size: 13, weight: 600, fill: "#333", anchor: "middle" }) + line(PX, PY + 44.5, PX + PW, PY + 44.5, { stroke: "#e3e3e3" }) +
+      rect(PX, PY + 45, 184, PH - 45 - 64, { fill: "#f6f6f6" }) + ["Desktop", "Dokumen", "Unduhan"].map((n, i) => (n === "Dokumen" ? rect(PX + 8, PY + 58 + i * 32, 168, 28, { r: 5, fill: "#e4e4e4" }) : "") + iconX("folder", PX + 26, PY + 72 + i * 32, 15, "#5e8fd8") + text(PX + 44, PY + 77 + i * 32, n, { size: 13, fill: "#1f1f1f" })).join("") +
+      text(PX + 204, PY + 74, "Dokumen", { size: 12, weight: 600, fill: "#5e5e5e" }) + row(PY + 88, "Faktur", false) + row(PY + 122, "NikahKit", false) + row(PY + 156, "Foto klien", false) +
+      line(PX, PY + PH - 64.5, PX + PW, PY + PH - 64.5, { stroke: "#e3e3e3" }) +
+      rect(PX + PW - 232, PY + PH - 48, 100, 32, { r: 6, fill: C.white, stroke: "#c4c7c5" }) + text(PX + PW - 182, PY + PH - 27, "Batal", { size: 13, fill: "#1f1f1f", anchor: "middle" }) +
+      rect(PX + PW - 120, PY + PH - 48, 100, 32, { r: 6, fill: "#0a7cff" }) + text(PX + PW - 70, PY + PH - 27, "Select", { size: 13, weight: 600, fill: C.white, anchor: "middle" });
+    const SEL = [PX + PW - 70, PY + PH - 32];
+    const pinned = 1296;
     const els = {
-      off: toggle(X + BW - 70, TOP + 22, false),
-      on: toggle(X + BW - 70, TOP + 22, true),
-      bar: devbar(),
-      picker: card(PX, PY, 500, 320, "Pilih folder ekstensi") + rect(PX + 1, PY + 50, 130, 269, { r: 0, fill: "#f6f6f6" }) +
-        ["Desktop", "Dokumen", "Unduhan"].map((n, i) => (i === 2 ? rect(PX + 6, PY + 58 + i * 30, 120, 26, { r: 5, fill: "#e4e4e4" }) : "") + text(PX + 18, PY + 76 + i * 30, n, { size: 13, fill: i === 2 ? C.ink : C.muted })).join("") +
-        text(PX + 150, PY + 76, `Unduhan › nikahkit-${VER}`, { size: 12, fill: C.muted }) + rect(PX + 150, PY + 88, 336, 34, { r: 6, fill: C.paper }) + rect(PX + 162, PY + 98, 20, 15, { r: 3, fill: "#f2b84b" }) + text(PX + 192, PY + 110, "NikahKit", { size: 14 }) +
-        button(PX + 290, PY + 274, "Batal", { variant: "ghost", color: C.muted, w: 90, h: 32 }) + button(PX + 390, PY + 274, "Select", { color: "#1a73e8", w: 96, h: 32 }),
-      rowSel: rect(PX + 150, PY + 88, 336, 34, { r: 6, fill: "#d3e3fd" }) + rect(PX + 162, PY + 98, 20, 15, { r: 3, fill: "#f2b84b" }) + text(PX + 192, PY + 110, "NikahKit", { size: 14, weight: 600 }) +
-        para(PX + 192, PY + 146, ["manifest.json", "nk-bg.js", "pin.html …"], { size: 12, fill: C.muted, lh: 20 }) + note(PX + 300, PY + 170, "ada manifest.json", PX + 250, PY + 142, { w: 150 }),
-      cardNk: extCard(VER),
-      puzzle: rect(X + BW - 50, Y + 44, 28, 24, { r: 6, fill: C.soft }) + rect(X + BW - 43, Y + 50, 13, 13, { r: 2, fill: "#5f6368" }) + circle(X + BW - 36.5, Y + 49, 3, { fill: "#5f6368" }) + circle(X + BW - 29, Y + 56.5, 3, { fill: "#5f6368" }),
-      pinPop: card(X + BW - 300, Y + 74, 280, 112, "Extensions", { titleSize: 14 }) + rect(X + BW - 290, Y + 120, 32, 32, { r: 6, fill: C.accent }) + text(X + BW - 274, Y + 142, "N", { size: 15, weight: 700, fill: C.paper, anchor: "middle" }) +
-        text(X + BW - 248, Y + 141, "NikahKit", { size: 14 }) + text(X + BW - 52, Y + 142, "📌", { size: 15, anchor: "middle" }),
-      okToast: toast(X + 200, TOP + 330, "NikahKit terpasang. Jangan hapus atau pindahkan foldernya.", { w: 480 })
+      typed: text(166, 68, url, { size: 14, fill: C.crText }),
+      page: { svg: extPage(0, CT, {}), enter: "fade", delay: 2.8 },
+      devPage: { svg: extPage(0, CT, { dev: true }), enter: "fade", delay: 1.15 },
+      picker: { svg: dimRect() + picker, enter: "pop", origin: [PX + PW / 2, PY + PH / 2], delay: 1.2 },
+      rowSel: { svg: row(PY + 122, "NikahKit", true) +
+        note(PX + 420, PY + 200, "berisi manifest.json", PX + 320, PY + 140, { w: 190 }), delay: 1.1 },
+      card: { svg: text(384, CT + 182, "Semua Ekstensi", { size: 16, fill: C.crText }) + extCardR(EXT_CARD.x, CT + EXT_CARD.y), delay: 1.3 },
+      cardRing: { svg: ring(EXT_CARD.x, CT + EXT_CARD.y, 400, 208, { r: 10 }), delay: 1.6 },
+      menu: { svg: shadow(1040, 80, 340, 190, 10, 3) + rect(1040, 80, 340, 190, { r: 10, fill: C.white }) + text(1062, 114, "Ekstensi", { size: 15, weight: 500, fill: C.crText }) +
+        nkLogo(1072, 152, 20) + text(1094, 157, "NikahKit", { size: 13, fill: C.crText }) + pinIc(1312, 152, 17, C.crIcon) + iconX("more-vertical", 1350, 152, 17, C.crIcon) +
+        line(1040, 196, 1380, 196, { stroke: "#e3e3e3" }) + iconX("settings", 1072, 232, 17, C.crIcon) + text(1094, 237, "Kelola ekstensi", { size: 13, fill: C.crText }), enter: "pop", origin: [1340, 63], delay: 1.2 },
+      pinOn: { svg: rect(1300, 140, 24, 24, { r: 12, fill: C.crBlueSoft }) + pinIc(1312, 152, 17, C.crBlue) + rect(1272, 46, 46, 34, { fill: C.white }) + rect(1240, 46, 34, 34, { r: 17, fill: C.crOmni }) + nkLogo(pinned, 63, 18), delay: 1.2 }
     };
     return {
-      title: "Memasang NikahKit lewat Load unpacked",
-      base: [extPage({ dev: false })],
+      title: "Memasang NikahKit lewat Muat yang belum dibuka", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs: [{ title: "Ekstensi", active: true, fav: favChrome }] })],
       els,
       steps: [
-        { caption: "Ketik chrome://extensions di kolom alamat Chrome, lalu Enter.", at: [X + 200, Y + 56], click: true, show: ["off"], dur: 3 },
-        { caption: "Nyalakan Developer mode di kanan atas.", at: [X + BW - 50, TOP + 32], click: true, show: ["on", "bar"], hide: ["off"] },
-        { caption: "Klik Load unpacked.", at: [X + 92, TOP + 83], click: true, show: ["picker"] },
-        { caption: "Pilih folder NikahKit yang berisi manifest.json, bukan ZIP-nya.", at: [PX + 240, PY + 105], click: true, show: ["rowSel"], dur: 3.8 },
-        { caption: "Klik Select. Kartu NikahKit muncul dan aktif.", at: [PX + 438, PY + 290], click: true, hide: ["picker", "rowSel"], show: ["cardNk", "okToast"], dur: 3.8 },
-        { caption: "Opsional: klik ikon puzzle, lalu sematkan NikahKit.", at: [X + BW - 35, Y + 56], click: true, hide: ["okToast"], show: ["puzzle", "pinPop"], dur: 3.4 }
+        { caption: "Ketik chrome://extensions di kolom alamat Chrome, lalu Enter.", cam: { x: 0, y: 0, w: 760 }, at: [300, 63], click: true, type: [{ id: "typed", n: url.length, box: [166, 52, tw(url, 14), 22] }], show: ["typed", "page"], dur: 3.6 },
+        { caption: "Nyalakan Mode developer (Developer mode) di kanan atas.", cam: { x: 720, y: CT - 20, w: 720 }, at: [1415, CT + 28], click: true, show: ["devPage"] },
+        { caption: "Klik Muat yang belum dibuka (Load unpacked).", cam: { x: 0, y: CT - 20, w: 720 }, at: mid(dev[0]), click: true, show: ["picker"], dur: 3.4 },
+        { caption: "Klik sekali folder NikahKit yang berisi manifest.json, bukan ZIP-nya.", cam: { x: 300, y: PY - 20, w: 880 }, at: [PX + 280, PY + 137], click: true, show: ["rowSel"], dur: 3.6 },
+        { caption: "Klik Select. Kartu NikahKit muncul dengan sakelar biru menyala.", at: SEL, click: true, hide: ["picker", "rowSel"], show: ["card", "cardRing"], dur: 3.6 },
+        { caption: "Opsional: klik ikon puzzle, lalu sematkan NikahKit.", cam: { x: 760, y: 0, w: 680 }, at: [1340, 63], click: true, hide: ["cardRing"], show: ["menu"] },
+        { caption: "Klik ikon pin. Ikon NikahKit tampil di toolbar Chrome.", at: [1312, 152], click: true, show: ["pinOn"], dur: 3.4 }
       ]
     };
   })(),
 
-  // Pasang: open the Scalev page in HTML Mode and see the NikahKit tab.
+  // Pasang bagian 3: Landing Pages, buka halaman HTML Mode, tab NikahKit, panel Masuk ke NikahKit.
   "gabung-tab-nikahkit-muncul": (() => {
-    const list = browser(X, Y, BW, BH, "app.scalev.com/pages", { tab: "Scalev · Landing Pages" }) + rect(X + 1, TOP, 190, BH - 77, { r: 0, fill: C.bg }) +
-      text(X + 20, TOP + 32, "Scalev", { size: 18, weight: 700, fill: C.sv }) + ["Home", "E-Payment", "Products", "Landing Pages", "Buku Tamu", "Orders", "Settings"].map((m, i) => (m === "Landing Pages" ? rect(X + 10, TOP + 48 + i * 34, 170, 30, { r: 6, fill: C.svTint }) : "") + text(X + 24, TOP + 68 + i * 34, m, { size: 13, fill: m === "Landing Pages" ? C.svDark : C.ink, weight: m === "Landing Pages" ? 600 : undefined })).join("") +
-      line(X + 190, TOP, X + 190, Y + BH) + text(X + 220, TOP + 40, "Landing Pages", { size: 20, weight: 600 }) +
-      ["Undangan Rina & Dimas", "Undangan Sari & Bayu", "Promo WO"].map((n, i) => rect(X + 220, TOP + 64 + i * 56, 630, 46, { r: 8, fill: C.paper, stroke: C.line }) + text(X + 240, TOP + 92 + i * 56, n, { size: 14, weight: i === 0 ? 600 : 400 }) + badge(X + 740, TOP + 78 + i * 56, "HTML Mode", {})).join("");
-    const codeCover = panelCover() + para(X + 20, GY + 36, ['<!doctype html>', '<html>', '  <head>…</head>', '  <body>…</body>', '</html>'], { size: 12, fill: C.muted, lh: 22 });
-    const tabX = X + 18 + 4 * 74; // NikahKit tab label x
+    const g = GATE_OUT(0, CT);
+    const home = scalevApp(0, CT, { active: "Home" }) + text(280, CT + 35, "Home", { size: 18, weight: 700, fill: C.ink }) + [0, 1, 2].map((k) => rect(280 + k * 380, CT + 80, 360, 140, { r: 8, fill: C.page, stroke: "#e6e8ec" })).join("");
+    const lp = svMenuAt("Landing Pages");
     const els = {
-      list,
-      codeTab: edFrame({ tab: "Code" }) + codeCover,
-      nkRing: ring(tabX - 4, TOP + 56, 66, 22, { r: 6 }),
-      nkTab: edFrame({ tab: "NikahKit" }) + gate("Masuk ke NikahKit.", "", { extra: gBtn(X + 20, GY + 124) }),
-      googleRing: ring(X + 20, GY + 124, 230, 40)
+      list: { svg: scalevApp(0, CT, { active: "Landing Pages" }) + lpList(0, CT), enter: "fade", delay: 1.2 },
+      editor: { svg: crTop({ tabs: [{ title: PAGE, active: true, fav: favScalev }], url: "app.scalev.com/pages/" + ID }) + scalevEditor(0, CT, { tab: "Code" }) + cover(0, CT), enter: "fade" },
+      nkRing: { svg: ring(228, CT + 52, 80, 28, { r: 6 }), delay: 0.3 },
+      gate: { svg: crop(0, CT + 44, 399, 856, 0, CT + 44, 1, scalevEditor(0, CT, { tab: "NikahKit" }) + g.svg), enter: "fade", delay: 1.2 },
+      gRing: { svg: ring(...g.at.google, { r: 6 }), delay: 0.3 }
     };
     return {
-      title: "Tab NikahKit muncul di editor Scalev",
-      base: [], els,
+      title: "Tab NikahKit muncul di editor Scalev", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs: [{ title: "Scalev", active: true, fav: favScalev }], url: "app.scalev.com" }), home],
+      els,
       steps: [
-        { caption: "Di Scalev, buka Landing Pages.", at: [X + 80, TOP + 165], show: ["list"], dur: 2.8 },
-        { caption: "Klik halaman undangan yang memakai HTML Mode.", at: [X + 330, TOP + 87], click: true },
-        { caption: "Editor terbuka. Lihat deretan tab di kiri atas.", hide: ["list"], show: ["codeTab"], dur: 2.8 },
-        { caption: "Tab NikahKit ada di samping Settings. Klik tab itu.", at: [tabX + 28, TOP + 66], click: true, show: ["nkRing"], dur: 3.4 },
-        { caption: "Panel NikahKit terbuka: Masuk ke NikahKit.", hide: ["codeTab", "nkRing"], show: ["nkTab", "googleRing"], dur: 3.6 }
+        { caption: "Di app.scalev.com, klik menu Landing Pages.", cam: { x: 0, y: 0, w: 900 }, at: [lp[0], CT + lp[1]], click: true, show: ["list"] },
+        { caption: "Klik halaman undangan yang memakai HTML Mode.", cam: { x: 240, y: CT + 200, w: 1100 }, at: [585 + tw(PAGE, 14, 500) / 2, CT + 362], click: true, dur: 3 },
+        { caption: "Editor terbuka. Tab NikahKit ada di samping Settings.", cam: { x: 0, y: 0, w: 720 }, at: [264, CT + 66], show: ["editor", "nkRing"], hide: ["list"], dur: 3.4 },
+        { caption: "Klik tab NikahKit. Panel NikahKit terbuka.", at: [264, CT + 66], click: true, show: ["gate"], hide: ["nkRing"] },
+        { caption: "Panel menampilkan Masuk ke NikahKit dan tombol Masuk dengan Google.", cam: { x: 0, y: CT + 20, w: 640 }, show: ["gRing"], dur: 3.6 }
       ]
     };
   })(),
 
-  // Masuk dengan Google.
+  // Masuk dengan Google: gate, jendela NikahKit, jendela Google, masuk berhasil.
   "gabung-masuk-google": (() => {
-    const GX = 540, GYY = 110, GW = 320, GH = 360;
+    const g = GATE_OUT(0, 0), n = GATE_NONE(0, 0);
+    const chk = dlgAt(0, 0, { state: "checking", msg: null }), out = dlgAt(0, 0, { state: "out", msg: null, gDisabled: true }), inn = dlgAt(0, 0, {});
+    const GX = 960, GY = 150, GW = 440, GH = 560;
+    const google = shadow(GX, GY, GW, GH, 10, 4) + rect(GX, GY, GW, GH, { r: 10, fill: C.white, stroke: "#d0d4d9" }) + rect(GX, GY, GW, 40, { r: 10, fill: C.crFrame }) + rect(GX, GY + 30, GW, 10, { fill: C.crFrame }) +
+      rect(GX + 10, GY + 7, GW - 20, 26, { r: 13, fill: C.white }) + icon("lock", GX + 26, GY + 20, 12, C.crIcon) + text(GX + 40, GY + 25, "accounts.google.com", { size: 12, fill: C.crText }) +
+      gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
+      line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
+      text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
+      circle(GX + 52, GY + 304, 14, { stroke: C.crSub }) + text(GX + 80, GY + 309, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(GX + 32, GY + 336.5, GX + GW - 32, GY + 336.5, { stroke: "#e3e3e3" });
     const els = {
-      checking: dlgHead(120) + text(DX + 20, DY + 92, "Memeriksa login...", { size: 13, fill: C.muted }),
-      google: browser(GX, GYY, GW, GH, "accounts.google.com", { tab: "Masuk - Akun Google" }) + text(GX + 24, GYY + 116, "Google", { size: 18, weight: 700, fill: "#4285f4" }) +
-        text(GX + 24, GYY + 150, "Pilih akun", { size: 22 }) +
-        rect(GX + 16, GYY + 176, GW - 32, 56, { r: 8, fill: C.paper, stroke: C.line }) + circle(GX + 44, GYY + 204, 14, { fill: C.accent }) + text(GX + 44, GYY + 209, "R", { size: 13, fill: C.paper, anchor: "middle", weight: 700 }) +
-        text(GX + 68, GYY + 200, "Rina WO", { size: 14, weight: 600 }) + text(GX + 68, GYY + 218, EMAIL, { size: 12, fill: C.muted }) +
-        rect(GX + 16, GYY + 240, GW - 32, 46, { r: 8, fill: C.paper, stroke: C.line }) + text(GX + 44, GYY + 268, "Gunakan akun lain", { size: 14, fill: C.muted }),
-      signedIn: dlgIn({}),
-      chooseRing: ring(DX + 36, DY + 148, 104, 28)
+      gateNone: { svg: n.svg, enter: "fade", delay: 0.3 },
+      dim: { svg: dimEd(0, 0), enter: "fade", delay: 1.1 },
+      chk: { svg: chk.svg, enter: "pop", origin: [720, 450], delay: 1.15 },
+      out: { svg: out.svg, enter: "fade" },
+      google: { svg: google, enter: "pop", origin: [GX + GW / 2, GY + GH / 2], delay: 0.5 },
+      rowHover: { svg: rect(GX + 32, GY + 201, GW - 64, 71, { fill: "rgba(11,87,208,.06)" }), enter: "fade", delay: 1.0 },
+      inn: { svg: inn.svg, enter: "fade", delay: 0.3 },
+      emailRing: { svg: ring(inn.X + 16, inn.Y + 60, 408, 22, { r: 6 }), delay: 1.6 },
+      chooseRing: { svg: ring(...inn.at.choose, { r: 6 }) }
     };
     return {
-      title: "Masuk ke NikahKit dengan akun Google",
-      base: [edFrame({ tab: "NikahKit" }), gate("Masuk ke NikahKit.", "", { extra: gBtn(X + 20, GY + 124) })],
+      title: "Masuk ke NikahKit dengan akun Google", world: ED_WORLD,
+      base: [scalevEditor(0, 0, { tab: "NikahKit" }), cover(0, 0), g.svg],
       els,
       steps: [
-        { caption: "Di panel NikahKit, klik Masuk dengan Google.", at: [X + 135, GY + 144], click: true, dur: 3 },
-        { caption: "Jendela NikahKit terbuka di atas editor, lalu jendela Google.", show: ["checking", "google"], dur: 3.4 },
-        { caption: "Klik akun Google yang dipakai untuk membership.", at: [GX + 160, GYY + 204], click: true, dur: 3.2 },
-        { caption: "Berhasil: email Google-mu tampil di atas, dengan tombol Keluar.", hide: ["checking", "google"], show: ["signedIn"], dur: 3.8 },
-        { caption: "Belum berlangganan? Lanjut ke Pilih paket.", at: [DX + 88, DY + 162], show: ["chooseRing"], dur: 3.4 }
+        { caption: "Di panel NikahKit, klik Masuk dengan Google.", cam: { x: 0, y: 60, w: 760 }, at: mid(g.at.google), click: true, show: ["dim", "chk"] },
+        { caption: "Jendela NikahKit muncul di atas editor: Memeriksa login...", cam: { x: 280, y: 160, w: 880 }, dur: 2.6 },
+        { caption: "Jendela Google terbuka terpisah. Klik akun Google-mu.", cam: { x: 360, y: 100, w: 1080 }, show: ["out", "google", "rowHover"], hide: ["chk"], at: [GX + 200, GY + 238], click: true, dur: 3.6 },
+        { caption: "Berhasil: email Google-mu tampil di atas, dengan tautan Keluar.", cam: { x: 360, y: inn.Y - 17, w: 900 }, hide: ["google", "rowHover"], show: ["gateNone", "inn", "emailRing"], dur: 3.6 },
+        { caption: "Belum berlangganan? Lanjut klik Pilih paket di kartu Paket.", at: mid(inn.at.choose), show: ["chooseRing"], hide: ["emailRing", "out"], dur: 3.4 }
       ]
     };
   })(),
 
-  // Plan comparison table (pin.html #compare).
+  // pin.html #compare: the plan table, column by column, then the rows that differ.
   "gabung-pilih-paket": (() => {
-    const t = planTable();
+    const t = planDlg(0, 0);
+    const colRing = (i) => ring(t.col(i) + 2, t.t0 + 4, t.pc - 4, 162, { r: 8 });
+    const rowRing = (a, b) => ring(t.tx + 4, t.rowY[a] + 2, 720, t.rowY[b] + t.rowsH[b] - t.rowY[a] - 4, { r: 6 });
     return {
-      title: "Membandingkan paket Bulanan, Tahunan, dan Sekali Bayar",
-      base: [edFrame({ tab: "NikahKit" }), t.svg],
-      els: {
-        colA: ring(t.col(0), t.y0 + 4, 160, 128),
-        colB: ring(t.col(1), t.y0 + 4, 160, 128),
-        colC: ring(t.col(2), t.y0 + 4, 160, 128),
-        rows: ring(t.x + 8, t.row(4), t.w - 16, 56),
-        grace: ring(t.x + 8, t.row(8), t.w - 16, 28),
-        foot: ring(t.x + 8, t.footY - 16, t.w - 16, 22)
-      },
+      title: "Membandingkan paket Bulanan, Tahunan, dan Sekali Bayar", world: ED_WORLD,
+      base: [scalevEditor(0, 0, { tab: "NikahKit" }), cover(0, 0), GATE_NONE(0, 0).svg, dimEd(0, 0), t.svg],
+      els: { a: colRing(0), b: colRing(1), c: colRing(2), staff: rowRing(4, 5), grace: rowRing(8, 8), foot: ring(t.tx, t.foot, 728, 18, { r: 6 }) },
       steps: [
-        { caption: "Bulanan: Rp79.000 per 30 hari. Cocok untuk mencoba dulu.", show: ["colA"], at: [t.col(0) + 80, t.y0 + 104], dur: 3.4 },
-        { caption: "Tahunan: Rp299.000 per tahun, setara Rp24.917/bulan.", show: ["colB"], hide: ["colA"], at: [t.col(1) + 80, t.y0 + 104], dur: 3.4 },
-        { caption: "Sekali Bayar: Rp699.000, tanpa perpanjang.", show: ["colC"], hide: ["colB"], at: [t.col(2) + 80, t.y0 + 104], dur: 3.2 },
-        { caption: "Akun staff dan impor CSV hanya di Tahunan dan Sekali Bayar.", show: ["rows"], hide: ["colC"], at: [t.col(0) + 80, t.row(4) + 14], dur: 3.8 },
-        { caption: "Masa aktif habis: tenggang 7 hari, undangan tetap tampil.", show: ["grace"], hide: ["rows"], at: [t.col(0) + 80, t.row(8) + 14], dur: 3.6 },
-        { caption: "Harga belum termasuk biaya layanan pembayaran Scalev.", show: ["foot"], hide: ["grace"], at: [t.x + 300, t.footY - 6], dur: 3.6 }
+        { caption: "Bulanan: Rp79.000 per 30 hari. Cocok untuk mencoba dulu.", cam: { x: 330, y: 10, w: 780 }, show: ["a"], at: [t.col(0) + 80, t.t0 + 75] },
+        { caption: "Tahunan: Rp299.000 per tahun, setara Rp24.917/bulan. Paling hemat.", show: ["b"], hide: ["a"], at: [t.col(1) + 80, t.t0 + 75], dur: 3.4 },
+        { caption: "Sekali Bayar: Rp699.000, tanpa perpanjang.", show: ["c"], hide: ["b"], at: [t.col(2) + 80, t.t0 + 75] },
+        { caption: "Akun staff dan impor CSV hanya di Tahunan dan Sekali Bayar.", cam: { x: 330, y: t.rowY[2] - 40, w: 780 }, show: ["staff"], hide: ["c"], at: [t.col(0) + 21, t.rowY[4] + 22], dur: 3.6 },
+        { caption: "Masa aktif habis: tenggang 7 hari, undangan tetap tampil.", cam: { x: 330, y: 464, w: 780 }, show: ["grace"], hide: ["staff"], at: [t.col(0) + 60, t.rowY[8] + 30], dur: 3.6 },
+        { caption: "Harga belum termasuk biaya layanan pembayaran Scalev.", show: ["foot"], hide: ["grace"], at: [t.tx + 380, t.foot + 10], dur: 3.4 }
       ]
     };
   })(),
 
-  // Choose a plan, pay in Scalev, Cek pembayaran, Periksa lagi.
+  // Pilih paket, bayar di tab Scalev, Cek pembayaran, Periksa lagi.
   "gabung-bayar-paket": (() => {
-    const t = planTable();
-    const payX = X, payY = Y;
+    const ey = CT, t = planDlg(0, ey);
+    const d0 = dlgAt(0, ey, {}), d1 = dlgAt(0, ey, { paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] });
+    const d2 = dlgAt(0, ey, { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true, msg: ["Langganan aktif. Tekan Periksa lagi di panel NikahKit."] });
+    const gn = GATE_NONE(0, ey);
+    const tabsA = [{ title: PAGE, active: true, fav: favScalev }, { title: "nikahin.myscalev.com", active: false, fav: favScalev }];
+    const tabsB = [{ title: PAGE, active: false, fav: favScalev }, { title: "nikahin.myscalev.com", active: true, fav: favScalev }];
+    const PAYX = 470, PAYW = 500;
+    const pay = rect(0, CT, 1440, 900, { fill: "#f5f6f8" }) + rect(PAYX, CT + 60, PAYW, 640, { r: 10, fill: C.white, stroke: "#e6e8ec" }) +
+      circle(PAYX + 40, CT + 104, 16, { fill: C.primary }) + rect(PAYX + 66, CT + 96, 140, 14, { r: 7, fill: "#e3e5e8" }) + line(PAYX, CT + 140.5, PAYX + PAYW, CT + 140.5, { stroke: "#eef0f3" }) +
+      rect(PAYX + 24, CT + 164, 180, 12, { r: 6, fill: "#e3e5e8" }) + text(PAYX + PAYW - 24, CT + 176, "Rp299.000", { size: 18, weight: 700, fill: C.strong, anchor: "end" }) +
+      [0, 1, 2, 3].map((k) => rect(PAYX + 24, CT + 214 + k * 64, PAYW - 48, 44, { r: 6, fill: C.white, stroke: "#dcdfe4" }) + rect(PAYX + 40, CT + 232 + k * 64, [120, 180, 90, 150][k], 9, { r: 4, fill: "#eceef1" })).join("") +
+      rect(PAYX + 24, CT + 620, PAYW - 48, 48, { r: 6, fill: C.primary });
+    const PAYBTN = [PAYX + PAYW / 2, CT + 644];
     const els = {
-      start: dlgIn({}),
-      table: t.svg,
-      pay: screen() + browser(payX, payY, BW, BH, "nikahin.myscalev.com/…", { tab: "Nikahin's Store" }) +
-        text(payX + 40, payY + 130, "NikahKit Tahunan", { size: 20, weight: 700 }) + text(payX + 40, payY + 160, "Rp299.000", { size: 18, weight: 700, fill: C.sv }) +
-        [0, 1, 2].map((i) => rect(payX + 40, payY + 190 + i * 54, 420, 44, { r: 8, fill: C.bg, stroke: C.line })).join("") + rect(payX + 40, payY + 360, 420, 44, { r: 8, fill: C.sv }) +
-        note(payX + 500, payY + 230, "Halaman bayar Scalev", payX + 462, payY + 240, { w: 190 }),
-      waiting: dlgIn({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar,", "tekan Cek pembayaran."] }),
-      active: dlgIn({ lic: "Paket Tahunan, aktif sampai 14 Oktober 2027.", choose: "Perpanjang atau ganti paket", redeem: false, msg: "Langganan aktif. Tekan Periksa lagi di panel NikahKit." }),
-      gateOk: edFrame({ tab: "NikahKit", railActive: "Template" }) + rect(X + 65, GY, 394, BH - 162, { r: 0, fill: C.paper }) + text(X + 84, GY + 32, "Template", { size: 18, weight: 700 }) + rect(X + 84, GY + 52, 160, 110, { r: 8, fill: C.tint }) + rect(X + 260, GY + 52, 160, 110, { r: 8, fill: C.svTint })
+      dimD0: { svg: dimEd(0, ey) + d0.svg, enter: "fade" },
+      table: { svg: t.svg, enter: "pop", origin: [720, ey + 450], delay: 1.15 },
+      payTab: { svg: crTop({ tabs: tabsB, url: "nikahin.myscalev.com/…" }) + pay, enter: "fade" },
+      payDone: { svg: rect(PAYX + 24, CT + 620, PAYW - 48, 48, { r: 6, fill: C.ok }) + iconX("check", PAYX + PAYW / 2, CT + 644, 22, C.white, 3), enter: "pop", origin: PAYBTN, delay: 1.2 },
+      tabBack: { svg: crTop({ tabs: tabsA, url: "app.scalev.com/pages/" + ID }), enter: "fade" },
+      back: { svg: d1.svg, enter: "fade" },
+      d2: { svg: clipped(d1.X - 30, d1.Y - 10, 500, d1.h + 30, scalevEditor(0, ey, { tab: "NikahKit" }), cover(0, ey), gn.svg, dimEd(0, ey)) + d2.svg, enter: "fade", delay: 1.2 },
+      okRing: { svg: ring(d2.X + 16, d2.Y + d2.h - 16 - 38, 408, 38, { r: 6 }), delay: 1.5 },
+      open: { svg: rect(0, CT + 92, 400, 808, { fill: C.white }) + nkRailWrap(ey) + templatePanel(0, ey, { chip: "Tahunan" }), enter: "fade", delay: 1.2 }
     };
     return {
-      title: "Memilih paket dan membayar di Scalev",
-      base: [edFrame({ tab: "NikahKit" }), gate("Akun belum berlangganan.", "", { chip: "Akun", extra: small(X + 20, GY + 124, "Pilih paket") + small(X + 146, GY + 124, "Periksa lagi", { variant: "ghost" }) })],
+      title: "Memilih paket dan membayar di Scalev", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs: [{ title: PAGE, active: true, fav: favScalev }], url: "app.scalev.com/pages/" + ID }), scalevEditor(0, ey, { tab: "NikahKit" }), cover(0, ey), gn.svg],
       els,
       steps: [
-        { caption: "Di jendela NikahKit, klik Pilih paket.", at: [DX + 80, DY + 162], click: true, show: ["start"], dur: 3 },
-        { caption: "Tabel paket muncul. Klik Pilih di paket yang kamu mau.", at: [t.col(1) + 80, t.y0 + 104], click: true, show: ["table"], dur: 3.4 },
-        { caption: "Halaman bayar Scalev terbuka di tab baru. Selesaikan pembayaran.", hide: ["start", "table"], show: ["pay"], dur: 3.8 },
-        { caption: "Kembali ke tab editor. Klik Cek pembayaran.", at: [DX + 196, DY + 162], click: true, hide: ["pay"], show: ["waiting"], dur: 3.6 },
-        { caption: "Langganan aktif. Tutup jendela ini dengan tombol Esc.", hide: ["waiting"], show: ["active"], dur: 3.6 },
-        { caption: "Di panel, klik Periksa lagi. Editor NikahKit terbuka.", at: [X + 196, GY + 138], click: true, hide: ["active"], show: ["gateOk"], dur: 3.8 }
+        { caption: "Di kartu Paket jendela NikahKit, klik Pilih paket.", cam: { x: 320, y: CT + 20, w: 800 }, at: mid(d0.at.choose), click: true, show: ["table"] },
+        { caption: "Tabel paket muncul. Klik Pilih di paket yang kamu mau.", cam: { x: 330, y: CT + 20, w: 780 }, at: mid(t.btns[1]), click: true, dur: 3 },
+        { caption: "Halaman bayar Scalev terbuka di tab baru. Selesaikan pembayaran.", cam: { x: 0, y: 0, w: 1440 }, at: PAYBTN, click: true, show: ["payTab", "payDone"], hide: ["table"], dur: 3.6 },
+        { caption: "Kembali ke tab editor. Klik Cek pembayaran.", cam: { x: 330, y: CT + 228, w: 780 }, show: ["tabBack", "back", "d2", "okRing"], hide: ["payTab", "payDone"], at: mid(d1.at.paid), click: true, dur: 3.8 },
+        { caption: "Langganan aktif. Tekan Esc untuk menutup jendela NikahKit.", hide: ["okRing"], dur: 3 },
+        { caption: "Di panel, klik Periksa lagi. Editor NikahKit terbuka.", cam: { x: 0, y: CT + 30, w: 820 }, hide: ["back", "d2", "dimD0"], at: mid(gn.at.recheck), click: true, show: ["open"], dur: 3.8 }
       ]
     };
   })(),
 
-  // Hubungkan bisnis Scalev.
+  // Hubungkan bisnis Scalev: gate, kartu Bisnis Scalev, layar izin Scalev, Hubungkan ulang, Periksa lagi.
   "gabung-hubungkan-scalev": (() => {
-    const SX = 560, SY = 90, SW = 360, SH = 380;
+    const gb = GATE_BIZ(0, 0);
+    const lic = { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true };
+    const d1 = dlgAt(0, 0, lic), d2 = dlgAt(0, 0, { ...lic, biz: BIZ, msg: ["Bisnis Scalev terhubung."] });
+    const SX = 900, SY = 140, SW = 480, SH = 600;
+    const consent = shadow(SX, SY, SW, SH, 10, 4) + rect(SX, SY, SW, SH, { r: 10, fill: C.white, stroke: "#d0d4d9" }) + rect(SX, SY, SW, 40, { r: 10, fill: C.crFrame }) + rect(SX, SY + 30, SW, 10, { fill: C.crFrame }) +
+      rect(SX + 10, SY + 7, SW - 20, 26, { r: 13, fill: C.white }) + icon("lock", SX + 26, SY + 20, 12, C.crIcon) + text(SX + 40, SY + 25, "app.scalev.com/oauth/authorize", { size: 12, fill: C.crText }) +
+      circle(SX + SW / 2 - 4, SY + 100, 22, { fill: "#3b7dd8" }) + circle(SX + SW / 2 - 10, SY + 94, 5, { fill: C.white }) + circle(SX + SW / 2 + 2, SY + 106, 5, { fill: C.white }) +
+      rect(SX + 90, SY + 150, 300, 14, { r: 7, fill: "#e3e5e8" }) + rect(SX + 130, SY + 176, 220, 10, { r: 5, fill: "#eceef1" }) +
+      rect(SX + 40, SY + 220, SW - 80, 64, { r: 8, fill: C.white, stroke: C.primary, sw: 2 }) + circle(SX + 72, SY + 252, 14, { fill: C.primary }) + text(SX + 72, SY + 257, "R", { size: 12, weight: 700, fill: C.white, anchor: "middle" }) +
+      text(SX + 96, SY + 257, "Rina Wedding Organizer", { size: 14, weight: 500, fill: C.strong }) +
+      [0, 1, 2].map((k) => rect(SX + 40, SY + 310 + k * 26, [320, 260, 300][k], 10, { r: 5, fill: "#eceef1" })).join("") +
+      rect(SX + 40, SY + SH - 90, SW - 80, 48, { r: 6, fill: C.primary });
+    const OK = [SX + SW / 2, SY + SH - 66];
     const els = {
-      dlg: dlgIn({ lic: "Paket Tahunan, aktif sampai 14 Oktober 2027.", choose: "Perpanjang atau ganti paket", redeem: false }),
-      bizRing: ring(DX + 36, DY + 348, 207, 26),
-      consent: browser(SX, SY, SW, SH, "app.scalev.com/oauth/authorize", { tab: "Scalev" }) + text(SX + 24, SY + 116, "Scalev", { size: 20, weight: 700, fill: C.sv }) +
-        rect(SX + 24, SY + 136, 300, 12, { r: 6, fill: C.soft }) + rect(SX + 24, SY + 158, 250, 12, { r: 6, fill: C.soft }) + rect(SX + 24, SY + 190, 312, 64, { r: 8, fill: C.bg, stroke: C.line }) +
-        rect(SX + 24, SY + 300, 312, 40, { r: 8, fill: C.sv }) + note(SX + 40, SY + 260, "Setujui di layar izin Scalev", SX + 180, SY + 300, { w: 230 }),
-      linked: dlgIn({ lic: "Paket Tahunan, aktif sampai 14 Oktober 2027.", choose: "Perpanjang atau ganti paket", redeem: false, biz: "Rina Wedding Organizer (@rinawo)", connect: "Hubungkan ulang", msg: "Bisnis Scalev terhubung." }),
-      open: edFrame({ tab: "NikahKit", railActive: "Template" }) + rect(X + 65, GY, 394, BH - 162, { r: 0, fill: C.paper }) + text(X + 84, GY + 32, "Template", { size: 18, weight: 700 }) + rect(X + 84, GY + 52, 160, 110, { r: 8, fill: C.tint }) + rect(X + 260, GY + 52, 160, 110, { r: 8, fill: C.svTint })
+      dim: { svg: dimEd(0, 0), enter: "fade", delay: 1.1 },
+      d1: { svg: d1.svg, enter: "pop", origin: [720, 450], delay: 1.15 },
+      bizRing: { svg: ring(...d1.at.connect, { r: 6 }) },
+      consent: { svg: consent, enter: "pop", origin: [SX + SW / 2, SY + SH / 2], delay: 1.2 },
+      d2: { svg: d2.svg, enter: "fade" },
+      linked: { svg: ring(d2.X + 16, d2.at.connect[1] - 68, 408, 121, { r: 10 }), delay: 1.6 },
+      open: { svg: rect(0, 92, 400, 808, { fill: C.white }) + nkRailWrap(0) + templatePanel(0, 0, { chip: "Tahunan" }), enter: "fade", delay: 1.2 }
     };
     return {
-      title: "Menghubungkan bisnis Scalev ke akun NikahKit",
-      base: [edFrame({ tab: "NikahKit" }), gate("Hubungkan bisnis Scalev dulu.", ["Hubungkan di akun NikahKit, lalu tekan", "Periksa lagi."], { warn: true, chip: "Tahunan",
-        extra: small(X + 20, GY + 160, "Hubungkan bisnis Scalev") + small(X + 240, GY + 160, "Periksa lagi", { variant: "ghost" }) })],
+      title: "Menghubungkan bisnis Scalev ke akun NikahKit", world: ED_WORLD,
+      base: [scalevEditor(0, 0, { tab: "NikahKit" }), cover(0, 0), gb.svg],
       els,
       steps: [
-        { caption: "Panel bilang: Hubungkan bisnis Scalev dulu. Klik tombol itu.", at: [X + 110, GY + 174], click: true, dur: 3.4 },
-        { caption: "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev.", at: [DX + 120, DY + 361], click: true, show: ["dlg", "bizRing"], dur: 3.4 },
-        { caption: "Jendela Scalev terbuka. Masuk bila diminta, lalu setujui akses.", at: [SX + 180, SY + 320], click: true, hide: ["bizRing"], show: ["consent"], dur: 4 },
-        { caption: "Nama bisnis tampil. Tombol berubah jadi Hubungkan ulang.", hide: ["consent", "dlg"], show: ["linked"], dur: 3.8 },
-        { caption: "Tekan Esc, lalu klik Periksa lagi. Editor NikahKit terbuka.", at: [X + 290, GY + 174], click: true, hide: ["linked"], show: ["open"], dur: 3.8 }
+        { caption: "Panel bilang Hubungkan bisnis Scalev dulu. Klik tombol itu.", cam: { x: 0, y: 70, w: 700 }, at: mid(gb.at.connect), click: true, show: ["dim", "d1"], dur: 3.4 },
+        { caption: "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev.", cam: { x: 300, y: 230, w: 840 }, at: mid(d1.at.connect), click: true, show: ["bizRing", "consent"], dur: 3.4 },
+        { caption: "Jendela Scalev terbuka. Masuk bila diminta, pilih bisnis, setujui.", cam: { x: 420, y: 130, w: 1020 }, at: OK, click: true, hide: ["bizRing"], dur: 3.6 },
+        { caption: "Nama bisnis tampil. Tombolnya berubah jadi Hubungkan ulang.", cam: { x: 300, y: 220, w: 840 }, hide: ["consent", "d1"], show: ["d2", "linked"], dur: 3.6 },
+        { caption: "Tekan Esc, lalu klik Periksa lagi. Editor NikahKit terbuka.", cam: { x: 0, y: 70, w: 820 }, hide: ["d2", "linked", "dim"], at: mid(gb.at.recheck), click: true, show: ["open"], dur: 3.8 }
       ]
     };
   })(),
 
-  // Update ekstensi.
+  // Update: banner (nomor versi tidak ditampilkan), unduh, ekstrak, timpa folder lama, ↻ di chrome://extensions, muat ulang.
   "gabung-update": (() => {
-    const FX = 150, FY = 70, FW = 660, FH = 400;
-    const banner = (hint) => rect(X + 80, GY + 50, 364, hint ? 128 : 96, { r: 8, fill: C.warnTint }) + text(X + 94, GY + 74, `NikahKit ${NEW} tersedia.`, { size: 13, weight: 700, fill: C.warn }) +
-      text(X + 262, GY + 74, `Anda memakai ${VER}.`, { size: 13, fill: C.ink }) + small(X + 94, GY + 90, "⤓ Update") + small(X + 188, GY + 90, "Cara update", { variant: "ghost" }) +
-      (hint ? para(X + 94, GY + 144, ["Ekstrak ZIP, timpa isi folder NikahKit, lalu", "klik ↻ di chrome://extensions."], { size: 12, lh: 16, fill: C.ink }) : "");
-    const ed = (b) => edFrame({ tab: "NikahKit", railActive: "Template" }) + rect(X + 65, GY, 394, BH - 162, { r: 0, fill: C.paper }) + text(X + 84, GY + 32, "Template", { size: 18, weight: 700 }) + b;
+    const ey = CT;
+    const tabsEd = [{ title: PAGE, active: true, fav: favScalev }, { title: "Ekstensi", active: false, fav: favChrome }];
+    const tabsExt = [{ title: PAGE, active: false, fav: favScalev }, { title: "Ekstensi", active: true, fav: favChrome }];
+    const edPanel = (banner, hint) => rect(0, CT + 92, 400, 808, { fill: C.white }) + nkRailWrap(ey) + templatePanel(0, ey, { banner, hint, chip: "Tahunan" }) + (banner ? updateBanner(0, ey, { hint }) : "");
+    const EX = 270, EY = 190, EW = 900, EH = 560, IX = EX + 220, IY = EY + 110;
+    const bubble = shadow(1012, 92, 380, 132, 10, 2) + rect(1012, 92, 380, 132, { r: 10, fill: C.white }) + rect(1032, 116, 28, 34, { r: 4, fill: "#e8eaed", stroke: "#c4c7c5" }) +
+      text(1074, 128, "nikahkit-….zip", { size: 14, fill: C.crText }) + text(1074, 148, "120 KB", { size: 12, fill: C.crSub }) + iconX("folder", 1362, 134, 18, C.crIcon);
+    const newWin = explorer(EX, EY, EW, EH, { title: "NikahKit", path: "Unduhan › nikahkit-… › NikahKit", side: "Unduhan" }) + NK_FILES.map((f, i) => fileIcon(IX + i * 130, IY, f, true)).join("");
+    const oldWin = explorer(EX, EY, EW, EH, { title: "NikahKit", path: "Dokumen › NikahKit", side: "Dokumen" }) + NK_FILES.map((f, i) => fileIcon(IX + i * 130, IY, f, false)).join("");
+    const RX = EX + 180, RY = EY + 150;
+    const replace = shadow(RX, RY, 540, 250, 8, 3) + rect(RX, RY, 540, 250, { r: 8, fill: C.white, stroke: "#cfd3d8" }) + rect(RX + 24, RY + 30, 260, 12, { r: 6, fill: "#e3e5e8" }) +
+      rect(RX + 24, RY + 80, 492, 52, { r: 6, fill: "#e5eefb", stroke: "#99c9ef" }) + iconX("check", RX + 48, RY + 106, 18, "#0067c0", 2.5) + text(RX + 72, RY + 111, "Replace the files in the destination", { size: 14, weight: 500, fill: "#1f1f1f" }) +
+      rect(RX + 24, RY + 146, 492, 40, { r: 6, fill: C.white }) + rect(RX + 72, RY + 162, 180, 9, { r: 4, fill: "#e3e5e8" });
     const els = {
-      e1: ed(banner(false)),
-      e2: ed(banner(true)) + rect(X + BW - 330, TOP + 6, 310, 46, { r: 8, fill: C.paper, stroke: C.line }) + text(X + BW - 316, TOP + 34, `nikahkit-${NEW}.zip · Selesai`, { size: 13 }),
-      files: screen(fileWin(FX, FY, FW, FH, `Unduhan › nikahkit-${NEW}`)) + folderIcon(FX + 200, FY + 92, "NikahKit", { bold: true }) + text(FX + 150, FY + 66, "ZIP baru sudah diekstrak:", { size: 13, fill: C.muted }) +
-        note(FX + 300, FY + 210, "salin semua isinya", FX + 232, FY + 160, { w: 160 }),
-      replace: screen(fileWin(FX, FY, FW, FH, "Dokumen › NikahKit", "Dokumen")) + text(FX + 150, FY + 66, "Folder NikahKit lama (yang dipilih saat Load unpacked):", { size: 13, fill: C.muted }) +
-        ["manifest.json", "nk-bg.js", "pin.html", "…"].map((f, i) => rect(FX + 150, FY + 84 + i * 34, 300, 28, { r: 5, fill: i < 3 ? C.bg : C.paper }) + text(FX + 164, FY + 103 + i * 34, f, { size: 13 })).join("") +
-        note(FX + 330, FY + 250, "Tempel, lalu pilih timpa semua", FX + 300, FY + 160, { w: 240 }),
-      ext: screen(extPage({ card: "old" })),
-      reloadRing: ring(RELOAD[0] - 14, RELOAD[1] - 16, 28, 28, { r: 14 }),
-      extNew: extCard(NEW),
-      e3: ed(rect(X + 80, GY + 50, 364, 60, { r: 8, fill: C.okTint }) + text(X + 94, GY + 86, "Banner update hilang: versi terbaru terpasang.", { size: 13, fill: C.ok, weight: 600 }))
+      hint: { svg: edPanel(true, true) + bubble, enter: "fade", delay: 1.2 },
+      files: { svg: newWin, enter: "pop", origin: [720, 470] },
+      old: { svg: oldWin, enter: "fade", delay: 0.2 },
+      replace: { svg: replace, enter: "pop", origin: [RX + 270, RY + 125], delay: 0.9 },
+      ext: { svg: crTop({ tabs: tabsExt, url: "chrome://extensions" }) + extPage(0, CT, { dev: true, card: true }), enter: "fade" },
+      spin: { svg: ring(RELOAD[0] - 14, RELOAD[1] - 14, 28, 28, { r: 14 }) + ring(EXT_CARD.x, CT + EXT_CARD.y, 400, 208, { r: 10, color: C.ok, sw: 2 }), delay: 1.2 },
+      after: { svg: crTop({ tabs: tabsEd, url: "app.scalev.com/pages/" + ID }) + scalevEditor(0, ey, { tab: "NikahKit" }) + cover(0, ey) + edPanel(false), enter: "fade", delay: 0.4 }
     };
     return {
-      title: "Memperbarui NikahKit ke versi baru",
-      base: [], els,
+      title: "Memperbarui NikahKit ke versi terbaru", world: CHROME_WORLD,
+      base: [chrome(0, 0, 1440, 985, { tabs: tabsEd, url: "app.scalev.com/pages/" + ID }), scalevEditor(0, ey, { tab: "NikahKit" }), cover(0, ey), edPanel(true, false)],
+      els,
       steps: [
-        { caption: "Ada versi baru? Banner kuning muncul. Klik Update.", at: [X + 130, GY + 104], click: true, show: ["e1"], dur: 3.4 },
-        { caption: "ZIP terbaru terunduh. Ekstrak seperti saat memasang.", hide: ["e1"], show: ["e2"], dur: 3.4 },
-        { caption: "Buka folder hasil ekstrak, salin isi folder NikahKit yang baru.", hide: ["e2"], show: ["files"], at: [FX + 232, FY + 124], dur: 3.4 },
-        { caption: "Buka folder NikahKit lama, tempel, lalu pilih timpa semua file.", at: [FX + 300, FY + 160], click: true, hide: ["files"], show: ["replace"], dur: 3.8 },
-        { caption: "Di chrome://extensions, klik ↻ di kartu NikahKit.", at: RELOAD, click: true, hide: ["replace"], show: ["ext", "reloadRing"], dur: 3.4 },
-        { caption: "Nomor versi di kartu berubah ke versi baru.", show: ["extNew"], hide: ["reloadRing"], dur: 3 },
-        { caption: "Muat ulang editor Scalev (F5). Banner update hilang.", hide: ["ext", "extNew"], show: ["e3"], dur: 3.6 }
+        { caption: "Ada versi baru? Banner kuning muncul di panel. Klik Update.", cam: { x: 0, y: CT + 40, w: 640 }, at: [UPDATE_BTN[0], ey + UPDATE_BTN[1]], click: true, show: ["hint"], dur: 3.6 },
+        { caption: "ZIP terbaru terunduh. Ekstrak, buka folder NikahKit yang baru, salin isinya.", cam: { x: 270, y: 186, w: 900 }, at: [IX + 300, IY + 40], show: ["files"], dur: 3.6 },
+        { caption: "Buka folder NikahKit lama, tempel, lalu pilih ganti semua file.", show: ["old", "replace"], hide: ["files"], at: [RX + 270, RY + 106], click: true, dur: 3.8 },
+        { caption: "Buka chrome://extensions, klik ↻ di kartu NikahKit.", cam: { x: 300, y: CT + 100, w: 640 }, hide: ["old", "replace"], show: ["ext", "spin"], at: RELOAD, click: true, dur: 3.6 },
+        { caption: "Kembali ke editor, tekan F5. Banner update hilang: versi terbaru aktif.", cam: { x: 0, y: CT + 40, w: 640 }, hide: ["ext", "spin"], show: ["after"], dur: 3.8 }
       ]
     };
   })()
 };
 
-// ---- Helpers used by the scenes above (hoisted function declarations) ------------------------------------------------
-function extCardMini(x, y) {
-  return rect(x, y, 420, 120, { r: 10, fill: C.bg, stroke: C.line }) + rect(x + 18, y + 18, 36, 36, { r: 8, fill: C.accent }) + text(x + 36, y + 42, "N", { size: 16, weight: 700, fill: C.paper, anchor: "middle" }) +
-    text(x + 68, y + 34, `NikahKit ${VER}`, { size: 14, weight: 600 }) + text(x + 68, y + 54, "chrome://extensions · Load unpacked", { size: 12, fill: C.muted }) + toggle(x + 360, y + 80, true);
+// ---- Pieces defined after use (hoisted) -------------------------------------------------------------------------------
+function dimRect() { return rect(0, CT, 1440, 900, { fill: "rgba(0,0,0,.32)" }); }
+// The editor rail (Template active), at the editor origin ey.
+function nkRailWrap(ey) { return crop(0, ey + 92, 72, 808, 0, 92, 1, scalevEditor(0, 0, { tab: "NikahKit", rail: "Template" })); }
+// pin.html PIN card with a PIN shown (openPin with an ID): PIN, copy, WhatsApp handover, Lihat PIN / Buat PIN baru.
+function pinCard(x, y) {
+  return rect(x + 0.5, y + 0.5, 407, 213, { r: 8, fill: C.white, stroke: C.line }) + text(x + 17, y + 28, "PIN dashboard", { size: 12, weight: 700 }) +
+    text(x + 17, y + 52, "PIN aktif (versi 1). Lupa? Lihat lagi kapan saja.", { size: 12, fill: C.faint }) +
+    rect(x + 17, y + 64, 296, 40, { r: 4, fill: C.mutedBg }) + text(x + 29, y + 91, "482190", { size: 16, weight: 700, fill: C.strong, mono: true }).replace("<text", '<text letter-spacing="6"') +
+    icon("copy", x + 335, y + 84, 18, C.text) + icon("message-circle", x + 375, y + 84, 18, C.text) +
+    nkBtn(x + 17, y + 116, "Lihat PIN", { size: 14, w: tw("Lihat PIN", 14, 500) + 24 }) + nkBtn(x + 17 + tw("Lihat PIN", 14, 500) + 32, y + 116, "Buat PIN baru", { variant: "quiet", size: 14, w: tw("Buat PIN baru", 14, 500) + 24 }) +
+    rect(x + 17, y + 166, 374, 32, { r: 4, fill: C.primarySoft }) + text(x + 29, y + 187, "Pesan tersalin.", { size: 12, fill: C.strong });
 }
-function phoneMini(x, y, label) {
-  return rect(x, y, 96, 140, { r: 16, fill: "#1f1f1f" }) + rect(x + 6, y + 14, 84, 116, { r: 4, fill: C.tint }) + (label ? text(x + 48, y + 66, label, { size: 11, anchor: "middle", weight: 700, fill: C.cocoa }) : "") +
-    rect(x + 22, y + 92, 52, 18, { r: 9, fill: C.accent });
+// Landing Pages row + linked business, for the journey tile.
+function lpRowCard() {
+  return rect(0, 0, 420, 300, { fill: C.white }) + rect(6, 10, 408, 121, { r: 8, fill: C.white, stroke: C.line }) + text(22, 38, "Bisnis Scalev", { size: 12, weight: 700 }) +
+    text(22, 65, BIZ, { size: 14, fill: C.text }) + nkBtn(22, 81, "Hubungkan ulang", { variant: "quiet", size: 14, w: tw("Hubungkan ulang", 14, 500) + 24 }) +
+    rect(6, 160, 408, 120, { r: 6, fill: C.white, stroke: "#e6e8ec" }) + rect(6, 160, 408, 34, { r: 6, fill: "#f5f6f8" }) + text(20, 182, "Nama Landing Page", { size: 12, fill: "#5b6675" }) + text(300, 182, "Mode", { size: 12, fill: "#5b6675" }) +
+    text(20, 228, PAGE, { size: 14, weight: 500, fill: C.primary }) + rect(300, 210, 83, 28, { r: 4, fill: "#e6f4fb" }) + text(341, 228, "HTML Mode", { size: 12, weight: 600, fill: "#1f86c2", anchor: "middle" });
 }
-function waBubble(x, y, lines) {
-  return rect(x, y, 560, 120, { r: 10, fill: C.waTint }) + para(x + 16, y + 26, lines, { size: 13, lh: 22, fill: C.ink }) + circle(x + 620, y + 60, 36, { fill: C.wa }) + text(x + 620, y + 66, "WA", { size: 16, weight: 700, fill: C.paper, anchor: "middle" });
-}
-// pin.html "Pilih paket" table (wide dialog).
-function planTable() {
-  const x = 100, w = 760, y = 30, h = 486;
-  const fw = 250, cw = 170;
-  const col = (i) => x + fw + i * cw;
-  const y0 = y + 52; // plan header block top
-  const rowH = 28, ry = y0 + 136;
-  const row = (i) => ry + i * rowH;
-  const rows = [
-    ["Masa aktif", "30 hari", "1 tahun", "Selama layanan berjalan"],
-    ["Jumlah undangan", "Tanpa batas", "Tanpa batas", "Tanpa batas"],
-    ["Editor NikahKit di Scalev", "✓", "✓", "✓"],
-    ["Buku Tamu Digital", "✓", "✓", "✓"],
-    ["Akun staff penerima tamu", "✗", "✓", "✓"],
-    ["Impor daftar tamu CSV", "✗", "✓", "✓"],
-    ["PIN dashboard dan tautan tamu", "✓", "✓", "✓"],
-    ["Semua template yang tersedia", "✓", "✓", "✓"],
-    ["Saat masa aktif habis", "Tenggang 7 hari", "Tenggang 7 hari", "Tidak perlu perpanjang"]
-  ];
-  const plans = [["", "Bulanan", "Rp79.000", "per 30 hari", true], ["Paling hemat", "Tahunan", "Rp299.000", "per tahun, setara Rp24.917/bulan", false], ["", "Sekali Bayar", "Rp699.000", "sekali bayar, tanpa perpanjang", true]];
-  let s = dim() + card(x, y, w, h, null) + text(x + 20, y + 32, "Pilih paket", { size: 16, weight: 700 }) + button(x + w - 104, y + 12, "Kembali", { variant: "ghost", w: 84, h: 30, size: 13 });
-  s += rect(col(1), y0, cw, row(9) - y0, { r: 0, fill: C.bg });
-  plans.forEach(([tag, name, price, per, ghost], i) => {
-    const cx = col(i) + 12;
-    if (tag) s += rect(cx, y0 + 6, tag.length * 7 + 12, 18, { r: 4, fill: C.svTint }) + text(cx + 6, y0 + 19, tag, { size: 11, weight: 600, fill: C.svDark });
-    s += text(cx, y0 + 42, name, { size: 14, weight: 700 }) + text(cx, y0 + 64, price, { size: 17, weight: 700, fill: C.sv });
-    s += per.length > 22 ? para(cx, y0 + 80, per.includes("setara") ? ["per tahun, setara", "Rp24.917/bulan"] : ["sekali bayar, tanpa", "perpanjang"], { size: 11, fill: C.muted, lh: 13 }) : text(cx, y0 + 80, per, { size: 11, fill: C.muted });
-    s += button(cx, y0 + 102, "Pilih", { variant: ghost ? "ghost" : "primary", w: cw - 24, h: 28, size: 13 });
-  });
-  rows.forEach((r, i) => {
-    s += line(x + 12, row(i), x + w - 12, row(i));
-    s += text(x + 20, row(i) + 19, r[0], { size: 12 });
-    r.slice(1).forEach((v, j) => (s += text(col(j) + 12, row(i) + 19, v, { size: v.length > 1 ? 11 : 14, weight: 600, fill: v === "✓" ? C.ok : v === "✗" ? "#9aa0a6" : C.ink })));
-  });
-  const footY = row(9) + 26;
-  s += text(x + 20, footY, "Harga belum termasuk biaya layanan pembayaran Scalev. Perpanjang kapan saja: sisa masa aktif tetap terhitung.", { size: 11, fill: C.muted });
-  return { svg: s, x, w, y0, col, row, footY };
+// Couple dashboard, Hari-H tab (dash-hari-h-hp.png), 390x844 at (x, y).
+function scanScreen(x, y) {
+  const G = "#57a96b";
+  return rect(x, y, 390, 844, { fill: "#f3f0eb" }) + rect(x, y, 390, 64, { fill: C.white }) + text(x + 16, y + 29, "Scan tamu", { size: 16, fill: "#0a0a0a" }) + text(x + 16, y + 48, "/" + SLUG, { size: 12, fill: "#666" }) +
+    rect(x + 16, y + 80, 358, 40, { r: 20, fill: G }) + text(x + 195, y + 106, "Buka kamera", { size: 15, weight: 700, fill: C.white, anchor: "middle" }) +
+    text(x + 20, y + 146, "Atau tempel link tamu", { size: 13, fill: "#555" }) + rect(x + 16, y + 155, 358, 52, { r: 26, fill: C.white }) +
+    text(x + 36, y + 187, "https://…?to=Nama&u=KODE", { size: 16, fill: "#8a8a8a" }) + circle(x + 348, y + 181, 20, { fill: G }) + icon("send", x + 348, y + 181, 16, C.white) +
+    rect(x, y + 773, 390, 71, { fill: C.white }) + line(x, y + 773.5, x + 390, y + 773.5, { stroke: "#e5e5e5" }) +
+    [["Beranda", 36], ["Kirim", 102], ["Tamu", 166], ["Ucapan", 231], ["Hari-H", 296]].map(([l, cx]) => (l === "Hari-H" ? rect(x + 264, y + 784, 64, 32, { r: 16, fill: "#d9fdd3" }) : "") +
+      circle(x + cx, y + 800, 8, { stroke: "#0a0a0a", sw: 1.6 }) + text(x + cx, y + 833, l, { size: 12, fill: "#0a0a0a", anchor: "middle" })).join("");
 }
