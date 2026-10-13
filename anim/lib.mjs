@@ -280,8 +280,9 @@ export function compile(scene) {
     const cx = r.x + r.w / 2, cy = r.y + (r.h ?? vh) / 2;
     return { s, tx: -(cx - vw / 2) * s, ty: -(cy - vh / 2) * s };
   };
-  const cams = []; let prevCam = steps[0].cam ?? "all";
-  steps.forEach((st) => { if (st.cam) prevCam = st.cam; cams.push(camOf(prevCam)); });
+  // Static view: every step shows the whole world; per-step `cam` is ignored.
+  const cams = steps.map(() => camOf("all"));
+  steps.forEach((st) => delete st.cam);
   const camT = (c) => `translate(${+c.tx.toFixed(2)}px,${+c.ty.toFixed(2)}px) scale(${+c.s.toFixed(4)})`;
   const MOVE = 0.6;
   const camKf = [];
