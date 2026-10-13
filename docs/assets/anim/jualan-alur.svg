@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="ttl dsc" font-family='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' data-total="21.400000000000002" data-steps="0,3.4,6.4,9.4,12.4,16">
+<title id="ttl">Alur jualan undangan dari klien sampai hari-H</title>
+<desc id="dsc">1. Klien menemukan Landing page kamu, lalu mengisi form data undangan. 2. Isian klien masuk ke Pesanan masuk di panel NikahKit. 3. Klik nama klien: semua kolom undangan terisi otomatis. 4. Ganti foto contoh, lalu Simpan &amp; Terbitkan di Scalev. 5. Kirim PIN dan pesan untuk pengantin. Mereka kirim undangan ke tamu. 6. Hari-H: check-in. Setelah acara: Buka untuk semua.</desc>
+<style>#e-a1{opacity:1;animation:v0 21.400000000000002s linear infinite}@keyframes v0{0%{opacity:0}1.168%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a2{opacity:1;animation:v1 21.400000000000002s linear infinite}@keyframes v1{0%{opacity:0}1.168%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a3{opacity:1;animation:v2 21.400000000000002s linear infinite}@keyframes v2{0%{opacity:0}15.888%{opacity:0}17.056%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a4{opacity:1;animation:v3 21.400000000000002s linear infinite}@keyframes v3{0%{opacity:0}29.907%{opacity:0}31.075%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a5{opacity:1;animation:v4 21.400000000000002s linear infinite}@keyframes v4{0%{opacity:0}43.925%{opacity:0}45.093%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a6{opacity:1;animation:v5 21.400000000000002s linear infinite}@keyframes v5{0%{opacity:0}57.944%{opacity:0}59.112%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a7{opacity:1;animation:v6 21.400000000000002s linear infinite}@keyframes v6{0%{opacity:0}57.944%{opacity:0}59.112%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a8{opacity:1;animation:v7 21.400000000000002s linear infinite}@keyframes v7{0%{opacity:0}74.766%{opacity:0}75.935%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#e-a9{opacity:1;animation:v8 21.400000000000002s linear infinite}@keyframes v8{0%{opacity:0}74.766%{opacity:0}75.935%{opacity:1}98.131%{opacity:1}100%{opacity:0}}
+#c0{opacity:0;animation:c0 21.400000000000002s linear infinite}@keyframes c0{0%{opacity:1}15.888%{opacity:1}17.056%{opacity:0}99.766%{opacity:0}100%{opacity:1}}
+#d0{animation:d0 21.400000000000002s linear infinite}@keyframes d0{0%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:#ffffff}}
+#c1{opacity:0;animation:c1 21.400000000000002s linear infinite}@keyframes c1{0%{opacity:0}15.888%{opacity:0}17.056%{opacity:1}29.907%{opacity:1}31.075%{opacity:0}100%{opacity:0}}
+#d1{animation:d1 21.400000000000002s linear infinite}@keyframes d1{0%{fill:rgba(255,255,255,.35)}15.888%{fill:rgba(255,255,255,.35)}17.056%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c2{opacity:0;animation:c2 21.400000000000002s linear infinite}@keyframes c2{0%{opacity:0}29.907%{opacity:0}31.075%{opacity:1}43.925%{opacity:1}45.093%{opacity:0}100%{opacity:0}}
+#d2{animation:d2 21.400000000000002s linear infinite}@keyframes d2{0%{fill:rgba(255,255,255,.35)}29.907%{fill:rgba(255,255,255,.35)}31.075%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c3{opacity:0;animation:c3 21.400000000000002s linear infinite}@keyframes c3{0%{opacity:0}43.925%{opacity:0}45.093%{opacity:1}57.944%{opacity:1}59.112%{opacity:0}100%{opacity:0}}
+#d3{animation:d3 21.400000000000002s linear infinite}@keyframes d3{0%{fill:rgba(255,255,255,.35)}43.925%{fill:rgba(255,255,255,.35)}45.093%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c4{opacity:0;animation:c4 21.400000000000002s linear infinite}@keyframes c4{0%{opacity:0}57.944%{opacity:0}59.112%{opacity:1}74.766%{opacity:1}75.935%{opacity:0}100%{opacity:0}}
+#d4{animation:d4 21.400000000000002s linear infinite}@keyframes d4{0%{fill:rgba(255,255,255,.35)}57.944%{fill:rgba(255,255,255,.35)}59.112%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c5{opacity:1;animation:c5 21.400000000000002s linear infinite}@keyframes c5{0%{opacity:0}74.766%{opacity:0}75.935%{opacity:1}98.131%{opacity:1}99.299%{opacity:0}100%{opacity:0}}
+#d5{animation:d5 21.400000000000002s linear infinite}@keyframes d5{0%{fill:rgba(255,255,255,.35)}74.766%{fill:rgba(255,255,255,.35)}75.935%{fill:#ffffff}98.131%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#n0{opacity:0;animation:c0 21.400000000000002s linear infinite}
+#n1{opacity:0;animation:c1 21.400000000000002s linear infinite}
+#n2{opacity:0;animation:c2 21.400000000000002s linear infinite}
+#n3{opacity:0;animation:c3 21.400000000000002s linear infinite}
+#n4{opacity:0;animation:c4 21.400000000000002s linear infinite}
+#n5{opacity:1;animation:c5 21.400000000000002s linear infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
+<defs></defs>
+<rect x="0" y="0" width="960" height="600" rx="14" fill="#f8f9fa"/>
+<rect x="0" y="0" width="960" height="536" rx="0" fill="#f8f9fa"/>
+<text x="480" y="50" font-size="22" font-weight="700" fill="#202124" text-anchor="middle">Alur kerja vendor dengan NikahKit</text>
+<g id="e-a1"><rect x="63" y="94" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="60" y="90" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="180" y="130" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">1. Klien buka</text><text x="180" y="154" font-size="14" fill="#5f6368" text-anchor="middle">Landing page</text>
+<text x="322" y="142" font-size="18" fill="#0899cf">▶</text>
+</g>
+<g id="e-a2"><rect x="363" y="94" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="360" y="90" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="480" y="130" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">2. Klien isi</text><text x="480" y="154" font-size="14" fill="#5f6368" text-anchor="middle">form data undangan</text>
+<text x="622" y="142" font-size="18" fill="#0899cf">▶</text>
+</g>
+<g id="e-a3"><rect x="663" y="94" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="660" y="90" width="240" height="90" rx="12" fill="#e6f6fc" stroke="#0899cf" stroke-width="1.5"/>
+<text x="780" y="130" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">3. Masuk ke</text><text x="780" y="154" font-size="14" fill="#5f6368" text-anchor="middle">Pesanan masuk</text>
+
+<text x="780" y="218" font-size="18" fill="#0899cf" text-anchor="middle">▼</text></g>
+<g id="e-a4"><rect x="663" y="254" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="660" y="250" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="780" y="290" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">4. Klik nama:</text><text x="780" y="314" font-size="14" fill="#5f6368" text-anchor="middle">undangan terisi</text>
+<text x="630" y="302" font-size="18" fill="#0899cf">◀</text>
+</g>
+<g id="e-a5"><rect x="363" y="254" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="360" y="250" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="480" y="290" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">5. Ganti foto, lalu</text><text x="480" y="314" font-size="14" fill="#5f6368" text-anchor="middle">Simpan &amp; Terbitkan</text>
+<text x="330" y="302" font-size="18" fill="#0899cf">◀</text>
+</g>
+<g id="e-a6"><rect x="63" y="254" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="60" y="250" width="240" height="90" rx="12" fill="#e6f6fc" stroke="#0899cf" stroke-width="1.5"/>
+<text x="180" y="290" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">6. Kirim PIN dan</text><text x="180" y="314" font-size="14" fill="#5f6368" text-anchor="middle">pesan untuk pengantin</text>
+
+<text x="180" y="378" font-size="18" fill="#0899cf" text-anchor="middle"></text><text x="180" y="378" font-size="18" fill="#0899cf" text-anchor="middle">▼</text></g>
+<g id="e-a7"><rect x="63" y="414" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="60" y="410" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="180" y="450" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">7. Pengantin kirim</text><text x="180" y="474" font-size="14" fill="#5f6368" text-anchor="middle">undangan ke tamu</text>
+<text x="322" y="462" font-size="18" fill="#0899cf">▶</text>
+</g>
+<g id="e-a8"><rect x="363" y="414" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="360" y="410" width="240" height="90" rx="12" fill="#ffffff" stroke="#0899cf" stroke-width="1.5"/>
+<text x="480" y="450" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">8. Hari-H:</text><text x="480" y="474" font-size="14" fill="#5f6368" text-anchor="middle">check-in tamu</text>
+<text x="622" y="462" font-size="18" fill="#0899cf">▶</text>
+</g>
+<g id="e-a9"><rect x="663" y="414" width="240" height="90" rx="12" fill="rgba(0,0,0,.07)"/><rect x="660" y="410" width="240" height="90" rx="12" fill="#e6f6fc" stroke="#0899cf" stroke-width="1.5"/>
+<text x="780" y="450" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">9. Setelah acara:</text><text x="780" y="474" font-size="14" fill="#5f6368" text-anchor="middle">Buka untuk semua</text>
+
+</g>
+
+
+<rect x="0" y="536" width="960" height="64" rx="0" fill="#2b1a07"/><rect x="0" y="586" width="960" height="14" rx="14" fill="#2b1a07"/>
+<g id="n0"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g><g id="n1"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">2</text></g><g id="n2"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">3</text></g><g id="n3"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">4</text></g><g id="n4"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">5</text></g><g id="n5"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">6</text></g><g id="c0"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Klien menemukan Landing page kamu, lalu mengisi form data undangan.</text></g><g id="c1"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Isian klien masuk ke Pesanan masuk di panel NikahKit.</text></g><g id="c2"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Klik nama klien: semua kolom undangan terisi otomatis.</text></g><g id="c3"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Ganti foto contoh, lalu Simpan &amp; Terbitkan di Scalev.</text></g><g id="c4"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Kirim PIN dan pesan untuk pengantin. Mereka kirim undangan ke tamu.</text></g><g id="c5"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Hari-H: check-in. Setelah acara: Buka untuk semua.</text></g><circle id="d0" cx="866" cy="568" r="4" fill="#ffffff"/><circle id="d1" cx="880" cy="568" r="4" fill="#ffffff"/><circle id="d2" cx="894" cy="568" r="4" fill="#ffffff"/><circle id="d3" cx="908" cy="568" r="4" fill="#ffffff"/><circle id="d4" cx="922" cy="568" r="4" fill="#ffffff"/><circle id="d5" cx="936" cy="568" r="4" fill="#ffffff"/>
+</svg>

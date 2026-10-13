@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="ttl dsc" font-family='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' data-total="19" data-steps="0,3.6,7,10.2,13.6">
+<title id="ttl">Checklist sebelum menyerahkan undangan ke klien</title>
+<desc id="dsc">1. Sebelum serah ke klien, cek isi undangan dan foto. 2. Musik, simpan, dan terbit sudah beres. 3. Coba tautan sebagai tamu dengan ?to=Nama. 4. Buat PIN dashboard dan salin pesan untuk pengantin. 5. Undangan khusus dan kode staff: cek bila dipakai klien.</desc>
+<style>#e-ckr0{opacity:1;animation:v0 19s linear infinite}@keyframes v0{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc0{opacity:1;animation:v1 19s linear infinite}@keyframes v1{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr1{opacity:1;animation:v2 19s linear infinite}@keyframes v2{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc1{opacity:1;animation:v3 19s linear infinite}@keyframes v3{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr2{opacity:1;animation:v4 19s linear infinite}@keyframes v4{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc2{opacity:1;animation:v5 19s linear infinite}@keyframes v5{0%{opacity:0}18.947%{opacity:0}20.263%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr3{opacity:1;animation:v6 19s linear infinite}@keyframes v6{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc3{opacity:1;animation:v7 19s linear infinite}@keyframes v7{0%{opacity:0}18.947%{opacity:0}20.263%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr4{opacity:1;animation:v8 19s linear infinite}@keyframes v8{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc4{opacity:1;animation:v9 19s linear infinite}@keyframes v9{0%{opacity:0}18.947%{opacity:0}20.263%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr5{opacity:1;animation:v10 19s linear infinite}@keyframes v10{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc5{opacity:1;animation:v11 19s linear infinite}@keyframes v11{0%{opacity:0}36.842%{opacity:0}38.158%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr6{opacity:1;animation:v12 19s linear infinite}@keyframes v12{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc6{opacity:1;animation:v13 19s linear infinite}@keyframes v13{0%{opacity:0}53.684%{opacity:0}55%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr7{opacity:1;animation:v14 19s linear infinite}@keyframes v14{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc7{opacity:1;animation:v15 19s linear infinite}@keyframes v15{0%{opacity:0}53.684%{opacity:0}55%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr8{opacity:1;animation:v16 19s linear infinite}@keyframes v16{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc8{opacity:1;animation:v17 19s linear infinite}@keyframes v17{0%{opacity:0}71.579%{opacity:0}72.895%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckr9{opacity:1;animation:v18 19s linear infinite}@keyframes v18{0%{opacity:0}1.316%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#e-ckc9{opacity:1;animation:v19 19s linear infinite}@keyframes v19{0%{opacity:0}71.579%{opacity:0}72.895%{opacity:1}97.895%{opacity:1}100%{opacity:0}}
+#cur{animation:cur 19s ease-in-out infinite}@keyframes cur{0%{transform:translate(840px,476px)}6.632%{transform:translate(239px,87px)}18.947%{transform:translate(239px,87px)}25.211%{transform:translate(239px,213px)}36.842%{transform:translate(239px,213px)}42.737%{transform:translate(239px,297px)}53.684%{transform:translate(239px,297px)}59.947%{transform:translate(239px,381px)}71.579%{transform:translate(239px,381px)}78.579%{transform:translate(239px,465px)}97.895%{transform:translate(239px,465px)}100%{transform:translate(840px,476px)}}
+#r0{opacity:0;transform-origin:239px 87px;animation:r0 19s linear infinite}@keyframes r0{0%,6.632%{opacity:0;transform:scale(.3)}7.053%{opacity:1;transform:scale(.5)}9.789%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#r1{opacity:0;transform-origin:239px 213px;animation:r1 19s linear infinite}@keyframes r1{0%,25.211%{opacity:0;transform:scale(.3)}25.632%{opacity:1;transform:scale(.5)}28.368%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#r2{opacity:0;transform-origin:239px 297px;animation:r2 19s linear infinite}@keyframes r2{0%,42.737%{opacity:0;transform:scale(.3)}43.158%{opacity:1;transform:scale(.5)}45.895%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#r3{opacity:0;transform-origin:239px 381px;animation:r3 19s linear infinite}@keyframes r3{0%,59.947%{opacity:0;transform:scale(.3)}60.368%{opacity:1;transform:scale(.5)}63.105%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#r4{opacity:0;transform-origin:239px 465px;animation:r4 19s linear infinite}@keyframes r4{0%,78.579%{opacity:0;transform:scale(.3)}79%{opacity:1;transform:scale(.5)}81.737%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#c0{opacity:0;animation:c0 19s linear infinite}@keyframes c0{0%{opacity:1}18.947%{opacity:1}20.263%{opacity:0}99.737%{opacity:0}100%{opacity:1}}
+#d0{animation:d0 19s linear infinite}@keyframes d0{0%{fill:#ffffff}97.895%{fill:#ffffff}100%{fill:#ffffff}}
+#c1{opacity:0;animation:c1 19s linear infinite}@keyframes c1{0%{opacity:0}18.947%{opacity:0}20.263%{opacity:1}36.842%{opacity:1}38.158%{opacity:0}100%{opacity:0}}
+#d1{animation:d1 19s linear infinite}@keyframes d1{0%{fill:rgba(255,255,255,.35)}18.947%{fill:rgba(255,255,255,.35)}20.263%{fill:#ffffff}97.895%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c2{opacity:0;animation:c2 19s linear infinite}@keyframes c2{0%{opacity:0}36.842%{opacity:0}38.158%{opacity:1}53.684%{opacity:1}55%{opacity:0}100%{opacity:0}}
+#d2{animation:d2 19s linear infinite}@keyframes d2{0%{fill:rgba(255,255,255,.35)}36.842%{fill:rgba(255,255,255,.35)}38.158%{fill:#ffffff}97.895%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c3{opacity:0;animation:c3 19s linear infinite}@keyframes c3{0%{opacity:0}53.684%{opacity:0}55%{opacity:1}71.579%{opacity:1}72.895%{opacity:0}100%{opacity:0}}
+#d3{animation:d3 19s linear infinite}@keyframes d3{0%{fill:rgba(255,255,255,.35)}53.684%{fill:rgba(255,255,255,.35)}55%{fill:#ffffff}97.895%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c4{opacity:1;animation:c4 19s linear infinite}@keyframes c4{0%{opacity:0}71.579%{opacity:0}72.895%{opacity:1}97.895%{opacity:1}99.211%{opacity:0}100%{opacity:0}}
+#d4{animation:d4 19s linear infinite}@keyframes d4{0%{fill:rgba(255,255,255,.35)}71.579%{fill:rgba(255,255,255,.35)}72.895%{fill:#ffffff}97.895%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#n0{opacity:0;animation:c0 19s linear infinite}
+#n1{opacity:0;animation:c1 19s linear infinite}
+#n2{opacity:0;animation:c2 19s linear infinite}
+#n3{opacity:0;animation:c3 19s linear infinite}
+#n4{opacity:1;animation:c4 19s linear infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
+<defs></defs>
+<rect x="0" y="0" width="960" height="600" rx="14" fill="#f8f9fa"/>
+<rect x="0" y="0" width="960" height="536" rx="0" fill="#f8f9fa"/>
+<rect x="202" y="28" width="560" height="496" rx="10" fill="rgba(0,0,0,.08)"/><rect x="200" y="24" width="560" height="496" rx="10" fill="#ffffff" stroke="#dadce0" stroke-width="1"/><text x="220" y="56" font-size="20" font-weight="600" fill="#202124">Checklist serah undangan</text>
+<g id="e-ckr0"><rect x="228" y="76" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="93" font-size="15" fill="#202124">Konten: nama, acara, tanggal sudah dicek</text></g>
+<g id="e-ckc0"><rect x="228" y="76" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="93" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr1"><rect x="228" y="118" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="135" font-size="15" fill="#202124">Foto contoh sudah diganti semua</text></g>
+<g id="e-ckc1"><rect x="228" y="118" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="135" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr2"><rect x="228" y="160" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="177" font-size="15" fill="#202124">Musik sudah diatur</text></g>
+<g id="e-ckc2"><rect x="228" y="160" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="177" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr3"><rect x="228" y="202" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="219" font-size="15" fill="#202124">Halaman tersimpan, slug terisi</text></g>
+<g id="e-ckc3"><rect x="228" y="202" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="219" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr4"><rect x="228" y="244" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="261" font-size="15" fill="#202124">Simpan &amp; Terbitkan sudah ditekan</text></g>
+<g id="e-ckc4"><rect x="228" y="244" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="261" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr5"><rect x="228" y="286" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="303" font-size="15" fill="#202124">Dicoba sebagai tamu (?to=Nama)</text></g>
+<g id="e-ckc5"><rect x="228" y="286" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="303" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr6"><rect x="228" y="328" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="345" font-size="15" fill="#202124">PIN dashboard dibuat</text></g>
+<g id="e-ckc6"><rect x="228" y="328" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="345" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr7"><rect x="228" y="370" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="387" font-size="15" fill="#202124">Pesan untuk pengantin tersalin</text></g>
+<g id="e-ckc7"><rect x="228" y="370" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="387" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr8"><rect x="228" y="412" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="429" font-size="15" fill="#202124">Undangan khusus dicek (bila dipakai)</text></g>
+<g id="e-ckc8"><rect x="228" y="412" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="429" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<g id="e-ckr9"><rect x="228" y="454" width="22" height="22" rx="4" fill="#ffffff" stroke="#5f6368" stroke-width="1"/><text x="264" y="471" font-size="15" fill="#202124">Kode staff untuk hari-H (bila dipakai)</text></g>
+<g id="e-ckc9"><rect x="228" y="454" width="22" height="22" rx="4" fill="#188038"/><text x="232" y="471" font-size="15" font-weight="700" fill="#ffffff">✓</text></g>
+<circle id="r0" cx="239" cy="87" r="18" fill="none" stroke="#b8460d" stroke-width="3"/><circle id="r1" cx="239" cy="213" r="18" fill="none" stroke="#b8460d" stroke-width="3"/><circle id="r2" cx="239" cy="297" r="18" fill="none" stroke="#b8460d" stroke-width="3"/><circle id="r3" cx="239" cy="381" r="18" fill="none" stroke="#b8460d" stroke-width="3"/><circle id="r4" cx="239" cy="465" r="18" fill="none" stroke="#b8460d" stroke-width="3"/>
+<g id="cur"><path d="M0 0 L0 22 L6 16 L10 26 L14 24 L10 15 L18 15 Z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+<rect x="0" y="536" width="960" height="64" rx="0" fill="#2b1a07"/><rect x="0" y="586" width="960" height="14" rx="14" fill="#2b1a07"/>
+<g id="n0"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g><g id="n1"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">2</text></g><g id="n2"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">3</text></g><g id="n3"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">4</text></g><g id="n4"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">5</text></g><g id="c0"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Sebelum serah ke klien, cek isi undangan dan foto.</text></g><g id="c1"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Musik, simpan, dan terbit sudah beres.</text></g><g id="c2"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Coba tautan sebagai tamu dengan ?to=Nama.</text></g><g id="c3"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Buat PIN dashboard dan salin pesan untuk pengantin.</text></g><g id="c4"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Undangan khusus dan kode staff: cek bila dipakai klien.</text></g><circle id="d0" cx="880" cy="568" r="4" fill="#ffffff"/><circle id="d1" cx="894" cy="568" r="4" fill="#ffffff"/><circle id="d2" cx="908" cy="568" r="4" fill="#ffffff"/><circle id="d3" cx="922" cy="568" r="4" fill="#ffffff"/><circle id="d4" cx="936" cy="568" r="4" fill="#ffffff"/>
+</svg>

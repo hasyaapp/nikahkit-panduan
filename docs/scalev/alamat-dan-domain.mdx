@@ -1,0 +1,118 @@
+---
+title: Alamat undangan dan domain sendiri
+description: Atur slug undangan, pahami hubungan slug dengan ID undangan, dan pasang domain merekmu sendiri lewat Cloudflare sesuai panduan resmi Scalev.
+---
+
+Alamat undangan terdiri dari domain bisnis Scalev dan slug halaman. Di sini kamu mengatur slug dengan aman dan, bila mau, memakai domain merekmu sendiri.
+
+<Info>
+**Yang kamu perlukan**
+- Halaman undangan yang sudah disimpan. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan).
+- Untuk domain sendiri: paket Scalev minimal Lite, domain yang sudah dibeli di penyedia domain (tanpa hosting), dan akun Cloudflare.
+</Info>
+
+<Image src="/assets/anim/scalev-custom-domain.svg" alt="Animasi: di Scalev buka Setting lalu Domain, klik Tambahkan Domain, ketik undangan.namabrand.com lalu Simpan, salin setiap record DNS dari Scalev ke Cloudflare dengan Proxy status DNS Only, klik Verifikasi sampai status domain aktif." caption="Menambahkan domain sendiri ke Scalev" />
+
+## Bagian alamat
+
+Contoh: `https://namabisnis.myscalev.com/rani-dimas`
+
+- `namabisnis.myscalev.com` adalah domain bawaan bisnis Scalev kamu.
+- `rani-dimas` adalah **slug**, diatur di tab **Settings** halaman.
+
+Setelah domain sendiri aktif, alamat yang sama bisa menjadi `https://undangan.namabrand.com/rani-dimas`.
+
+## Slug dan ID undangan
+
+- Isi slug sebelum menyimpan halaman. Tanpa alamat publik, **Bagikan** menampilkan **Isi slug di tab Settings Scalev, lalu Simpan.**
+- Slug hanya unik di dalam satu bisnis. Karena itu NikahKit tidak memakai slug sebagai kunci undangan.
+- Kunci undangan adalah **ID undangan**: angka di `app.scalev.com/pages/<id>`.
+- **Ganti slug tidak mengubah ID.** RSVP, ucapan, PIN, dan buku tamu tetap ikut undangan yang sama.
+- **Halaman hasil duplikat mendapat ID baru.** Undangan duplikat mulai dengan RSVP dan ucapan kosong.
+
+<Warning>
+Mengganti slug mengubah alamat publik. Tautan lama yang sudah dikirim ke tamu tidak lagi membuka undangan itu. Ganti slug sebelum tautan dibagikan.
+</Warning>
+
+## Langkah: ubah slug
+
+<Steps>
+<Step title="Buka tab Settings di editor">
+Di editor halaman, klik tab **Settings**.
+</Step>
+<Step title="Isi slug">
+Ketik slug yang pendek dan mudah dibaca. Saran: huruf kecil, kata dipisah tanda minus. Contoh: `rani-dimas`.
+</Step>
+<Step title="Simpan & Terbitkan">
+Klik **Simpan & Terbitkan**. Lalu klik **Bagikan** di rel NikahKit dan salin tautan umum yang baru.
+</Step>
+</Steps>
+
+## Langkah: pakai domain sendiri
+
+Scalev memberi urutan wajib di [A–Z Custom Domain di Scalev](https://tutorial.scalev.com/azcustomdomain/). Ikuti urutannya. Custom domain dan custom subdomain butuh paket Scalev minimal Lite ([sumber](https://tutorial.scalev.com/subdomain/)).
+
+<Steps>
+<Step title="Beli domain saja, tanpa hosting">
+Beli domain di penyedia domain pihak ketiga. Hostingnya memakai Scalev, jadi jangan beli hosting.
+</Step>
+<Step title="Pindahkan pengaturan DNS ke Cloudflare">
+Scalev mewajibkan Cloudflare. Daftar di `https://dash.cloudflare.com/sign-up`, lalu ikuti video [Cara Memindahkan Pengaturan DNS ke Cloudflare](https://tutorial.scalev.com/cloudflare/).
+</Step>
+<Step title="Buka Setting, lalu Domain">
+Di dasbor Scalev, buka menu **Setting**, lalu **Domain**.
+</Step>
+<Step title="Klik Tambahkan Domain">
+Klik **Tambahkan Domain**. Ketik domain atau subdomain, misalnya `undangan.namabrand.com`, lalu klik **Simpan**.
+</Step>
+<Step title="Salin record DNS ke Cloudflare">
+Scalev menampilkan kode DNS. Di Cloudflare, klik **DNS**, lalu **Add Record**. Masukkan setiap record satu per satu. Pastikan Type, Name, dan Target sama persis. Ubah Proxy Status menjadi **DNS Only**.
+</Step>
+<Step title="Klik verifikasi di Scalev">
+Kembali ke Scalev, klik verifikasi. Bila berhasil, status domain menjadi aktif. Verifikasi bisa butuh sampai 2×24 jam. Klik verifikasi lagi secara berkala.
+</Step>
+<Step title="Pakai domain itu untuk halaman">
+Ganti domain bawaan halaman ke domain sendiri. Contoh dari Scalev: `https://elpe.myscalev.com/ngebut` menjadi `https://lpngebut.com/ngebut`. Caranya ada di video [Cara buka LP lewat custom domain](https://tutorial.scalev.com/customdomain/).
+</Step>
+</Steps>
+
+<Info>
+Custom domain juga memengaruhi potongan Scalev Fee pada paket tertentu. Lihat [Terima pembayaran dari klien](/scalev/terima-pembayaran).
+</Info>
+
+## Tanda berhasil
+
+<Success>
+Status domain di Scalev aktif, dan alamat `https://domainmu/slug` membuka undangan di HP.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Verifikasi domain belum berhasil">
+Cek lagi setiap record: Type, Name, Target harus sama persis. Bila ada lebih dari satu record type A dengan Name domain, hapus yang bukan dari Scalev. Record type A wajib **DNS Only**. Lalu tunggu, verifikasi bisa sampai 2×24 jam. Panduan: [Menambahkan Domain dan Sub Domain](https://tutorial.scalev.com/domain/).
+</Accordion>
+<Accordion title="Domain aktif, orang lain bisa buka, tapi laptopmu tidak">
+Ini cache. Restart modem atau wifi. Hapus cache browser dengan Ctrl+Shift+Del, centang Browsing history dan Cached images and files, Time range All time, lalu Delete Data. Flush DNS: Windows `ipconfig /flushdns` di CMD, Mac `dscacheutil -flushcache` di Terminal.
+</Accordion>
+<Accordion title="Domain tidak bisa diakses sama sekali, muncul halaman peringatan">
+Domain mungkin diblokir Komdigi. Cek di `https://trustpositif.komdigi.go.id/welcome`. Bila statusnya **Ada**, gunakan domain baru (disarankan) atau ajukan normalisasi. Panduan: [Cara cek blokir Komdigi](https://tutorial.scalev.com/diblokir-negara/).
+</Accordion>
+<Accordion title="RSVP dan ucapan hilang setelah duplikat halaman">
+Halaman duplikat mendapat ID baru, jadi datanya terpisah. Data lama tetap ada di halaman asli dengan ID lamanya.
+</Accordion>
+<Accordion title="Tamu membuka tautan lama dan halaman tidak ditemukan">
+Slug sudah diganti. Kirim ulang tautan baru dari **Bagikan**, atau kembalikan slug lama.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Izin domain (CSP)" icon="shield" href="/scalev/izin-domain">
+Pastikan foto, musik, dan RSVP tidak diblokir.
+</Card>
+<Card title="Bagikan undangan" icon="share-2" href="/tamu/bagikan-undangan">
+Kirim tautan undangan ke tamu.
+</Card>
+</CardGroup>

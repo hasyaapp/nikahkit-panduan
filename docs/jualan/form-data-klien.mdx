@@ -1,0 +1,135 @@
+---
+title: Form data klien
+description: Isi form data undangan yang diisi klien, pesan yang terbentuk, dan cara membagikan Link form klien.
+---
+
+Form data undangan adalah tempat klien menulis data pernikahannya sendiri. Kirimannya langsung masuk ke **Pesanan masuk** kamu dan bisa mengisi undangan dengan satu klik.
+
+<Info>
+**Yang kamu perlukan**
+
+- Membership NikahKit aktif. Form berhenti menerima kiriman bila langgananmu habis.
+- Landing page terpasang (form ada di bagian bawahnya), atau **Link form klien** dari Pesanan masuk. Lihat [Landing page](/jualan/landing-page) dan [Pesanan masuk](/jualan/pesanan-masuk).
+</Info>
+
+<Image src="/assets/anim/jualan-form-klien.svg" alt="Di HP klien: Langkah 1 dari 10, Pesanan, dengan Paket, Fitur undangan, dan Desain. Centang fitur lalu tekan lanjut. Di Pemesan, menekan lanjut saat Nama kosong memunculkan Nama wajib diisi. Isi Nama dan WhatsApp lalu lanjut. Di langkah Catatan tekan kirim data, muncul Data terkirim." caption="Klien mengisi form data undangan" />
+
+## Dua cara klien membuka form
+
+<Tabs>
+<TabItem label="Lewat Landing page" value="landing">
+Klien membuka Landing page kamu dan menggulir ke **Isi data pesanan**, atau menekan **Pesan undangan**. Bila klien sudah memilih desain atau paket, langkah pertama form menulis **Pilihan kalian: ...**.
+</TabItem>
+<TabItem label="Lewat Link form klien" value="link">
+Kirim link form langsung ke klien. Caranya di bawah. Di form ini klien tidak melihat paket dari Profil merek. Klien menulis desain sendiri dan mencentang fitur.
+</TabItem>
+</Tabs>
+
+## Langkah menyalin Link form klien
+
+<Steps>
+<Step title="Buka panel NikahKit di halaman undangan">
+Ikon Pesanan masuk hanya tampil saat sebuah undangan terbuka di editor.
+</Step>
+<Step title="Klik ikon kotak masuk di kepala panel">
+Layar **Pesanan masuk** terbuka.
+</Step>
+<Step title="Klik Link form klien (opsional)">
+Kotaknya terbuka dengan tulisan "Kirim ke klien bila ingin mereka mengisi sendiri. Isian mereka muncul di daftar ini." dan alamat link berbentuk `https://nikahin.myscalev.com/order?k=` diikuti 8 huruf kode akunmu.
+</Step>
+<Step title="Klik Salin link form">
+Muncul **Tersalin.** Tempel link di chat WhatsApp klien.
+</Step>
+</Steps>
+
+<Warning>
+Link dan Landing page memakai kode akunmu. Siapa pun yang punya link bisa mengirim data ke Pesanan masuk kamu. Bagikan hanya ke klien.
+</Warning>
+
+## Langkah dan kolom di form
+
+Di atas form tertulis **Langkah N dari M** dan nama langkahnya. Tombol bawah: **kembali**, **lanjut**, dan di langkah terakhir **kirim data**. Kolom bertanda `*` wajib.
+
+| Langkah | Kolom |
+| --- | --- |
+| Pesanan | **Paket** (hanya di Landing page), **Fitur undangan** (centang), **Desain** |
+| Pemesan | **Nama \***, **WhatsApp \***, **Email** |
+| Mempelai pria, Mempelai wanita | **Nama lengkap dan gelar \***, **Nama panggilan \***, **Anak ke-**, **Nama ayah**, **Ayah sudah almarhum**, **Nama ibu**, **Ibu sudah almarhumah**, **Pekerjaan (opsional)**, **Kota asal**, **Instagram** |
+| Akad Nikah | **Salam pembuka**, lalu **Nama acara**, **Tanggal**, **Jam mulai**, **Jam selesai (opsional)**, **Nama tempat**, **Alamat**, **Link Google Maps**, **Catatan acara (opsional)** |
+| Resepsi | Sama dengan Akad, plus **Tempat sama dengan acara pertama** |
+| Ngunduh Mantu | Hanya bila fitur **Acara ngunduh mantu** dicentang |
+| Detail undangan | **Hashtag**, **Batas konfirmasi kehadiran**, **Satu undangan untuk berapa orang?**, **Cerita singkat kalian**, **Dress code**, **Warna yang dihindari**, **Susunan acara**, **Turut mengundang** dari keluarga wanita, keluarga pria, dan rekan kerja |
+| Foto dan musik | **Link folder foto (Google Drive)**, **Link lagu YouTube untuk audio latar** |
+| Amplop digital | **Bank rekening 1**, **Nomor rekening**, **Atas nama**. Dengan fitur dua rekening: rekening 2 dan alamat kirim kado |
+| Tambahan | Hanya bila fitur siaran langsung, gaya, atau link per tamu dicentang |
+| Catatan | **Catatan untuk tim** |
+
+Pilihan **Fitur undangan**: Siaran langsung, Dua rekening dan alamat kirim kado, Acara ngunduh mantu, Warna, font, dan filter Instagram pilihan, QR check-in tamu, Hanya tamu yang diundang (link per tamu).
+
+<Info>
+Isian yang belum terkirim tersimpan di browser HP klien. Bila klien menutup halaman lalu membukanya lagi di HP yang sama, isiannya masih ada.
+</Info>
+
+## Yang diterima klien dan kamu
+
+- Klien melihat **Data terkirim** dan "Terima kasih. Vendor undangan kalian sudah menerima data ini dan akan mengabari kalian."
+- Kamu menerima pesanan baru di **Pesanan masuk**, berlabel **Baru**.
+
+Isi kiriman berupa pesan teks yang sama formatnya dengan pesan WhatsApp. Contoh bagian awalnya:
+
+```
+Halo, ini data undangan kami.
+
+*Pesanan*
+Paket: Basic
+Fitur: QR check-in tamu
+Desain: Arunika
+
+*Pemesan*
+Nama: Rani
+WhatsApp: 0812 3456 7890
+...
+
+Data untuk mengisi undangan otomatis (jangan diubah):
+#data-undangan {"v":1, ...}
+```
+
+Isi di atas hanya contoh. Baris `#data-undangan` adalah data yang dibaca NikahKit untuk mengisi undangan. Kalau pesan seperti ini sampai lewat WhatsApp, tempel **seluruh** pesannya di **Tempel data pesanan**. Lihat [Pesanan masuk](/jualan/pesanan-masuk).
+
+## Tanda berhasil
+
+- Klien melihat **Data terkirim**.
+- Nama pasangan muncul di Pesanan masuk kamu dengan label **Baru**.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="&quot;Nama wajib diisi.&quot; (atau kolom lain &quot;wajib diisi&quot;)">
+Kolom bertanda `*` kosong. Klien mengisinya lalu menekan **lanjut** lagi.
+</Accordion>
+<Accordion title="&quot;Nomor WhatsApp belum lengkap.&quot;">
+Nomor kurang dari 9 angka. Tulis nomor lengkap, misalnya `08xxxxxxxxxx`.
+</Accordion>
+<Accordion title="&quot;Email belum benar.&quot;">
+Format email salah. Perbaiki atau kosongkan, karena email tidak wajib.
+</Accordion>
+<Accordion title="&quot;Link form ini sudah tidak aktif. Hubungi vendor undangan kalian.&quot;">
+Langganan NikahKit kamu habis (lewat masa tenggang 7 hari) atau link salah. Perpanjang paket, lalu minta klien mengirim lagi. Isiannya masih tersimpan di HP klien.
+</Accordion>
+<Accordion title="&quot;Form sedang penuh. Hubungi vendor undangan kalian.&quot;">
+Pesanan masuk kamu sudah berisi 300 kiriman. Hapus pesanan lama yang sudah diisi. Lihat [Pesanan masuk](/jualan/pesanan-masuk).
+</Accordion>
+<Accordion title="&quot;Terlalu sering mengirim. Coba lagi dalam beberapa menit.&quot;">
+Klien mengirim berkali-kali dalam waktu singkat. Tunggu beberapa menit, lalu tekan **kirim data** lagi.
+</Accordion>
+<Accordion title="&quot;Gagal mengirim. Periksa koneksi, lalu tekan kirim lagi.&quot;">
+Internet klien putus. Cek sinyal, lalu tekan **kirim data** lagi.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Pesanan masuk" icon="inbox" href="/jualan/pesanan-masuk">Isi undangan dari kiriman klien.</Card>
+<Card title="Landing page" icon="store" href="/jualan/landing-page">Halaman jualan tempat form berada.</Card>
+</CardGroup>

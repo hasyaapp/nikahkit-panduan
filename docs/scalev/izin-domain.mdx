@@ -1,0 +1,125 @@
+---
+title: Izin domain (CSP) di tab Security
+description: Pahami tab Security Scalev, apa yang ditambahkan NikahKit otomatis, cara membaca Bantuan > Izin domain (CSP), dan cara menempel domain manual.
+---
+
+Scalev memblokir gambar, font, video, dan koneksi dari luar Scalev kecuali domainnya diizinkan di tab **Security**. NikahKit mengurus sebagian besar izin ini sendiri. Di sini kamu belajar mengecek dan menambah yang kurang.
+
+<Info>
+**Yang kamu perlukan**
+- Halaman undangan yang sudah berisi undangan NikahKit. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan).
+- Tab NikahKit terbuka di editor Scalev.
+</Info>
+
+<Image src="/assets/anim/scalev-security-csp.svg" alt="Animasi: klik Bantuan di rel NikahKit, lihat daftar Izin domain (CSP) dengan status Sudah diizinkan, Ditambahkan otomatis, dan Perlu ditambah manual, klik Salin domain kurang, buka tab Security, tempel domain di kolom Image Sources, lalu klik Simpan & Terbitkan." caption="Mengecek dan menambah izin domain" />
+
+## Apa itu tab Security
+
+Tab **Security** di editor HTML Mode berisi daftar domain yang boleh dimuat halaman. Domain di luar Scalev diblokir browser. Kolomnya dikelompokkan menurut jenis:
+
+| Kolom di Security | Untuk | Kode di NikahKit |
+| --- | --- | --- |
+| **Connect Sources** | Koneksi data ke server lain (misalnya ucapan dan RSVP Nikahin) | `connect_src` |
+| **Image Sources** | Gambar dari luar Scalev | `img_src` |
+| **Media Sources** | File audio atau video dari hosting sendiri | `media_src` |
+| **Font Sources** | File font dari luar | `font_src` |
+| **Style Sources** | Stylesheet atau CSS dari luar | `style_src` |
+| **Script Sources** | Skrip dari luar | `script_src` |
+| **Frame Sources** | Embed seperti YouTube atau Google Maps | `frame_src` |
+
+Ada juga **Worker Sources**, tetapi NikahKit tidak memakainya. Sumber: [Cara Membuat HTML Sales Page di Scalev, poin 2](https://tutorial.scalev.com/html-sales-page/).
+
+## Yang ditambahkan NikahKit otomatis
+
+Setiap kali undangan ditulis, NikahKit menambahkan izin yang dipakai undangan, bila Scalev mengizinkan:
+
+- Ucapan dan RSVP Nikahin (`connect_src`).
+- Musik YouTube (`script_src` dan `frame_src`) dan video YouTube (`frame_src`, plus gambar thumbnail `img_src`).
+- Peta Google Maps (`frame_src https://www.google.com`).
+- Foto dari luar Media Scalev (`img_src`) dan file musik dari luar Media Scalev (`media_src`).
+
+Google Fonts sudah diizinkan Scalev di semua halaman, jadi tidak perlu ditambah. Di daftar Bantuan, barisnya tampil sebagai **Sudah diizinkan**.
+
+## Arti status di Bantuan
+
+| Status | Arti | Yang perlu kamu lakukan |
+| --- | --- | --- |
+| **Sudah diizinkan** | Domain sudah diizinkan untuk halaman ini | Tidak ada |
+| **Ditambahkan otomatis** | NikahKit baru saja menambahkannya | Klik **Simpan & Terbitkan** |
+| **Perlu ditambah manual** | NikahKit tidak bisa menambahkannya | Ikuti langkah di bawah |
+
+## Langkah
+
+<Steps>
+<Step title="Klik Bantuan">
+Di tab NikahKit, klik **Bantuan** di bagian bawah rel kiri. Bantuan langsung memeriksa izin domain dan mengizinkan yang bisa.
+</Step>
+<Step title="Cari bagian Izin domain (CSP)">
+Gulir ke bagian **Izin domain (CSP)**. Setiap baris berisi domain, status, kegunaan (misalnya "Musik atau video YouTube"), dan jenis izin.
+
+- Bila tertulis **Tidak butuh izin tambahan.**, kamu selesai.
+- Bila tertulis **Belum ada undangan di halaman ini.**, pilih template dulu.
+</Step>
+<Step title="Salin domain yang kurang">
+Bila ada **Perlu ditambah manual**, klik **Salin domain kurang**. Muncul **Tersalin. Tempel di tab Security.** Bila tidak ada yang kurang, tombolnya bernama **Salin daftar domain**.
+</Step>
+<Step title="Lihat hasil salinan">
+Hasil salinan berbentuk satu baris per jenis, misalnya:
+
+```
+img_src: https://foto.contoh.com
+frame_src: https://www.youtube.com
+```
+
+Kata sebelum titik dua menunjukkan kolom tujuan (lihat tabel di atas). `img_src` masuk ke **Image Sources**, `frame_src` ke **Frame Sources**, dan seterusnya. Bila satu baris berisi beberapa domain, domainnya dipisah spasi.
+</Step>
+<Step title="Buka tab Security">
+Klik tab **Security** di strip editor Scalev.
+</Step>
+<Step title="Tempel domain di kolom yang sesuai">
+Klik kolom yang cocok, lalu ketik atau tempel domainnya saja, misalnya `https://foto.contoh.com`. Jangan tempel kata `img_src:`.
+</Step>
+<Step title="Simpan & Terbitkan">
+Klik **Simpan & Terbitkan**.
+</Step>
+<Step title="Periksa ulang">
+Kembali ke tab **NikahKit**, buka **Bantuan**, lalu klik **Periksa ulang**. Status berubah menjadi **Sudah diizinkan**.
+</Step>
+</Steps>
+
+## Tanda berhasil
+
+<Success>
+Semua baris di **Izin domain (CSP)** berstatus **Sudah diizinkan** atau **Ditambahkan otomatis**, dan foto, musik, serta ucapan muncul di alamat publik.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Izin otomatis tidak tersedia. Tambahkan di tab Security.">
+Versi editor Scalev yang terbuka tidak bisa diisi otomatis oleh NikahKit, jadi domain yang belum ada berstatus **Perlu ditambah manual**. Klik **Salin domain kurang**, lalu tempel domainnya di tab **Security** seperti langkah di atas.
+</Accordion>
+<Accordion title="Izinkan di tab Security: ... (pesan kuning di panel)">
+Ada domain yang belum diizinkan. Ikuti langkah di halaman ini mulai dari **Bantuan**.
+</Accordion>
+<Accordion title="Gagal menyalin. Salin manual.">
+Browser memblokir salin otomatis. Ketik domain dari daftar di Bantuan langsung ke tab **Security**.
+</Accordion>
+<Accordion title="Di pratinjau editor ucapan dan YouTube tidak jalan">
+Ini normal. Pratinjau Scalev memblokir koneksi ke Nikahin dan iframe YouTube walau izinnya ada. Cek di alamat publik. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan).
+</Accordion>
+<Accordion title="Foto dari luar tetap tidak muncul">
+Foto harus memakai alamat `https`. Alamat `http`, `blob:`, dan gambar base64 ditolak NikahKit. Lebih aman unggah foto ke Media Scalev. Lihat [Foto dan media](/editor/foto-dan-media).
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Menu Bantuan" icon="life-buoy" href="/bantuan/menu-bantuan">
+Semua isi Bantuan NikahKit.
+</Card>
+<Card title="Musik" icon="music" href="/editor/musik">
+Pasang musik YouTube di undangan.
+</Card>
+</CardGroup>

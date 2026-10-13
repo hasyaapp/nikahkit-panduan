@@ -1,0 +1,129 @@
+---
+title: Kirim undangan dari dashboard
+description: Pengantin menempel daftar tamu di tab Kirim, lalu mengirim tautan pribadi ke tiap tamu lewat WhatsApp.
+---
+
+Tab **Kirim** membuat tautan pribadi untuk tiap tamu (berisi nama tamu) dan membuka WhatsApp dengan pesan siap kirim. Di halaman ini kamu belajar seluruh alurnya, dari menempel daftar sampai menandai terkirim.
+
+<Info>
+**Yang kamu perlukan**
+
+- Sudah masuk ke dashboard dengan PIN pasangan. Lihat [Masuk ke Dashboard pasangan](/pasangan/masuk-dashboard).
+- Daftar nama tamu (boleh dengan nomor WhatsApp) dari catatan, Excel, atau chat.
+- WhatsApp di HP atau WhatsApp Web di laptop.
+</Info>
+
+<Image src="/assets/anim/pasangan-kirim.svg" alt="Di tab Kirim, tekan tombol tambah. Tempel daftar tamu satu per baris, tekan Simpan daftar. Muncul 3 tamu siap. Ketuk nama tamu, pratinjau pesan dengan tautan pribadi muncul. Tekan tombol kirim hijau, WhatsApp terbuka dengan pesan siap kirim." caption="Mengirim undangan per tamu" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka tab Kirim">
+Di HP, ketuk **Kirim** di tab bawah. Di laptop, klik ikon kedua di lajur kiri. Judul **Kirim undangan** muncul. Saat daftar masih kosong tertulis **Belum ada tamu**.
+
+Di dalam dashboard, link undangan dan PIN sudah terisi otomatis dari saat masuk.
+</Step>
+<Step title="Tekan Tambah tamu">
+Tekan ikon tambah di kepala daftar (namanya **Tambah tamu**). Panel **Tambah tamu** terbuka dengan kolom **Daftar tamu, satu per baris**.
+</Step>
+<Step title="Tempel daftar tamu">
+Satu tamu per baris. Formatnya: `nama - nomor WA - kategori - jumlah orang`. Hanya nama yang wajib. Contoh:
+
+```text
+Keluarga Besar Surya
+Bapak Andi & Ibu Rina - 081234567890
+Dewi Lestari - 082198765432 - Sahabat - 2
+```
+
+Daftar bernomor dari WhatsApp dan kolom yang disalin dari Excel juga dikenali. Paling banyak 1.000 tamu.
+</Step>
+<Step title="Tekan Simpan daftar">
+Tekan **Simpan daftar**. Muncul **Menyiapkan link tamu...**, lalu misalnya **3 tamu siap.** Daftar tamu tampil seperti daftar chat. Tamu yang belum dikirim ditandai **Belum dikirim:**.
+</Step>
+<Step title="Pilih teks pengantar">
+Ketuk satu tamu. Pratinjau pesan muncul seperti gelembung chat. Di bawahnya ada pilihan teks: **formal**, **muslim**, **nasrani**, **hindu**, **custom**. Bawaannya **muslim**.
+
+Kamu boleh mengubah isi pesan. Pakai tombol **+ [nama]** dan **+ [link-undangan]** untuk menyisipkan nama tamu dan tautannya. Keduanya diganti otomatis per tamu. Pesan ini berlaku untuk semua tamu.
+</Step>
+<Step title="Tekan kirim lewat WhatsApp">
+Tekan tombol bulat hijau (**Kirim lewat WhatsApp**). WhatsApp terbuka dengan pesan terisi. Muncul **WhatsApp dibuka untuk** nama tamu.
+- Tamu punya nomor: chat tamu langsung terbuka.
+- Tamu tanpa nomor: pilih kontaknya sendiri di WhatsApp.
+
+Tamu langsung ditandai **Terkirim** dengan jam saat tombol ditekan, sebelum kamu menekan kirim di WhatsApp. Tekan kirim di WhatsApp. Kalau batal mengirim, buka ⋮ lalu **Tandai belum dikirim**.
+</Step>
+<Step title="Ulangi untuk tamu berikutnya">
+Tekan panah kembali, pilih tamu berikutnya. Pakai saringan **Belum dikirim** supaya hanya tamu yang belum dikirim yang tampil.
+</Step>
+</Steps>
+
+### Menu di percakapan tamu
+
+Tombol ⋮ (**Menu tamu**) berisi **Buka undangan tamu ini**, **Salin tautan**, **Salin pesan**, **Tandai terkirim** (atau **Tandai belum dikirim**), dan **Hapus tamu**.
+
+### Menu daftar (⋮ di kepala daftar)
+
+| Pilihan | Fungsi |
+| --- | --- |
+| **Impor file CSV** | Tambah tamu dari file CSV dengan kolom `nama, no wa, kategori, jumlah`. Tombol **Impor CSV** juga ada di panel **Tambah tamu**. Bisa di semua paket. Ini berbeda dari [Impor CSV di Buku Tamu](/tamu/impor-csv) milik member, yang khusus paket Tahunan dan Sekali Bayar. |
+| **Reset status kirim** | Semua tamu kembali **Belum dikirim**. |
+| **Kembalikan pesan bawaan** | Pesan kembali ke teks bawaan. |
+| **Kosongkan tamu & pesan** | Daftar dan pesan dikosongkan. Status kirim tetap. |
+| **Hapus semua tamu** | Semua tamu dihapus dari daftar. |
+
+Di dalam dashboard, link undangan dan PIN diatur oleh layar masuk dashboard, jadi pilihan **Atur link & PIN** tidak muncul di menu ini.
+
+<Warning>
+Daftar tamu, pesan, dan status terkirim di tab **Kirim** disimpan di browser yang dipakai, bukan di server. Nomor tamu juga tidak disimpan di server. Kalau pengantin ganti HP, ganti browser, atau menghapus data browser, daftar di tab Kirim kosong lagi. Sarankan pengantin mengirim dari satu HP saja, dan menyimpan daftar tamunya di catatan.
+</Warning>
+
+<Info>
+Tautan pribadi berbentuk `alamat-undangan?to=Nama+Tamu&u=KODE`. Kodenya dibuat server dari nama tamu. Jangan mengubah nama di tautan secara manual: kodenya tidak akan cocok.
+</Info>
+
+## Tanda berhasil
+
+- Muncul **N tamu siap.** setelah **Simpan daftar**.
+- Pratinjau pesan memuat tautan pribadi, bukan tulisan **[tautan pribadi dibuat setelah masuk]**.
+- Setelah dikirim, tamu pindah ke saringan **Terkirim**.
+- Saat tamu membuka tautannya, tamu itu muncul di [Pelacakan](/pasangan/pelacakan).
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Masuk dengan PIN dulu.">
+Tab Kirim belum menerima PIN dari layar masuk dashboard. Buka menu akun, tekan **Keluar**, lalu masuk lagi dengan PIN pasangan. Kalau PIN sudah diganti member, dashboard kembali ke layar masuk dengan tulisan **PIN salah.**: minta PIN terbaru.
+</Accordion>
+<Accordion title="Link belum siap. Simpan daftar tamu dulu.">
+Tautan pribadi tamu belum dibuat. Tekan tambah, lalu tekan **Simpan daftar** lagi.
+</Accordion>
+<Accordion title="Masukkan nama tamu.">
+Kolom daftar kosong saat **Simpan daftar** ditekan. Tempel daftar tamu dulu.
+</Accordion>
+<Accordion title="Daftar terlalu besar, bagi dua.">
+Daftar terlalu panjang untuk sekali kirim ke server. Simpan setengah daftar dulu, lalu tambahkan sisanya.
+</Accordion>
+<Accordion title="Simpan Excel sebagai CSV dulu.">
+File yang dipilih bukan CSV. Di Excel, pilih **Save As** lalu format CSV, kemudian impor file itu.
+</Accordion>
+<Accordion title="Tunggu beberapa menit.">
+Terlalu banyak permintaan dalam waktu singkat. Tunggu beberapa menit, lalu coba lagi.
+</Accordion>
+<Accordion title="WhatsApp tidak terbuka">
+Browser memblokir jendela baru. Izinkan pop-up untuk halaman ini, atau pakai **Salin pesan** di menu tamu lalu tempel sendiri di WhatsApp.
+</Accordion>
+<Accordion title="Belum ada status terkirim.">
+Muncul saat memilih **Reset status kirim** padahal belum ada yang dikirim. Tidak perlu tindakan.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Tamu dan ucapan" icon="users" href="/pasangan/tamu-dan-ucapan">
+Lihat siapa yang sudah RSVP.
+</Card>
+<Card title="Pelacakan" icon="eye" href="/pasangan/pelacakan">
+Cek siapa yang sudah membuka tautan.
+</Card>
+</CardGroup>

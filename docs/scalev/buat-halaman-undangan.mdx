@@ -1,0 +1,92 @@
+---
+title: Buat halaman undangan di Scalev
+description: Buat Landing Page tipe HTML Mode, buka tab NikahKit, lalu Simpan sekali supaya halaman punya ID undangan.
+---
+
+Setiap undangan adalah satu halaman di **Landing Pages** Scalev. Di sini kamu membuat halaman HTML Mode baru dan menyimpannya sekali, supaya NikahKit bisa memakainya untuk undangan dan RSVP.
+
+<Info>
+**Yang kamu perlukan**
+- Akun dan bisnis Scalev siap. Lihat [Siapkan akun Scalev](/scalev/akun-scalev).
+- Ekstensi NikahKit terpasang di Chrome. Lihat [Pasang ekstensi](/gabung/pasang-ekstensi).
+- Sudah masuk, membership aktif, dan bisnis Scalev terhubung. Lihat [Masuk dan bayar](/gabung/masuk-dan-bayar) dan [Hubungkan Scalev](/gabung/hubungkan-scalev).
+</Info>
+
+<Image src="/assets/anim/scalev-buat-halaman-html.svg" alt="Animasi: klik Landing Pages, klik tombol buat halaman baru, pilih HTML Mode, editor terbuka dengan tab Code, Media, Security, Settings dan NikahKit, klik NikahKit, lalu klik Simpan sehingga alamat berubah menjadi app.scalev.com/pages/359177." caption="Dari Landing Pages sampai halaman punya ID" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka Landing Pages">
+Di dasbor Scalev, klik **Landing Pages** di menu kiri. Daftar halaman bisnismu tampil.
+</Step>
+<Step title="Buat halaman baru">
+Klik tombol untuk membuat landing page baru. Nama tombolnya bisa berubah sesuai versi Scalev, jadi cek di layar Landing Pages. Video resmi Scalev menunjukkan langkah ini: [Cara Membuat HTML Sales Page di Scalev](https://tutorial.scalev.com/html-sales-page/).
+</Step>
+<Step title="Pilih tipe HTML">
+Pilih landing page tipe **HTML Mode**. NikahKit hanya bekerja di halaman HTML Mode.
+
+Setelah itu editor terbuka, dengan strip tab seperti **Code**, **Media**, **Security**, dan **Settings**.
+</Step>
+<Step title="Cari tab NikahKit">
+Bila ekstensi terpasang, tab **NikahKit** dengan logo biru muncul di ujung strip tab itu.
+</Step>
+<Step title="Klik NikahKit">
+Klik **NikahKit**. Panel NikahKit terbuka di bawah strip tab dan pratinjau pindah ke tampilan ponsel. Menu **Template** dan **Media** sudah bisa dibuka. Menu lain masih terkunci. Pada halaman yang belum pernah disimpan, arahkan kursor ke menu yang terkunci: keterangannya **Simpan halaman di Scalev dulu.**
+</Step>
+<Step title="Isi slug di tab Settings">
+Klik tab **Settings** Scalev, lalu isi slug halaman. Contoh: `rani-dimas`. Slug menjadi bagian akhir alamat undangan. Saran menulis slug ada di [Alamat dan domain](/scalev/alamat-dan-domain).
+</Step>
+<Step title="Klik Simpan">
+Klik **Simpan** di editor Scalev. Setelah tersimpan, alamat di bilah browser berbentuk `app.scalev.com/pages/<angka>`, misalnya `app.scalev.com/pages/359177`.
+
+Angka itu adalah **ID undangan**. NikahKit memakai ID ini untuk RSVP, ucapan, PIN, dan buku tamu.
+</Step>
+<Step title="Kembali ke tab NikahKit">
+Klik **NikahKit** lagi, lalu pilih template. Setelah template dipilih, menu lain terbuka. Lanjut ke [Pilih template](/editor/pilih-template).
+</Step>
+</Steps>
+
+<Warning>
+Halaman baru yang belum disimpan belum punya ID, jadi RSVP dan ucapan belum tersambung. Selalu Simpan sekali sebelum mengisi undangan.
+</Warning>
+
+## Tanda berhasil
+
+<Success>
+Alamat browser berbentuk `app.scalev.com/pages/<angka>`. Di tab NikahKit, bagian RSVP di **Konten** menampilkan **Tersambung. ID:** diikuti angka yang sama.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Tab NikahKit tidak muncul">
+Pastikan halaman bertipe HTML Mode, bukan tipe lain. Pastikan ekstensi aktif di `chrome://extensions`, lalu muat ulang editor. Lihat [Pasang ekstensi](/gabung/pasang-ekstensi).
+</Accordion>
+<Accordion title="Ekstensi tidak tersambung. / Muat ulang halaman.">
+Ekstensi belum terhubung ke editor. Tekan F5 (Windows) atau Cmd+R (Mac) untuk memuat ulang editor.
+</Accordion>
+<Accordion title="Halaman belum ada di bisnis Scalev yang terhubung.">
+Keterangannya: **Tekan Simpan, atau hubungkan bisnis pemilik halaman ini, lalu Periksa lagi.** Klik **Simpan**, lalu **Periksa lagi**. Bila tetap, halaman ini ada di bisnis yang tidak terhubung ke NikahKit. Buat halaman di bisnis yang terhubung.
+</Accordion>
+<Accordion title="Hubungkan bisnis Scalev dulu.">
+Akun NikahKit belum terhubung ke Scalev, atau Scalev sedang tidak bisa dihubungi. Klik **Hubungkan bisnis Scalev**, lalu **Periksa lagi**. Lihat [Hubungkan Scalev](/gabung/hubungkan-scalev).
+</Accordion>
+<Accordion title="RSVP: Isi slug (min. 3 karakter) di tab Settings Scalev.">
+Pesan ini muncul selama undangan belum punya ID, biasanya karena halaman belum pernah disimpan. Isi slug di tab **Settings**, klik **Simpan**, lalu tunggu beberapa detik sampai tulisannya berubah menjadi **Tersambung. ID:**.
+</Accordion>
+<Accordion title="Tidak bisa membuat halaman baru">
+Scalev gratis hanya 3 halaman aktif. Naikkan paket ke Scalev Lite ke atas.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Simpan dan terbitkan" icon="upload" href="/scalev/simpan-dan-terbitkan">
+Kapan pakai Simpan, kapan Simpan & Terbitkan.
+</Card>
+<Card title="Pilih template" icon="layout" href="/editor/pilih-template">
+Mulai mengisi undangan dari template.
+</Card>
+</CardGroup>

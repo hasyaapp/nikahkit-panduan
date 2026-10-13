@@ -1,0 +1,94 @@
+---
+title: Bagikan undangan
+description: Cara memakai panel Bagikan di NikahKit untuk mencoba undangan sebagai tamu, menyalin tautan tamu, dan membuka halaman untuk pengantin.
+---
+
+Di halaman ini kamu belajar memakai panel **Bagikan**. Hasilnya, kamu bisa mencoba undangan seperti tamu, menyalin tautan dengan nama tamu, dan membuka Dashboard pasangan.
+
+<Info>
+**Yang kamu perlukan**
+
+- Undangan sudah dibuat di editor NikahKit. Lihat [Kenali editor](/editor/kenali-editor).
+- Halaman sudah punya slug dan sudah disimpan. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan).
+- Untuk tombol pengantin: Dashboard pasangan sudah dipasang. Lihat [Pasang Dashboard pasangan](/jualan/pasang-dashboard-pasangan).
+</Info>
+
+<Image src="/assets/anim/tamu-bagikan.svg" alt="1. Klik Bagikan di rel kiri editor. 2. Panel Bagikan terbuka. 3. Ketik nama tamu, tautan berubah dengan ?to=. 4. Klik Lihat sebagai tamu, nama tamu tampil di sampul. 5. Klik Salin tautan tamu, muncul Tersalin. 6. Bagian Untuk pengantin berisi tombol Kirim undangan dan Buka Dashboard." caption="Panel Bagikan dari awal sampai menyalin tautan" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka editor undangan">
+Buka halaman undangan di Scalev, lalu klik tab **NikahKit**. Rel menu NikahKit tampil di kiri.
+</Step>
+<Step title="Klik Bagikan">
+Di bagian bawah rel kiri, klik **Bagikan**. Panel **Bagikan** terbuka.
+
+Kalau panel hanya berisi tulisan **Isi slug di tab Settings Scalev, lalu Simpan.**, halaman belum punya alamat. Isi slug dulu di tab **Settings**, klik **Simpan**, lalu buka **Bagikan** lagi.
+</Step>
+<Step title="Perhatikan peringatan simpan">
+Kalau di atas muncul **Perubahan belum disimpan di Scalev.**, klik **Simpan** di editor Scalev dulu. Tamu hanya melihat versi yang sudah disimpan.
+</Step>
+<Step title="Ketik nama tamu">
+Kolom **Nama tamu** sudah berisi contoh `Nama Tamu`. Hapus, lalu ketik nama, misalnya `Budi Santoso`. Maksimal 60 huruf.
+
+Di bawah kolom ada petunjuk **Ditambahkan sebagai ?to=Nama.** Tautan di bawahnya langsung berubah, contohnya `.../rara-dimas?to=Budi+Santoso`.
+</Step>
+<Step title="Coba sebagai tamu">
+Klik **Lihat sebagai tamu**. Undangan terbuka di tab baru. Nama tamu tampil di sampul.
+</Step>
+<Step title="Salin tautan tamu">
+Klik **Salin tautan tamu**. Di bawah tombol muncul **Tersalin.** Tempel tautan itu di WhatsApp tamu.
+</Step>
+<Step title="Atau salin tautan umum">
+Klik **Salin tautan umum** kalau kamu butuh tautan tanpa nama tamu, misalnya untuk dibagikan di grup.
+</Step>
+<Step title="Lihat bagian Untuk pengantin">
+Gulir ke bawah melewati bagian **Undangan khusus** sampai **Untuk pengantin**. Kalau Dashboard pasangan sudah dipasang, ada tombol:
+
+- **Kirim undangan**: membuka halaman Kirim di Dashboard pasangan untuk membuat tautan per tamu.
+- **Buka Dashboard**: membuka Beranda Dashboard pasangan.
+- **Buka Check-in**: hanya tampil bila **Undangan khusus** menyala dan **Tampilkan QR masuk untuk tamu undangan khusus** aktif di Konten > RSVP.
+
+Di bawahnya tertulis **Masuk dengan PIN dashboard.** Buat PIN di [PIN dashboard](/tamu/pin-dashboard).
+</Step>
+</Steps>
+
+<Warning>
+Tautan dari panel ini tidak memakai token. Kalau **Undangan khusus** menyala, tautan ini tidak akan membuka isi undangan untuk tamu. Buat tautan tamu di Dashboard > Kirim. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Warning>
+
+## Tanda berhasil
+
+<Success>
+Setelah klik salin, muncul **Tersalin.** Saat tautan tamu dibuka, nama tamu tampil di sampul undangan.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Isi slug di tab Settings Scalev, lalu Simpan.">
+Artinya halaman belum punya alamat publik. Buka tab **Settings** di editor Scalev, isi slug (minimal 3 karakter), klik **Simpan**, lalu buka **Bagikan** lagi.
+</Accordion>
+<Accordion title="Perubahan belum disimpan di Scalev.">
+Ada perubahan yang belum disimpan. Klik **Simpan** di editor Scalev. Tamu yang membuka tautan masih melihat versi lama sampai kamu menyimpan.
+</Accordion>
+<Accordion title="Gagal menyalin. Salin manual.">
+Browser menolak menyalin otomatis. Blok tautan yang tampil di panel dengan mouse, lalu tekan Ctrl+C (Windows) atau Cmd+C (Mac).
+</Accordion>
+<Accordion title="Pasang Dashboard pasangan dulu (Template > Marketing).">
+Tombol untuk pengantin belum ada karena Dashboard pasangan belum dipasang. Ikuti [Pasang Dashboard pasangan](/jualan/pasang-dashboard-pasangan), lalu buka **Bagikan** lagi.
+</Accordion>
+<Accordion title="Tombol Buka Check-in tidak muncul">
+Tombol ini hanya tampil kalau **Undangan khusus** menyala dan **Tampilkan QR masuk untuk tamu undangan khusus** aktif di Konten > RSVP. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="PIN dashboard" icon="key" href="/tamu/pin-dashboard">Buat PIN supaya pengantin bisa masuk dashboard.</Card>
+<Card title="Undangan khusus" icon="lock" href="/tamu/undangan-khusus">Batasi undangan hanya untuk tamu yang diundang.</Card>
+<Card title="Kirim undangan (pengantin)" icon="send" href="/pasangan/kirim-undangan">Cara pengantin membuat tautan per tamu.</Card>
+<Card title="Buku Tamu" icon="book" href="/tamu/buku-tamu">Lihat ucapan dan RSVP yang masuk.</Card>
+</CardGroup>

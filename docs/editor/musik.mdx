@@ -1,0 +1,94 @@
+---
+title: Musik
+description: Cara memasang lagu latar dari YouTube, memilih detik mulai, dan mengatur putar otomatis serta ulang terus.
+---
+
+Di halaman ini kamu memasang lagu latar undangan dari link YouTube, memilih detik mulainya, lalu mengatur agar lagu berputar saat tamu membuka undangan.
+
+<Info>
+**Yang kamu perlukan**
+
+- Editor NikahKit sudah terbuka dan template sudah dipilih. Belum? Baca [Pilih template](/editor/pilih-template).
+- Link lagu di YouTube (contoh `https://youtu.be/...` atau `https://www.youtube.com/watch?v=...`).
+</Info>
+
+<Image src="/assets/anim/editor-musik-youtube.svg" alt="1. Klik Audio di rel kiri, panel Musik terbuka. 2. Tempel link YouTube di Tautan lagu. 3. Isi Mulai dari 1:05. 4. Klik Coba putar dari 1:05. 5. Nyalakan Putar saat undangan dibuka dan Ulang terus." caption="Memasang musik dari YouTube" />
+
+<Warning>
+**Jangan unggah lagu ke Media Scalev.** Media Scalev menolak semua format audio (mp3, m4a, ogg, dan lainnya). Pakai link YouTube. File `.mp3`, `.m4a`, atau `.ogg` hanya bisa dipakai kalau sudah ada di hosting lain dengan alamat `https://`.
+</Warning>
+
+## Langkah
+
+<Steps>
+<Step title="Salin link lagu di YouTube">
+Buka lagu di YouTube. Klik **Bagikan** di bawah video, lalu **Salin**. Kalau ingin lagu mulai dari detik tertentu, centang pilihan mulai di jendela bagikan YouTube. Detik itu ikut terbaca otomatis.
+</Step>
+<Step title="Buka menu Audio">
+Kembali ke editor Scalev. Klik **Audio** di rel kiri NikahKit. Panel berjudul **Musik** terbuka.
+</Step>
+<Step title="Tempel link di Tautan lagu">
+Klik kolom **Tautan lagu** (isinya pudar `https://youtu.be/...`). Tekan **Ctrl+V** (Mac: **Cmd+V**). Di bawah kolom tertulis **YouTube, atau .mp3 dari hosting lain.**
+</Step>
+<Step title="Isi Mulai dari">
+Klik kolom **Mulai dari** (isinya pudar `0:00`). Tulis detik mulai, contoh `1:05` atau `65`. Keduanya sama: satu menit lima detik. Kosongkan bila lagu mulai dari awal.
+</Step>
+<Step title="Coba dengarkan">
+Gambar video muncul di bawah kolom, dengan tombol **Coba putar dari 1:05**. Klik tombol itu. Lagu diputar di pemutar uji. Klik **Hentikan** untuk berhenti. Kalau yang kamu tempel file audio https, yang muncul adalah pemutar audio dengan tulisan **Diputar mulai 1:05.**
+</Step>
+<Step title="Atur cara putar">
+Di bawahnya ada dua sakelar:
+
+- **Putar saat undangan dibuka**: lagu mulai saat tamu menekan tombol buka undangan di sampul. Kalau sampul tidak punya tombol buka, lagu mulai saat tamu pertama kali mengetuk atau mengklik halaman.
+- **Ulang terus**: setelah selesai, lagu mengulang dari detik pilihanmu.
+
+Klik sakelar sampai berwarna biru untuk menyalakan.
+</Step>
+<Step title="Simpan di Scalev">
+Klik **Simpan** di kanan atas editor Scalev. Panduannya di [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan).
+</Step>
+</Steps>
+
+<Info>
+Pratinjau editor Scalev memblokir pemutar YouTube, jadi lagu YouTube tidak berbunyi di pratinjau. Piringan musik di pratinjau bertuliskan **Musik diputar setelah terbit** saat mouse diarahkan ke sana. Untuk mengecek lagu di undangan, simpan dulu, lalu buka undangan sebagai tamu lewat **Bagikan** > **Lihat sebagai tamu** (lihat [Bagikan undangan](/tamu/bagikan-undangan)).
+</Info>
+
+### Ganti atau hapus lagu
+
+- **Ganti**: hapus isi **Tautan lagu**, lalu tempel link baru.
+- **Hapus**: klik **Hapus musik** di bagian bawah panel. Undangan tidak lagi punya lagu.
+
+## Tanda berhasil
+
+- Gambar video YouTube tampil di bawah kolom, tanpa tulisan merah.
+- Tombol **Coba putar dari ...** memutar lagu dari detik yang benar.
+- Setelah disimpan, undangan versi tamu memutar lagu saat dibuka.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Muncul: Tautan harus dari YouTube atau file audio https (.mp3, .m4a, .ogg).">
+Link yang kamu tempel bukan link YouTube dan bukan file audio https. Contoh yang salah: link Spotify, link Google Drive, atau link halaman toko musik. Salin ulang link dari YouTube.
+</Accordion>
+<Accordion title="Muncul: Musik berbentuk data/base64 atau blob: tidak bisa dipakai. Pakai tautan YouTube.">
+Yang ditempel bukan alamat, tetapi isi file atau alamat sementara. Pakai link YouTube.
+</Accordion>
+<Accordion title="Di kolom Mulai dari muncul: Tulis 65 atau 1:05.">
+Format detiknya tidak dikenali. Tulis angka detik saja (`65`) atau menit:detik (`1:05`).
+</Accordion>
+<Accordion title="Lagu tidak terdengar di undangan tamu">
+Cek tiga hal: (1) sakelar **Putar saat undangan dibuka** menyala; (2) kamu sudah menekan **Simpan** di Scalev; (3) izin domain sudah ada (YouTube, atau domain hosting file audio kalau kamu memakai file `.mp3`). NikahKit mencoba menambahkannya sendiri; kalau gagal, panel menampilkan **Izinkan di tab Security: ...**. Buka **Bantuan** di rel, lihat bagian izin domain, lalu ikuti [Izin domain](/scalev/izin-domain). Ingat: lagu baru mulai setelah tamu menekan tombol buka undangan.
+</Accordion>
+<Accordion title="Lagu mulai dari detik yang salah">
+Cek kolom **Mulai dari**. Link YouTube yang berisi waktu mulai (`?t=65`) mengisi kolom ini otomatis. Ubah angkanya bila perlu.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Gaya" icon="palette" href="/editor/gaya">Atur warna, huruf, bentuk, dan gerak.</Card>
+<Card title="Foto dan Media" icon="image" href="/editor/foto-dan-media">Unggah dan pasang foto.</Card>
+<Card title="Izin domain" icon="shield" href="/scalev/izin-domain">Izinkan YouTube di tab Security.</Card>
+<Card title="Bagikan undangan" icon="share" href="/tamu/bagikan-undangan">Lihat undangan sebagai tamu.</Card>
+</CardGroup>

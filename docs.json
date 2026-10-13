@@ -1,0 +1,117 @@
+{
+  "$schema": "https://docs.page/schema.json",
+  "name": "Panduan NikahKit",
+  "description": "Panduan lengkap member NikahKit: dari gabung, pasang ekstensi, membuat undangan di Scalev, mengurus tamu, sampai menjual undangan ke klien.",
+  "logo": { "light": "/assets/logo.png" },
+  "favicon": "/assets/favicon.png",
+  "theme": { "primary": "#b8460d" },
+  "content": { "headerDepth": 3, "zoomImages": true },
+  "header": {
+    "links": [
+      { "title": "WhatsApp", "href": "https://wa.me/6282175274118?text=Halo%20Nikahin%2C%20saya%20mau%20tanya%20soal%20NikahKit.", "cta": true }
+    ]
+  },
+  "sidebar": [
+    {
+      "group": "Mulai",
+      "icon": "rocket",
+      "pages": [
+        { "title": "Selamat datang", "href": "/" },
+        { "title": "Alur kerja dari nol sampai jualan", "href": "/mulai/alur-lengkap" },
+        { "title": "Istilah penting", "href": "/mulai/istilah" }
+      ]
+    },
+    {
+      "group": "Gabung dan pasang",
+      "icon": "user-plus",
+      "pages": [
+        { "title": "Pilih paket membership", "href": "/gabung/pilih-paket" },
+        { "title": "Pasang ekstensi NikahKit", "href": "/gabung/pasang-ekstensi" },
+        { "title": "Masuk dan bayar membership", "href": "/gabung/masuk-dan-bayar" },
+        { "title": "Hubungkan bisnis Scalev", "href": "/gabung/hubungkan-scalev" },
+        { "title": "Update ekstensi", "href": "/gabung/update-ekstensi" }
+      ]
+    },
+    {
+      "group": "Siapkan Scalev",
+      "icon": "store",
+      "pages": [
+        { "title": "Akun dan paket Scalev", "href": "/scalev/akun-scalev" },
+        { "title": "Buat halaman undangan", "href": "/scalev/buat-halaman-undangan" },
+        { "title": "Simpan dan terbitkan", "href": "/scalev/simpan-dan-terbitkan" },
+        { "title": "Alamat dan domain sendiri", "href": "/scalev/alamat-dan-domain" },
+        { "title": "Izin domain (tab Security)", "href": "/scalev/izin-domain" },
+        { "title": "Terima pembayaran klien", "href": "/scalev/terima-pembayaran" },
+        { "title": "Tutorial resmi Scalev pilihan", "href": "/scalev/tutorial-scalev" }
+      ]
+    },
+    {
+      "group": "Membuat undangan",
+      "icon": "pen-ruler",
+      "pages": [
+        { "title": "Kenali editor NikahKit", "href": "/editor/kenali-editor" },
+        { "title": "Pilih template", "href": "/editor/pilih-template" },
+        { "title": "Konten: sampul, mempelai, acara", "href": "/editor/konten-mempelai-acara" },
+        { "title": "Konten: cerita, galeri, video, susunan acara", "href": "/editor/konten-cerita-galeri" },
+        { "title": "Konten: RSVP, hadiah, keluarga, penutup", "href": "/editor/konten-rsvp-hadiah" },
+        { "title": "Foto dan Media", "href": "/editor/foto-dan-media" },
+        { "title": "Musik", "href": "/editor/musik" },
+        { "title": "Gaya: warna, font, bentuk, gerak", "href": "/editor/gaya" },
+        { "title": "Lapisan: tampilkan dan urutkan bagian", "href": "/editor/lapisan" },
+        { "title": "Klik di pratinjau", "href": "/editor/klik-di-pratinjau" },
+        { "title": "Urungkan, ulangi, kosongkan", "href": "/editor/urungkan-kosongkan" },
+        { "title": "Kode diubah manual (Dijeda)", "href": "/editor/edit-manual-dijeda" }
+      ]
+    },
+    {
+      "group": "Bagikan dan tamu",
+      "icon": "users",
+      "pages": [
+        { "title": "Bagikan undangan", "href": "/tamu/bagikan-undangan" },
+        { "title": "Undangan khusus", "href": "/tamu/undangan-khusus" },
+        { "title": "PIN dashboard pasangan", "href": "/tamu/pin-dashboard" },
+        { "title": "Buku Tamu di Scalev", "href": "/tamu/buku-tamu" },
+        { "title": "Impor daftar tamu (CSV)", "href": "/tamu/impor-csv" },
+        { "title": "Staff penerima tamu", "href": "/tamu/staff-penerima-tamu" }
+      ]
+    },
+    {
+      "group": "Dashboard pasangan",
+      "icon": "heart",
+      "pages": [
+        { "title": "Serahkan undangan ke pasangan", "href": "/pasangan/serahkan-ke-klien" },
+        { "title": "Masuk ke dashboard", "href": "/pasangan/masuk-dashboard" },
+        { "title": "Beranda", "href": "/pasangan/beranda" },
+        { "title": "Kirim undangan lewat WhatsApp", "href": "/pasangan/kirim-undangan" },
+        { "title": "Tamu dan ucapan", "href": "/pasangan/tamu-dan-ucapan" },
+        { "title": "Hari-H: check-in tamu", "href": "/pasangan/hari-h-check-in" },
+        { "title": "Pelacakan", "href": "/pasangan/pelacakan" },
+        { "title": "Pengaturan undangan", "href": "/pasangan/pengaturan" }
+      ]
+    },
+    {
+      "group": "Jualan",
+      "icon": "sack-dollar",
+      "pages": [
+        { "title": "Alur kerja dengan klien", "href": "/jualan/alur-dengan-klien" },
+        { "title": "Profil merek", "href": "/jualan/profil-merek" },
+        { "title": "Pasang Dashboard pasangan milikmu", "href": "/jualan/pasang-dashboard-pasangan" },
+        { "title": "Landing page jualan", "href": "/jualan/landing-page" },
+        { "title": "Form data undangan untuk klien", "href": "/jualan/form-data-klien" },
+        { "title": "Pesanan masuk", "href": "/jualan/pesanan-masuk" },
+        { "title": "Checklist sebelum diserahkan", "href": "/jualan/checklist-serah" }
+      ]
+    },
+    {
+      "group": "Bantuan",
+      "icon": "life-ring",
+      "pages": [
+        { "title": "Menu Bantuan di NikahKit", "href": "/bantuan/menu-bantuan" },
+        { "title": "Masalah umum dan solusinya", "href": "/bantuan/masalah-umum" },
+        { "title": "Arti pesan galat", "href": "/bantuan/pesan-galat" },
+        { "title": "Pertanyaan yang sering muncul", "href": "/bantuan/faq" },
+        { "title": "Hubungi tim", "href": "/bantuan/hubungi" }
+      ]
+    }
+  ]
+}

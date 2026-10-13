@@ -1,0 +1,127 @@
+---
+title: Impor daftar tamu (CSV)
+description: Cara menyiapkan file CSV daftar tamu dan mengimpornya di Buku Tamu supaya setiap tamu langsung punya tautan personal.
+---
+
+Punya daftar tamu di Excel? Simpan sebagai CSV, lalu impor di Buku Tamu. Setiap tamu langsung mendapat tautan personal.
+
+<Info>
+**Yang kamu perlukan**
+
+- Paket **Tahunan** atau **Sekali Bayar**. Paket Bulanan tidak bisa impor. Lihat [Pilih paket](/gabung/pilih-paket).
+- Menu **Buku Tamu** di Scalev sudah bisa dibuka. Lihat [Buku Tamu](/tamu/buku-tamu).
+- Daftar tamu di Excel, Google Sheets, atau Numbers.
+</Info>
+
+<Image src="/assets/anim/tamu-impor-csv.svg" alt="1. Di Buku Tamu, buka undangan lalu tab Tautan personal. 2. Klik Impor daftar tamu (CSV). 3. Pilih file CSV lalu Open. 4. Pratinjau menunjukkan 3 tamu siap diimpor dan 1 baris dilewati. 5. Klik Impor 3 tamu, muncul 3 tamu baru, 0 diperbarui." caption="Mengimpor daftar tamu dari CSV" />
+
+## Format file
+
+Baris pertama **wajib** berisi judul kolom. Urutan kolom bebas. Hanya **nama** yang wajib.
+
+| Kolom | Wajib | Aturan |
+|---|---|---|
+| `nama` | Ya | Nama tamu. Lebih dari 120 huruf dipotong. Nama yang sama (huruf besar kecil dan spasi ganda diabaikan) dianggap tamu yang sama. |
+| `whatsapp` | Tidak | Nomor WhatsApp, minimal 8 angka. Selain angka diabaikan. `0812...` otomatis jadi `62812...`. |
+| `kategori` | Tidak | Bebas, misalnya Keluarga, Kantor, Teman. Lebih dari 40 huruf dipotong. |
+| `pax` | Tidak | Jumlah orang, angka bulat 1 sampai 10. Kosong = 1. |
+
+Contoh isi file `daftar-tamu.csv`:
+
+```csv
+nama;whatsapp;kategori;pax
+Budi Santoso;081234567890;Keluarga;2
+Siti Aminah;6285711112222;Kantor;1
+Pak RT Joko;;Tetangga;
+```
+
+Pemisah boleh titik koma (`;`) atau koma (`,`). NikahKit memilihnya dari baris judul: yang lebih banyak di baris itu dipakai. Huruf besar kecil di judul kolom tidak berpengaruh.
+
+<Info>
+Judul kolom lain yang juga dikenali: `name` atau `nama tamu` untuk nama; `wa`, `phone`, `telepon`, `no wa`, `nomor wa`, `hp`, `no hp` untuk WhatsApp; `category` untuk kategori; `jumlah` atau `jumlah orang` untuk pax.
+</Info>
+
+## Langkah
+
+<Steps>
+<Step title="Siapkan file">
+Isi baris 1 dengan `nama`, `whatsapp`, `kategori`, `pax`. Isi tamu mulai baris 2. Lalu simpan atau unduh sebagai file `.csv`.
+
+Langkah di bawah adalah panduan umum program spreadsheet, bukan menu NikahKit. Nama menu bisa berbeda menurut versi dan bahasa programmu.
+
+<Tabs>
+<TabItem label="Excel (Windows/Mac)" value="excel">
+Umumnya lewat **File > Save As** (Simpan Sebagai), lalu pilih jenis file CSV, misalnya **CSV UTF-8**.
+</TabItem>
+<TabItem label="Google Sheets" value="sheets">
+Umumnya lewat **File > Download**, lalu pilih format CSV.
+</TabItem>
+</Tabs>
+</Step>
+<Step title="Buka Buku Tamu">
+Di Scalev, klik **Buku Tamu** di sidebar, lalu klik kartu undangan.
+</Step>
+<Step title="Klik tab Tautan personal">
+Klik tab **Tautan personal**. Kamu melihat tombol **Impor daftar tamu (CSV)** dan petunjuk **Kolom: nama, whatsapp, kategori, pax**.
+</Step>
+<Step title="Klik Impor daftar tamu (CSV)">
+Jendela pilih file dari komputermu terbuka. Pilih file CSV-mu, lalu konfirmasi di jendela itu.
+</Step>
+<Step title="Cek pratinjau">
+Muncul ringkasan seperti **3 tamu siap diimpor, 1 baris dilewati.**, contoh 5 tamu pertama, dan daftar **Baris yang dilewati:** dengan alasannya (paling banyak 20 baris ditampilkan). Klik **Batal** kalau ingin memperbaiki file dulu.
+</Step>
+<Step title="Klik Impor">
+Klik **Impor 3 tamu** (angkanya sesuai jumlah tamu). Daftar besar diimpor bertahap, dengan pesan seperti **Mengimpor 1–50 dari 120 tamu…**
+</Step>
+<Step title="Lihat hasil">
+Muncul pesan seperti **3 tamu baru, 0 diperbarui.** Tamu tampil di tab **Tautan personal** dengan label **Belum dibuka**. Kalau server menolak beberapa baris, muncul juga **N baris ditolak server:** dengan alasannya.
+</Step>
+</Steps>
+
+<Info>
+Nama yang sudah ada diperbarui kategori, pax, dan nomornya sesuai isi file (kolom kosong ikut mengosongkan); tautannya tetap sama. Jadi aman mengimpor ulang file yang sama setelah memperbaiki baris yang salah.
+</Info>
+
+## Tanda berhasil
+
+<Success>
+Muncul **N tamu baru, N diperbarui.** dan jumlah di **Dibuka ... dari ... tautan personal.** bertambah.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Kolom nama tidak ditemukan. Baris pertama harus judul kolom, misalnya nama;whatsapp;kategori;pax.">
+Baris pertama file bukan judul kolom, atau ejaannya salah. Tambahkan baris judul `nama;whatsapp;kategori;pax` di paling atas, simpan, lalu impor lagi.
+</Accordion>
+<Accordion title="Baris N: nama kosong">
+Kolom nama di baris itu kosong. Isi atau hapus barisnya.
+</Accordion>
+<Accordion title="Baris N: pax harus 1 sampai 10">
+Isi pax dengan angka bulat 1 sampai 10, tanpa tulisan seperti "2 orang".
+</Accordion>
+<Accordion title="Baris N: nomor WhatsApp tidak sah">
+Nomor kurang dari 8 angka. Perbaiki, atau kosongkan kalau tidak tahu.
+</Accordion>
+<Accordion title="Baris N: nama sudah ada di baris sebelumnya">
+Nama sama muncul dua kali di file. Bedakan namanya, misalnya `Budi (Kantor)` dan `Budi (Tetangga)`.
+</Accordion>
+<Accordion title="Khusus paket Tahunan dan Sekali Bayar.">
+Muncul saat kamu klik **Impor ... tamu** dengan paket Bulanan. Ganti paket di [Pilih paket](/gabung/pilih-paket), atau buat tautan satu per satu lewat Dashboard > Kirim.
+</Accordion>
+<Accordion title="... tamu pertama sudah tersimpan; impor ulang file yang sama untuk sisanya.">
+Impor terputus di tengah. Impor ulang file yang sama. Tamu yang sudah masuk hanya diperbarui, tidak dobel.
+</Accordion>
+<Accordion title="Semua isi masuk ke satu kolom saat file dibuka di program spreadsheet">
+Ini bukan masalah NikahKit; programmu memakai pemisah berbeda. Sebagai panduan umum, pakai fitur pemisah teks di programmu (di Excel biasanya **Data > Text to Columns**) dan pilih titik koma. Untuk impor ke NikahKit, file tetap bisa dipakai apa adanya selama baris pertamanya judul kolom.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Buku Tamu" icon="book" href="/tamu/buku-tamu">Kirim pengingat dan pantau RSVP.</Card>
+<Card title="Kirim undangan (pengantin)" icon="send" href="/pasangan/kirim-undangan">Kirim tautan personal lewat WhatsApp.</Card>
+<Card title="Undangan khusus" icon="lock" href="/tamu/undangan-khusus">Kunci undangan untuk tamu terdaftar.</Card>
+<Card title="Staff penerima tamu" icon="users" href="/tamu/staff-penerima-tamu">Siapkan check-in di hari-H.</Card>
+</CardGroup>

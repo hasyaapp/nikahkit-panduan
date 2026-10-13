@@ -1,0 +1,211 @@
+---
+title: Menu Bantuan di editor
+description: Cara membuka menu Bantuan NikahKit, membaca daftar cek, mengecek update, memperbaiki Izin domain (CSP), lalu menyalin atau mengirim laporan ke admin Nikahin.
+---
+
+Menu **Bantuan** adalah tempat pertama yang kamu buka saat NikahKit terasa aneh. Di sini kamu bisa melihat bagian mana yang bermasalah, mengecek update, dan mengirim laporan teknis ke admin Nikahin dengan satu klik.
+
+<Info>
+**Yang kamu perlukan**
+- NikahKit sudah terpasang di Chrome komputer. Lihat [Pasang ekstensi](/gabung/pasang-ekstensi).
+- Kamu sudah masuk dan punya paket aktif. Lihat [Masuk dan bayar](/gabung/masuk-dan-bayar).
+- Halaman Landing Page di editor Scalev (HTML Mode) dengan tab **NikahKit** terbuka. Lihat [Kenali editor](/editor/kenali-editor).
+</Info>
+
+<Image src="/assets/anim/bantuan-salin-laporan.svg" alt="Animasi: di editor Scalev, klik Bantuan di bagian bawah rel NikahKit. Dialog Bantuan terbuka berisi versi, tombol Cek update, baris status 1 perlu perhatian, dan daftar cek. Baris Penyimpanan ucapan dan RSVP bertanda seru dengan keterangan simpan halaman di Scalev dulu. Setelah digulir, klik Salin laporan, muncul tulisan Tersalin, lalu Lihat isi laporan menampilkan isi laporan teknis." caption="Membuka Bantuan dan menyalin laporan" />
+
+<Warning>
+Tombol **Bantuan** hanya ada di rel NikahKit, yaitu deretan menu di kiri panel (**Template**, **Gaya**, **Audio**, **Media**, **Lapisan**, **Konten**). Kalau panel NikahKit hanya menampilkan pesan seperti **Masuk ke NikahKit.** atau **Akun belum berlangganan.**, rel belum terbuka. Selesaikan dulu pesan itu. Artinya ada di [Pesan galat](/bantuan/pesan-galat).
+</Warning>
+
+## Langkah
+
+<Steps>
+<Step title="Buka editor halaman undangan">
+Di Scalev, buka **Landing Pages**, lalu buka halaman undangan yang mau dicek. Pastikan tab **NikahKit** aktif (garis biru di bawah tulisan **NikahKit**).
+</Step>
+<Step title="Cari tombol Bantuan">
+Lihat rel NikahKit di kiri. Di bawah menu **Konten** ada garis tipis, lalu deretan alat: **Bagikan**, tombol urungkan dan ulangi, tombol pratinjau (**Desktop**, **Tablet**, atau **Mobile**), **Klik aktif** atau **Klik mati** (kadang **Inspect**), **Kosongkan**, dan paling bawah **Bantuan**.
+</Step>
+<Step title="Klik Bantuan">
+Dialog berjudul **Bantuan** terbuka di atas panel. Begitu terbuka, NikahKit langsung memeriksa izin domain dan menambahkan izin yang bisa ditambahkan otomatis.
+</Step>
+<Step title="Baca baris versi">
+Baris paling atas menulis **Versi** dan nomor versi NikahKit yang kamu pakai. Di kanan ada tombol **Cek update**. Lanjut ke bagian [Cek update](#cek-update) di bawah untuk arti pesannya.
+</Step>
+<Step title="Baca baris status">
+Di bawah versi ada kotak status:
+- **Semua berjalan normal.** berarti tidak ada masalah.
+- **N perlu perhatian. Muat ulang editor; bila tetap, kirim laporan.** (N = jumlah baris bermasalah). Muat ulang halaman editor dulu (tekan F5 atau Ctrl+R, di Mac Cmd+R), lalu buka Bantuan lagi.
+</Step>
+<Step title="Baca tips Terbit tertahan">
+Ada catatan kecil: **Terbit tertahan "not finished previewing"? Muat ulang editor, lalu tekan Simpan & Terbitkan.** Pakai tips ini kalau Scalev menolak terbit dengan pesan `not finished previewing`, misalnya tepat setelah halaman baru pertama kali disimpan.
+</Step>
+<Step title="Periksa daftar cek satu per satu">
+Setiap baris punya tanda di kiri:
+- **✓** berarti berjalan.
+- **i** berarti informasi saja, bukan masalah.
+- **!** berarti bermasalah. Keterangan kecil di bawah nama baris menjelaskan penyebabnya.
+
+Arti setiap baris dan cara memperbaikinya ada di tabel [Daftar cek](#daftar-cek).
+</Step>
+<Step title="Gulir ke bawah, klik Salin laporan">
+Di bawah daftar cek ada dua tombol: **Salin laporan** dan **Kirim lewat WhatsApp**. Klik **Salin laporan**. Tulisan kecil di bawahnya berubah dari **Tanpa data undangan.** menjadi **Tersalin.**
+</Step>
+<Step title="Kirim laporannya ke admin">
+Tempel laporan (Ctrl+V, di Mac Cmd+V) di chat WhatsApp admin Nikahin. Atau klik **Kirim lewat WhatsApp** supaya chat terbuka dengan laporan sudah terisi. Caranya lengkap di [Hubungi tim Nikahin](/bantuan/hubungi).
+</Step>
+<Step title="Tutup Bantuan">
+Klik **×** di kanan atas dialog, atau tekan Esc di keyboard.
+</Step>
+</Steps>
+
+## Cek update
+
+NikahKit mengecek versi terbaru sekali setiap kali editor dibuka, dan Bantuan menampilkan hasil cek itu. Klik **Cek update** untuk bertanya ulang ke server. Pesan yang bisa muncul:
+
+| Pesan | Artinya | Yang harus dilakukan |
+| --- | --- | --- |
+| **Memeriksa...** | Sedang bertanya ke server Nikahin. | Tunggu beberapa detik. |
+| **Sudah versi terbaru.** | Kamu memakai versi terakhir. | Tidak perlu apa-apa. |
+| **Versi Web Store: update otomatis.** | NikahKit dipasang dari Chrome Web Store. | Chrome mengupdate sendiri. |
+| **Gagal memeriksa update.** | Server tidak terjangkau atau ekstensi tidak menjawab. | Cek internet, lalu klik **Cek update** lagi. |
+| **NikahKit (versi baru) tersedia. Anda memakai (versi lama).** | Ada versi baru. Muncul tombol **Update** dan **Cara update**. | Ikuti [Update ekstensi](/gabung/update-ekstensi). |
+
+Setelah kamu klik **Update**, pesan di bawah tombol bisa berupa:
+
+| Pesan | Artinya | Yang harus dilakukan |
+| --- | --- | --- |
+| **Ekstrak ZIP, timpa isi folder NikahKit, lalu klik ↻ di chrome://extensions.** | Unduhan dimulai. | Ikuti langkah di pesan itu, lalu muat ulang editor Scalev. |
+| **Unduhan baru saja dimulai. Cek folder Unduhan, atau tunggu 30 detik untuk mengulang.** | Kamu menekan **Update** dua kali dalam 30 detik. | Cek folder Unduhan dulu. |
+| **Sesi habis. Masuk lagi, lalu tekan Update.** | Login NikahKit sudah berakhir. | Klik tautan **Masuk lagi** di pesan itu, masuk dengan Google, lalu klik **Update** lagi. |
+| **Khusus member aktif. Hubungi admin lewat WhatsApp.** | Akun belum berlangganan atau langganan sudah habis. | Perpanjang di [Masuk dan bayar](/gabung/masuk-dan-bayar), atau klik tautan WhatsApp di pesan itu. |
+| **Berkas update belum tersedia. Coba lagi nanti.** | Berkas versi baru belum siap di server. | Coba lagi beberapa saat kemudian. |
+| **Gagal membuat tautan. Coba lagi.** | Gangguan lain. | Klik **Update** lagi. Bila tetap, kirim laporan. |
+
+## Daftar cek
+
+Urutan baris di layar sama dengan tabel ini. Baris yang bertanda **!** menampilkan keterangan kecil (kolom kedua).
+
+| Baris | Keterangan saat bermasalah | Artinya dan cara memperbaiki |
+| --- | --- | --- |
+| **Aplikasi Scalev (Nuxt/Vue)** | (tanpa keterangan) | Halaman Scalev belum termuat penuh. Muat ulang halaman editor. |
+| **Komponen halaman studio** | (tanpa keterangan) | NikahKit tidak menemukan editor halaman. Pastikan kamu membuka editor Landing Page, bukan daftar halaman, lalu muat ulang. |
+| **HTML Mode aktif** | (tanpa keterangan) | Halaman tidak memakai HTML Mode. NikahKit hanya bekerja di halaman HTML Mode. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan). |
+| **Editor kode (CodeMirror)** | (tanpa keterangan) | Editor kode Scalev tidak ditemukan. Muat ulang halaman editor. |
+| **Strip tab sidebar** | (tanpa keterangan) | Deretan tab (**Code**, **Media**, dan lainnya) tidak ditemukan. Muat ulang. |
+| **Area panel sidebar** | (tanpa keterangan) | Area panel kiri tidak ditemukan. Muat ulang. |
+| **Iframe preview** | (tanpa keterangan) | Pratinjau kanan belum termuat. Tunggu, lalu muat ulang. |
+| **Inspect preview** | (tanpa keterangan) | Fitur Inspect Scalev tidak tersedia. Klik di pratinjau mungkin tidak jalan. Muat ulang. |
+| **Sinkron device** | (tanpa keterangan) | Tombol **Desktop**/**Tablet**/**Mobile** tidak bisa mengganti pratinjau Scalev. Muat ulang. |
+| **Media Scalev** | (tanpa keterangan) | Daftar foto di Media Scalev tidak terbaca. Muat ulang. |
+| **Izin CSP otomatis** | (tanpa keterangan) | NikahKit tidak bisa menambah izin domain sendiri. Tambahkan manual di tab **Security**. Lihat [Izin domain](/scalev/izin-domain). |
+| **Hanya NikahKit yang aktif** | **Landing Hero juga aktif. Matikan di chrome://extensions, lalu muat ulang.** | Ekstensi Landing Hero menyunting halaman yang sama. Matikan kartunya di `chrome://extensions`, lalu muat ulang editor. |
+| **Versi editor Scalev** | **(nomor build): belum diuji. Aman bila baris lain berjalan.** | Tanda **i**, bukan masalah. Scalev memperbarui editornya. Selama baris lain **✓**, lanjutkan saja. |
+| **Data undangan terbaca** | **kode halaman diubah di luar NikahKit** | Kode di tab **Code** diubah manual. Lihat [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda). |
+| **Data undangan terbaca** | **belum ada undangan di halaman ini** | Halaman masih kosong. Pilih template dulu di [Pilih template](/editor/pilih-template). |
+| **Klik di pratinjau** | **pratinjau Scalev terkunci sandbox. Pakai tombol Inspect di rel.** | Pratinjau tidak bisa diklik langsung. Pakai tombol **Inspect** di rel. Lihat [Klik di pratinjau](/editor/klik-di-pratinjau). |
+| **Klik di pratinjau** | **belum menjawab; tunggu beberapa detik** | Pratinjau masih memuat. Tunggu, lalu buka Bantuan lagi. |
+| **Kode halaman cocok dengan NikahKit** | **ada perubahan manual di tab Code; NikahKit dijeda** | Ada perubahan manual di tab **Code**. Pilih **Lihat di kode** atau **Timpa dengan NikahKit** di panel. Lihat [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda). |
+| **Penyimpanan ucapan dan RSVP** | **simpan halaman di Scalev dulu** | Bagian RSVP aktif, tapi halaman belum punya ID yang tersimpan. Klik **Simpan** di Scalev, lalu buka Bantuan lagi. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan). |
+| **Izin domain di tab Security** | daftar domain, misalnya `https://contoh.com (img_src)` | Ada domain yang belum diizinkan. Lihat bagian [Izin domain (CSP)](#izin-domain-csp) di bawah. |
+| **Penulisan ke editor** | **penulisan terakhir gagal** | NikahKit gagal menulis ke kode halaman. Status di kaki rel menulis **Gagal**. Muat ulang halaman editor. |
+
+<Info>
+Kaki rel (paling bawah, di bawah **Bantuan**) juga menunjukkan status penulisan: **Tersimpan**, **Menulis...**, **Gagal**, atau **Dijeda**. **Tersimpan** di sini berarti NikahKit sudah menulis ke kode halaman. Kamu tetap harus klik **Simpan** di Scalev supaya tersimpan di Scalev.
+</Info>
+
+## Izin domain (CSP)
+
+Di bawah tombol laporan ada bagian **Izin domain (CSP)**. Bagian ini mendaftar domain luar yang dipakai undangan, misalnya YouTube, Google Maps, atau foto dari luar Media Scalev.
+
+<Image src="/assets/anim/bantuan-izin-domain.svg" alt="Animasi: panel NikahKit menulis Izinkan di tab Security. Klik Bantuan, gulir ke Izin domain (CSP). Domain YouTube untuk skrip berstatus Ditambahkan otomatis, domain YouTube untuk bingkai Sudah diizinkan, dan foto dari luar berstatus Perlu ditambah manual. Klik Salin domain kurang, muncul Tersalin. Tempel di tab Security. Buka tab Security, tempel, simpan, lalu kembali dan klik Periksa ulang sampai statusnya Sudah diizinkan." caption="Memperbaiki izin domain dari Bantuan" />
+
+Yang bisa tampil di bagian ini:
+
+- **Belum ada undangan di halaman ini.** Halaman belum berisi undangan NikahKit.
+- **Tidak butuh izin tambahan.** Undangan tidak memakai domain luar. Tidak perlu apa-apa.
+- **Izin otomatis tidak tersedia. Tambahkan di tab Security.** NikahKit tidak bisa menambahkan izin sendiri di editor ini. Semua domain harus kamu tambahkan manual.
+- Daftar domain. Setiap baris berisi alamat domain, status, dan kegunaannya (misalnya **Musik atau video YouTube**, **Peta Google Maps**, **Font Google**, **Ucapan & RSVP (Nikahin)**, **Foto dari luar Media Scalev**, **File musik dari luar Media Scalev**), lalu jenis izinnya dalam kurung (misalnya `img_src`).
+
+Arti status:
+
+| Status | Artinya | Yang harus dilakukan |
+| --- | --- | --- |
+| **Sudah diizinkan** | Domain sudah ada di tab **Security**. | Tidak perlu apa-apa. |
+| **Ditambahkan otomatis** | NikahKit baru saja menambahkannya. | Klik **Simpan** di Scalev supaya tersimpan. |
+| **Perlu ditambah manual** | NikahKit tidak bisa menambahkannya. | Ikuti langkah di bawah. |
+
+<Steps>
+<Step title="Klik Salin domain kurang">
+Tombol ini muncul bila ada status **Perlu ditambah manual**. Bila semua sudah aman, namanya **Salin daftar domain**. Setelah diklik muncul **Tersalin. Tempel di tab Security.**
+</Step>
+<Step title="Buka tab Security">
+Klik tab **Security** di deretan tab editor Scalev (di antara **Media** dan **Settings**).
+</Step>
+<Step title="Tempel di kolom yang sesuai">
+Teks yang kamu salin berbentuk `img_src: https://contoh.com`. Bagian sebelum titik dua adalah jenis izinnya. Tempel domainnya di kolom jenis itu. Daftar kolom ada di [Izin domain](/scalev/izin-domain).
+</Step>
+<Step title="Simpan, lalu Periksa ulang">
+Klik **Simpan** di Scalev. Kembali ke tab **NikahKit**, buka **Bantuan**, klik **Periksa ulang**. Muncul **Diperiksa ulang.** dan statusnya menjadi **Sudah diizinkan**.
+</Step>
+</Steps>
+
+Kalau penyalinan gagal, muncul **Gagal menyalin. Salin manual.** Pilih teks domainnya dengan mouse, lalu tekan Ctrl+C (Mac: Cmd+C).
+
+## Isi laporan dan privasi
+
+Klik **Lihat isi laporan** (paling bawah dialog) untuk melihat persis apa yang akan kamu kirim. Isinya:
+
+- Baris judul `Laporan NikahKit` dan nomor versi.
+- `Waktu`, `Halaman` (bagian alamat editor setelah nama domain, misalnya `/pages/365671`), `Build Scalev`, dan `Browser`.
+- Setiap baris daftar cek dengan tanda `[OK]`, `[INFO]`, atau `[X]`, plus keterangannya bila bermasalah.
+- Daftar izin domain dan statusnya, bila ada.
+- Sampai 5 galat terakhir yang dicatat NikahKit, bila ada.
+
+<Success>
+Laporan **tidak memuat isi undangan**: tidak ada nama mempelai, tanggal, alamat, rekening, atau data tamu. Karena itu di bawah tombol tertulis **Tanpa data undangan.** Laporan aman dikirim ke admin.
+</Success>
+
+## Tanda berhasil
+
+- Dialog **Bantuan** terbuka dan kotak status menulis **Semua berjalan normal.**
+- Setelah klik **Salin laporan**, tulisan berubah menjadi **Tersalin.**
+- Di bagian **Izin domain (CSP)** tidak ada lagi status **Perlu ditambah manual**.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Tombol Bantuan tidak ada">
+Rel NikahKit belum terbuka karena ada pesan akses di panel (misalnya **Masuk ke NikahKit.** atau **Hubungkan bisnis Scalev dulu.**). Selesaikan pesan itu dulu. Cari artinya di [Pesan galat](/bantuan/pesan-galat).
+</Accordion>
+<Accordion title="Tertulis Gagal menyalin. Salin dari isi laporan.">
+Chrome menolak menyalin otomatis, biasanya karena jendela tidak sedang aktif. Klik sekali di dalam dialog, lalu coba **Salin laporan** lagi. Kalau tetap gagal, klik **Lihat isi laporan**, blok semua teksnya dengan mouse, lalu tekan Ctrl+C (Mac: Cmd+C).
+</Accordion>
+<Accordion title="Masih N perlu perhatian setelah muat ulang">
+Klik **Salin laporan**, lalu kirim ke admin lewat [Hubungi tim Nikahin](/bantuan/hubungi). Sertakan screenshot dialog Bantuan.
+</Accordion>
+<Accordion title="Status Perlu ditambah manual tidak berubah">
+Pastikan kamu menempel di kolom yang sesuai dengan kode dalam kurung (misalnya `img_src`), lalu klik **Simpan** di Scalev sebelum **Periksa ulang**. Detail kolom ada di [Izin domain](/scalev/izin-domain).
+</Accordion>
+<Accordion title="Scalev menolak terbit dengan not finished previewing">
+Muat ulang halaman editor (F5), tunggu pratinjau tampil, lalu klik **Simpan & Terbitkan** lagi.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Masalah umum" icon="wrench" href="/bantuan/masalah-umum">
+Cari gejala yang kamu alami dan cara memperbaikinya.
+</Card>
+<Card title="Pesan galat" icon="triangle-exclamation" href="/bantuan/pesan-galat">
+Kamus semua pesan yang bisa muncul di layar.
+</Card>
+<Card title="Hubungi tim Nikahin" icon="whatsapp" href="/bantuan/hubungi">
+Kirim laporan ke admin lewat WhatsApp.
+</Card>
+<Card title="Izin domain" icon="shield" href="/scalev/izin-domain">
+Detail tab Security dan kolomnya.
+</Card>
+</CardGroup>

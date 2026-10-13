@@ -1,0 +1,158 @@
+---
+title: Pasang ekstensi NikahKit
+description: Unduh ZIP NikahKit, ekstrak di Windows atau Mac, pasang lewat Load unpacked di chrome://extensions, lalu pastikan tab NikahKit muncul di editor Scalev.
+---
+
+Di halaman ini kamu memasang NikahKit di Google Chrome komputer. Hasil akhirnya: ada tab **NikahKit** di editor halaman Scalev, siap untuk masuk dengan Google.
+
+<Info>
+**Yang kamu perlukan**
+
+- Komputer Windows atau Mac dengan Google Chrome. NikahKit tidak bisa dipasang di HP.
+- Akun Scalev dengan minimal satu halaman yang memakai HTML Mode. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan).
+- Sekitar 120 KB ruang kosong untuk ZIP NikahKit.
+- Halaman unduhan resmi: [Cara pasang NikahKit](https://assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html).
+</Info>
+
+<Image src="/assets/anim/gabung-ekstrak-zip.svg" alt="Halaman Cara pasang NikahKit dengan tombol Unduh NikahKit diklik, lalu unduhan selesai. Folder Unduhan berisi file nikahkit ZIP. Klik kanan, pilih Extract All, lalu klik Extract. Muncul folder bernama sama dengan ZIP. Di dalamnya ada folder NikahKit berisi manifest.json, nk-bg.js, pin.html. Catatan untuk Mac: klik dua kali ZIP, folder NikahKit langsung muncul, lalu pindahkan ke Dokumen." caption="Bagian 1: unduh dan ekstrak ZIP" />
+
+<Image src="/assets/anim/pasang-load-unpacked.svg" alt="Halaman chrome://extensions. Developer mode di kanan atas dinyalakan, muncul tombol Load unpacked, Pack extension, Update. Load unpacked diklik, jendela Pilih folder ekstensi terbuka. Folder NikahKit yang berisi manifest.json dipilih, lalu Select. Kartu NikahKit muncul dengan tombol Details, Remove, ikon muat ulang, dan sakelar aktif. Terakhir ikon puzzle diklik untuk menyematkan NikahKit." caption="Bagian 2: pasang lewat Load unpacked" />
+
+<Warning>
+Pakai ZIP dari halaman [Cara pasang NikahKit](https://assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html) saja, bukan salinan dari orang lain. Salinan lain bisa membuat **Masuk** gagal.
+</Warning>
+
+## Langkah
+
+### Bagian 1: Unduh dan ekstrak
+
+<Steps>
+  <Step title="Buka halaman Cara pasang NikahKit di Chrome komputer">
+    Buka [https://assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html](https://assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html).
+    Kamu melihat judul **Cara pasang NikahKit** dan tombol gelap **Unduh NikahKit** dengan nomor versi.
+  </Step>
+  <Step title="Klik Unduh NikahKit">
+    Chrome mengunduh file bernama seperti `nikahkit-0.7.59.zip` (angkanya bisa berbeda). Ukurannya sekitar 120 KB.
+  </Step>
+  <Step title="Buka folder Unduhan">
+    Di Chrome, klik ikon unduhan di kanan atas, lalu klik ikon folder di sebelah nama file. Folder Unduhan terbuka dengan file ZIP terpilih.
+  </Step>
+  <Step title="Ekstrak ZIP">
+    <Tabs>
+      <TabItem label="Windows" value="win">
+        1. Klik kanan file ZIP.
+        2. Pilih **Extract All...** (di Windows berbahasa Indonesia: **Ekstrak Semua...**).
+        3. Jendela **Extract Compressed (Zipped) Folders** terbuka. Klik **Extract**.
+        4. Muncul folder bernama sama dengan ZIP, misalnya `nikahkit-0.7.59`. Buka folder itu. Di dalamnya ada folder **NikahKit**.
+      </TabItem>
+      <TabItem label="Mac" value="mac">
+        1. Klik dua kali file ZIP.
+        2. Folder **NikahKit** langsung muncul di folder Unduhan.
+      </TabItem>
+    </Tabs>
+  </Step>
+  <Step title="Pastikan isi folder NikahKit benar">
+    Buka folder **NikahKit**. Di dalamnya harus ada file `manifest.json`, `nk-bg.js`, `pin.html`, dan file lain. Folder inilah yang kamu pilih nanti.
+  </Step>
+  <Step title="Pindahkan folder NikahKit ke tempat tetap">
+    Seret folder **NikahKit** ke folder **Dokumen**. Jangan simpan di Unduhan kalau kamu sering membersihkan folder itu.
+    <Warning>
+    Chrome menjalankan NikahKit langsung dari folder ini. Kalau folder dihapus atau dipindah setelah dipasang, NikahKit hilang dari Chrome.
+    </Warning>
+  </Step>
+</Steps>
+
+### Bagian 2: Pasang di Chrome
+
+<Steps>
+  <Step title="Buka halaman ekstensi Chrome">
+    Klik kolom alamat Chrome, ketik `chrome://extensions`, lalu tekan Enter.
+    Halaman **Extensions** (atau **Ekstensi**) terbuka.
+  </Step>
+  <Step title="Nyalakan Developer mode">
+    Di kanan atas ada tombol geser **Developer mode** (atau **Mode developer**). Klik sampai berwarna biru.
+    Muncul baris tombol baru: **Load unpacked**, **Pack extension**, **Update**.
+  </Step>
+  <Step title="Klik Load unpacked">
+    Di Chrome berbahasa Indonesia tombolnya bernama **Muat yang belum dibuka**. Jendela pemilih folder terbuka.
+  </Step>
+  <Step title="Pilih folder NikahKit">
+    Masuk ke **Dokumen**, klik sekali folder **NikahKit** (yang berisi `manifest.json`). Jangan masuk ke dalamnya dan jangan pilih ZIP-nya.
+  </Step>
+  <Step title="Klik Select">
+    Di Windows tombolnya **Select Folder** atau **Pilih Folder**. Di Mac tombolnya **Select** atau **Pilih**.
+    Kartu **NikahKit** muncul di halaman Extensions, lengkap dengan nomor versi dan sakelar biru yang menyala.
+  </Step>
+  <Step title="Sematkan NikahKit (opsional)">
+    Klik ikon puzzle di kanan atas Chrome, lalu klik ikon pin di samping **NikahKit**. Ikon NikahKit tampil di toolbar sebagai tanda ekstensi terpasang.
+    NikahKit dipakai dari tab **NikahKit** di editor Scalev, bukan dari ikon ini.
+  </Step>
+</Steps>
+
+### Bagian 3: Cek tab NikahKit di Scalev
+
+<Image src="/assets/anim/gabung-tab-nikahkit-muncul.svg" alt="Dashboard Scalev, menu Landing Pages diklik, lalu halaman Undangan Rina dan Dimas dibuka. Editor Landing Page Studio HTML Mode terbuka dengan tab Code, Media, Security, Settings, NikahKit. Tab NikahKit dilingkari dan diklik. Panel NikahKit menampilkan Masuk ke NikahKit dan tombol Masuk dengan Google." caption="Bagian 3: tab NikahKit muncul di editor Scalev" />
+
+<Steps>
+  <Step title="Buka Scalev di tab baru">
+    Masuk ke `app.scalev.com`. Kalau editor Scalev sudah terbuka sebelum NikahKit dipasang, muat ulang halamannya (tekan F5 di Windows, Cmd+R di Mac).
+  </Step>
+  <Step title="Klik menu Landing Pages">
+    Daftar halamanmu tampil.
+  </Step>
+  <Step title="Klik halaman undangan yang memakai HTML Mode">
+    Editor terbuka. Alamatnya seperti `app.scalev.com/pages/48213` (angkanya hanya contoh).
+  </Step>
+  <Step title="Klik tab NikahKit">
+    Tab ada di deretan tab kiri atas, di samping **Settings**.
+    Panel NikahKit tampil dengan tulisan **Masuk ke NikahKit.** dan tombol **Masuk dengan Google**.
+  </Step>
+</Steps>
+
+## Tanda berhasil
+
+<Success>
+- Di `chrome://extensions` ada kartu **NikahKit** dengan sakelar menyala.
+- Di editor halaman HTML Mode ada tab **NikahKit**.
+- Panel NikahKit menampilkan **Masuk ke NikahKit.** dan tombol **Masuk dengan Google**.
+</Success>
+
+Lanjutkan ke [Masuk dan bayar membership](/gabung/masuk-dan-bayar).
+
+## Kalau ada masalah
+
+<AccordionGroup>
+  <Accordion title='"Manifest file is missing"'>
+    Yang terpilih folder luar atau ZIP-nya. Pilih folder **NikahKit** yang berisi `manifest.json`.
+    Di Windows, hasil Extract All biasanya folder bernama sama dengan ZIP (misalnya `nikahkit-0.7.59`) yang berisi folder **NikahKit**. Pilih folder **NikahKit** yang di dalam.
+  </Accordion>
+  <Accordion title="Tab NikahKit tidak muncul">
+    Pastikan kartu NikahKit aktif dan halaman Scalev memakai HTML Mode, lalu muat ulang editor.
+    Cek juga: kamu membuka editor halaman (alamat `app.scalev.com/pages/...`), bukan daftar halaman.
+  </Accordion>
+  <Accordion title="Chrome minta mematikan ekstensi developer">
+    Pilih **Batal** agar NikahKit tetap jalan. Chrome kadang menampilkan peringatan ini untuk ekstensi yang dipasang lewat Load unpacked.
+  </Accordion>
+  <Accordion title="Masuk gagal">
+    Pakai ZIP dari halaman [Cara pasang NikahKit](https://assets.nikahin.workers.dev/brand-assets/nikahkit/pasang.html) saja, bukan salinan dari orang lain. Lihat juga [Masuk dan bayar membership](/gabung/masuk-dan-bayar).
+  </Accordion>
+  <Accordion title="Folder terhapus atau pindah">
+    NikahKit hilang dari Chrome. Ekstrak lagi, lalu ulangi langkah **Load unpacked**. Undangan tetap ada di Scalev.
+  </Accordion>
+  <Accordion title="Landing Hero juga aktif. Matikan di chrome://extensions, lalu muat ulang.">
+    Ekstensi Landing Hero mengubah halaman yang sama dengan NikahKit. Di `chrome://extensions`, matikan sakelar Landing Hero, lalu muat ulang editor Scalev.
+  </Accordion>
+  <Accordion title="Ekstensi tidak tersambung. Muat ulang halaman.">
+    Panel NikahKit tidak bisa bicara dengan ekstensinya, misalnya karena ekstensi baru dipasang atau dimuat ulang. Muat ulang halaman editor Scalev.
+  </Accordion>
+  <Accordion title="Tidak ada tombol Load unpacked">
+    **Developer mode** belum menyala. Klik tombol geser di kanan atas halaman `chrome://extensions`.
+  </Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+  <Card title="Masuk dan bayar membership" icon="right-to-bracket" href="/gabung/masuk-dan-bayar" />
+  <Card title="Update ekstensi" icon="rotate" href="/gabung/update-ekstensi" />
+</CardGroup>

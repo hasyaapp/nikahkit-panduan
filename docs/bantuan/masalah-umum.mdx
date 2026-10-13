@@ -1,0 +1,538 @@
+---
+title: Masalah umum dan cara memperbaikinya
+description: Daftar gejala yang sering dialami member NikahKit, dikelompokkan per bagian (pasang, masuk, bayar, Scalev, editor, terbit, RSVP, musik, foto, undangan khusus, dashboard pasangan, check-in, pesanan), lengkap dengan penyebab dan langkah perbaikan.
+---
+
+Halaman ini membantu kamu menemukan penyebab masalah dari gejala yang terlihat, lalu memperbaikinya sendiri. Setiap masalah ditulis dengan pola yang sama: **Gejala**, **Penyebab**, lalu **Langkah perbaikan**.
+
+<Info>
+**Yang kamu perlukan**
+- Chrome di komputer Windows atau Mac, tempat NikahKit terpasang. Lihat [Pasang ekstensi](/gabung/pasang-ekstensi).
+- Kalau ada pesan di layar, catat kalimatnya persis. Artinya bisa dicari di [Pesan galat](/bantuan/pesan-galat).
+- Kalau panel NikahKit masih terbuka, buka juga [menu Bantuan](/bantuan/menu-bantuan).
+</Info>
+
+<Image src="/assets/anim/bantuan-cek-gejala.svg" alt="Animasi: panel NikahKit menampilkan pesan Server NikahKit tidak terjangkau. Periksa internet, lalu tekan Periksa lagi. Baris tebal adalah gejala, baris kedua langkah perbaikannya. Setelah internet dicek, klik Periksa lagi. Panel menulis Memeriksa akses, lalu rel menu NikahKit tampil lagi." caption="Pola memperbaiki: baca pesan, perbaiki, periksa lagi" />
+
+## Langkah
+
+<Steps>
+<Step title="Catat gejalanya">
+Tulis apa yang kamu lihat dan di layar mana (editor Scalev, Dashboard pasangan, halaman tamu, atau halaman check-in). Kalau ada pesan, salin kalimatnya persis.
+</Step>
+<Step title="Cari bagiannya di bawah">
+Gejala dikelompokkan per bagian. Tekan Ctrl+F (Mac: Cmd+F) dan ketik beberapa kata dari gejalanya.
+</Step>
+<Step title="Ikuti Langkah perbaikan">
+Kerjakan satu langkah, lalu cek lagi. Jangan lompat ke langkah berikutnya sebelum yang pertama dicoba.
+</Step>
+<Step title="Periksa lagi">
+Di editor, tombol **Periksa lagi** di panel NikahKit memeriksa ulang akses tanpa memuat ulang halaman. Kalau tombolnya tidak ada, muat ulang halaman (F5, di Mac Cmd+R).
+</Step>
+<Step title="Masih belum beres? Kirim laporan">
+Buka **Bantuan**, klik **Salin laporan**, lalu kirim ke admin. Caranya di [Hubungi tim Nikahin](/bantuan/hubungi).
+</Step>
+</Steps>
+
+## Pasang ekstensi
+
+<AccordionGroup>
+<Accordion title="Chrome menulis Manifest file is missing">
+**Gejala:** saat **Load unpacked**, Chrome menolak dengan pesan `Manifest file is missing`.
+
+**Penyebab:** yang kamu pilih adalah folder luar atau file ZIP-nya, bukan folder NikahKit.
+
+**Langkah perbaikan:**
+1. Pastikan ZIP sudah diekstrak.
+2. Klik **Load unpacked** lagi.
+3. Masuk ke folder hasil ekstrak sampai kamu melihat file `manifest.json`, lalu pilih folder itu.
+
+Detail: [Pasang ekstensi](/gabung/pasang-ekstensi).
+</Accordion>
+<Accordion title="Tab NikahKit tidak muncul di editor Scalev">
+**Gejala:** di editor halaman hanya ada tab **Code**, **Media**, **Security**, **Settings**, tanpa **NikahKit**.
+
+**Penyebab:** kartu NikahKit di Chrome mati, atau halaman tidak memakai HTML Mode.
+
+**Langkah perbaikan:**
+1. Buka `chrome://extensions`, pastikan kartu NikahKit menyala.
+2. Pastikan halaman Scalev dibuat dengan HTML Mode. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan).
+3. Muat ulang editor Scalev.
+</Accordion>
+<Accordion title="Chrome minta mematikan ekstensi mode developer">
+**Gejala:** muncul jendela Chrome yang menyarankan mematikan ekstensi developer.
+
+**Penyebab:** NikahKit dipasang lewat **Load unpacked**, jadi Chrome menganggapnya ekstensi developer.
+
+**Langkah perbaikan (panduan umum Chrome, bukan fitur NikahKit):** tutup jendela itu tanpa memilih mematikan ekstensi, supaya NikahKit tetap jalan. Kalau NikahKit sempat dimatikan, nyalakan lagi kartunya di `chrome://extensions`.
+</Accordion>
+<Accordion title="NikahKit hilang setelah folder dipindah atau dihapus">
+**Gejala:** NikahKit tidak ada lagi di Chrome, atau kartunya error.
+
+**Penyebab:** Chrome menjalankan NikahKit langsung dari folder hasil ekstrak. Kalau folder itu dipindah atau dihapus, NikahKit ikut hilang.
+
+**Langkah perbaikan:** ekstrak ZIP lagi ke tempat tetap, lalu ulangi **Load unpacked**. Undangan kamu tetap aman di Scalev.
+</Accordion>
+<Accordion title="Panel menulis Landing Hero juga aktif">
+**Gejala:** pesan merah **Landing Hero juga aktif. Matikan di chrome://extensions, lalu muat ulang.**
+
+**Penyebab:** ekstensi Landing Hero menyunting halaman yang sama dengan NikahKit.
+
+**Langkah perbaikan:** buka `chrome://extensions`, matikan kartu Landing Hero, lalu muat ulang editor.
+</Accordion>
+</AccordionGroup>
+
+## Masuk (login)
+
+<AccordionGroup>
+<Accordion title="Masuk dengan Google gagal terus">
+**Gejala:** setelah klik **Masuk dengan Google**, muncul pesan seperti **Login Google tidak cocok. Masuk lagi.** atau **Login Google tidak sah. Masuk lagi.**
+
+**Penyebab:** server Nikahin menolak bukti login yang dikirim Google.
+
+**Langkah perbaikan:** klik **Masuk dengan Google** sekali lagi. Kalau pesan yang sama terus muncul, kirim screenshot pesannya ke admin lewat [Hubungi tim Nikahin](/bantuan/hubungi).
+</Accordion>
+<Accordion title="Tiba-tiba diminta masuk lagi">
+**Gejala:** pesan **Sesi berakhir. Masuk lagi.** atau panel kembali ke **Masuk ke NikahKit.**
+
+**Penyebab:** sesi masuk NikahKit berlaku 12 jam. Setelah itu kamu harus masuk lagi.
+
+**Langkah perbaikan:** klik **Masuk dengan Google** lagi dengan akun Google yang sama.
+</Accordion>
+<Accordion title="Login dibatalkan.">
+**Gejala:** muncul **Login dibatalkan.**
+
+**Penyebab:** jendela Google ditutup sebelum selesai memilih akun.
+
+**Langkah perbaikan:** klik **Masuk dengan Google** lagi dan pilih akun sampai jendelanya tertutup sendiri.
+</Accordion>
+<Accordion title="Email Google belum terverifikasi.">
+**Gejala:** muncul **Email Google belum terverifikasi.**
+
+**Penyebab:** akun Google kamu belum memverifikasi emailnya.
+
+**Langkah perbaikan:** verifikasi email di akun Google, atau pakai akun Google lain.
+</Accordion>
+</AccordionGroup>
+
+## Bayar dan paket
+
+<AccordionGroup>
+<Accordion title="Sudah bayar, tapi editor masih menulis Akun belum berlangganan.">
+**Gejala:** pembayaran sudah selesai, tapi panel masih menolak.
+
+**Penyebab:** status pembayaran belum dicek ulang.
+
+**Langkah perbaikan:**
+1. Klik chip akun di kanan atas panel NikahKit untuk membuka jendela akun.
+2. Klik **Cek pembayaran**.
+3. Kalau muncul **Langganan aktif. Tekan Periksa lagi di panel NikahKit.**, tutup jendela lalu klik **Periksa lagi**.
+4. Kalau muncul **Pembayaran belum tercatat. Tunggu sebentar, lalu cek lagi.**, tunggu beberapa menit dan ulangi.
+
+Detail: [Masuk dan bayar](/gabung/masuk-dan-bayar).
+</Accordion>
+<Accordion title="Pesanan sudah kedaluwarsa atau dibatalkan.">
+**Gejala:** setelah **Cek pembayaran** muncul **Pesanan sudah kedaluwarsa atau dibatalkan. Pilih paket lagi.**
+
+**Penyebab:** pesanan di Scalev tidak dibayar sampai lewat batasnya, atau dibatalkan.
+
+**Langkah perbaikan:** klik **Pilih paket**, pilih paket lagi, lalu bayar di tab yang terbuka.
+</Accordion>
+<Accordion title="Panel menulis Langganan berakhir N hari lagi">
+**Gejala:** catatan kuning **Langganan berakhir N hari lagi.** atau merah **Langganan berakhir. N hari lagi ucapan, RSVP, dan Dashboard berhenti.**
+
+**Penyebab:** paket hampir habis atau sedang dalam masa tenggang 7 hari.
+
+**Langkah perbaikan:** klik **Perpanjang** di catatan itu. Sisa masa aktif tetap terhitung.
+</Accordion>
+<Accordion title="Langganan NikahKit sudah habis.">
+**Gejala:** panel menulis **Langganan NikahKit sudah habis. Undangan tayang tetap tampil.**
+
+**Penyebab:** masa tenggang 7 hari sudah lewat.
+
+**Langkah perbaikan:** klik **Pilih paket** dan bayar. Selama habis, undangan yang sudah tayang tetap terlihat tamu, tapi RSVP, ucapan, dan dashboard berhenti. Lihat [FAQ](/bantuan/faq).
+</Accordion>
+</AccordionGroup>
+
+## Scalev dan halaman
+
+<AccordionGroup>
+<Accordion title="Hubungkan bisnis Scalev dulu.">
+**Gejala:** panel menulis **Hubungkan bisnis Scalev dulu. Hubungkan di akun NikahKit, lalu tekan Periksa lagi.**
+
+**Penyebab:** akun NikahKit belum terhubung ke bisnis Scalev.
+
+**Langkah perbaikan:** klik **Hubungkan bisnis Scalev**, ikuti izin di Scalev, lalu klik **Periksa lagi**. Detail: [Hubungkan Scalev](/gabung/hubungkan-scalev).
+</Accordion>
+<Accordion title="Halaman belum ada di bisnis Scalev yang terhubung.">
+**Gejala:** panel menulis **Halaman belum ada di bisnis Scalev yang terhubung.**
+
+**Penyebab:** halaman baru belum pernah disimpan, atau halaman ini milik bisnis Scalev lain.
+
+**Langkah perbaikan:** klik **Simpan** di Scalev, lalu **Periksa lagi**. Kalau halaman milik bisnis lain, hubungkan bisnis itu di akun NikahKit.
+</Accordion>
+<Accordion title="Undangan ini milik akun NikahKit lain.">
+**Gejala:** panel menolak dengan **Undangan ini milik akun NikahKit lain. Masuk dengan akun pemiliknya.**
+
+**Penyebab:** halaman ini sudah dipakai akun Google lain.
+
+**Langkah perbaikan:** klik chip akun, klik **Keluar**, lalu masuk dengan akun Google yang dulu membuat undangan ini.
+</Accordion>
+<Accordion title="Tidak bisa menambah halaman baru di Scalev">
+**Gejala:** Scalev tidak mengizinkan halaman aktif baru.
+
+**Penyebab:** Scalev gratis hanya mengizinkan 3 halaman aktif.
+
+**Langkah perbaikan:** untuk banyak undangan, pakai Scalev Lite ke atas. Lihat [Akun Scalev](/scalev/akun-scalev).
+</Accordion>
+</AccordionGroup>
+
+## Editor
+
+<AccordionGroup>
+<Accordion title="Menu di rel abu-abu dan tidak bisa diklik">
+**Gejala:** **Gaya**, **Audio**, **Lapisan**, dan **Konten** pudar. Saat kursor diarahkan muncul **Pilih template dulu** atau **Simpan halaman di Scalev dulu.**
+
+**Penyebab:** halaman belum berisi undangan, atau halaman baru belum disimpan.
+
+**Langkah perbaikan:** pilih template di **Template** ([Pilih template](/editor/pilih-template)), atau klik **Simpan** di Scalev bila tertulis **Simpan halaman di Scalev dulu.**
+</Accordion>
+<Accordion title="Panel berhenti di Memuat template...">
+**Gejala:** panel lama menulis **Memuat template...**
+
+**Penyebab:** koneksi lambat saat mengambil desain dari server Nikahin.
+
+**Langkah perbaikan:** tunggu. Kalau muncul pesan **Desain template ... belum bisa diambil dari server Nikahin. Periksa koneksi, lalu coba lagi.**, cek internet lalu klik **Periksa lagi**.
+</Accordion>
+<Accordion title="Template khusus paket Tahunan dan Sekali Bayar">
+**Gejala:** muncul **Template (nama) khusus paket Tahunan dan Sekali Bayar.**
+
+**Penyebab:** kamu memakai paket Bulanan.
+
+**Langkah perbaikan:** pilih template lain, atau ganti ke paket Tahunan atau Sekali Bayar.
+</Accordion>
+<Accordion title="Kode diubah di tab Code. NikahKit dijeda.">
+**Gejala:** catatan kuning **Kode diubah di tab Code. NikahKit dijeda.** dan kaki rel menulis **Dijeda**.
+
+**Penyebab:** ada perubahan manual di tab **Code**.
+
+**Langkah perbaikan:** klik **Lihat di kode** untuk melihat bagian yang berubah, atau **Timpa dengan NikahKit** untuk membuang perubahan manual (bisa diurungkan). Detail: [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda).
+</Accordion>
+<Accordion title="Kaki rel menulis Gagal">
+**Gejala:** status di bawah rel **Gagal**, dan panel menulis **Gagal menulis. Muat ulang halaman.**
+
+**Penyebab:** NikahKit tidak bisa menulis ke editor kode Scalev.
+
+**Langkah perbaikan:** muat ulang halaman editor. Perubahan yang sudah kamu simpan di Scalev tetap aman.
+</Accordion>
+<Accordion title="Urungkan/Ulangi tidak tersedia">
+**Gejala:** pesan **Urungkan/Ulangi tidak tersedia: buka tab Code di Scalev, lalu coba lagi.**
+
+**Penyebab:** riwayat urungkan memakai editor kode Scalev yang belum siap.
+
+**Langkah perbaikan:** klik tab **Code** sekali, kembali ke **NikahKit**, lalu coba lagi. Lihat [Urungkan dan Kosongkan](/editor/urungkan-kosongkan).
+</Accordion>
+</AccordionGroup>
+
+## Pratinjau
+
+<AccordionGroup>
+<Accordion title="Klik di pratinjau tidak membuka form">
+**Gejala:** mengklik bagian undangan di pratinjau tidak membuka form di panel.
+
+**Penyebab:** tombol di rel menulis **Klik mati**, atau pratinjau Scalev terkunci sandbox (rel menampilkan **Inspect**).
+
+**Langkah perbaikan:** klik tombolnya sampai tertulis **Klik aktif**. Kalau yang ada tombol **Inspect**, klik **Inspect** sampai tertulis **Inspect aktif**, lalu klik bagian di pratinjau. Detail: [Klik di pratinjau](/editor/klik-di-pratinjau).
+</Accordion>
+<Accordion title="Pratinjau tidak berganti ukuran HP">
+**Gejala:** pratinjau tetap lebar komputer.
+
+**Penyebab:** tombol pratinjau di rel masih **Desktop** atau **Tablet**.
+
+**Langkah perbaikan:** klik tombol itu sampai tertulis **Mobile**. Urutannya Desktop, Tablet, Mobile.
+</Accordion>
+</AccordionGroup>
+
+## Simpan dan terbit
+
+<AccordionGroup>
+<Accordion title="Scalev menolak terbit: not finished previewing">
+**Gejala:** **Simpan & Terbitkan** gagal dengan pesan `not finished previewing`.
+
+**Penyebab:** Scalev menganggap pratinjau belum selesai, biasanya tepat setelah halaman baru pertama kali disimpan.
+
+**Langkah perbaikan:** muat ulang editor, tunggu pratinjau tampil, lalu klik **Simpan & Terbitkan** lagi.
+</Accordion>
+<Accordion title="Tamu masih melihat versi lama">
+**Gejala:** perubahan sudah terlihat di pratinjau, tapi halaman publik belum berubah. Di **Bagikan** tertulis **Perubahan belum disimpan di Scalev.**
+
+**Penyebab:** halaman publik selalu menampilkan versi yang terakhir disimpan dan diterbitkan.
+
+**Langkah perbaikan:** klik **Simpan & Terbitkan** di Scalev. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan).
+</Accordion>
+<Accordion title="Bagikan menulis Isi slug di tab Settings Scalev, lalu Simpan.">
+**Gejala:** dialog **Bagikan** tidak menampilkan tautan.
+
+**Penyebab:** halaman belum punya alamat (slug), atau belum pernah disimpan.
+
+**Langkah perbaikan:** buka tab **Settings** di editor Scalev, isi slug, lalu klik **Simpan**. Lihat [Alamat dan domain](/scalev/alamat-dan-domain).
+</Accordion>
+<Accordion title="Domain tidak bisa dibuka sama sekali">
+**Gejala:** halaman undangan di domain sendiri tidak terbuka di HP tamu, sementara alamat lain bisa.
+
+**Penyebab:** salah satunya, domain diblokir Komdigi.
+
+**Langkah perbaikan:** cek dengan panduan Scalev [Domain tidak bisa diakses, jangan-jangan blokir Komdigi](https://tutorial.scalev.com/diblokir-negara/). Solusi yang disarankan di sana: pakai domain baru yang tidak diblokir, atau ajukan normalisasi.
+</Accordion>
+</AccordionGroup>
+
+## RSVP dan ucapan tidak muncul
+
+<AccordionGroup>
+<Accordion title="Di pratinjau tertulis Ucapan & RSVP aktif setelah terbit.">
+**Gejala:** form RSVP di pratinjau editor tidak bisa dipakai.
+
+**Penyebab:** normal. Form hanya aktif di halaman yang sudah terbit.
+
+**Langkah perbaikan:** klik **Simpan & Terbitkan**, lalu uji dari tautan publik lewat **Bagikan** > **Lihat sebagai tamu**.
+</Accordion>
+<Accordion title="Form tamu menulis Form belum aktif.">
+**Gejala:** di halaman tamu, bagian ucapan menulis **Form belum aktif.**
+
+**Penyebab:** undangan belum tersambung ke penyimpanan ucapan karena halaman belum punya ID. ID undangan adalah nomor ID halaman Scalev, yang baru ada setelah halaman disimpan. Di **Konten** > **RSVP** tertulis **Isi slug (min. 3 karakter) di tab Settings Scalev.**, dan Bantuan menandai **Penyimpanan ucapan dan RSVP**.
+
+**Langkah perbaikan:** klik **Simpan** di Scalev (isi slug di tab **Settings** dulu bila belum ada), tunggu **Konten** > **RSVP** menulis **Tersambung. ID:** diikuti nomor ID halaman, lalu **Simpan & Terbitkan**.
+</Accordion>
+<Accordion title="Ucapan & RSVP sudah ditutup.">
+**Gejala:** tamu melihat **Ucapan & RSVP sudah ditutup.** atau **Konfirmasi kehadiran sudah ditutup. Terima kasih.**
+
+**Penyebab:** **Ucapan & RSVP sudah ditutup.** berarti langganan kamu sudah habis (lewat masa tenggang). **Konfirmasi kehadiran sudah ditutup. Terima kasih.** berarti **Tenggat konfirmasi** di **Konten** > **RSVP** sudah lewat.
+
+**Langkah perbaikan:** untuk pesan pertama, perpanjang paket. Untuk pesan kedua, ubah atau kosongkan **Tenggat konfirmasi**, lalu **Simpan & Terbitkan**. Detail RSVP: [RSVP dan hadiah](/editor/konten-rsvp-hadiah).
+</Accordion>
+<Accordion title="Ucapan belum bisa dimuat.">
+**Gejala:** daftar ucapan di halaman tamu menulis **Ucapan belum bisa dimuat.**
+
+**Penyebab:** koneksi ke server Nikahin diblokir (izin domain kurang), internet tamu putus, atau server sedang terganggu.
+
+**Langkah perbaikan:** buka **Bantuan** dan cek **Izin domain (CSP)**, terutama baris **Ucapan & RSVP (Nikahin)**. Perbaiki yang **Perlu ditambah manual**, lalu **Simpan & Terbitkan**. Minta tamu menekan **Coba lagi**.
+</Accordion>
+<Accordion title="Tamu menulis jawaban sudah dicatat pengantin">
+**Gejala:** tamu mendapat **Belum terkirim: jawaban sudah dicatat pengantin, hubungi mereka untuk mengubahnya.**
+
+**Penyebab:** pengantin sudah mengoreksi jawaban itu di dashboard, jadi tamu tidak bisa mengubahnya lagi.
+
+**Langkah perbaikan:** tamu menghubungi pengantin, lalu pengantin mengubahnya di [Tamu dan ucapan](/pasangan/tamu-dan-ucapan).
+</Accordion>
+</AccordionGroup>
+
+## Musik dan video
+
+<AccordionGroup>
+<Accordion title="Tautan musik ditolak">
+**Gejala:** kolom musik menulis **Tautan harus dari YouTube atau file audio https (.mp3, .m4a, .ogg).** atau **Musik berbentuk data/base64 atau blob: tidak bisa dipakai. Pakai tautan YouTube.**
+
+**Penyebab:** tautan bukan YouTube dan bukan file audio `https`.
+
+**Langkah perbaikan:** tempel tautan video YouTube, atau tautan `https` yang berakhiran `.mp3`, `.m4a`, atau `.ogg`. Lihat [Musik](/editor/musik).
+</Accordion>
+<Accordion title="Musik tidak berbunyi saat halaman dibuka">
+**Gejala:** musik diam saat tamu baru membuka halaman.
+
+**Penyebab:** browser HP tidak mengizinkan suara sebelum tamu menyentuh layar. Musik diputar saat tamu menekan tombol buka undangan di sampul.
+
+**Langkah perbaikan:** uji dengan menekan tombol di sampul. Kalau tetap diam, cek **Bantuan** > **Izin domain (CSP)** untuk baris YouTube atau file musik.
+</Accordion>
+<Accordion title="Tautan YouTube tidak dikenali.">
+**Gejala:** kolom video menulis **Tautan YouTube tidak dikenali.**
+
+**Penyebab:** yang ditempel bukan tautan video YouTube.
+
+**Langkah perbaikan:** buka videonya di YouTube, salin alamatnya dari address bar, lalu tempel lagi. Lihat [Cerita dan galeri](/editor/konten-cerita-galeri).
+</Accordion>
+</AccordionGroup>
+
+## Foto
+
+<AccordionGroup>
+<Accordion title="Sebagian foto dilewati saat diunggah">
+**Gejala:** muncul **N dilewati: hanya JPG, PNG, WebP, GIF.** atau **N gagal diunggah.**
+
+**Penyebab:** Media Scalev hanya menerima JPG, PNG, WebP, dan GIF. Format lain (misalnya HEIC dari iPhone) ditolak.
+
+**Langkah perbaikan:** ubah fotonya ke JPG dulu, lalu unggah lagi. Lihat [Foto dan media](/editor/foto-dan-media).
+</Accordion>
+<Accordion title="Tautan foto ditolak">
+**Gejala:** di **Atau tempel tautan https** muncul **Alamat harus diawali https://**, **Bukan alamat yang sah. Contoh: https://domain.com/foto.jpg**, atau pesan tentang `data/base64` dan `blob:`.
+
+**Penyebab:** tautan bukan alamat gambar `https` yang tetap.
+
+**Langkah perbaikan:** paling aman, unggah foto ke Media Scalev lewat **Unggah foto**, lalu pilih dari daftar.
+</Accordion>
+<Accordion title="Foto dari luar tidak tampil di halaman tamu">
+**Gejala:** foto tampil di pratinjau tapi kosong di halaman publik.
+
+**Penyebab:** domain foto belum diizinkan di tab **Security**.
+
+**Langkah perbaikan:** buka **Bantuan** > **Izin domain (CSP)**, salin domain yang **Perlu ditambah manual**, tempel di tab **Security**, lalu **Simpan & Terbitkan**. Lihat [Menu Bantuan](/bantuan/menu-bantuan#izin-domain-csp).
+</Accordion>
+</AccordionGroup>
+
+## Tamu tidak bisa membuka undangan khusus
+
+<AccordionGroup>
+<Accordion title="Tamu melihat Undangan ini bersifat pribadi">
+**Gejala:** tamu melihat **Undangan ini bersifat pribadi** dengan keterangan **Undangan ini hanya terbuka lewat tautan pribadi yang dikirim pengantin kepada Anda.**
+
+**Penyebab:** tamu membuka tautan umum atau tautan tanpa kode tamu. Tautan dari **Bagikan** di editor juga tanpa kode (panel menulis **Tautan di atas tanpa token. Buat tautan tamu di Dashboard > Kirim.**).
+
+**Langkah perbaikan:** buat tautan per tamu di Dashboard pasangan, tab **Kirim**, lalu kirim ulang. Lihat [Kirim undangan](/pasangan/kirim-undangan).
+</Accordion>
+<Accordion title="Tamu melihat Sudah dibuka di perangkat lain">
+**Gejala:** tamu melihat **Sudah dibuka di perangkat lain**.
+
+**Penyebab:** **Kunci perangkat** aktif dan tautan tamu itu sudah dipakai di semua perangkat yang diizinkan (**Perangkat per tamu**).
+
+**Langkah perbaikan:** pengantin membuka detail tamu di Dashboard pasangan lalu memilih **Buka kunci perangkat**. Kalau mode **+ PIN untuk HP baru** aktif, tamu cukup mengetik PIN tamu di kolom **PIN undangan**. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Accordion>
+<Accordion title="Tamu menulis PIN salah">
+**Gejala:** di layar PIN tamu muncul **PIN salah. Periksa lagi, atau minta PIN kepada pengantin.** atau **Terlalu banyak percobaan. Coba lagi dalam N menit.**
+
+**Penyebab:** PIN tamu keliru atau sudah diganti.
+
+**Langkah perbaikan:** pengantin melihat PIN tamu yang berlaku di Dashboard pasangan (baris **PIN tamu untuk HP baru**, hanya tampil bila undangan khusus sudah terbit dengan mode **+ PIN untuk HP baru**) dan mengirimkannya ke tamu. Lihat [Pelacakan](/pasangan/pelacakan).
+</Accordion>
+<Accordion title="Undangan belum bisa dimuat">
+**Gejala:** tamu melihat **Undangan belum bisa dimuat** dan tombol **Coba lagi**.
+
+**Penyebab:** internet tamu terputus atau server sedang tidak terjangkau.
+
+**Langkah perbaikan:** minta tamu mengecek internet lalu menekan **Coba lagi**.
+</Accordion>
+</AccordionGroup>
+
+## Dashboard pasangan
+
+<AccordionGroup>
+<Accordion title="Pengantin tidak bisa masuk">
+**Gejala:** di halaman masuk dashboard muncul **PIN salah.**, **PIN dashboard belum dibuat.**, atau **Link undangan belum valid.**
+
+**Penyebab:** PIN keliru, PIN belum dibuat, atau link undangan yang diisi bukan link undangan.
+
+**Langkah perbaikan:** buat atau lihat PIN di editor lewat **Bagikan** > **Kelola PIN dashboard** ([PIN dashboard](/tamu/pin-dashboard)). Kirim ulang pesan serah terima ke pengantin. Lihat [Masuk dashboard](/pasangan/masuk-dashboard).
+</Accordion>
+<Accordion title="Masa aktif undangan berakhir.">
+**Gejala:** dashboard menolak dengan **Masa aktif undangan berakhir.**
+
+**Penyebab:** langganan NikahKit kamu sudah habis.
+
+**Langkah perbaikan:** perpanjang paket. Dashboard jalan lagi setelah paket aktif.
+</Accordion>
+<Accordion title="Tombol Kirim undangan dan Buka Dashboard tidak ada di Bagikan">
+**Gejala:** di **Bagikan** tertulis **Pasang Dashboard pasangan dulu (Template > Marketing).**
+
+**Penyebab:** kamu belum memasang halaman Dashboard pasangan milikmu sendiri.
+
+**Langkah perbaikan:** ikuti [Pasang Dashboard pasangan](/jualan/pasang-dashboard-pasangan).
+</Accordion>
+<Accordion title="Pengantin harus memasukkan PIN lagi setiap kali">
+**Gejala:** setiap buka dashboard, pengantin diminta PIN.
+
+**Penyebab:** normal. Halaman menulis **PIN hanya diingat selama tab ini terbuka.**
+
+**Langkah perbaikan:** simpan PIN di tempat aman. PIN bisa dilihat lagi oleh member lewat **Lihat PIN**.
+</Accordion>
+</AccordionGroup>
+
+## Check-in hari-H
+
+<AccordionGroup>
+<Accordion title="Kamera tidak bisa memindai QR">
+**Gejala:** muncul **Scan QR tidak didukung. Tempel link.** atau **Kamera tak bisa dibuka. Tempel link.**
+
+**Penyebab:** browser HP tidak mendukung pemindai QR, atau izin kamera ditolak.
+
+**Langkah perbaikan:** izinkan kamera di pengaturan browser, atau tempel link undangan tamu di kolom yang tersedia. Lihat [Hari-H check-in](/pasangan/hari-h-check-in).
+</Accordion>
+<Accordion title="Staff tidak bisa masuk">
+**Gejala:** **Kode staff salah atau sudah dicabut.** atau **Kode staff khusus paket Tahunan dan Sekali Bayar.**
+
+**Penyebab:** kode salah ketik, sudah dicabut, atau paket kamu Bulanan.
+
+**Langkah perbaikan:** buat kode baru di **Buku Tamu** > **Staff penerima tamu**. Lihat [Staff penerima tamu](/tamu/staff-penerima-tamu).
+</Accordion>
+<Accordion title="Hasil pindai Link tanpa nama dan kode tamu.">
+**Gejala:** setelah memindai, muncul **Link tanpa nama dan kode tamu.**
+
+**Penyebab:** yang dipindai bukan QR masuk tamu undangan khusus, atau tautan umum tanpa kode tamu.
+
+**Langkah perbaikan:** minta tamu menunjukkan QR masuk dari tautan pribadinya. QR hanya tampil bila **Undangan khusus** aktif dan **Tampilkan QR masuk untuk tamu undangan khusus** dinyalakan di **Konten** > **RSVP**.
+</Accordion>
+<Accordion title="Hasil pindai Sudah check-in pukul ...">
+**Gejala:** layar menulis **Sudah check-in pukul** dan jamnya.
+
+**Penyebab:** tamu itu sudah tercatat datang sebelumnya.
+
+**Langkah perbaikan:** tidak perlu apa-apa. Ini penanda agar satu tautan tidak dipakai dua kali.
+</Accordion>
+</AccordionGroup>
+
+## Pesanan masuk dan landing page
+
+<AccordionGroup>
+<Accordion title="Landing page tidak bisa dipasang">
+**Gejala:** muncul **Isi profil merek (nama bisnis, nomor WhatsApp, dan minimal satu paket) sebelum memasang Landing page.**
+
+**Penyebab:** Profil merek belum lengkap.
+
+**Langkah perbaikan:** isi [Profil merek](/jualan/profil-merek), klik **Simpan profil**, lalu pasang lagi.
+</Accordion>
+<Accordion title="Klien melapor form tidak aktif">
+**Gejala:** klien melihat **Link form ini sudah tidak aktif. Hubungi vendor undangan kalian.**
+
+**Penyebab:** langganan NikahKit kamu habis, jadi form pesanan ikut nonaktif. Bisa juga link form yang dipakai klien salah atau sudah tidak berlaku.
+
+**Langkah perbaikan:** perpanjang paket, lalu kirim ulang link dari **Pesanan masuk** > **Salin link form**. Kalau klien melihat **Form sedang penuh. Hubungi vendor undangan kalian.**, hapus pesanan lama yang sudah diisi di **Pesanan masuk**.
+</Accordion>
+<Accordion title="Tempel data pesanan ditolak">
+**Gejala:** **Data pesanan tidak ditemukan. Tempel seluruh pesan WhatsApp dari form, termasuk baris #data-undangan.**
+
+**Penyebab:** pesan yang ditempel terpotong atau bukan pesan dari form.
+
+**Langkah perbaikan:** salin seluruh pesan WhatsApp dari klien, termasuk baris paling bawah yang diawali `#data-undangan`. Lihat [Pesanan masuk](/jualan/pesanan-masuk).
+</Accordion>
+</AccordionGroup>
+
+## Tanda berhasil
+
+- Pesan masalah hilang dan rel menu NikahKit tampil lagi.
+- **Bantuan** menulis **Semua berjalan normal.**
+- Dari HP, tautan tamu terbuka dan form ucapan bisa dikirim.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Gejala saya tidak ada di halaman ini">
+Cari kalimat pesannya di [Pesan galat](/bantuan/pesan-galat). Kalau tidak ada juga, kirim laporan dari **Bantuan** ke admin lewat [Hubungi tim Nikahin](/bantuan/hubungi).
+</Accordion>
+<Accordion title="Sudah mengikuti langkah, tetap gagal">
+Muat ulang halaman editor sekali, lalu buka **Bantuan** dan klik **Salin laporan**. Kirim laporan beserta screenshot ke admin.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Pesan galat" icon="triangle-exclamation" href="/bantuan/pesan-galat">
+Arti setiap pesan yang muncul di layar.
+</Card>
+<Card title="Menu Bantuan" icon="circle-question" href="/bantuan/menu-bantuan">
+Daftar cek dan laporan teknis.
+</Card>
+<Card title="FAQ" icon="comments" href="/bantuan/faq">
+Pertanyaan yang sering ditanyakan member.
+</Card>
+<Card title="Hubungi tim Nikahin" icon="whatsapp" href="/bantuan/hubungi">
+Kirim laporan lewat WhatsApp.
+</Card>
+</CardGroup>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="ttl dsc" font-family='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' data-total="23.400000000000002" data-steps="0,3.4,7,10.8,14.8,18">
+<title id="ttl">Apa yang terjadi saat masa aktif habis</title>
+<desc id="dsc">1. Selama paket aktif, semua fitur berjalan. 2. Seminggu sebelum berakhir, panel NikahKit mengingatkan kamu. 3. Lewat tanggal berakhir: masa tenggang 7 hari, fitur masih jalan. 4. Lewat tenggang: RSVP, ucapan, dan dashboard pasangan berhenti. 5. Halaman undangan tetap tampil untuk tamu. 6. Perpanjang kapan saja: sisa masa aktif tetap terhitung.</desc>
+<style>#e-p1{opacity:1;animation:v0 23.400000000000002s linear infinite}@keyframes v0{0%{opacity:0}1.068%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-p2{opacity:1;animation:v1 23.400000000000002s linear infinite}@keyframes v1{0%{opacity:0}14.53%{opacity:0}15.598%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-p3{opacity:1;animation:v2 23.400000000000002s linear infinite}@keyframes v2{0%{opacity:0}29.915%{opacity:0}30.983%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-p4{opacity:1;animation:v3 23.400000000000002s linear infinite}@keyframes v3{0%{opacity:0}46.154%{opacity:0}47.222%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-rsvpOn{opacity:0;animation:v4 23.400000000000002s linear infinite}@keyframes v4{0%{opacity:0}1.068%{opacity:1}46.154%{opacity:1}47.222%{opacity:0}98.291%{opacity:0}100%{opacity:0}}
+#e-rsvpOff{opacity:1;animation:v5 23.400000000000002s linear infinite}@keyframes v5{0%{opacity:0}46.154%{opacity:0}47.222%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-renew{opacity:1;animation:v6 23.400000000000002s linear infinite}@keyframes v6{0%{opacity:0}76.923%{opacity:0}77.991%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#e-cur{opacity:0;animation:v7 23.400000000000002s linear infinite}@keyframes v7{0%{opacity:0}1.068%{opacity:1}29.915%{opacity:1}30.983%{opacity:0}98.291%{opacity:0}100%{opacity:0}}
+#e-curG{opacity:0;animation:v8 23.400000000000002s linear infinite}@keyframes v8{0%{opacity:0}29.915%{opacity:0}30.983%{opacity:1}46.154%{opacity:1}47.222%{opacity:0}98.291%{opacity:0}100%{opacity:0}}
+#e-curX{opacity:1;animation:v9 23.400000000000002s linear infinite}@keyframes v9{0%{opacity:0}46.154%{opacity:0}47.222%{opacity:1}98.291%{opacity:1}100%{opacity:0}}
+#cur{animation:cur 23.400000000000002s ease-in-out infinite}@keyframes cur{0%{transform:translate(840px,476px)}14.53%{transform:translate(840px,476px)}29.915%{transform:translate(840px,476px)}46.154%{transform:translate(840px,476px)}63.248%{transform:translate(840px,476px)}76.923%{transform:translate(840px,476px)}82.607%{transform:translate(140px,460px)}98.291%{transform:translate(140px,460px)}100%{transform:translate(840px,476px)}}
+#r5{opacity:0;transform-origin:140px 460px;animation:r5 23.400000000000002s linear infinite}@keyframes r5{0%,82.607%{opacity:0;transform:scale(.3)}82.949%{opacity:1;transform:scale(.5)}85.171%{opacity:0;transform:scale(1.4)}100%{opacity:0}}
+#c0{opacity:0;animation:c0 23.400000000000002s linear infinite}@keyframes c0{0%{opacity:1}14.53%{opacity:1}15.598%{opacity:0}99.786%{opacity:0}100%{opacity:1}}
+#d0{animation:d0 23.400000000000002s linear infinite}@keyframes d0{0%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:#ffffff}}
+#c1{opacity:0;animation:c1 23.400000000000002s linear infinite}@keyframes c1{0%{opacity:0}14.53%{opacity:0}15.598%{opacity:1}29.915%{opacity:1}30.983%{opacity:0}100%{opacity:0}}
+#d1{animation:d1 23.400000000000002s linear infinite}@keyframes d1{0%{fill:rgba(255,255,255,.35)}14.53%{fill:rgba(255,255,255,.35)}15.598%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c2{opacity:0;animation:c2 23.400000000000002s linear infinite}@keyframes c2{0%{opacity:0}29.915%{opacity:0}30.983%{opacity:1}46.154%{opacity:1}47.222%{opacity:0}100%{opacity:0}}
+#d2{animation:d2 23.400000000000002s linear infinite}@keyframes d2{0%{fill:rgba(255,255,255,.35)}29.915%{fill:rgba(255,255,255,.35)}30.983%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c3{opacity:0;animation:c3 23.400000000000002s linear infinite}@keyframes c3{0%{opacity:0}46.154%{opacity:0}47.222%{opacity:1}63.248%{opacity:1}64.316%{opacity:0}100%{opacity:0}}
+#d3{animation:d3 23.400000000000002s linear infinite}@keyframes d3{0%{fill:rgba(255,255,255,.35)}46.154%{fill:rgba(255,255,255,.35)}47.222%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c4{opacity:0;animation:c4 23.400000000000002s linear infinite}@keyframes c4{0%{opacity:0}63.248%{opacity:0}64.316%{opacity:1}76.923%{opacity:1}77.991%{opacity:0}100%{opacity:0}}
+#d4{animation:d4 23.400000000000002s linear infinite}@keyframes d4{0%{fill:rgba(255,255,255,.35)}63.248%{fill:rgba(255,255,255,.35)}64.316%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c5{opacity:1;animation:c5 23.400000000000002s linear infinite}@keyframes c5{0%{opacity:0}76.923%{opacity:0}77.991%{opacity:1}98.291%{opacity:1}99.359%{opacity:0}100%{opacity:0}}
+#d5{animation:d5 23.400000000000002s linear infinite}@keyframes d5{0%{fill:rgba(255,255,255,.35)}76.923%{fill:rgba(255,255,255,.35)}77.991%{fill:#ffffff}98.291%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#n0{opacity:0;animation:c0 23.400000000000002s linear infinite}
+#n1{opacity:0;animation:c1 23.400000000000002s linear infinite}
+#n2{opacity:0;animation:c2 23.400000000000002s linear infinite}
+#n3{opacity:0;animation:c3 23.400000000000002s linear infinite}
+#n4{opacity:0;animation:c4 23.400000000000002s linear infinite}
+#n5{opacity:1;animation:c5 23.400000000000002s linear infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
+<defs></defs>
+<rect x="0" y="0" width="960" height="600" rx="14" fill="#f8f9fa"/>
+<rect x="40" y="24" width="880" height="500" rx="12" fill="#ffffff" stroke="#dadce0" stroke-width="1"/>
+<text x="80" y="94" font-size="20" font-weight="700" fill="#202124">Masa aktif paket NikahKit</text>
+<rect x="80" y="144" width="356" height="36" rx="6" fill="#188038"/><text x="258" y="167" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Aktif</text>
+<rect x="440" y="144" width="216" height="36" rx="6" fill="#b06000"/><text x="548" y="167" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Tenggang 7 hari</text>
+<rect x="660" y="144" width="216" height="36" rx="6" fill="#c5221f"/><text x="768" y="167" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Habis</text>
+<text x="436" y="200" font-size="12" fill="#5f6368" text-anchor="middle">tanggal berakhir</text>
+<line x1="438" y1="138" x2="438" y2="186" stroke="#202124" stroke-width="2"/>
+<text x="658" y="200" font-size="12" fill="#5f6368" text-anchor="middle">+7 hari</text>
+<line x1="658" y1="138" x2="658" y2="186" stroke="#202124" stroke-width="2"/>
+<rect x="640" y="234" width="200" height="280" rx="30" fill="#1f1f1f"/><rect x="652" y="274" width="176" height="216" rx="6" fill="#f7efe9"/><rect x="710" y="250" width="60" height="8" rx="4" fill="#444"/>
+<text x="740" y="314" font-size="16" font-weight="700" fill="#2b1a07" text-anchor="middle">Rani &amp; Dimas</text>
+<text x="740" y="338" font-size="12" fill="#5f6368" text-anchor="middle">Undangan tetap tampil</text>
+<g id="e-p1"><rect x="80" y="238" width="500" height="38" rx="8" fill="#f1f3f4"/><text x="94" y="260" font-size="13" fill="#202124"><tspan x="94" dy="0">Paket aktif: editor, RSVP, ucapan, dashboard pasangan jalan.</tspan></text></g>
+<g id="e-p2"><rect x="80" y="288" width="500" height="38" rx="8" fill="#fef7e0"/><text x="94" y="310" font-size="13" fill="#202124"><tspan x="94" dy="0">7 hari terakhir, panel menulis: Langganan berakhir 5 hari lagi.</tspan></text></g>
+<g id="e-p3"><rect x="80" y="338" width="500" height="38" rx="8" fill="#fef7e0"/><text x="94" y="360" font-size="13" fill="#202124"><tspan x="94" dy="0">Masa tenggang 7 hari: fitur masih jalan. Segera perpanjang.</tspan></text></g>
+<g id="e-p4"><rect x="80" y="388" width="500" height="38" rx="8" fill="#fce8e6"/><text x="94" y="410" font-size="13" fill="#202124"><tspan x="94" dy="0">Setelah tenggang: RSVP, ucapan, dan dashboard berhenti.</tspan></text></g>
+<g id="e-rsvpOn"><rect x="664" y="374" width="152" height="70" rx="8" fill="#ffffff"/><text x="740" y="400" font-size="12" font-weight="600" fill="#202124" text-anchor="middle">Ucapan &amp; RSVP</text><rect x="684" y="410" width="112" height="26" rx="6" fill="#0779a6"/><text x="740" y="428" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Kirim</text></g>
+<g id="e-rsvpOff"><rect x="664" y="374" width="152" height="70" rx="8" fill="#ffffff"/><text x="676" y="400" font-size="12" fill="#c5221f"><tspan x="676" dy="0">Ucapan &amp; RSVP</tspan><tspan x="676" dy="18">sudah ditutup.</tspan></text></g>
+<g id="e-renew"><rect x="80" y="444" width="120" height="32" rx="6" fill="#0779a6"/><text x="140" y="465" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Perpanjang</text></g>
+<g id="e-cur"><rect x="76" y="140" width="364" height="44" rx="8" fill="none" stroke="#b8460d" stroke-width="3"/></g>
+<g id="e-curG"><rect x="436" y="140" width="224" height="44" rx="8" fill="none" stroke="#b8460d" stroke-width="3"/></g>
+<g id="e-curX"><rect x="656" y="140" width="224" height="44" rx="8" fill="none" stroke="#b8460d" stroke-width="3"/></g>
+<circle id="r5" cx="140" cy="460" r="18" fill="none" stroke="#b8460d" stroke-width="3"/>
+<g id="cur"><path d="M0 0 L0 22 L6 16 L10 26 L14 24 L10 15 L18 15 Z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+<rect x="0" y="536" width="960" height="64" rx="0" fill="#2b1a07"/><rect x="0" y="586" width="960" height="14" rx="14" fill="#2b1a07"/>
+<g id="n0"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g><g id="n1"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">2</text></g><g id="n2"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">3</text></g><g id="n3"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">4</text></g><g id="n4"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">5</text></g><g id="n5"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">6</text></g><g id="c0"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Selama paket aktif, semua fitur berjalan.</text></g><g id="c1"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Seminggu sebelum berakhir, panel NikahKit mengingatkan kamu.</text></g><g id="c2"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Lewat tanggal berakhir: masa tenggang 7 hari, fitur masih jalan.</text></g><g id="c3"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Lewat tenggang: RSVP, ucapan, dan dashboard pasangan berhenti.</text></g><g id="c4"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Halaman undangan tetap tampil untuk tamu.</text></g><g id="c5"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Perpanjang kapan saja: sisa masa aktif tetap terhitung.</text></g><circle id="d0" cx="866" cy="568" r="4" fill="#ffffff"/><circle id="d1" cx="880" cy="568" r="4" fill="#ffffff"/><circle id="d2" cx="894" cy="568" r="4" fill="#ffffff"/><circle id="d3" cx="908" cy="568" r="4" fill="#ffffff"/><circle id="d4" cx="922" cy="568" r="4" fill="#ffffff"/><circle id="d5" cx="936" cy="568" r="4" fill="#ffffff"/>
+</svg>

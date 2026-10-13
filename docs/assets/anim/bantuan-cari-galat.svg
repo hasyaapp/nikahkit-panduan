@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="ttl dsc" font-family='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif' data-total="22.200000000000003" data-steps="0,3.6,7,10.6,13.6,16.8">
+<title id="ttl">Mencari arti pesan galat di panduan</title>
+<desc id="dsc">1. Catat pesan persis seperti di layar, lalu buka halaman Pesan galat. 2. Tekan Ctrl+F (Mac: Cmd+F). Kotak cari muncul di kanan atas. 3. Ketik beberapa kata awal pesannya, misalnya Sesi berakhir. 4. Baris yang cocok ditandai kuning. 5. Baca kolom Artinya supaya tahu penyebabnya. 6. Ikuti kolom Yang harus dilakukan. Di sini: masuk lagi.</desc>
+<style>#e-find{opacity:1;animation:v0 22.200000000000003s linear infinite}@keyframes v0{0%{opacity:0}16.216%{opacity:0}17.342%{opacity:1}98.198%{opacity:1}100%{opacity:0}}
+#e-hl{opacity:1;animation:v2 22.200000000000003s linear infinite}@keyframes v2{0%{opacity:0}47.748%{opacity:0}48.874%{opacity:1}98.198%{opacity:1}100%{opacity:0}}
+#e-ringMean{opacity:0;animation:v3 22.200000000000003s linear infinite}@keyframes v3{0%{opacity:0}61.261%{opacity:0}62.387%{opacity:1}75.676%{opacity:1}76.802%{opacity:0}98.198%{opacity:0}100%{opacity:0}}
+#e-ringDo{opacity:1;animation:v4 22.200000000000003s linear infinite}@keyframes v4{0%{opacity:0}75.676%{opacity:0}76.802%{opacity:1}98.198%{opacity:1}100%{opacity:0}}
+.t2_0{animation:t2_0 22.200000000000003s linear infinite}@keyframes t2_0{0%,32.883%{transform:scaleX(0)}43.694%,98.198%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+#c0{opacity:0;animation:c0 22.200000000000003s linear infinite}@keyframes c0{0%{opacity:1}16.216%{opacity:1}17.342%{opacity:0}99.775%{opacity:0}100%{opacity:1}}
+#d0{animation:d0 22.200000000000003s linear infinite}@keyframes d0{0%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:#ffffff}}
+#c1{opacity:0;animation:c1 22.200000000000003s linear infinite}@keyframes c1{0%{opacity:0}16.216%{opacity:0}17.342%{opacity:1}31.532%{opacity:1}32.658%{opacity:0}100%{opacity:0}}
+#d1{animation:d1 22.200000000000003s linear infinite}@keyframes d1{0%{fill:rgba(255,255,255,.35)}16.216%{fill:rgba(255,255,255,.35)}17.342%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c2{opacity:0;animation:c2 22.200000000000003s linear infinite}@keyframes c2{0%{opacity:0}31.532%{opacity:0}32.658%{opacity:1}47.748%{opacity:1}48.874%{opacity:0}100%{opacity:0}}
+#d2{animation:d2 22.200000000000003s linear infinite}@keyframes d2{0%{fill:rgba(255,255,255,.35)}31.532%{fill:rgba(255,255,255,.35)}32.658%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c3{opacity:0;animation:c3 22.200000000000003s linear infinite}@keyframes c3{0%{opacity:0}47.748%{opacity:0}48.874%{opacity:1}61.261%{opacity:1}62.387%{opacity:0}100%{opacity:0}}
+#d3{animation:d3 22.200000000000003s linear infinite}@keyframes d3{0%{fill:rgba(255,255,255,.35)}47.748%{fill:rgba(255,255,255,.35)}48.874%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c4{opacity:0;animation:c4 22.200000000000003s linear infinite}@keyframes c4{0%{opacity:0}61.261%{opacity:0}62.387%{opacity:1}75.676%{opacity:1}76.802%{opacity:0}100%{opacity:0}}
+#d4{animation:d4 22.200000000000003s linear infinite}@keyframes d4{0%{fill:rgba(255,255,255,.35)}61.261%{fill:rgba(255,255,255,.35)}62.387%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#c5{opacity:1;animation:c5 22.200000000000003s linear infinite}@keyframes c5{0%{opacity:0}75.676%{opacity:0}76.802%{opacity:1}98.198%{opacity:1}99.324%{opacity:0}100%{opacity:0}}
+#d5{animation:d5 22.200000000000003s linear infinite}@keyframes d5{0%{fill:rgba(255,255,255,.35)}75.676%{fill:rgba(255,255,255,.35)}76.802%{fill:#ffffff}98.198%{fill:#ffffff}100%{fill:rgba(255,255,255,.35)}}
+#n0{opacity:0;animation:c0 22.200000000000003s linear infinite}
+#n1{opacity:0;animation:c1 22.200000000000003s linear infinite}
+#n2{opacity:0;animation:c2 22.200000000000003s linear infinite}
+#n3{opacity:0;animation:c3 22.200000000000003s linear infinite}
+#n4{opacity:0;animation:c4 22.200000000000003s linear infinite}
+#n5{opacity:1;animation:c5 22.200000000000003s linear infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
+<defs><clipPath id="t2_0"><rect class="t2_0" x="0" y="0" width="960" height="600"/></clipPath></defs>
+<rect x="0" y="0" width="960" height="600" rx="14" fill="#f8f9fa"/>
+<rect x="40" y="24" width="880" height="500" rx="10" fill="#ffffff" stroke="#dadce0" stroke-width="1"/>
+<rect x="40" y="24" width="880" height="36" rx="10" fill="#dee1e6"/><rect x="40" y="50" width="880" height="10" rx="0" fill="#dee1e6"/>
+<rect x="52" y="30" width="240" height="30" rx="8" fill="#ffffff"/><text x="66" y="50" font-size="12" fill="#202124">Panduan NikahKit</text>
+<rect x="40" y="60" width="880" height="40" rx="0" fill="#ffffff"/><line x1="40" y1="100" x2="920" y2="100" stroke="#dadce0" stroke-width="1"/>
+<circle cx="62" cy="80" r="5" fill="#bdc1c6"/><circle cx="80" cy="80" r="5" fill="#bdc1c6"/>
+<rect x="100" y="68" width="760" height="24" rx="12" fill="#f1f3f4"/><text x="116" y="85" font-size="13" fill="#5f6368">…/bantuan/pesan-galat</text>
+<text x="70" y="152" font-size="24" font-weight="700" fill="#202124">Pesan galat</text>
+<text x="70" y="180" font-size="13" fill="#5f6368">Cari pesan yang kamu lihat, lalu ikuti kolom ketiga.</text>
+<rect x="60" y="218" width="840" height="34" rx="0" fill="#f1f3f4"/>
+<text x="70" y="240" font-size="13" font-weight="700" fill="#202124">Pesan (verbatim)</text>
+<text x="370" y="240" font-size="13" font-weight="700" fill="#202124">Artinya</text>
+<text x="620" y="240" font-size="13" font-weight="700" fill="#202124">Yang harus dilakukan</text>
+<line x1="60" y1="252" x2="900" y2="252" stroke="#dadce0" stroke-width="1"/>
+<text x="70" y="278" font-size="13" font-weight="600" fill="#202124">Sesi berakhir. Masuk lagi.</text>
+<text x="370" y="278" font-size="13" fill="#202124">Login NikahKit habis</text>
+<text x="620" y="278" font-size="13" fill="#202124">Masuk dengan Google lagi</text>
+<line x1="60" y1="296" x2="900" y2="296" stroke="#dadce0" stroke-width="1"/>
+<text x="70" y="322" font-size="13" font-weight="600" fill="#202124">Login dibatalkan.</text>
+<text x="370" y="322" font-size="13" fill="#202124">Jendela Google ditutup</text>
+<text x="620" y="322" font-size="13" fill="#202124">Klik Masuk dengan Google lagi</text>
+<line x1="60" y1="340" x2="900" y2="340" stroke="#dadce0" stroke-width="1"/>
+<text x="70" y="366" font-size="13" font-weight="600" fill="#202124">Kode salah.</text>
+<text x="370" y="366" font-size="13" fill="#202124">Kode uji tidak dikenali</text>
+<text x="620" y="366" font-size="13" fill="#202124">Cek ulang kode dari tim</text>
+<line x1="60" y1="384" x2="900" y2="384" stroke="#dadce0" stroke-width="1"/>
+<text x="70" y="410" font-size="13" font-weight="600" fill="#202124">Pakai tautan https.</text>
+<text x="370" y="410" font-size="13" fill="#202124">Tautan diawali http://</text>
+<text x="620" y="410" font-size="13" fill="#202124">Ganti jadi https://</text>
+<line x1="60" y1="428" x2="900" y2="428" stroke="#dadce0" stroke-width="1"/>
+<text x="70" y="454" font-size="13" font-weight="600" fill="#202124">PIN salah.</text>
+<text x="370" y="454" font-size="13" fill="#202124">PIN dashboard keliru</text>
+<text x="620" y="454" font-size="13" fill="#202124">Lihat PIN di jendela NikahKit</text>
+<g id="e-find"><rect x="590" y="104" width="310" height="40" rx="8" fill="#ffffff" stroke="#dadce0" stroke-width="1"/><text x="830" y="129" font-size="12" fill="#5f6368">1/1</text></g>
+<g id="e-findText"><g clip-path="url(#t2_0)"><text x="604" y="129" font-size="14" fill="#202124">Sesi berakhir</text></g></g>
+<g id="e-hl"><rect x="66" y="262" width="186" height="22" rx="3" fill="#fde293"/><text x="70" y="278" font-size="13" font-weight="600" fill="#202124">Sesi berakhir. Masuk lagi.</text></g>
+<g id="e-ringMean"><rect x="360" y="254" width="238" height="38" rx="8" fill="none" stroke="#b8460d" stroke-width="3"/></g>
+<g id="e-ringDo"><rect x="610" y="254" width="268" height="38" rx="8" fill="none" stroke="#b8460d" stroke-width="3"/></g>
+
+
+<rect x="0" y="536" width="960" height="64" rx="0" fill="#2b1a07"/><rect x="0" y="586" width="960" height="14" rx="14" fill="#2b1a07"/>
+<g id="n0"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g><g id="n1"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">2</text></g><g id="n2"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">3</text></g><g id="n3"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">4</text></g><g id="n4"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">5</text></g><g id="n5"><circle cx="32" cy="568" r="15" fill="#b8460d"/><text x="32" y="573" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">6</text></g><g id="c0"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Catat pesan persis seperti di layar, lalu buka halaman Pesan galat.</text></g><g id="c1"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Tekan Ctrl+F (Mac: Cmd+F). Kotak cari muncul di kanan atas.</text></g><g id="c2"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Ketik beberapa kata awal pesannya, misalnya Sesi berakhir.</text></g><g id="c3"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Baris yang cocok ditandai kuning.</text></g><g id="c4"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Baca kolom Artinya supaya tahu penyebabnya.</text></g><g id="c5"><text x="64" y="574" font-size="16" font-weight="500" fill="#ffffff">Ikuti kolom Yang harus dilakukan. Di sini: masuk lagi.</text></g><circle id="d0" cx="866" cy="568" r="4" fill="#ffffff"/><circle id="d1" cx="880" cy="568" r="4" fill="#ffffff"/><circle id="d2" cx="894" cy="568" r="4" fill="#ffffff"/><circle id="d3" cx="908" cy="568" r="4" fill="#ffffff"/><circle id="d4" cx="922" cy="568" r="4" fill="#ffffff"/><circle id="d5" cx="936" cy="568" r="4" fill="#ffffff"/>
+</svg>

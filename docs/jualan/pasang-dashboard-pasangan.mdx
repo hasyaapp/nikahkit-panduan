@@ -1,0 +1,87 @@
+---
+title: Pasang Dashboard pasangan
+description: Pasang halaman Kelola undangan milikmu sendiri di Scalev, supaya pengantin bisa kirim undangan, lihat RSVP, dan check-in.
+---
+
+Dashboard pasangan adalah halaman tempat pengantin (klienmu) mengelola undangannya. Kamu memasangnya sekali di bisnis Scalev milikmu, lalu semua undangan yang kamu buat memakai halaman yang sama.
+
+<Info>
+**Yang kamu perlukan**
+
+- Ekstensi NikahKit terpasang dan kamu sudah masuk. Lihat [Masuk dan bayar](/gabung/masuk-dan-bayar).
+- Bisnis Scalev terhubung. Lihat [Hubungkan Scalev](/gabung/hubungkan-scalev).
+- Satu halaman HTML Mode **baru dan kosong** di Scalev, khusus untuk dashboard. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan) (caranya sama).
+</Info>
+
+<Image src="/assets/anim/jualan-pasang-dashboard.svg" alt="Di Template, kategori Marketing, klik kartu Dashboard pasangan. Muncul dialog Pasang Dashboard pasangan di halaman ini? dengan tombol Batal dan Pasang. Klik Pasang, pratinjau berubah menjadi Kelola undangan dan muncul pesan Dashboard pasangan dipasang. Tekan Simpan di Scalev. Lalu klik Simpan dan Terbitkan; kartu berlabel Dipakai." caption="Memasang Dashboard pasangan" />
+
+<Warning>
+**Pasang** mengganti **seluruh isi halaman**. Jangan memasangnya di halaman undangan klien. Kalau terlanjur, klik **Urungkan** di pesan yang muncul, atau tombol Urungkan di rel kiri.
+</Warning>
+
+## Langkah
+
+<Steps>
+<Step title="Buat halaman HTML Mode baru di Scalev">
+Di Scalev, buat halaman baru dengan HTML Mode (cek nama menunya di layarmu). Isi slug di tab **Settings**, misalnya `kelola` (contoh).
+</Step>
+<Step title="Klik tab NikahKit">
+Panel NikahKit terbuka. Karena halaman masih kosong, panel menampilkan pustaka **Template**.
+</Step>
+<Step title="Klik Marketing di Kategori">
+Muncul kotak **Profil merek** dan dua kartu: **Dashboard pasangan** dan **Landing page**. Dashboard pasangan tidak butuh Profil merek.
+</Step>
+<Step title="Klik kartu Dashboard pasangan">
+Muncul dialog **Pasang Dashboard pasangan di halaman ini?** dengan tulisan "Seluruh isi halaman diganti. Bisa diurungkan."
+</Step>
+<Step title="Klik Pasang">
+Pratinjau berubah menjadi halaman **Kelola undangan**. Di bawah muncul pesan **Dashboard pasangan dipasang. Tekan Simpan di Scalev.** NikahKit juga menambah izin domain (CSP) yang dibutuhkan halaman ini, dan mengisi judul halaman dengan **Kelola undangan** bila judulnya masih kosong.
+</Step>
+<Step title="Klik Simpan & Terbitkan">
+Klik **Simpan & Terbitkan** di kanan atas. Setelah tersimpan, NikahKit mencatat alamat publik halaman ini sebagai alamat Dashboard kamu.
+</Step>
+<Step title="Cek di undangan: buka Bagikan">
+Buka salah satu halaman undangan, klik **Bagikan** di rel kiri. Di bagian **Untuk pengantin** kini ada **Kirim undangan** dan **Buka Dashboard**, plus tulisan "Masuk dengan PIN dashboard."
+</Step>
+</Steps>
+
+<Image src="/assets/anim/jualan-bagikan-pengantin.svg" alt="Di undangan, klik Bagikan. Bagian Untuk pengantin menampilkan Kirim undangan, Buka Dashboard, dan Buka Check-in. Klik Buka Dashboard dan halaman Kelola undangan terbuka di tab baru." caption="Tombol Untuk pengantin di Bagikan" />
+
+<Info>
+**Buka Check-in** hanya muncul bila undangan memakai **Undangan khusus** dan pilihan **Tampilkan QR masuk untuk tamu undangan khusus** di Konten > RSVP menyala. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Info>
+
+## Tanda berhasil
+
+- Kartu **Dashboard pasangan** berlabel **Dipakai** saat kamu membuka halaman itu.
+- Di **Bagikan** undangan mana pun, muncul **Kirim undangan** dan **Buka Dashboard**.
+- **Salin pesan untuk pengantin** di jendela PIN memuat baris "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): ...".
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Bagikan masih menulis &quot;Pasang Dashboard pasangan dulu (Template > Marketing).&quot;">
+Alamat dashboard belum tercatat. NikahKit mencatatnya setelah halaman dashboard tersimpan di Scalev. Buka lagi halaman dashboard di editor, klik **Simpan & Terbitkan**, lalu buka ulang undangan dan **Bagikan**.
+</Accordion>
+<Accordion title="&quot;Dashboard pasangan belum bisa dimuat. Muat ulang halaman, lalu coba lagi.&quot;">
+Ekstensi belum menyerahkan isi halaman. Muat ulang editor Scalev, lalu ulangi dari Template > Marketing.
+</Accordion>
+<Accordion title="Pengantin membuka Dashboard tapi data tidak muncul">
+Izin domain (CSP) halaman dashboard mungkin belum tersimpan. Cek tab **Security** di Scalev. Lihat [Izin domain](/scalev/izin-domain).
+</Accordion>
+<Accordion title="Pesan untuk pengantin tidak memuat tautan Dashboard">
+Jendela PIN menulis "Pasang Dashboard pasangan dulu (Template > Marketing) supaya pesan ini memuat tautan kelola undangan." Ikuti langkah di atas, lalu salin pesannya lagi.
+</Accordion>
+<Accordion title="Terlanjur memasang di halaman undangan">
+Klik **Urungkan** pada pesan di bawah, atau tombol Urungkan di rel kiri, sebelum menyimpan. Lihat [Urungkan dan Kosongkan](/editor/urungkan-kosongkan).
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="PIN dashboard" icon="key-round" href="/tamu/pin-dashboard">Buat PIN untuk pengantin.</Card>
+<Card title="Serahkan ke klien" icon="send" href="/pasangan/serahkan-ke-klien">Kirim pesan untuk pengantin.</Card>
+<Card title="Landing page" icon="store" href="/jualan/landing-page">Pasang halaman jualan.</Card>
+<Card title="Masuk Dashboard" icon="log-in" href="/pasangan/masuk-dashboard">Cara pengantin masuk.</Card>
+</CardGroup>

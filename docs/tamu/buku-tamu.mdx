@@ -1,0 +1,118 @@
+---
+title: Buku Tamu di Scalev
+description: Cara memakai menu Buku Tamu di sidebar Scalev untuk melihat ucapan, RSVP, dan tautan personal, memoderasi ucapan, dan mengunduh CSV.
+---
+
+NikahKit menambah menu **Buku Tamu** di sidebar Scalev. Dari sana kamu melihat semua ucapan, RSVP, dan tautan personal undanganmu, lalu menyembunyikan, membalas, atau menghapusnya.
+
+<Info>
+**Yang kamu perlukan**
+
+- Ekstensi NikahKit terpasang di Chrome komputer. Lihat [Pasang ekstensi](/gabung/pasang-ekstensi).
+- Paket aktif dan bisnis Scalev terhubung. Lihat [Hubungkan Scalev](/gabung/hubungkan-scalev).
+- Minimal satu undangan NikahKit di **Landing Pages**.
+</Info>
+
+<Image src="/assets/anim/tamu-buku-tamu.svg" alt="1. Klik menu Buku Tamu di sidebar Scalev. 2. Daftar undangan tampil, klik satu undangan. 3. Ringkasan kehadiran di atas, ucapan di tab Ucapan. 4. Klik Sembunyikan pada satu ucapan, label Disembunyikan muncul. 5. Centang baris untuk aksi sekaligus. 6. Klik Unduh daftar tamu (CSV)." caption="Buku Tamu: dari menu sampai unduh CSV" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka dashboard Scalev">
+Buka `app.scalev.com` di Chrome komputer. Pastikan ekstensi NikahKit menyala.
+</Step>
+<Step title="Klik Buku Tamu">
+Di sidebar kiri, klik **Buku Tamu**. Letaknya di dekat **Landing Pages**. Kalau muncul tombol **Masuk dengan Google**, klik dan pilih akun NikahKit-mu.
+</Step>
+<Step title="Pilih undangan">
+Daftar undanganmu tampil. Tiap kartu berisi nama undangan, ID undangan (angka ID halaman Scalev, misalnya `/365671`), status **Terbit** atau **Belum terbit**, lalu ringkasan seperti **Ucapan 52 (tampil 50) · Hadir 86 orang · Tidak 9 · Ragu 4**. Label **Ada yang baru** berarti ada data baru sejak terakhir kamu membuka undangan itu di browser ini. Pakai kolom **Cari nama atau ID undangan** kalau undanganmu banyak. Klik kartu undangan.
+</Step>
+<Step title="Baca ringkasan kehadiran">
+Di atas ada ringkasan seperti **Hadir 86 orang (41 RSVP) · Tidak 9 · Ragu 4**, dan rincian per sesi atau per pihak bila ada.
+</Step>
+<Step title="Pilih tab">
+Ada tiga tab. Angka di samping nama tab adalah jumlah datanya, misalnya **Ucapan (52)**.
+
+- **Ucapan**: ucapan dan doa dari tamu.
+- **RSVP**: konfirmasi kehadiran. Tombol **+ Tambah tamu** untuk mencatat tamu yang konfirmasi lewat WA atau telepon.
+- **Tautan personal**: tamu yang punya tautan pribadi, berapa kali dibuka, dan sudah RSVP atau belum. Di sini juga ada impor CSV. Lihat [Impor CSV](/tamu/impor-csv).
+</Step>
+<Step title="Cari atau saring">
+Ketik di **Cari nama atau isi ucapan**. Atau pilih saringan di kotak sebelahnya. Pilihannya berbeda per tab:
+
+- **Ucapan**: **Semua**, **Baru sejak terakhir dibuka**, **Disembunyikan**, **Belum dibalas**, **Diubah/dicatat pemilik**.
+- **RSVP**: **Semua**, **Baru sejak terakhir dibuka**, **Hadir**, **Tidak hadir**, **Ragu**, **Disembunyikan**, **Diubah/dicatat pemilik**.
+- **Tautan personal**: **Semua**, **Belum membuka tautan**, **Sudah buka, belum RSVP**.
+</Step>
+<Step title="Moderasi satu ucapan">
+Di tab **Ucapan**, tiap ucapan punya tombol:
+
+- **Balas**: tulis balasan atas nama mempelai, lalu **Simpan balasan**. Balasan tampil di undangan. Kalau sudah dibalas, tombolnya jadi **Ubah balasan**.
+- **Ubah teks**: perbaiki teks ucapan, lalu **Simpan teks**. Di undangan diberi tanda diubah pemilik.
+- **Sembunyikan**: ucapan tidak tampil lagi di undangan. Label **Disembunyikan** muncul. Klik **Tampilkan** untuk mengembalikan.
+- **Hapus**: muncul **Hapus permanen? Tidak bisa dikembalikan.**
+
+Di tab **RSVP**, tombolnya **Koreksi** (untuk membetulkan nama, kehadiran, jumlah orang, sesi, atau pihak), **Sembunyikan**, dan **Hapus**.
+</Step>
+<Step title="Aksi sekaligus">
+Di tab **Ucapan** atau **RSVP**, centang kotak di kiri beberapa baris. Bar aksi muncul dengan **Sembunyikan**, **Tampilkan**, **Balas** (hanya untuk ucapan), **Unduh CSV terpilih**, **Hapus**, dan **Batal pilih**. **Balas** sekaligus memakai teks bawaan `Terima kasih {nama}, doanya kami aminkan.` dengan `{nama}` diganti nama tamu. Ucapan yang sudah dibalas dilewati.
+</Step>
+<Step title="Unduh CSV">
+Klik **Unduh daftar tamu (CSV)**. File seperti `daftar-tamu-365671-2026-10-14.csv` (ID undangan dan tanggal) tersimpan di folder unduhan browser. Isinya RSVP sesuai pencarian dan saringan yang sedang aktif.
+</Step>
+</Steps>
+
+<Warning>
+**Hapus** tidak bisa dikembalikan. Kalau menghapus RSVP, ucapan yang dikirim lewat RSVP itu ikut terhapus. Kalau ragu, pakai **Sembunyikan**.
+</Warning>
+
+<Info>
+File CSV memakai pemisah titik koma (`;`). Ini panduan umum spreadsheet, bukan menu NikahKit: kalau semua isi masuk ke satu kolom saat dibuka, pakai fitur pemisah teks di programmu (di Excel biasanya **Data > Text to Columns**) dan pilih titik koma. Nama menu bisa berbeda menurut versi dan bahasa programmu.
+</Info>
+
+## Tanda berhasil
+
+<Success>
+Ucapan yang disembunyikan berlabel **Disembunyikan** dan hilang dari halaman undangan. File CSV muncul di folder Unduhan.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Menu Buku Tamu tidak muncul di sidebar">
+Pastikan ekstensi NikahKit menyala di `chrome://extensions`, lalu muat ulang halaman Scalev. Menu hanya muncul di halaman Scalev yang punya sidebar, bukan di editor.
+</Accordion>
+<Accordion title="Belum ada undangan NikahKit di bisnis Scalev yang terhubung.">
+Undanganmu ada di bisnis lain, atau belum dibuat. Buat undangan di **Landing Pages**, atau hubungkan bisnis yang benar. Lihat [Hubungkan Scalev](/gabung/hubungkan-scalev).
+</Accordion>
+<Accordion title="Daftar undangan dari Scalev belum bisa dimuat. Coba lagi nanti.">
+Scalev sedang tidak menjawab. Tunggu beberapa menit, lalu klik **Coba lagi**.
+</Accordion>
+<Accordion title="Akun ini belum punya paket aktif. Beli paket lewat NikahKit.">
+Pilih paket dulu. Lihat [Pilih paket](/gabung/pilih-paket).
+</Accordion>
+<Accordion title="Paket sudah berakhir. Perpanjang lewat NikahKit.">
+Masa aktif dan tenggang 7 hari sudah lewat. Perpanjang di [Masuk dan bayar](/gabung/masuk-dan-bayar).
+</Accordion>
+<Accordion title="Sesi habis. Masuk lagi.">
+Klik **Masuk dengan Google** lagi.
+</Accordion>
+<Accordion title="Tidak tersambung ke server Nikahin. Periksa internet, lalu coba lagi.">
+Periksa koneksi internet, lalu muat ulang.
+</Accordion>
+<Accordion title="Tidak ada RSVP untuk diunduh dengan pencarian atau saringan ini.">
+Hapus isi pencarian dan pilih saringan **Semua**, lalu unduh lagi.
+</Accordion>
+<Accordion title="Undangan ini bukan milik akun ini.">
+Undangan dibuat dengan akun NikahKit lain. Masuk dengan akun pemiliknya.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Impor daftar tamu (CSV)" icon="file-import" href="/tamu/impor-csv">Buat banyak tautan personal sekaligus.</Card>
+<Card title="Staff penerima tamu" icon="users" href="/tamu/staff-penerima-tamu">Kode check-in untuk penerima tamu.</Card>
+<Card title="Tamu dan ucapan (pengantin)" icon="comments" href="/pasangan/tamu-dan-ucapan">Versi dashboard untuk pengantin.</Card>
+<Card title="Masalah umum" icon="circle-question" href="/bantuan/masalah-umum">Kalau masih bingung.</Card>
+</CardGroup>

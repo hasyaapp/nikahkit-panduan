@@ -1,0 +1,93 @@
+---
+title: Pelacakan
+description: Melihat tamu mana yang sudah membuka tautan pribadinya, kapan, di berapa perangkat, serta membuka kunci perangkat dan mengganti PIN tamu.
+---
+
+Tab **Pelacakan** menjawab pertanyaan "undangan sudah dibuka belum?". Setiap tamu yang punya tautan pribadi tampil di sini, lengkap dengan jumlah buka dan perangkatnya.
+
+<Info>
+**Yang kamu perlukan**
+
+- Sudah masuk dengan PIN pasangan. Lihat [Masuk ke Dashboard pasangan](/pasangan/masuk-dashboard).
+- Tamu menerima tautan pribadi dari tab **Kirim**. Lihat [Kirim undangan](/pasangan/kirim-undangan).
+- Untuk kunci perangkat dan PIN tamu: undangan khusus dengan mode akses yang sesuai. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Info>
+
+<Image src="/assets/anim/pasangan-pelacakan.svg" alt="Di laptop, klik ikon Pelacakan di lajur kiri. Daftar tamu tampil dengan label kali dibuka, Perangkat penuh, atau Belum dibuka, dan bar PIN tamu untuk HP baru. Saring dengan Sudah dibuka, Belum dibuka, Perangkat penuh. Klik Bapak Andi, detail Aktivitas undangan tampil di kanan. Klik titik tiga lalu Buka kunci perangkat, muncul Kunci perangkat dibuka." caption="Pelacakan dan buka kunci perangkat" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka Pelacakan">
+<Tabs>
+<TabItem label="Laptop" value="laptop">
+Klik ikon di bawah garis pemisah pada lajur kiri. Namanya **Pelacakan: siapa yang sudah membuka**.
+</TabItem>
+<TabItem label="HP" value="hp">
+Pelacakan tidak ada di tab bawah. Ketuk lingkaran inisial di ujung kanan, lalu pilih **Pelacakan**.
+</TabItem>
+</Tabs>
+Muncul **Tautan tamu: dibuka atau belum, kapan, dan perangkatnya.**
+</Step>
+<Step title="Baca daftar">
+Yang terakhir membuka ada di atas. Yang belum membuka di bawah, urut nama. Tiap baris menunjukkan:
+- **N kali dibuka**: tamu sudah membuka N kali.
+- **Belum dibuka**: tautan sudah dibuat, tamu belum membuka. Keterangannya **Tautan dibuat** tanggal.
+- **Perangkat penuh**: tamu sudah memakai semua jatah perangkatnya.
+
+Keterangan kecil berisi **Pertama dibuka** tanggal dan **Perangkat** (misalnya `1/2`: 1 perangkat dari jatah 2).
+</Step>
+<Step title="Saring">
+Tekan **Semua**, **Sudah dibuka**, **Belum dibuka**, atau **Perangkat penuh**. Pakai **Belum dibuka** untuk tahu siapa yang perlu diingatkan.
+</Step>
+<Step title="Buka detail tamu">
+Klik tamu. Bagian **Aktivitas undangan** berisi **Status**, **Dibuka**, **Pertama dibuka**, **Terakhir dibuka**, **Perangkat**, **Tautan dibuat**, dan **Kode tamu**.
+</Step>
+<Step title="Buka kunci perangkat (kalau tamu ganti HP)">
+Kalau undangan memakai kunci perangkat, tamu yang ganti HP tidak bisa membuka. Di detail tamu, tekan ⋮ lalu **Buka kunci perangkat**. Muncul **Kunci perangkat dibuka.** Jumlah perangkat tamu kembali 0, dan tamu bisa membuka lagi di HP barunya.
+</Step>
+<Step title="PIN tamu untuk HP baru (mode + PIN untuk HP baru)">
+Kalau undangan khusus yang terbit memakai keamanan **+ PIN untuk HP baru**, di atas daftar muncul bar **PIN tamu untuk HP baru:** dengan angkanya. Berikan PIN ini ke tamu yang ganti HP. PIN ini tidak membuka dashboard.
+
+Untuk mengganti, tekan **Ganti**, lalu setujui **Buat PIN tamu baru? PIN lama langsung tidak berlaku.** Muncul **PIN tamu diganti.** Tamu yang sudah membuka di HP-nya tidak terpengaruh.
+</Step>
+<Step title="Unduh CSV (opsional)">
+Tekan ikon unduh di kanan atas. File CSV berisi nama, jumlah buka, waktu buka, dan perangkat.
+</Step>
+</Steps>
+
+## Tanda berhasil
+
+- Tamu yang baru membuka tautan berpindah ke atas dengan label **kali dibuka** setelah **Muat ulang data**.
+- Setelah membuka kunci, label **Perangkat penuh** hilang dari tamu itu.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Belum ada tautan tamu">
+Belum ada tamu yang punya tautan pribadi. Tautan dibuat dari tab **Kirim**. Lihat [Kirim undangan](/pasangan/kirim-undangan).
+</Accordion>
+<Accordion title="Tamu bilang sudah buka, tapi tertulis Belum dibuka">
+Tamu mungkin membuka link undangan umum, bukan tautan pribadinya. Pastikan tamu memakai link dari pesan WhatsApp yang dikirim lewat tab Kirim. Tekan **Muat ulang data**.
+</Accordion>
+<Accordion title="Bar PIN tamu tidak muncul">
+Bar hanya muncul kalau versi undangan khusus yang sudah diterbitkan memakai keamanan **+ PIN untuk HP baru**. Member mengaturnya di editor (**Bagikan** > **Undangan khusus** > **Keamanan**), lalu menerbitkan ulang di Scalev. Lihat [Undangan khusus](/tamu/undangan-khusus).
+</Accordion>
+<Accordion title="Menu Buka kunci perangkat tidak ada">
+Pilihan ini hanya muncul untuk tamu yang punya tautan dan sudah tercatat memakai perangkat.
+</Accordion>
+<Accordion title="Ada gangguan di server. Coba lagi sebentar.">
+Tunggu sebentar, lalu tekan **Muat ulang data**.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Pengaturan" icon="gear" href="/pasangan/pengaturan">
+Buka undangan khusus untuk semua.
+</Card>
+<Card title="Undangan khusus" icon="lock" href="/tamu/undangan-khusus">
+Atur mode akses dan kunci perangkat.
+</Card>
+</CardGroup>

@@ -1,0 +1,110 @@
+---
+title: Urungkan dan Kosongkan
+description: Cara membatalkan dan mengulangi perubahan di editor NikahKit, dan cara mengosongkan halaman dengan aman tanpa kehilangan RSVP dan ucapan.
+---
+
+Di halaman ini kamu belajar membatalkan perubahan yang salah (**Urungkan**), mengembalikannya (**Ulangi**), dan mengosongkan seluruh halaman untuk mulai dari nol (**Kosongkan**).
+
+<Info>
+**Yang kamu perlukan**
+
+- Editor NikahKit terbuka dan template sudah dipilih. Lihat [Kenali editor](/editor/kenali-editor).
+</Info>
+
+<Image src="/assets/anim/editor-urungkan-kosongkan.svg" alt="1. Lihat tombol panah di rel kiri. 2. Klik Urungkan atau tekan Ctrl+Z, nama kembali benar. 3. Klik Kosongkan di rel. 4. Dialog Kosongkan halaman? muncul, klik Kosongkan halaman. 5. Halaman kosong, pesan Halaman dikosongkan. dengan tombol Urungkan." caption="Mengurungkan perubahan dan mengosongkan halaman" />
+
+## Langkah
+
+### A. Urungkan dan Ulangi
+
+<Steps>
+<Step title="Cari tombol panah di rel">
+Di bagian alat rel kiri, di bawah **Bagikan**, ada dua tombol panah kecil. Arahkan mouse: yang kiri **Urungkan (Ctrl+Z)**, yang kanan **Ulangi (Ctrl+Shift+Z)**.
+</Step>
+<Step title="Klik Urungkan">
+Klik panah kiri. Perubahan terakhir dibatalkan dan pratinjau kembali seperti sebelumnya. Klik lagi untuk membatalkan perubahan sebelumnya.
+</Step>
+<Step title="Klik Ulangi bila kebablasan">
+Klik panah kanan untuk mengembalikan perubahan yang baru saja diurungkan.
+</Step>
+</Steps>
+
+**Pintasan keyboard**
+
+<Tabs>
+<TabItem label="Windows" value="win">
+
+- Urungkan: **Ctrl+Z**
+- Ulangi: **Ctrl+Shift+Z** atau **Ctrl+Y**
+
+</TabItem>
+<TabItem label="Mac" value="mac">
+
+- Urungkan: **Cmd+Z**
+- Ulangi: **Cmd+Shift+Z** atau **Cmd+Y**
+
+</TabItem>
+</Tabs>
+
+<Info>
+Saat kursor ada di dalam kolom isian, Ctrl+Z hanya membatalkan ketikan di kolom itu. Klik di luar kolom (misalnya di area kosong panel) dulu bila ingin mengurungkan perubahan undangan. Tombol panah tidak bisa diklik (pudar) bila belum ada yang bisa diurungkan atau diulangi.
+</Info>
+
+### B. Kosongkan halaman
+
+<Warning>
+**Kosongkan** menghapus seluruh isi undangan dari halaman ini: template, gaya, dan semua isian. **Ucapan dan RSVP tamu tetap aman**, karena tersimpan di server Nikahin, bukan di halaman. Kamu masih bisa membatalkan dengan **Urungkan** selama belum keluar dari editor. Kalau ragu, jangan tekan **Simpan** di Scalev sebelum yakin.
+</Warning>
+
+<Steps>
+<Step title="Klik Kosongkan">
+Di rel kiri, klik **Kosongkan** (tulisan merah, judul tombol **Kosongkan halaman**).
+</Step>
+<Step title="Baca dialog">
+Muncul jendela **Kosongkan halaman?** dengan pesan **Isi undangan dihapus. Ucapan dan RSVP aman. Bisa diurungkan.**
+</Step>
+<Step title="Pilih">
+Klik tombol merah **Kosongkan halaman** untuk melanjutkan. Klik **Batal** (atau tekan Esc) untuk mundur.
+</Step>
+<Step title="Lihat hasilnya">
+Halaman kembali kosong seperti halaman HTML Mode baru di Scalev. NikahKit kembali ke menu **Template**. Di bawah muncul pesan **Halaman dikosongkan.** dengan tombol **Urungkan**.
+</Step>
+<Step title="Batalkan bila berubah pikiran">
+Klik **Urungkan** di pesan itu, atau tombol Urungkan di rel. Undangan kembali utuh.
+</Step>
+</Steps>
+
+## Tanda berhasil
+
+- Setelah Urungkan, pratinjau kembali ke keadaan sebelumnya.
+- Setelah Kosongkan, menu **Template** terbuka dan pratinjau kosong.
+- Kaki rel menunjukkan **Tersimpan**.
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Muncul: Urungkan/Ulangi tidak tersedia: buka tab Code di Scalev, lalu coba lagi.">
+Urungkan memakai riwayat editor kode Scalev, yang hanya ada saat tab **Code** sudah dimuat. Klik tab **Code** di strip atas editor Scalev, tunggu kodenya tampil, kembali ke tab **NikahKit**, lalu klik Urungkan lagi.
+</Accordion>
+<Accordion title="Ctrl+Z tidak mengubah undangan">
+Kursor mungkin masih di dalam kolom isian. Klik di luar kolom, lalu tekan Ctrl+Z lagi. Atau klik tombol panah di rel.
+</Accordion>
+<Accordion title="Tombol Kosongkan tidak bisa diklik">
+Belum ada undangan di halaman ini (template belum dipilih), jadi tidak ada yang dikosongkan.
+</Accordion>
+<Accordion title="Sudah Kosongkan dan Simpan, tapi ingin isi lama kembali">
+Coba Urungkan selama editor masih terbuka, lalu Simpan lagi. Kalau Urungkan sudah tidak bisa, hubungi tim Nikahin lewat [Hubungi](/bantuan/hubungi).
+</Accordion>
+<Accordion title="Apakah RSVP dan ucapan tamu ikut hilang?">
+Tidak. Ucapan dan RSVP tersimpan di server Nikahin per ID halaman Scalev, jadi tidak ikut terhapus.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Pilih template" icon="table-cells" href="/editor/pilih-template">Mulai lagi dengan template baru.</Card>
+<Card title="Edit manual dijeda" icon="code" href="/editor/edit-manual-dijeda">Kalau kode diubah di tab Code.</Card>
+<Card title="Simpan dan terbitkan" icon="floppy-disk" href="/scalev/simpan-dan-terbitkan">Simpan perubahan di Scalev.</Card>
+<Card title="Masalah umum" icon="wrench" href="/bantuan/masalah-umum">Solusi masalah yang sering terjadi.</Card>
+</CardGroup>

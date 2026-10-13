@@ -1,0 +1,129 @@
+---
+title: Terima pembayaran dari klien lewat Scalev
+description: Aktifkan ePayment di toko Scalev, pahami potongan Transaction Fee dan Scalev Fee, dan tarik saldo hasil penjualan undangan.
+---
+
+Klienmu bisa membayar undangan lewat Scalev, dan uangnya masuk ke saldo bisnis Scalev kamu. Di sini kamu mengaktifkan ePayment, memahami potongannya, dan tahu kapan saldo bisa ditarik. Semua aturan di halaman ini mengikuti tutorial resmi Scalev.
+
+<Info>
+**Yang kamu perlukan**
+- Akun dan bisnis Scalev siap. Lihat [Siapkan akun Scalev](/scalev/akun-scalev).
+- Toko (Store) di Scalev. Lihat video [Tutorial Cara Setting Toko Scalev](https://tutorial.scalev.com/toko/).
+- Produk di Scalev untuk paket undanganmu. Lihat video [Tutorial Cara Jualan Produk Digital](https://tutorial.scalev.com/jualandigital/).
+</Info>
+
+<Image src="/assets/anim/scalev-epayment.svg" alt="Animasi: klik Stores, pilih toko, gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran, pilih Invoice di dropdown, centang Aktifkan Metode Pembayaran ALL E-Payment, klik Simpan di dialog, lalu klik Simpan di kanan atas." caption="Mengaktifkan ePayment di toko Scalev" />
+
+<Info>
+Ini uang dari klienmu ke bisnismu. Ini berbeda dengan membership NikahKit yang kamu bayar ke Nikahin. Lihat [Pilih paket](/gabung/pilih-paket). Form pesanan di [Landing page jualan](/jualan/landing-page) NikahKit hanya mengirim data ke **Pesanan masuk**, bukan menagih pembayaran.
+</Info>
+
+## Pilihan cara bayar
+
+- **Transfer bank manual**: tidak dikenakan fee sama sekali.
+- **ePayment**: QRIS, Virtual Account, GoPay, LinkAja, DANA, OVO, ShopeePay, dan Kartu Kredit. Setiap pesanan yang dibayar dengan ePayment dikenakan dua jenis fee.
+
+## Langkah: aktifkan ePayment
+
+Sumber: [Tutorial Cara Menambahkan Epayment di Scalev](https://tutorial.scalev.com/tambah-epayment/).
+
+<Steps>
+<Step title="Buka Stores">
+Di dasbor Scalev, buka menu **Stores**.
+</Step>
+<Step title="Pilih tokomu">
+Klik nama tokomu di daftar yang tampil.
+</Step>
+<Step title="Klik Pilih Metode Pembayaran">
+Gulir ke bagian **Metode Pembayaran**, lalu klik **Pilih Metode Pembayaran**. Sebuah dialog muncul.
+</Step>
+<Step title="Pilih Invoice">
+Di dialog, klik dropdown, lalu pilih **Invoice**.
+</Step>
+<Step title="Centang ALL E-Payment">
+Centang **Aktifkan Metode Pembayaran ALL E-Payment**.
+</Step>
+<Step title="Klik Simpan di dialog">
+Klik **Simpan** di dalam dialog.
+</Step>
+<Step title="Klik Simpan di kanan atas">
+Klik **Simpan** di kanan atas layar supaya pengaturan benar-benar tersimpan.
+
+<Warning>
+Langkah ini yang memastikan pengaturan metode pembayaran tersimpan. Jangan dilewati.
+</Warning>
+</Step>
+<Step title="Cek dari sisi pembeli">
+Buka form pemesananmu sebagai pembeli. Pilihan ePayment tampil, dan pembeli bebas memilih metode yang tersedia.
+</Step>
+</Steps>
+
+## Potongan ePayment
+
+Sumber: [A-Z Fee di Scalev karena Menerima Pembayaran ePayment](https://tutorial.scalev.com/skemaepaymentscalev/). Tarif bisa berubah, selalu cek artikel itu.
+
+1. **Transaction Fee**: dipotong oleh payment gateway (misalnya DOKU, SingaPay, atau Xendit), bukan oleh Scalev. Besarnya tergantung gateway dan metode yang dipilih klien.
+2. **Scalev Fee**: dipotong Scalev, ditentukan oleh paket Scalev, custom domain pada **checkout page** (bukan domain toko atau landing page), dan status NPWP.
+
+Scalev Fee bila bisnismu sudah punya NPWP:
+
+| Paket Scalev | Pakai custom domain | Tanpa custom domain |
+| --- | --- | --- |
+| Basic / Pro / Ultimate | 1% | 5% |
+| Lite | 5% | 5% |
+| Free | Tidak tersedia | 5% |
+
+- Tanpa NPWP, transaksi lewat DOKU dan SingaPay kena tambahan 5%. Contoh: Basic dengan custom domain naik dari 1% menjadi 6%.
+- Xendit tidak kena tambahan 5% walau tanpa NPWP.
+- Durianpay wajib NPWP.
+- Tarif Scalev Fee belum termasuk PPN.
+
+## Kapan saldo bisa ditarik
+
+Sumber: [A-Z Withdrawal di Scalev](https://tutorial.scalev.com/a-z-withdrawal-scalev/).
+
+- Saldo masuk sebagai **Pending**, lalu menjadi **Active** setelah settlement. Saldo Active bisa ditarik.
+- Settlement dihitung dengan hari dan jam kerja bank. Transaksi akhir pekan atau hari libur nasional mulai dihitung di hari kerja berikutnya.
+- Waktunya berbeda per gateway dan metode. Contoh di Xendit: Virtual Account selain BCA (misalnya BNI, BRI, Mandiri) instan, VA BCA H+1 hari kerja, QRIS dan e-wallet H+2 hari kerja, kartu kredit/debit H+5 hari. DOKU: QRIS dan VA selain BCA H+1, VA BCA dan e-wallet H+2. SingaPay H+1 untuk semua metode. Rincian Durianpay ada di artikelnya.
+- ePayment biasa ditarik dari dasbor Scalev. **e-payment+** ditarik lewat dasbor Xendit (`https://dashboard.xendit.co`) dengan login Xendit, bukan login Scalev.
+
+<Info>
+Mau paham alur uang dari klien sampai rekeningmu? Lihat [Alur Perjalanan Uang pada Pembayaran ePayment](https://tutorial.scalev.com/alur-epayment/).
+</Info>
+
+## Tanda berhasil
+
+<Success>
+Form pemesananmu menampilkan pilihan ePayment, pesanan yang dibayar tercatat di Scalev, dan saldonya muncul sebagai Pending lalu Active.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Pilihan ePayment tidak muncul di form">
+Ulangi langkah di atas. Pastikan kamu menekan **Simpan** di dialog dan **Simpan** di kanan atas.
+</Accordion>
+<Accordion title="Saldo masih Pending lewat dari tanggal EST">
+Bila tanggal EST di menu Balance jatuh di Sabtu, Minggu, Senin, atau dekat tanggal merah, biasanya tertunda 1–2 hari. Rekonsiliasi antar-bank atau pengecekan manual juga bisa menambah 1–2 hari kerja. Tunggu.
+</Accordion>
+<Accordion title="Potongan lebih besar dari perkiraan">
+Cek paket Scalev, apakah checkout page memakai custom domain, dan status NPWP bisnismu. Tanpa NPWP, DOKU dan SingaPay kena tambahan 5%.
+</Accordion>
+<Accordion title="Ada pesanan yang dibayar di luar Scalev">
+Scalev punya fitur manual order. Tonton [Cara Membuat Manual Order di Scalev](https://tutorial.scalev.com/manual-order/).
+</Accordion>
+<Accordion title="Masih ada pertanyaan soal fee">
+User berbayar bisa chat lewat widget di pojok kanan bawah dasbor Scalev. User gratis bisa email ke `cs@scalev.id`.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Alur kerja dengan klien" icon="users" href="/jualan/alur-dengan-klien">
+Dari pesanan sampai undangan diserahkan.
+</Card>
+<Card title="Tutorial resmi Scalev" icon="book-open" href="/scalev/tutorial-scalev">
+Daftar tutorial Scalev yang paling berguna.
+</Card>
+</CardGroup>

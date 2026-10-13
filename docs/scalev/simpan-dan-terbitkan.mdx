@@ -1,0 +1,91 @@
+---
+title: Simpan dan terbitkan undangan
+description: Bedanya Simpan dan Simpan & Terbitkan di editor Scalev, cara menemukan alamat publik, dan cara mengatasi terbit yang tertahan.
+---
+
+NikahKit menulis undangan ke editor Scalev, tetapi tamu baru melihatnya setelah Scalev menyimpan dan menerbitkan halaman. Di sini kamu belajar menyimpan dengan benar dan mengecek hasilnya di HP.
+
+<Info>
+**Yang kamu perlukan**
+- Halaman HTML Mode yang sudah punya ID. Lihat [Buat halaman undangan](/scalev/buat-halaman-undangan).
+- Undangan sudah diisi di tab NikahKit. Lihat [Kenali editor](/editor/kenali-editor).
+- HP untuk mengecek tampilan tamu.
+</Info>
+
+<Image src="/assets/anim/scalev-simpan-terbitkan.svg" alt="Animasi: setelah mengubah isi undangan, panel Bagikan menampilkan Perubahan belum disimpan di Scalev. Tombol Simpan dan Simpan & Terbitkan disorot, lalu Simpan & Terbitkan diklik. Alamat publik namabisnis.myscalev.com/rani-dimas dibuka di HP. Bila tertahan not finished previewing, muat ulang editor lalu terbitkan lagi." caption="Simpan & Terbitkan supaya tamu melihat versi terbaru" />
+
+## Cara kerjanya
+
+- Isi undangan biasa disimpan di dalam kode halaman Scalev itu sendiri, jadi tombol simpan Scalev yang menentukan versi mana yang tersimpan. Pengecualian: **Undangan khusus** (paket Tahunan dan Sekali Bayar) tidak menaruh isinya di kode halaman. Isinya dikirim server Nikahin hanya ke tamu dengan tautan sah.
+- Status di kaki rel NikahKit (**Tersimpan**, **Menulis...**, **Gagal**, **Dijeda**) hanya berarti NikahKit sudah menulis ke editor Scalev. Itu belum berarti Scalev sudah menyimpan.
+- Editor Scalev punya tombol **Simpan** dan **Simpan & Terbitkan**. Pakai **Simpan & Terbitkan** saat kamu ingin tamu melihat perubahan.
+
+## Langkah
+
+<Steps>
+<Step title="Selesaikan perubahan di tab NikahKit">
+Isi atau ubah undangan seperti biasa. Tunggu status di kaki rel kiri menjadi **Tersimpan**.
+</Step>
+<Step title="Cek pengingat di Bagikan">
+Klik **Bagikan** di rel kiri. Bila ada perubahan yang belum disimpan Scalev, muncul tulisan kuning **Perubahan belum disimpan di Scalev.** Tutup dialog.
+</Step>
+<Step title="Klik Simpan & Terbitkan">
+Klik **Simpan & Terbitkan** di editor Scalev. Tunggu sampai Scalev selesai memproses.
+</Step>
+<Step title="Buka Bagikan lagi">
+Klik **Bagikan**. Tulisan **Perubahan belum disimpan di Scalev.** sudah hilang. Klik **Salin tautan umum** untuk menyalin alamat publik undangan.
+</Step>
+<Step title="Buka alamat publik di HP">
+Kirim tautan itu ke WhatsApp kamu sendiri, lalu buka di HP. Alamatnya berbentuk `namabisnis.myscalev.com/slug`, atau domain sendiri bila sudah dipasang.
+</Step>
+<Step title="Cek RSVP, ucapan, dan video">
+Coba kirim ucapan di halaman publik. Putar video YouTube. Bagian ini memang hanya berjalan di halaman yang sudah terbit.
+</Step>
+</Steps>
+
+<Info>
+Pratinjau di editor Scalev memblokir koneksi ke Nikahin dan iframe YouTube, walaupun izinnya sudah ada. Karena itu, di pratinjau bagian ucapan dan video menampilkan keterangan bahwa fitur itu aktif setelah terbit. Ini normal. Cek RSVP dan video selalu di alamat publik.
+</Info>
+
+## Tanda berhasil
+
+<Success>
+Di HP, alamat publik menampilkan isi terbaru. Ucapan yang kamu kirim muncul, dan video YouTube bisa diputar.
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Terbit tertahan &quot;not finished previewing&quot;">
+Ini pernah terlihat tepat setelah halaman baru disimpan pertama kali. Muat ulang editor (F5 di Windows, Cmd+R di Mac), lalu tekan **Simpan & Terbitkan** lagi. Petunjuk yang sama ada di **Bantuan** NikahKit.
+</Accordion>
+<Accordion title="Perubahan belum disimpan di Scalev.">
+Scalev belum menyimpan perubahan terakhir. Klik **Simpan & Terbitkan**, lalu buka **Bagikan** lagi.
+</Accordion>
+<Accordion title="Bagikan: Isi slug di tab Settings Scalev, lalu Simpan.">
+Halaman belum punya alamat publik, biasanya karena belum punya slug atau belum pernah disimpan. Isi slug di tab **Settings**, lalu klik **Simpan**. Lihat [Alamat dan domain](/scalev/alamat-dan-domain).
+</Accordion>
+<Accordion title="Status kaki rel: Gagal / Gagal menulis. Muat ulang halaman.">
+NikahKit gagal menulis ke editor Scalev. Muat ulang editor, lalu cek lagi perubahanmu sebelum menerbitkan.
+</Accordion>
+<Accordion title="Status kaki rel: Dijeda">
+Kode diubah manual di tab **Code**, jadi NikahKit berhenti menulis. Lihat [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda).
+</Accordion>
+<Accordion title="Di HP masih tampil versi lama">
+Pastikan kamu menekan **Simpan & Terbitkan**, bukan hanya **Simpan**. Lalu muat ulang halaman di HP.
+</Accordion>
+<Accordion title="Foto, musik, atau font tidak muncul di halaman publik">
+Domain sumbernya belum diizinkan di tab **Security**. Lihat [Izin domain (CSP)](/scalev/izin-domain).
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Alamat dan domain" icon="globe" href="/scalev/alamat-dan-domain">
+Atur slug dan pakai domain sendiri.
+</Card>
+<Card title="Bagikan undangan" icon="share-2" href="/tamu/bagikan-undangan">
+Kirim tautan undangan ke tamu.
+</Card>
+</CardGroup>

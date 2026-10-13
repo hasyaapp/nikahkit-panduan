@@ -1,0 +1,103 @@
+---
+title: Klik di pratinjau
+description: Cara membuka form isian dengan mengklik langsung bagian undangan di pratinjau, memakai toolbar Isi, naik, turun, Sembunyikan, dan cadangan Inspect.
+---
+
+Di halaman ini kamu belajar cara tercepat mengisi undangan: klik tulisan di pratinjau, dan form yang tepat langsung terbuka dengan kursor di kolomnya.
+
+<Info>
+**Yang kamu perlukan**
+
+- Editor NikahKit terbuka dan template sudah dipilih. Belum? Baca [Kenali editor](/editor/kenali-editor).
+- Pratinjau Scalev tampil di sisi kanan editor.
+</Info>
+
+<Image src="/assets/anim/editor-klik-pratinjau.svg" alt="1. Pastikan tombol Klik aktif di rel. 2. Arahkan mouse ke nama mempelai. 3. Klik, form Mempelai terbuka dengan kursor di Nama panggilan. 4. Klik Galeri Foto, toolbar muncul. 5. Isi, panah naik, panah turun, Sembunyikan. 6. Klik Sembunyikan, pesan dengan Urungkan muncul." caption="Mengisi undangan dengan klik di pratinjau" />
+
+## Langkah
+
+<Steps>
+<Step title="Cek tombol Klik aktif">
+Lihat bagian alat di rel kiri. Harus tertulis **Klik aktif**. Kalau tertulis **Klik mati**, klik tombol itu sekali sampai berubah menjadi **Klik aktif**.
+</Step>
+<Step title="Arahkan mouse ke pratinjau">
+Gerakkan mouse ke undangan di pratinjau kanan. Bagian yang kamu tunjuk diberi garis biru dan label nama bagiannya, contoh **Galeri Foto · klik untuk mengisi**.
+</Step>
+<Step title="Klik tulisan yang mau diubah">
+Klik tulisan, misalnya nama mempelai di sampul. Menu **Konten** terbuka di kelompok pemilik tulisan itu, dan kursor langsung ada di kolomnya. Contoh: nama di sampul membuka **Nama panggilan** di **Mempelai**.
+</Step>
+<Step title="Ketik perubahan">
+Ketik isi baru. Pratinjau ikut berubah setelah sesaat. Kaki rel menunjukkan **Menulis...** lalu **Tersimpan**.
+</Step>
+<Step title="Lihat toolbar bagian">
+Setiap klik di pratinjau juga memilih bagian itu. Bagian yang dipilih diberi bingkai biru, dan di pojok kanan atasnya muncul toolbar kecil berwarna gelap. Coba klik bagian lain, misalnya **Galeri Foto**.
+</Step>
+<Step title="Pakai tombol toolbar">
+Isi toolbar:
+
+- **Isi**: membuka form bagian ini di **Konten**.
+- **↑**: memindah bagian ke atas.
+- **↓**: memindah bagian ke bawah.
+- **Sembunyikan**: menyembunyikan bagian ini.
+
+Panah melompati bagian yang tersembunyi, dan pratinjau mengikuti bagian ke posisi barunya.
+</Step>
+<Step title="Batalkan bila salah">
+Setelah **Sembunyikan**, muncul pesan di bawah, contoh **Galeri Foto disembunyikan.** dengan tombol **Urungkan**. Klik **Urungkan** untuk menampilkannya lagi. Pesan hilang sendiri setelah beberapa detik. Bagian yang tersembunyi juga bisa dinyalakan lagi di [Lapisan](/editor/lapisan).
+</Step>
+</Steps>
+
+<Info>
+**Sampul** dan **Kaki Halaman** tidak bisa dipindah atau disembunyikan, jadi toolbar Sampul hanya punya **Isi**. Klik di **Kaki Halaman** tidak membuka form apa pun. Isi kaki halaman lewat **Konten** > **Kaki Halaman**.
+</Info>
+
+### Kalau tombolnya berubah menjadi Inspect
+
+Kadang skrip NikahKit tidak bisa masuk ke pratinjau Scalev. Setelah sekitar 6 detik tanpa jawaban, tombol **Klik aktif** berganti menjadi **Inspect**. Cara memakainya:
+
+<Steps>
+<Step title="Nyalakan Inspect">
+Klik **Inspect** di rel. Tulisannya berubah menjadi **Inspect aktif**.
+</Step>
+<Step title="Klik bagian di pratinjau">
+Klik bagian undangan di pratinjau. Form bagian itu terbuka di **Konten**. Bedanya: kursor tidak langsung masuk ke kolom tertentu, dan toolbar tidak muncul.
+</Step>
+<Step title="Matikan bila selesai">
+Klik **Inspect aktif** lagi untuk mematikan.
+</Step>
+</Steps>
+
+## Tanda berhasil
+
+- Mengklik nama mempelai membuka **Konten** > **Mempelai** dengan kursor di kolomnya.
+- Toolbar **Isi**, **↑**, **↓**, **Sembunyikan** muncul di bagian yang kamu klik.
+- Di **Bantuan**, baris **Klik di pratinjau** diberi tanda centang (✓).
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Mengklik pratinjau tidak membuka apa-apa">
+Cek tombol di rel. Kalau tertulis **Klik mati**, klik sampai **Klik aktif**. Kalau tertulis **Inspect**, ikuti langkah Inspect di atas. Klik di pratinjau juga hanya bekerja setelah template dipilih.
+</Accordion>
+<Accordion title="Klik aktif, tetapi pratinjau tidak bereaksi sama sekali">
+NikahKit perlu izin berjalan di `preview.myscalev.com` (alamat pratinjau Scalev). Buka `chrome://extensions`, klik **Detail** di NikahKit, lalu cek pengaturan akses situs. Pastikan NikahKit boleh berjalan di semua situs yang dimintanya. Tanpa izin ini, fitur lain tetap jalan dan kamu masih bisa memakai **Inspect**.
+</Accordion>
+<Accordion title="Di Bantuan: pratinjau Scalev terkunci sandbox. Pakai tombol Inspect di rel.">
+Skrip NikahKit tidak bisa masuk ke pratinjau. Pakai **Inspect** seperti dijelaskan di atas. Panduan Bantuan ada di [Menu Bantuan](/bantuan/menu-bantuan).
+</Accordion>
+<Accordion title="Di Bantuan: belum menjawab; tunggu beberapa detik">
+Pratinjau masih dimuat. Tunggu beberapa detik. Kalau tetap begitu, muat ulang halaman editor Scalev.
+</Accordion>
+<Accordion title="Tombol ↑ atau ↓ tidak ada di toolbar">
+Bagian sudah mentok di atas (di bawah Sampul) atau di bawah (di atas Kaki Halaman), atau bagian itu terkunci.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Lapisan" icon="layer-group" href="/editor/lapisan">Atur urutan dan sembunyikan bagian dari daftar.</Card>
+<Card title="Urungkan dan Kosongkan" icon="rotate-left" href="/editor/urungkan-kosongkan">Batalkan perubahan.</Card>
+<Card title="Konten mempelai dan acara" icon="pen" href="/editor/konten-mempelai-acara">Detail kolom isian.</Card>
+<Card title="Menu Bantuan" icon="circle-question" href="/bantuan/menu-bantuan">Cek kondisi editor.</Card>
+</CardGroup>

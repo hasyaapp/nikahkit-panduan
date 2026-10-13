@@ -1,0 +1,120 @@
+---
+title: PIN dashboard
+description: Cara membuat, melihat, dan mengganti PIN dashboard, lalu menyalin pesan siap kirim untuk pengantin.
+---
+
+PIN dashboard adalah 6 angka yang dipakai pengantin untuk masuk ke Dashboard pasangan. Di halaman ini kamu membuat PIN dan menyalin pesan lengkap untuk pengantin.
+
+<Info>
+**Yang kamu perlukan**
+
+- Sudah masuk NikahKit dengan Google dan paket aktif. Lihat [Masuk dan bayar](/gabung/masuk-dan-bayar).
+- Undangan sudah tersimpan di bisnis Scalev yang terhubung. Lihat [Hubungkan Scalev](/gabung/hubungkan-scalev).
+- Supaya pesan memuat tautan dashboard: Dashboard pasangan sudah dipasang. Lihat [Pasang Dashboard pasangan](/jualan/pasang-dashboard-pasangan).
+</Info>
+
+<Image src="/assets/anim/tamu-pin.svg" alt="1. Di panel Bagikan, klik Kelola PIN dashboard. 2. Jendela NikahKit terbuka dengan tulisan Undangan ini belum punya PIN. 3. Klik Buat PIN, PIN 6 angka tampil. 4. Klik ikon Salin pesan untuk pengantin, muncul Pesan tersalin. 5. Tempel pesan di WhatsApp pengantin." caption="Membuat PIN dan menyalin pesan untuk pengantin" />
+
+## Langkah
+
+<Steps>
+<Step title="Buka panel Bagikan">
+Di editor NikahKit, klik **Bagikan** di bawah rel kiri.
+</Step>
+<Step title="Klik Kelola PIN dashboard">
+Gulir ke bawah sampai **PIN dashboard**, lalu klik **Kelola PIN dashboard**. Jendela NikahKit terbuka di atas editor. Di atasnya tertulis ID undangan (angka ID halaman Scalev), lalu bagian **Paket**, **PIN dashboard**, dan **Bisnis Scalev**.
+</Step>
+<Step title="Baca status PIN">
+Di bagian **PIN dashboard** kamu melihat salah satu:
+
+- **Undangan ini belum punya PIN.** dengan tombol **Buat PIN**.
+- **PIN aktif (versi ...). Lupa? Lihat lagi kapan saja.** dengan tombol **Lihat PIN** dan **Buat PIN baru**. Kalau PIN dulu diatur manual, hanya ada **Buat PIN baru**.
+</Step>
+<Step title="Klik Buat PIN">
+Klik **Buat PIN**. PIN 6 angka tampil, dengan pesan **PIN dibuat. Bisa dilihat lagi kapan saja lewat Lihat PIN.**
+</Step>
+<Step title="Salin pesan untuk pengantin">
+Klik ikon **Salin pesan untuk pengantin** di samping PIN. Muncul **Pesan tersalin.**
+
+Isi pesannya seperti ini:
+
+```text
+Undangan siap: https://tokomu.myscalev.com/rara-dimas
+Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=...
+PIN: 482913
+```
+
+Alamat di atas hanya contoh. Tautan kelola memakai alamat halaman Dashboard pasangan yang kamu pasang, ditambah ID undangan (`w`) dan alamat undangan (`link`).
+</Step>
+<Step title="Kirim ke pengantin">
+Tempel pesan itu di chat WhatsApp pengantin, lalu kirim. Pengantin tinggal membuka tautan kelola dan mengetik PIN. Lihat [Masuk dashboard](/pasangan/masuk-dashboard).
+</Step>
+<Step title="Hanya perlu PIN saja?">
+Klik ikon **Salin PIN**. Muncul **PIN tersalin.**
+</Step>
+</Steps>
+
+### Lupa PIN atau PIN bocor
+
+<Tabs>
+<TabItem label="Lupa PIN" value="lupa">
+Buka **Kelola PIN dashboard** lagi, lalu klik **Lihat PIN**. PIN yang sama tampil, dengan pesan **PIN aktif saat ini. Tetap berlaku sampai Anda membuat PIN baru.**
+</TabItem>
+<TabItem label="PIN bocor" value="ganti">
+Klik **Buat PIN baru**. Muncul pertanyaan **Buat PIN baru? PIN lama langsung tidak berlaku.** Klik OK. Muncul **PIN baru dibuat; yang lama tidak berlaku.** Kirim PIN baru ke pengantin.
+</TabItem>
+</Tabs>
+
+<Warning>
+Setelah **Buat PIN baru**, PIN lama langsung tidak berlaku. Pengantin harus memakai PIN baru untuk masuk dashboard.
+</Warning>
+
+## Tips keamanan
+
+- PIN hanya tampil di jendela NikahKit, tidak di halaman Scalev.
+- Kirim PIN hanya ke pengantin. Untuk penerima tamu, pakai [kode staff](/tamu/staff-penerima-tamu), bukan PIN.
+- PIN membuka semua menu dashboard, termasuk menghapus ucapan.
+
+## Tanda berhasil
+
+<Success>
+Status berubah menjadi **PIN aktif ...** dan setelah menyalin muncul **Pesan tersalin.**
+</Success>
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Ekstensi tidak tersambung. Muat ulang halaman.">
+Jendela PIN gagal dibuka. Muat ulang halaman editor Scalev (F5), lalu coba lagi.
+</Accordion>
+<Accordion title="Tombol Kelola PIN dashboard abu-abu">
+Undangan belum punya ID. Simpan halaman di Scalev dulu, lalu buka **Bagikan** lagi.
+</Accordion>
+<Accordion title="Sudah ada PIN. Buat PIN baru bila hilang.">
+Undangan ini sudah punya PIN. Klik **Lihat PIN** untuk melihatnya, atau **Buat PIN baru** untuk mengganti.
+</Accordion>
+<Accordion title="PIN diatur manual. Buat PIN baru untuk mengganti.">
+PIN lama tidak bisa ditampilkan lagi. Klik **Buat PIN baru**.
+</Accordion>
+<Accordion title="Salin otomatis diblokir. Pilih PIN lalu tekan Ctrl+C.">
+Browser menolak menyalin. Blok angka PIN dengan mouse, lalu tekan Ctrl+C (Mac: Cmd+C).
+</Accordion>
+<Accordion title="Pesan tersalin, tapi tidak ada tautan kelola undangan">
+Muncul juga kalimat **Pasang Dashboard pasangan dulu (Template > Marketing) supaya pesan ini memuat tautan kelola undangan.** Ikuti [Pasang Dashboard pasangan](/jualan/pasang-dashboard-pasangan), lalu salin pesan lagi.
+</Accordion>
+<Accordion title="Langganan habis. Perpanjang dulu.">
+PIN tidak bisa dibuat saat paket habis. Perpanjang di [Pilih paket](/gabung/pilih-paket).
+</Accordion>
+<Accordion title="Sesi berakhir. Masuk lagi.">
+Klik **Masuk dengan Google** di jendela NikahKit, lalu ulangi.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Serahkan ke klien" icon="handshake" href="/pasangan/serahkan-ke-klien">Apa yang dikirim ke pengantin.</Card>
+<Card title="Masuk dashboard" icon="right-to-bracket" href="/pasangan/masuk-dashboard">Yang dilakukan pengantin dengan PIN.</Card>
+<Card title="Staff penerima tamu" icon="users" href="/tamu/staff-penerima-tamu">Kode check-in tanpa membagi PIN.</Card>
+<Card title="Bagikan undangan" icon="share" href="/tamu/bagikan-undangan">Kembali ke panel Bagikan.</Card>
+</CardGroup>

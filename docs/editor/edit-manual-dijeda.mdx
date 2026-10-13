@@ -1,0 +1,93 @@
+---
+title: Edit manual dan status Dijeda
+description: Apa yang terjadi bila kode halaman diubah langsung di tab Code Scalev, arti status Dijeda, dan cara memulihkan undangan dengan Lihat di kode, Timpa dengan NikahKit, atau Tulis ulang.
+---
+
+Di halaman ini kamu memahami kenapa NikahKit kadang berhenti menulis (status **Dijeda**) dan cara memulihkannya tanpa kehilangan isian.
+
+<Info>
+**Yang kamu perlukan**
+
+- Editor NikahKit terbuka. Lihat [Kenali editor](/editor/kenali-editor).
+- Tahu letak tab **Code** di strip atas editor Scalev.
+</Info>
+
+<Image src="/assets/anim/editor-dijeda-timpa.svg" alt="1. Status di kaki rel menjadi Dijeda. 2. Panel menampilkan Kode diubah di tab Code. NikahKit dijeda. 3. Klik Lihat di kode, tab Code menandai bagian yang diubah. 4. Kembali ke NikahKit, klik Timpa dengan NikahKit. 5. Status kembali Tersimpan." caption="NikahKit dijeda karena kode diubah manual" />
+
+## Kenapa bisa dijeda
+
+NikahKit menulis undangan ke kode halaman Scalev. Setiap kali menulis, NikahKit memberi tanda pada isi `<body>`. Kalau isi `<body>` diubah di tab **Code** (oleh kamu atau orang lain), tandanya tidak cocok. NikahKit lalu **berhenti menulis** supaya ketikan manualmu tidak tertimpa diam-diam.
+
+- Kaki rel kiri menunjukkan **Dijeda** dengan titik kuning.
+- Di panel muncul kotak kuning: **Kode diubah di tab Code.** **NikahKit dijeda.**
+- Perubahan di bagian `<head>` tidak dihitung. Yang diperiksa hanya isi `<body>`.
+- Isian yang kamu ketik di NikahKit selama dijeda belum ditulis ke halaman. Isian itu baru masuk ke halaman setelah kamu menekan **Timpa dengan NikahKit**. Kalau kamu malah membatalkan perubahan manual di tab Code, NikahKit kembali memakai isi yang ada di halaman, jadi ketikan selama dijeda bisa hilang. Sebaiknya putuskan dulu, baru lanjut mengisi.
+
+<Warning>
+**Timpa dengan NikahKit** membuang semua perubahan manual di `<body>`. Kalau perubahan manual itu penting, salin dulu kodenya ke tempat lain sebelum menimpa.
+</Warning>
+
+## Langkah
+
+<Steps>
+<Step title="Lihat status di kaki rel">
+Kalau kaki rel menunjukkan **Dijeda**, baca kotak kuning di atas panel NikahKit.
+</Step>
+<Step title="Klik Lihat di kode">
+Klik **Lihat di kode**. Panel NikahKit tertutup, tab **Code** terbuka, dan bagian yang diubah manual ditandai. Baca apa yang berubah.
+</Step>
+<Step title="Putuskan">
+Ada dua pilihan:
+
+- **Perubahan manual tidak penting** (salah ketik, coba-coba): lanjut ke langkah berikutnya.
+- **Perubahan manual penting**: salin kodenya dulu, atau batalkan di tab Code dengan Ctrl+Z (Mac: Cmd+Z) sampai kode kembali seperti tulisan NikahKit. Begitu cocok lagi, jeda hilang sendiri.
+</Step>
+<Step title="Kembali ke tab NikahKit">
+Klik tab **NikahKit** di strip atas editor Scalev.
+</Step>
+<Step title="Klik Timpa dengan NikahKit">
+Klik tombol biru **Timpa dengan NikahKit** (judul tombol: **Buang perubahan manual. Bisa diurungkan.**). NikahKit membangun ulang halaman dari datanya.
+</Step>
+<Step title="Cek status">
+Kotak kuning hilang dan kaki rel kembali ke **Tersimpan**. Tekan **Simpan** di Scalev ([Simpan dan terbitkan](/scalev/simpan-dan-terbitkan)).
+</Step>
+</Steps>
+
+### Kalau yang muncul "Kode diubah di luar NikahKit."
+
+Pesan ini muncul bila data undangan di halaman tidak terbaca lagi, misalnya bagian data NikahKit ikut terubah atau terhapus di tab **Code**. Kalau ada tombol **Tulis ulang**, klik tombol itu. NikahKit menimpa seluruh halaman dengan isian yang masih dipegangnya (perubahan manual ikut terbuang) dan melepas jeda. Tombol ini hanya muncul bila NikahKit masih memegang isian undangan. Kalau tidak ada tombolnya, coba **Urungkan** sampai kode kembali seperti tulisan NikahKit.
+
+## Tanda berhasil
+
+- Kaki rel menunjukkan **Tersimpan**, bukan **Dijeda**.
+- Tidak ada kotak kuning **Kode diubah di tab Code.**
+- Di **Bantuan**, baris **Kode halaman cocok dengan NikahKit** diberi tanda centang (✓).
+
+## Kalau ada masalah
+
+<AccordionGroup>
+<Accordion title="Muncul: Perbedaan tidak ditemukan. Muat ulang halaman.">
+NikahKit tidak menemukan bagian yang berubah. Muat ulang halaman editor Scalev (tekan F5, atau Cmd+R di Mac), buka tab **NikahKit** lagi, lalu cek status.
+</Accordion>
+<Accordion title="Muncul: Tab Code tidak bisa dibuka.">
+Klik tab **Code** sendiri di strip atas editor Scalev untuk melihat kodenya.
+</Accordion>
+<Accordion title="Saya ingin mengubah desain lewat kode">
+NikahKit akan selalu dijeda setiap kali `<body>` diubah manual, dan **Timpa dengan NikahKit** membuang perubahan itu. Pakai menu **Gaya**, **Lapisan**, dan **Konten** untuk mengubah undangan. Lihat [Gaya](/editor/gaya) dan [Lapisan](/editor/lapisan).
+</Accordion>
+<Accordion title="Salah klik Timpa dengan NikahKit">
+Klik **Urungkan** di rel atau tekan Ctrl+Z (Mac: Cmd+Z) di luar kolom isian. Lihat [Urungkan dan Kosongkan](/editor/urungkan-kosongkan).
+</Accordion>
+<Accordion title="Kaki rel menunjukkan Gagal dan muncul: Gagal menulis. Muat ulang halaman.">
+Ini bukan jeda karena kode manual. NikahKit gagal menulis ke editor Scalev. Muat ulang halaman editor. Kalau masih terjadi, buka [Menu Bantuan](/bantuan/menu-bantuan) dan kirim laporannya.
+</Accordion>
+</AccordionGroup>
+
+## Lanjut
+
+<CardGroup cols={2}>
+<Card title="Urungkan dan Kosongkan" icon="rotate-left" href="/editor/urungkan-kosongkan">Batalkan perubahan.</Card>
+<Card title="Menu Bantuan" icon="circle-question" href="/bantuan/menu-bantuan">Cek kondisi editor dan kirim laporan.</Card>
+<Card title="Pesan galat" icon="triangle-exclamation" href="/bantuan/pesan-galat">Arti pesan galat lain.</Card>
+<Card title="Kenali editor" icon="window-maximize" href="/editor/kenali-editor">Kenali rel dan status kaki rel.</Card>
+</CardGroup>
