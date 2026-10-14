@@ -583,7 +583,7 @@ const SCENES = {
         { caption: "Gulir ke Foto, lalu klik Pilih foto. Jendela Pilih foto terbuka.", focus: LEFT, at: [150, FOTO_AT + 38], scroll: { id: "open", dy }, click: true, show: ["dlg"],
           mark: nkBtnBox(ACC_X, FOTO_AT + 20, "Pilih foto", { icon: "image" }), lens: { src: [8, 100, 390, 190] }, dur: 3.6 },
         { caption: "Klik satu foto di grid. Foto itu diberi tanda terpilih.", show: ["sel"], at: [selX + gs / 2, selY + gs / 2], click: true, mark: [selX, selY, gs, gs], note: "Foto terpilih", dur: 3.4 },
-        { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 100] }, dur: 3.6 },
+        { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 144] }, dur: 3.6 },
         { caption: "Klik Deskripsi foto, lalu tulis kalimat pendek tentang isi foto.", focus: PANELF, at: [230, p2.alt + 18], click: true, show: ["alt", "altFocus"], type: [typed("alt", ACC_X + 20, p2.alt + 8, ALT)],
           mark: [ACC_X + 10, p2.alt, ACC_W - 20, 36], lens: { src: [ACC_X, p2.alt - 34, ACC_W, 78] }, dur: 3.8 },
         { caption: "Wajah terpotong di undangan? Di Titik fokus, klik Atas.", at: [ACC_X + 10 + atasW / 2, p2.focus + 19], click: true, show: ["top"], mark: [ACC_X + 10, p2.focus, atasW, 38],

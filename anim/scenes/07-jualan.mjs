@@ -561,7 +561,7 @@ function pasangScenes(kind, title, page, after, result, toast, caps) {
         tabStep(caps[0], 3),
         { caption: caps[1], at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING, lens: { src: [80, 160, 295, 120] }, dur: 3.2 },
         { caption: `Klik kartu ${name}. Layar meredup: dialog konfirmasi muncul.`, at: CARD_AT[kind], click: true, show: ["veil"], mark: M(cx, MKY, 134, 167, 8),
-          lens: { src: [84, MKY - 4, 290, 236] }, dur: 3.6 }
+          lens: { src: [84, MKY + 168, 290, 64] }, dur: 3.6 }
       ]
     },
     [`${slug}-dialog`]: {
