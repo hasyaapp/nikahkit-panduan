@@ -8,7 +8,7 @@
 // Stores, the Security tab, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
 import {
   C, chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkDialogHead, nkBtn, nkInput, nkLabel, nkHint,
-  nkNote, nkAcc, nkH3, icon, iconX, dim, shadow, clipped, skeleton, phoneDesk, PHONE, group, text, para, rect, line, circle, tw
+  nkNote, nkAcc, nkH3, icon, iconX, dim, shadow, clipped, phoneDesk, PHONE, group, text, para, rect, line, circle, tw
 } from "../lib.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
@@ -17,8 +17,6 @@ const SERIF = "Georgia,'Times New Roman',serif";
 
 // ---- shared pieces ----------------------------------------------------------------------------------------------------
 const bar = (x, y, w, h = 10, fill = SV.bar) => rect(x, y, w, h, { r: h / 2, fill });
-// A whole screen state shown as an element: skeleton everywhere, detail only inside rects (like the base under focus).
-const scr = (svg, ...rects) => skeleton(svg) + rects.map((r) => clipped(...r, svg)).join("");
 // Scalev inside a Chrome window: the frame, and page markup (drawn at 0,0) moved below the toolbar.
 const frame = (url = "app.scalev.com") => chrome(0, 0, 1440, 900, { tabs: [{ title: "Scalev", active: true, fav: favScalev }], url });
 const shifted = (svg) => clipped(0, CT, 1440, 900 - CT, group({ transform: `translate(0 ${CT})` }, svg));
@@ -670,7 +668,7 @@ export const scenes = {
   "scalev-buat-halaman-html": {
     title: "Membuka Landing Pages di dasbor Scalev",
     base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
-    els: { lp: { svg: scr(lpScreen(), [0, 118, 256, 540]), enter: "fade" } },
+    els: { lp: { svg: lpScreen(), skel: true, enter: "fade" } },
     steps: [{
       caption: "Di dasbor Scalev, klik Landing Pages di menu kiri.", focus: [0, 118, 256, 540], at: svMenuAt("Landing Pages"), click: true, show: ["lp"], dur: 3.4,
       mark: { box: [28, 220, 196, 28], r: 6 }, lens: { src: [8, 180, 248, 110] }
@@ -696,7 +694,7 @@ export const scenes = {
     title: "Editor HTML Mode terbuka, lalu klik tab NikahKit",
     base: [scalevEditor(0, 0, { tab: "Code" }), desktopPreview],
     els: {
-      edNk: { svg: scr(edNikahKit({ locked: true }), PANEL), enter: "fade" },
+      edNk: { svg: edNikahKit({ locked: true }), skel: true, enter: "fade" },
       tip: { svg: lockTip, enter: "fade", delay: 0.8 }
     },
     steps: [
@@ -717,13 +715,14 @@ export const scenes = {
     title: "Alamat halaman berisi ID undangan",
     base: [frame(), shifted(settingsEd({ pub: false }) + desktopPreview + slugText("rani-dimas"))],
     els: {
-      saved: { svg: urlSwap("app.scalev.com/pages/365671") + text(34, CT + 334, "Saat ini:", { size: 12, weight: 500, fill: C.strong }) + text(82, CT + 334, PUB_URL, { size: 12, weight: 500, fill: C.primary }), enter: "fade", delay: 0.3 },
-      edNk: { svg: shifted(scr(edNikahKit(), PANEL)), enter: "fade" }
+      saved: { svg: urlSwap("app.scalev.com/pages/365671"), enter: "fade", delay: 0.3 },
+      now: { svg: text(34, CT + 334, "Saat ini:", { size: 12, weight: 500, fill: C.strong }) + text(82, CT + 334, PUB_URL, { size: 12, weight: 500, fill: C.primary }), enter: "fade", delay: 0.3 },
+      edNk: { svg: shifted(edNikahKit()), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Tersimpan: alamat jadi app.scalev.com/pages/365671. Angka itu ID undangan.", focus: [OMNI.box, dn(DOMAIN_ACC)], show: ["saved"], dur: 4,
+      { caption: "Tersimpan: alamat jadi app.scalev.com/pages/365671. Angka itu ID undangan.", focus: [OMNI.box, dn(DOMAIN_ACC)], show: ["saved", "now"], dur: 4,
         mark: { box: [160, 52, tw("app.scalev.com/pages/365671", 14) + 12, 24], r: 4 }, lens: { src: [124, 41, 420, 44] } },
-      { caption: "Klik NikahKit lagi, lalu pilih template. Menu lain terbuka.", focus: dn(PANEL), at: [ED.tab.NikahKit[0], ED.tab.NikahKit[1] + CT], click: true, show: ["edNk"], dur: 3.6,
+      { caption: "Klik NikahKit lagi, lalu pilih template. Menu lain terbuka.", focus: dn(PANEL), at: [ED.tab.NikahKit[0], ED.tab.NikahKit[1] + CT], click: true, show: ["edNk"], hide: ["now"], dur: 3.6,
         mark: { box: dn(TAB.NikahKit), r: 6 }, lens: { src: [0, CT + 92, 330, 200], at: [300, 90] } }
     ]
   },
@@ -732,12 +731,12 @@ export const scenes = {
     title: "Mengisi slug di tab Settings",
     base: [edNikahKit({ locked: true })],
     els: {
-      set: { svg: scr(settingsEd({ pub: false }) + desktopPreview, [0, 44, 399, 48], DOMAIN_ACC), enter: "fade" },
+      set: { svg: settingsEd({ pub: false }) + desktopPreview, skel: true, enter: "fade" },
       focus: { svg: slugFocus, enter: "fade" },
       slug: slugText("rani-dimas")
     },
     steps: [
-      { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [0, 44, 399, 48], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 275], at: [300, 40] } },
+      { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 275], at: [300, 40] } },
       { caption: "Isi Slug URL, misalnya rani-dimas.", focus: DOMAIN_ACC, at: [SLUG[0] + 200, SLUG[1] + 21], click: true, show: ["focus", "slug"], type: [{ id: "slug", n: 10, box: [48, 285, 76, 22] }], dur: 3.4, mark: SLUG, lens: SLUG_LENS }
     ]
   },
@@ -746,13 +745,13 @@ export const scenes = {
     title: "Mengubah slug di tab Settings lalu Simpan & Terbitkan",
     base: [editorKonten()],
     els: {
-      set: { svg: scr(SET_PUB(), [0, 44, 399, 48], DOMAIN_ACC), enter: "fade" },
+      set: { svg: SET_PUB(), skel: true, enter: "fade" },
       old: slugText("undangan-baru"),
       clear: { svg: rect(37, 277, 324, 36, { fill: "#f6f9fc" }) + slugFocus, enter: "fade" },
       slug: slugText("rani-dimas")
     },
     steps: [
-      { caption: "Di editor halaman, klik tab Settings.", focus: [0, 44, 399, 48], at: ED.tab.Settings, click: true, show: ["set", "old"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 300], at: [300, 40] } },
+      { caption: "Di editor halaman, klik tab Settings.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set", "old"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 300], at: [300, 40] } },
       { caption: "Ganti Slug URL, misalnya rani-dimas.", focus: DOMAIN_ACC, at: [SLUG[0] + 200, SLUG[1] + 21], click: true, show: ["clear", "slug"], hide: ["old"], type: [{ id: "slug", n: 10, box: [48, 285, 76, 22] }], dur: 3.4, mark: SLUG, lens: SLUG_LENS }
     ]
   },
@@ -810,7 +809,7 @@ export const scenes = {
       helpBody: { svg: clipCss("helpBody", 0, 154, 386, 746) + helpBody(), enter: "fade" },
       helpBar: { svg: rect(388, 160, 6, 120, { r: 3, fill: "#c9ced6" }), enter: "fade" },
       copied: { svg: nkHint(16, up(HB.msg), "Tersalin. Tempel di tab Security."), enter: "fade" },
-      sec: { svg: scr(scalevEditor(0, 0, { tab: "Security" }) + securityPanel + cover(SC.x, SC.y), [0, 44, 399, 48], [0, 93, 399, 520]), enter: "fade" },
+      sec: { svg: scalevEditor(0, 0, { tab: "Security" }) + securityPanel + cover(SC.x, SC.y), skel: true, enter: "fade" },
       secFocus: { svg: rect(20.5, secY(1) + 10.5, 358, 39, { r: 4, stroke: SV.blue, sw: 2 }), enter: "fade" },
       paste: { svg: text(32, secY(1) + 35, "https://foto.contoh.com", { size: 14, fill: SV.ink }), enter: "fade", delay: 0.2 }
     },
@@ -820,8 +819,8 @@ export const scenes = {
         mark: [16, up(HB.rows[2][0]), 351, HB.rows[2][1]], lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[3][0] - HB.h3 + 22] } },
       { caption: "Ada Perlu ditambah manual? Klik Salin domain kurang.", at: [190, up(HB.copy) + 18], click: true, show: ["copied"], dur: 3.4,
         mark: [16, up(HB.copy), 351, 36], lens: { src: [8, up(HB.recheck) - 8, 380, up(HB.msg) - up(HB.recheck) + 20] } },
-      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [0, 44, 399, 48], at: ED.tab.Security, click: true, show: ["sec"], mark: tabMark("Security"), lens: TABS_LENS },
-      { caption: "Tempel domainnya saja di kolom yang cocok: img_src ke Image Sources.", at: [200, secY(1) + 30], click: true, show: ["secFocus", "paste"], hide: ["help", "helpBody", "helpBar", "copied"], dur: 3.8,
+      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 93, 399, 520]], at: ED.tab.Security, click: true, show: ["sec"], hide: ["help", "helpBody", "helpBar", "copied"], mark: tabMark("Security"), lens: TABS_LENS },
+      { caption: "Tempel domainnya saja di kolom yang cocok: img_src ke Image Sources.", at: [200, secY(1) + 30], click: true, show: ["secFocus", "paste"], dur: 3.8,
         mark: [20, secY(1) + 10, 359, 40], lens: { src: [10, secY(1) - 22, 380, 80] } }
     ]
   },
@@ -844,19 +843,19 @@ export const scenes = {
     title: "Menambahkan domain sendiri di Settings Scalev",
     base: [settingsPage("Profil"), profileCard()],
     els: {
-      dom: { svg: scr(settingsPage("Domain") + domainSection, SUBMENU, [MAIN.x, MAIN.y, MAIN.w, 80]), enter: "fade" },
+      dom: { svg: settingsPage("Domain") + domainSection, skel: true, enter: "fade" },
       addBtn: { svg: svBtn(ADD[0], ADD[1], "Tambahkan Domain", { w: 160 }), enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
       dlg: { svg: domainDlg, enter: "pop", origin: [ADD[0] + 80, ADD[1] + 20] },
       typed: text(DOM_IN[0] + 12, DOM_IN[1] + 25, "undangan.namabrand.com", { size: 14, fill: SV.ink }),
-      done: { svg: scr(settingsPage("Domain") + domainSection + dnsTable, [MAIN.x, MAIN.y, MAIN.w, 340]), enter: "fade" }
+      done: { svg: settingsPage("Domain") + domainSection + dnsTable, skel: true, enter: "fade" }
     },
     steps: [
       { caption: "Di Settings dasbor Scalev, buka bagian Domain.", focus: SUBMENU, at: subAt("Domain"), click: true, show: ["dom", "addBtn"], mark: subBox("Domain"), lens: { src: [SUB.x, 382, SUB.w, 82] } },
       { caption: "Klik Tambahkan Domain.", focus: [MAIN.x, MAIN.y, MAIN.w, 80], at: [ADD[0] + 80, ADD[1] + 20], click: true, press: "addBtn", show: ["shade", "dlg"], mark: ADD, lens: { src: [ADD[0] - 60, MAIN.y, 240, 72] } },
       { caption: "Ketik domain atau subdomain, misalnya undangan.namabrand.com.", focus: [MD.x, MD.y, MD.w, MD.h], at: [DOM_IN[0] + 200, DOM_IN[1] + 20], click: true, show: ["typed"],
-        type: [{ id: "typed", n: 22, box: [DOM_IN[0] + 12, DOM_IN[1] + 9, 190, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [MD.x + 12, MD.y + 12, 300, 120] } },
-      { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", at: [DOM_SAVE[0] + 40, DOM_SAVE[1] + 20], click: true, show: ["done"], hide: ["shade", "dlg", "typed"], dur: 3.6,
+        type: [{ id: "typed", n: 22, box: [DOM_IN[0] + 12, DOM_IN[1] + 9, 174, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [MD.x + 12, MD.y + 12, 300, 120] } },
+      { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", focus: [MAIN.x, MAIN.y, MAIN.w, 340], at: [DOM_SAVE[0] + 40, DOM_SAVE[1] + 20], click: true, show: ["done"], hide: ["shade", "dlg", "typed"], dur: 3.6,
         mark: DOM_SAVE, lens: { src: [MAIN.x + 16, MAIN.y + 84, 420, 140] } }
     ]
   },
@@ -865,17 +864,15 @@ export const scenes = {
     title: "Menyalin record DNS ke Cloudflare lalu verifikasi di Scalev",
     base: [settingsPage("Domain"), domainSection, dnsTable],
     els: {
-      cf: { svg: skeleton(cfPage), enter: "fade" },
-      cfSide: { svg: clipped(0, CT + 53, 240, 762, cfPage), enter: "fade" },
-      cfMain: { svg: clipped(...CF_TABLE, cfPage), enter: "fade" },
+      cf: { svg: cfPage, skel: true, enter: "fade" },
       cfForm: { svg: cfForm, enter: "pop", origin: [CF_ADD[0] + 66, CF_ADD[1] + 36] },
       ok: { svg: verified, enter: "pop" }
     },
     steps: [
-      { caption: "Di Cloudflare buka DNS.", focus: "none", at: [100, CF_DNS[1] + 17], show: ["cf", "cfSide"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 230] } },
-      { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", at: [CF_ADD[0] + 66, CF_ADD[1] + 18], click: true, show: ["cfMain", "cfForm"], hide: ["cfSide"], dur: 4,
+      { caption: "Di Cloudflare buka DNS.", focus: [0, CT + 53, 240, 762], at: [100, CF_DNS[1] + 17], show: ["cf"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 230] } },
+      { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", focus: CF_TABLE, at: [CF_ADD[0] + 66, CF_ADD[1] + 18], click: true, show: ["cfForm"], dur: 4,
         mark: CF_ADD, lens: { src: [320, 330, 560, 150], at: [80, 330] } },
-      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["ok"], hide: ["cf", "cfMain", "cfForm"], dur: 4,
+      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["ok"], hide: ["cf", "cfForm"], dur: 4,
         mark: VERIFY, lens: { src: [MAIN.x + 16, MAIN.y + 84, 300, 140], at: [360, 320] } }
     ]
   },
@@ -884,9 +881,9 @@ export const scenes = {
     title: "Memilih metode pembayaran Invoice di toko Scalev",
     base: [storesPage],
     els: {
-      det: { svg: skeleton(scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg })), enter: "fade" },
-      detBody: { svg: clipCss("detBody", 256, DET_TOP + 1, 1184, 900) + skeleton(detContent) + clipped(...PM_CARD, detContent), enter: "fade" },
-      detHead: { svg: skeleton(detHead + topSave), enter: "fade" },
+      det: { svg: scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg }), skel: true, enter: "fade" },
+      detBody: { svg: clipCss("detBody", 256, DET_TOP + 1, 1184, 900) + detContent, skel: true, enter: "fade" },
+      detHead: { svg: detHead + topSave, skel: true, enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
       dlg: { svg: payDlg, enter: "pop", origin: [PICK[0] + 110, PICK[1] + 20] },
       menu: { svg: payMenu, enter: "pop", origin: [SEL[0] + SEL[2] / 2, SEL[1] + 40] },
@@ -894,7 +891,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Di Stores, klik nama tokomu.", focus: STORES_TABLE, at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [288, 136, 260, 64] } },
-      { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", focus: "none", scroll: { id: "detBody", dy: DET_DY }, at: [PICK[0] + 110, PICK[1] + 20], click: true, show: ["shade", "dlg"], dur: 3.8,
+      { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], scroll: { id: "detBody", dy: DET_DY }, at: [PICK[0] + 110, PICK[1] + 20], click: true, show: ["shade", "dlg"], dur: 3.8,
         mark: PICK, lens: { src: [292, PM_Y - DET_DY + 8, 300, 140], at: [40, 330] } },
       { caption: "Di dialog, klik dropdown.", focus: PAY_DLG, at: [SEL[0] + SEL[2] - 30, SEL[1] + 20], click: true, show: ["menu"], dur: 2.8, mark: SEL, lens: { src: [SEL[0] - 8, SEL[1] - 8, 210, 190] } },
       { caption: "Pilih Invoice.", at: [SEL[0] + 60, SEL[1] + 108], click: true, show: ["val"], hide: ["menu"], dur: 2.8, mark: INVOICE, lens: { src: [SEL[0] - 8, SEL[1] - 8, 210, 150] } }
@@ -907,12 +904,12 @@ export const scenes = {
     els: {
       on: { svg: check(PD.x + 24, PD.y + 150, true), enter: "pop" },
       dlgSave: svBtn(DLG_SAVE[0], DLG_SAVE[1], "Simpan", { w: 80 }),
-      after: { svg: scr(detAfter, [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]]), enter: "fade" },
+      after: { svg: detAfter, skel: true, enter: "fade" },
       topSave
     },
     steps: [
       { caption: "Centang Aktifkan Metode Pembayaran ALL E-Payment.", focus: PAY_DLG, at: [CHECK[0] + 9, CHECK[1] + 9], click: true, show: ["on", "dlgSave"], mark: { box: CHECK, r: 3 }, lens: { src: [PD.x + 16, PD.y + 136, 360, 48], at: [300, 380] } },
-      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
+      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", focus: [PAY_DLG, [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]]], at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
         lens: { src: [292, PM_Y - DET_DY + 8, 330, 190], at: [40, 300] } },
       { caption: "Klik Simpan di kanan atas supaya pengaturan benar-benar tersimpan.", focus: [256, 0, 1184, 70], at: [TOP_SAVE[0] + 50, TOP_SAVE[1] + 20], click: true, press: "topSave", dur: 3.8, mark: TOP_SAVE, lens: { src: [1240, 0, 200, 72] } }
     ]
@@ -927,14 +924,14 @@ export const scenes = {
       saveBtn: { svg: svBtn(SAVE[0], SAVE[1], "Save", { w: 80 }), enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
       konf: { svg: confirmDlg, enter: "pop", origin: [SAVE[0] + 40, SAVE[1] + 20] },
-      wa: { svg: scr(waWeb("+6282125784683") + waDraft + waSend, WA.head, [461, WA.foot, 979, 62]), enter: "rise", delay: 0.15 }
+      wa: { svg: waWeb("+6282125784683") + waDraft + waSend, skel: true, enter: "rise", delay: 0.15 }
     },
     steps: [
       { caption: "Di Settings bagian Profil, klik Edit.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [EDIT[0] + 40, EDIT[1] + 18], click: true, show: ["edit", "saveBtn"], mark: EDIT, lens: { src: [EDIT[0] - 120, MAIN.y, 240, 72] } },
       { caption: "Isi nomor WhatsApp yang aktif di kolom nomor telepon.", at: [PHONE_IN.x + 200, PHONE_IN.y + 20], click: true, show: ["num"], type: [{ id: "num", n: 12, box: [PHONE_IN.x + 34, PHONE_IN.y + 9, 104, 22] }], dur: 3.4,
         mark: PHONE_BOX, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 22, 330, 72] } },
       { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", at: [SAVE[0] + 40, SAVE[1] + 20], click: true, press: "saveBtn", show: ["shade", "konf"], dur: 3.4, mark: SAVE, lens: { src: [CD.x + 16, CD.y + 70, 300, 50] } },
-      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [CD.x, CD.y, 400, 220], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf"], dur: 3.8,
+      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [WA.head, [461, WA.foot, 979, 62]], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf", "edit", "num", "saveBtn"], dur: 3.8,
         mark: VERIF, lens: { src: [470, CT, 320, 60] } }
     ]
   },
@@ -943,14 +940,14 @@ export const scenes = {
     title: "Mengirim OTP lewat WhatsApp, Cek Verifikasi, lalu MFA",
     base: [settingsPage("Profil"), editPage, phoneNum, cekBtn],
     els: {
-      wa: scr(waWeb("+6282125784683") + waDraft, WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]),
+      wa: { svg: waWeb("+6282125784683") + waDraft, skel: true },
       send: waSend,
       bubble: { svg: waBubble, enter: "slide" },
       ok: { svg: icon("circle-check", PHONE_IN.x + PHONE_IN.w - 22, PHONE_IN.y + 20, 20, "#15a34a"), enter: "pop" },
       mfa: { svg: mfaCard, enter: "fade" }
     },
     steps: [
-      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: "none", at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [470, CT, 320, 60], at: [440, 200] } },
+      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [470, CT, 320, 60], at: [440, 200] } },
       { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
         mark: CEK, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 10, 470, 60] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [MAIN.x + 16, MAIN.y + 180, 420, 70] } }
@@ -961,25 +958,25 @@ export const scenes = {
     title: "Membuat gambar thumbnail 1:1 di Canva",
     base: [cvEditor],
     els: {
-      down: scr(galleryDown, [0, 330, 1425, 300]),
-      top: { svg: scr(galleryTop, [0, CT, 1425, 80]), enter: "fade", delay: -1 },
+      down: { svg: galleryDown, skel: true },
+      top: { svg: galleryTop, skel: true, enter: "fade", delay: -1 },
       pop: { svg: cvPop, enter: "pop", origin: [CREATE_CV[0] + 70, CREATE_CV[1] + 32] },
       size: { svg: cvSize, enter: "fade" },
       w: cvW, h: cvH,
       sel: { svg: cvSel, enter: "fade" },
-      names: cvNames, date: cvDate, namesSk: { svg: skeleton(cvNames + cvDate), enter: "fade" },
+      names: { svg: cvNames, skel: true }, date: { svg: cvDate, skel: true },
       share: { svg: cvShare, enter: "pop", origin: [SHARE_CV[0] + 53, SHARE_CV[1] + 34] },
       dl: { svg: cvDl, enter: "fade" },
       done: { svg: dlBubble, enter: "pop", origin: [DLB.x + 340, DLB.y] }
     },
     steps: [
-      { caption: "Buka galeri template undangan Canva. Mahkota berarti Canva Pro.", focus: "none", at: CROWN, dur: 3.6, mark: { box: [CROWN[0] - 12, CROWN[1] - 12, 24, 24], r: 12 }, lens: { src: [320, 530, 240, 100] } },
-      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"], mark: { box: CREATE_CV, r: 8 }, lens: { src: [1100, 95, 300, 60] } },
+      { caption: "Buka galeri template undangan Canva. Mahkota berarti Canva Pro.", focus: [0, 330, 1425, 300], at: CROWN, dur: 3.6, mark: { box: [CROWN[0] - 12, CROWN[1] - 12, 24, 24], r: 12 }, lens: { src: [320, 530, 240, 100] } },
+      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", focus: [0, CT, 1425, 80], at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"], mark: { box: CREATE_CV, r: 8 }, lens: { src: [1100, 95, 300, 60] } },
       { caption: "Isi 1080 x 1080 px.", at: [CUSTOM[0] + 100, CUSTOM[1] + 20], click: true, show: ["size", "w", "h"], type: [{ id: "w", n: 4 }, { id: "h", n: 4 }], mark: { box: CUSTOM, r: 6 }, lens: { src: [POP.x, POP.y, POP.w, 184], at: [200, 150] } },
       { caption: "Klik Create new design, lalu salin elemen dari template.", focus: [SQ.x, SQ.y, SQ.s, SQ.s + 50], at: [NEW_CV[0] + 144, NEW_CV[1] + 21], click: true, hide: ["top", "pop", "size", "w", "h"], dur: 3.6,
         mark: { box: NEW_CV, r: 8 }, lens: { src: [SQ.x + 160, SQ.y + SQ.s + 8, 240, 40] } },
       { caption: "Isi nama panggilan dan tanggal dengan huruf besar.", at: [SQ.x + SQ.s / 2, SQ.y + 255], click: true, show: ["sel", "names", "date"], type: [{ id: "names", n: 12 }, { id: "date", n: 14 }], dur: 3.8, mark: NAMES },
-      { caption: "Unduh: klik Share, lalu Download.", focus: [SHARE_CV, [SHP.x - 6, 141, SHP.w + 12, 222]], at: [SHARE_CV[0] + 53, SHARE_CV[1] + 17], click: true, show: ["share", "namesSk"], hide: ["sel", "names", "date"],
+      { caption: "Unduh: klik Share, lalu Download.", focus: [SHARE_CV, [SHP.x - 6, 141, SHP.w + 12, 222]], at: [SHARE_CV[0] + 53, SHARE_CV[1] + 17], click: true, show: ["share"], hide: ["sel"],
         mark: { box: SHARE_CV, r: 8 }, lens: { src: [SHP.x, SHP.y, SHP.w, 220], at: [140, 150] } },
       { caption: "Pilih PNG atau JPG.", at: [DL_ROW[0] + 100, DL_ROW[1] + 26], click: true, show: ["dl"], mark: { box: DL_ROW, r: 6 }, lens: { src: [SHP.x, SHP.y, SHP.w, 220], at: [140, 150] } },
       { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6, mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x, DLB.y, 400, 96], at: [140, 150] } }
@@ -990,7 +987,7 @@ export const scenes = {
     title: "Memasang thumbnail di SEO & Page Identity Scalev",
     base: [editorKonten()],
     els: {
-      set: { svg: scr(settingsEd({ now: PUB_URL }) + cover(SC.x, SC.y), [0, 44, 399, 48], [0, 520, 399, 100]), enter: "fade" },
+      set: { svg: settingsEd({ now: PUB_URL }) + cover(SC.x, SC.y), skel: true, enter: "fade" },
       seo: { svg: seoAfter({ id: "seo" }), enter: "fade" },
       jFocus: { svg: rect(35, 351, 313, 40, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
       judul: text(48, 376, JUDUL, { size: 14, fill: "#0f161e" }),
@@ -1003,7 +1000,7 @@ export const scenes = {
       hover: { svg: imgHover, enter: "fade" }
     },
     steps: [
-      { caption: "Di editor halaman, klik tab Settings.", focus: [0, 44, 399, 48], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { ...TABS_LENS, at: [300, 40] } },
+      { caption: "Di editor halaman, klik tab Settings.", focus: [[0, 44, 399, 48], [0, 520, 399, 100]], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { ...TABS_LENS, at: [300, 40] } },
       { caption: "Buka bagian SEO & PAGE IDENTITY.", focus: [0, 92, 399, 808], at: [200, 567], click: true, show: ["seo"], mark: { box: [17, 538, 364, 58], r: 8 }, lens: { src: [0, 240, 399, 140] } },
       { caption: "Isi Judul Tag, misalnya Undangan Rani & Dimas.", at: [190, 371], click: true, show: ["jFocus", "judul", "gTitle"], type: [{ id: "judul", n: 21, box: [48, 361, 160, 22] }], dur: 3.6,
         mark: [34, 350, 315, 42], lens: { src: [26, 318, 340, 80] } },
@@ -1026,15 +1023,15 @@ export const scenes = {
     title: "Membuka tutorial resmi Scalev dari panduan",
     base: [guidePage([{ ...GUIDE_TAB, active: true }])],
     els: {
-      tutFrame: { svg: skeleton(tutFrame), enter: "fade" },
-      tut: { svg: clipCss("tut", 0, CT, 1425, 815) + scr(tutArticle, [330, CT + 270, 770, 600]), enter: "fade" },
-      back: { svg: scr(guidePage([{ ...GUIDE_TAB, active: true }, { ...TUT_TAB }]), [0, 0, 1440, 41], GUIDE_FOCUS), enter: "fade" }
+      tutFrame: { svg: tutFrame, skel: true, enter: "fade" },
+      tut: { svg: clipCss("tut", 0, CT, 1425, 815) + tutArticle, skel: true, enter: "fade" },
+      back: { svg: guidePage([{ ...GUIDE_TAB, active: true }, { ...TUT_TAB }]), skel: true, enter: "fade" }
     },
     steps: [
       { caption: "Tentukan kebutuhanmu: cari kelompoknya, misalnya Domain.", focus: GUIDE_FOCUS, at: [370, CT + 218], dur: 3.4, mark: DOMAIN_H2, lens: { src: [310, CT + 190, 330, 90] } },
-      { caption: "Klik judul tutorial. Halaman tutorial Scalev terbuka.", at: [AZ_LINK[0] + 110, AZ_LINK[1] + 11], click: true, show: ["tutFrame", "tut"], mark: { box: AZ_LINK, r: 3 } },
-      { caption: "Tonton atau baca sampai habis. Ikuti urutannya.", focus: "none", at: [1000, 600], scroll: { id: "tut", dy: 420 }, dur: 3.6 },
-      { caption: "Kembali ke tab panduan NikahKit.", at: [200, 23], click: true, show: ["back"], hide: ["tutFrame", "tut"], mark: { box: [84, 6, 250, 35], r: 8 }, lens: { src: [76, 0, 520, 41] } }
+      { caption: "Klik judul tutorial. Halaman tutorial Scalev terbuka.", focus: [330, CT + 270, 770, 545], at: [AZ_LINK[0] + 110, AZ_LINK[1] + 11], click: true, show: ["tutFrame", "tut"], mark: { box: AZ_LINK, r: 3 } },
+      { caption: "Tonton atau baca sampai habis. Ikuti urutannya.", focus: [330, CT, 770, 815], at: [1000, 600], scroll: { id: "tut", dy: 420 }, dur: 3.6 },
+      { caption: "Kembali ke tab panduan NikahKit.", focus: [[0, 0, 1440, 41], GUIDE_FOCUS], at: [200, 23], click: true, show: ["back"], hide: ["tutFrame", "tut"], mark: { box: [84, 6, 250, 35], r: 8 }, lens: { src: [76, 0, 520, 41] } }
     ]
   },
 
@@ -1043,13 +1040,13 @@ export const scenes = {
     base: [frame(""), rect(0, CT, 1440, 815, { fill: C.white })],
     els: {
       url: text(166, 68, "app.scalev.com", { size: 14, fill: C.crText }),
-      dash: { svg: shifted(scr(scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody(), [0, 0, 256, 900])), enter: "fade", delay: 1.3 },
+      dash: { svg: shifted(scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody()), skel: true, enter: "fade", delay: 1.3 },
       biz: { svg: shifted(bizMenu), enter: "pop", origin: [127, CT + 110] }
     },
     steps: [
       { caption: "Buka app.scalev.com di Chrome komputer, lalu daftar dan masuk.", focus: OMNI.box, at: [300, 63], click: true, show: ["url", "dash"], type: [{ id: "url", n: 14, box: [166, 54, 108, 20] }], dur: 3.8,
         mark: OMNI, lens: { src: [124, 41, 360, 44] } },
-      { caption: "Tanda sudah masuk: menu kiri punya Landing Pages.", at: [110, 234 + CT], mark: { box: [28, 220 + CT, 196, 28], r: 6 }, lens: { src: [8, 180 + CT, 248, 110] } },
+      { caption: "Tanda sudah masuk: menu kiri punya Landing Pages.", focus: [0, CT, 256, 815], at: [110, 234 + CT], mark: { box: [28, 220 + CT, 196, 28], r: 6 }, lens: { src: [8, 180 + CT, 248, 110] } },
       { caption: "Klik nama bisnis. Pilih bisnis untuk merek undanganmu.", at: [127, 86 + CT], click: true, show: ["biz"], dur: 3.6, mark: { box: dn(BIZ), r: 4 }, lens: { src: [16, CT + 112, 290, 240], at: [300, 120] } }
     ]
   },
@@ -1064,10 +1061,10 @@ export const scenes = {
   "scalev-domain-cloudflare": {
     title: "Memindahkan DNS domain ke Cloudflare",
     base: [cfSign],
-    els: { ns: { svg: scr(nsPage, [320, CT + 100, 800, 250]), enter: "fade", delay: -1 }, nsOk: { svg: icon("circle-check", 484, NS_SAVE[1] + 21, 22, "#15a34a"), enter: "pop" } },
+    els: { ns: { svg: nsPage, skel: true, enter: "fade", delay: -1 }, nsOk: { svg: icon("circle-check", 484, NS_SAVE[1] + 21, 22, "#15a34a"), enter: "pop" } },
     steps: [
       { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [500, CT + 80, 440, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [124, 41, 360, 44] } },
-      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: "none", at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
+      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: [320, CT + 100, 800, 250], at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
         mark: { box: NS_SAVE, r: 6 }, lens: { src: [336, CT + 150, 540, 130], at: [200, 360] } }
     ]
   }
