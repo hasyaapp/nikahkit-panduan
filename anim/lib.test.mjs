@@ -42,7 +42,7 @@ const final = (id) => +new RegExp(`\\.e-${id}\\{[^}]*?opacity:(\\d)`).exec(svg)?
 assert.equal(final("later"), 1, "shown later: visible in the final frame");
 assert.equal(final("base"), 0, "hidden in step 2: gone in the final frame");
 assert.equal(final("gone"), 0, "shown then hidden: gone in the final frame");
-assert.ok(!/\.e-c0\{/.test(svg) && svg.includes('<g class="e-c0">') && svg.includes('<g id="c0">'), "never shown or hidden: always visible; does not collide with caption c0");
+assert.ok(!/\.e-c0\{/.test(svg) && svg.includes('<g id="ed-c0" class="e-c0">') && svg.includes('<use href="#ed-c0"/>') && svg.includes('<g id="c0">'), "never shown or hidden: always visible; does not collide with caption c0");
 assert.match(svg, /data-steps="0,3\.2,6\.4"/, "step start times for frames.mjs");
 // A click step changes the screen at the click (1.12 s into the 3.2 s step + 0.1), not at its start: 4.42 / 11.2 s.
 const at = (id, v) => new RegExp(`@keyframes v\\d+\\{[^@]*?39\\.464%\\{opacity:${v}`).test(svg);
@@ -56,7 +56,11 @@ assert.ok(m.includes('<circle cx="196" cy="96" r="10" fill="#b8460d"/>'), "step 
 const tip = /<path d="M([\d.]+) ([\d.]+) L/.exec(m);
 assert.ok(tip && +tip[1] === 264 && +tip[2] >= 96 && +tip[2] <= 124, "arrow tip on the ring edge: " + (tip && tip.slice(1)));
 
-// Lens: 2x the stage view of its source, with the detailed base and the elements of that step.
+// Lens: 2x the stage view of its source, with the detailed base and the elements of that step (by reference, not copies).
 const l = compile(scene({ els: { later: "<rect/>" }, steps: [{ caption: "a", focus: [72, 92, 327, 200], show: ["later"], mark: [100, 120, 80, 30], lens: { src: [72, 92, 300, 120] } }] }));
-assert.ok(/scale\(1\.3333\) translate\(-72 -92\)"><g clip-path="url\(#ln0\)"><use href="#db"\/><g class="e-later">/.test(l), "lens = detailed base + the step's elements at 2x");
+assert.ok(/scale\(1\.3333\) translate\(-72 -92\)"><g clip-path="url\(#ln0\)"><use href="#db"\/><use href="#ed-later"\/>/.test(l), "lens = detailed base + the step's elements at 2x");
+assert.equal((l.match(/<rect\/>/g) || []).length, 1, "each element is drawn once, whatever the number of lenses");
+// skel element: part of the screen, a skeleton everywhere and detailed inside the focus.
+const k = compile(scene({ els: { panel: { svg: text(100, 300, "Nama panggilan", { size: 14 }), skel: true } }, steps: [{ caption: "a", focus: [72, 92, 327, 808] }] }));
+assert.ok(/<g class="e-panel"><rect [^>]*fill="#dde2e8"\/><\/g>/.test(k) && /<g class="fz0" clip-path="url\(#fz0\)"><use href="#db"\/><use href="#ed-panel"\/><\/g>/.test(k), "skel element: bar outside, detail inside the focus");
 console.log("lib.mjs: ok");
