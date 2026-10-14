@@ -6,12 +6,7 @@
   "favicon": "/assets/favicon.png",
   "theme": { "primary": "#b8460d" },
   "content": { "headerDepth": 3, "zoomImages": true },
-  "header": {
-    "showGitHubCard": false,
-    "links": [
-      { "title": "WhatsApp", "href": "https://wa.me/6282175274118?text=Halo%20Nikahin%2C%20saya%20mau%20tanya%20soal%20NikahKit.", "cta": true }
-    ]
-  },
+  "header": { "showGitHubCard": false },
   "sidebar": [
     {
       "group": "Mulai",
