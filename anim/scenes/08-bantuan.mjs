@@ -128,7 +128,8 @@ function helpBody(o) {
   }
   y += 12;
   add("more", text(20, y + 20, "▸", { size: 12, fill: C.action }) + text(34, y + 20, "Lihat isi laporan", { size: 12, fill: C.action })); y += 32;
-  return { svg: s, pos, part, end: y + 16 };
+  // White behind the whole body, so its detailed copy (inside a step's focus) hides the skeleton under it.
+  return { svg: white(0, 154, 398, y + 16 - 154) + s, pos, part, end: y + 16 };
 }
 // Dialog pieces: white sheet, header (title + ×), the body scrolled by dy inside the view (y 154..900), and the Scalev
 // bars over the dialog's column (they hide a body that scrolls up past the header).
@@ -165,7 +166,7 @@ const IZ1 = iz.end - 900; // fully scrolled: Izin domain (CSP) section in view
 // which also turns the check row "Izin domain di tab Security" to OK (help.jsx checks; store.js recheckCsp).
 const izF = helpBody({ csp: IZ_CSP.map((r) => ({ ...r, st: r.st === "failed" ? "exists" : r.st })), cspMsg: true });
 const IZF = izF.end - 900;
-const izCopied = text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
+const izCopied = white(16, iz.pos.cspMsg[1] - IZ1, 351, 18) + text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
 const izDialog = (copied) => dlgSheet + dlgHead + dlgView(iz, IZ1) + (copied ? izCopied : "");
 const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[0][1]];
 // Scalev Security tab (column names from the guide's Izin domain page and Scalev's tutorial; layout not measured).
@@ -744,7 +745,7 @@ export const scenes = {
         note: "Tempel: Ctrl+V" },
       { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", dur: 3.8, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 },
         note: "Jangan kirim PIN, kode staff, atau data klien" },
-      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [[BUB.x - 250, BUB.y - 170, BUB.w + 260, BUB.h + 180], [WC + 1, 838, 1440 - WC - 1, 62]],
+      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [WC + 1, T + 60, 1440 - WC - 1, 900 - T - 60],
         mark: { box: SEND_BOX, r: 21 }, at: SEND, click: true, hide: ["shot", "end", "typed1", "typed2"], show: ["empty", "sent"] }
     ]
   }
