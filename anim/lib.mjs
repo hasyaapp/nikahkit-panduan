@@ -223,6 +223,9 @@ const marksOf = (m) => (!m ? [] : Array.isArray(m) && Array.isArray(m[0]) ? m.ma
 const overlap = (a, b, pad = 0) => a[0] < b[0] + b[2] + pad && b[0] < a[0] + a[2] + pad && a[1] < b[1] + b[3] + pad && b[1] < a[1] + a[3] + pad;
 const hits = (p, b) => p[0] >= b[0] - 2 && p[0] <= b[0] + b[2] + 2 && p[1] >= b[1] - 2 && p[1] <= b[1] + b[3] + 2; // click point on a mark box
 const toStage = (p) => [+(p[0] * FIT).toFixed(1), +(p[1] * FIT).toFixed(1)], boxStage = (b) => [b[0] * FIT, b[1] * FIT, b[2] * FIT, b[3] * FIT];
+// A world coordinate on the nearest whole stage pixel (1.5 world px): a focus zone edge through a pixel blends the
+// detailed and skeleton layers there, which shows as a faint line under a translucent overlay (a dim).
+const onPixel = (v) => Math.round(v / (WORLD.w / W)) * (WORLD.w / W);
 // Where the segment from the centre of rect r towards point p leaves r.
 function edge(r, p) {
   const [cx, cy] = mid(r), dx = p[0] - cx, dy = p[1] - cy;
@@ -457,7 +460,7 @@ export function compile(scene) {
   const world = (a, b) => `<use href="#db"/>${ids.filter((id) => during(a, b)(win[id])).map((id) => `<use href="#ed-${id}"/>`).join("")}`;
   const zones = focusZones(steps, focusOf, t);
   zones.forEach((z, k) => {
-    if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
+    if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${onPixel(x[0])}" y="${onPixel(x[1])}" width="${onPixel(x[0] + x[2]) - onPixel(x[0])}" height="${onPixel(x[1] + x[3]) - onPixel(x[1])}"/>`).join("")}</clipPath>`);
     css.push(t.fade(`.fz${k}`, `fz${k}`, [[z.a, z.b]], { enter: 0.3, exit: 0.3 }));
   });
   const overlays = steps.map((_, i) => stepOverlays(scene, i, t, focusOf[i], (a, b) => world(a, b) + (anim.carets ? '<use href="#carets"/>' : "")));

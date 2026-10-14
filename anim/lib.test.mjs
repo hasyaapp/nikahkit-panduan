@@ -56,8 +56,9 @@ assert.ok(wl.length > 2 && wl.every((l) => tw(l, 14) <= 200) && wl.join("") === 
 const cid = (s) => /clipPath id="(\w+)"/.exec(s)[1];
 assert.ok(cid(clipShape('<path d="M0 0h9v9z"/>', "<a/>")) === cid(clipShape('<path d="M0 0h9v9z"/>', "<b/>")) && cid(clipShape('<path d="M0 0h8v9z"/>')) !== cid(clipShape('<path d="M0 0h9v9z"/>')), "clip id from the shape");
 
-// Focus: the skeleton base under one detailed layer per run of steps with the same focus.
-assert.ok(svg.includes('<clipPath id="fz0"><rect x="72" y="92" width="327" height="808"/></clipPath>'), "step 1-2 focus clip");
+// Focus: the skeleton base under one detailed layer per run of steps with the same focus. Its clip lands on whole
+// stage pixels (y 92 → 91.5 = 61 px), so no half-covered row blends detail and skeleton into a line.
+assert.ok(svg.includes('<clipPath id="fz0"><rect x="72" y="91.5" width="327" height="808.5"/></clipPath>'), "step 1-2 focus clip, on stage pixels");
 assert.ok(/<g class="fz0" clip-path="url\(#fz0\)"><use href="#db"\/>/.test(svg) && /<g class="fz1"><use href="#db"\/>/.test(svg), "two focus layers, the second unclipped (all)");
 assert.ok(svg.indexOf('fill="#dde2e8"') < svg.indexOf('class="fz0"'), "skeleton drawn under the detailed layers");
 
