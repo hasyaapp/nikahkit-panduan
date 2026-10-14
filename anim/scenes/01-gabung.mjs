@@ -20,7 +20,7 @@ import { templatePanel, cardAt, kList, panelBody, panelBg, seg, ACCOUNT } from "
 import { brandClosed, brandOpen, mkCards, BOX, MKY, CARD_X } from "../ui/marketing.mjs";
 import { pvCover, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
-import { ordersDlg, linkOpen, salinBtn, SALIN_W, pasteOpen } from "../ui/pesanan.mjs";
+import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen } from "../ui/pesanan.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;
@@ -435,7 +435,7 @@ export const scenes = {
     ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
     ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing()), -184, 92, [CARD_X.landing, MKY, 134, 167], { lens: [CARD_X.landing - 8, MKY - 8, 150, 245] })],
     ["23. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
-      pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, [28, 534, SALIN_W, 36], { lens: [8, 369, 382, 217] })],
+      pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, SALIN_BOX, { lens: [8, 369, 382, 217] })],
     ["24. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
       pv(clipped(0, 92, 399, 808, ordersDlg + pasteOpen(true)), -184, 92, nkBtnBox(28, 488, "Isi undangan"), { lens: [20, 373, 358, 160] })]
   ]),
