@@ -2,7 +2,7 @@
 // Every scene is the whole real 1440x900 Scalev editor (ui/kit scalevEditor): top bar, tabs, rail, panel and preview. The
 // Template and Konten panels come from ui/editor-panels (measured), the preview from ui/invitation (generic layout).
 import { C, rect, text, line, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
-import { ED, nkHead, nkRail, nkBtn, nkInput, nkAcc, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
+import { ED, nkHead, nkRail, nkBtn, nkInput, nkAcc, nkBadgeBox, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
 import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
 import { ACCOUNT, P, PW, I, IW, hintL, typeIn, col, itemBar, itemBox, quietBlock, panelBg, panelBody, lid, LOCKED, kList, kListAt,
   fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillRsvp, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
@@ -17,8 +17,8 @@ const SIMPAN = ED.simpanBox, FOOT = { box: [0, 851, 71, 49], r: 0 };
 const railM = (n) => ({ box: [0, ED.rail[n][1] - 26, 71, 52], r: 0 });
 const accM = (y) => [88, y, 279, 50];
 const cardM = (x, y) => ({ box: [x, y, 134, 167], r: 8 });
-// Box of a kit nkBadge with its right edge at xr (width as nkBadge draws it), stretched down by `more` for a column of badges.
-const badgeM = (label, xr, y, more = 0) => { const w = tw(label, 10, 500) + 12; return [xr - w, y, w, 18 + more]; };
+// Box of a kit badge with its right edge at xr, stretched down by `more` for a column of badges.
+const badgeM = (label, xr, y, more = 0) => { const [x, , w, h] = nkBadgeBox(xr, y, label, { end: true }); return [x, y, w, h + more]; };
 const FOLIO_C = [301, 420], DASAR_C = [155, 420]; // card centres with the cards at y 337
 const ADAT_CHIP = [206, 277]; // centre of the Adat chip with the default counts
 // The whole editor with a rail tab active (gradients for the photo placeholders first).
