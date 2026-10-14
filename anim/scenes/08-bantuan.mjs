@@ -5,12 +5,13 @@
 // 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (ui/scalev.mjs).
 // WhatsApp Web: tata letak umum, belum diukur.
 import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, wrap, mid, grow, esc, PHONE } from "../lib.mjs";
-import { nkBtn, nkBtnBox, nkH3, chrome, favScalev, scalevEditor, svSimpan, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
+import { nkBtn, nkH3, chrome, favScalev, scalevEditor, svSimpan, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
 import { CHECKS, helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { securityPanel, SECURITY } from "../ui/scalev.mjs";
 import { ACCOUNT, kList } from "../ui/editor-panels.mjs";
 import { MAROON, SERIF, CREAM, PHOTO_DEFS, pvMempelai, secTitle, dock } from "../ui/invitation.mjs";
 import { WA, WA_X, WA_HEAD, waWeb, waFoot, waFootBox, waBubble } from "../ui/whatsapp.mjs";
+import { gate, accountChip, chipW } from "../ui/gate.mjs";
 
 const tr = (dx, dy, ...kids) => group({ transform: `translate(${dx} ${dy})` }, ...kids);
 
@@ -64,20 +65,10 @@ const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz
 // picker = the Add image domain box with the pasted domain as an option). Image Sources starts empty in this example.
 const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PREVIEW + securityPanel(0, o);
 
-// ---- bantuan-cek-gejala: AccessGate ----------------------------------------------------------------------------------
-function gate(lines, o = {}) {
-  let s = rect(0, 92, 398, 808, { fill: C.white }) + text(16, 128, "NikahKit", { size: 16, weight: 700, fill: C.strong }) +
-    (o.chip ? chip(262, 108, ACCOUNT) : "") + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
-  const h = 20 + lines.length * 18, fg = o.warn ? C.warnStrong : C.strong;
-  s += rect(16, 169, 351, h, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + lines.map((l, i) => text(28, 192 + i * 18, l, { size: 12, fill: fg })).join("");
-  return s + (o.buttons ?? "");
-}
-const chip = (x, y, label, warn) => rect(x + 0.5, y + 0.5, 79, 27, { r: 14, fill: warn ? C.warnSoft : C.white, stroke: warn ? "#fde7c7" : C.field }) +
-  icon("circle-user-round", x + 16, y + 14, 14, warn ? C.warn : C.action) + text(x + 27, y + 18, label, { size: 12, weight: 500, fill: warn ? C.warnStrong : C.strong });
-const RECHECK = nkBtnBox(16, 237, "Periksa lagi", { size: 14 });
-const recheckBtn = nkBtn(16, 237, "Periksa lagi", { variant: "quiet", w: RECHECK[2], size: 14 });
-const GATE_SERVER = gate([[{ t: "Server NikahKit tidak terjangkau.", w: 700 }, " Periksa"], ["internet, lalu tekan Periksa lagi."]], { warn: true, buttons: recheckBtn });
-const GATE_MSG = [16, 169, 351, 56];
+// ---- bantuan-cek-gejala: AccessGate (ui/gate.mjs) --------------------------------------------------------------------
+const gServer = gate({ state: "server" });
+const RECHECK = gServer.at.recheck;
+const GATE_MSG = gServer.note;
 const RAIL_TABS = [0, 104, 72, 336];
 
 // ---- bantuan-masa-aktif ------------------------------------------------------------------------------------------------
@@ -88,9 +79,9 @@ const renewNote = (lines, err) => {
 };
 const RN_WARN = renewNote(["Langganan berakhir 5 hari", "lagi."]);
 const RN_ERR = renewNote(["Langganan berakhir. 6 hari", "lagi ucapan, RSVP, dan", "Dashboard berhenti."], true);
-const CHIP = [262, 108, 80, 28];
+const CHIP = [343 - chipW(ACCOUNT), 108, chipW(ACCOUNT), 28]; // the account chip, as the gate places it
 const panelWith = (rn) => rect(72, 154, 327, 746, { fill: C.white }) + kontenBody(rn.h + 12) + rn.svg +
-  rect(262, 108, 81, 29, { fill: C.white }) + chip(262, 108, ACCOUNT, true);
+  rect(CHIP[0] - 2, 107, CHIP[2] + 4, 30, { fill: C.white }) + accountChip(CHIP[0], 108, ACCOUNT, true);
 // Guide timeline (not part of the UI), in the grey preview area left of the invitation.
 const TL = { x: 435, y: 136, w: 256 };
 const TL_ROWS = [["Aktif", "Semua fitur jalan", C.ok], ["7 hari terakhir", "Panel mengingatkan", C.changed], ["Tenggang 7 hari", "Fitur masih jalan", C.warn], ["Habis", "RSVP dan ucapan berhenti", C.danger]];
@@ -100,14 +91,11 @@ const timeline = shadow(TL.x, TL.y, TL.w, 330, 10, 2) + rect(TL.x, TL.y, TL.w, 3
   TL_ROWS.map(([l, sub, c], i) => circle(TL.x + 30, tlY(i) + 10, 8, { fill: c }) + text(TL.x + 50, tlY(i) + 14, l, { size: 14, weight: 600, fill: C.ink }) +
     text(TL.x + 50, tlY(i) + 33, sub, { size: 12, fill: C.faint })).join("");
 const tlBox = (i) => [TL.x + 14, tlY(i) - 6, TL.w - 28, 48];
-const GATE_EXP_BTN = nkBtnBox(16, 237, "Pilih paket", { size: 14 });
-// The gate's message and buttons (169..273); ends at 278, above the Konten text the gate covers (a focus edge through
-// text under it would let a sliver of that text through the anti-aliased edge).
-const GATE_AREA = [0, 154, 399, 124];
-const pilihBtn = nkBtn(16, 237, "Pilih paket", { w: GATE_EXP_BTN[2], size: 14 });
-const GATE_EXPIRED = gate([[{ t: "Langganan NikahKit sudah habis.", w: 700 }, " Undangan tayang"], ["tetap tampil."]], {
-  warn: true, chip: true, buttons: pilihBtn + nkBtn(24 + GATE_EXP_BTN[2], 237, "Periksa lagi", { variant: "quiet", size: 14 })
-});
+const gExpired = gate({ state: "expired", chip: ACCOUNT });
+const GATE_EXP_BTN = gExpired.at.choose;
+// The gate's message and buttons (gate area), ending at 278: above the Konten text the gate covers (a focus edge
+// through text under it lets a sliver of that text through the anti-aliased edge).
+const GATE_AREA = [...gExpired.area.slice(0, 3), 278 - gExpired.area[1]];
 // NikahKit account window (ext/pin.html, editor-akun.png): header, email + Keluar, Paket card, Bisnis Scalev card.
 const AW = { x: 500, y: 261, w: 440 };
 const AW_LIC = wrap("Langganan habis. Undangan tetap tampil, tetapi RSVP dan ucapan berhenti. Pilih paket.", 370, 14);
@@ -474,10 +462,10 @@ export const scenes = {
   "bantuan-cek-gejala": {
     title: "Pola memperbaiki masalah: baca pesan, perbaiki, periksa lagi",
     cursorStart: REST,
-    base: [scalevEditor(0, 0) + PREVIEW + GATE_SERVER],
+    base: [scalevEditor(0, 0) + PREVIEW + gServer.svg],
     els: {
-      recheck: { svg: recheckBtn, skel: true },
-      checking: { svg: gate([[{ t: "Memeriksa akses...", w: 700 }]]), skel: true, enter: "fade" },
+      recheck: { svg: gServer.btn.recheck, skel: true },
+      checking: { svg: gate({ state: "checking" }).svg, skel: true, enter: "fade" },
       ok: { svg: panelKonten(), skel: true, enter: "fade", delay: 0.6 }
     },
     steps: [
@@ -541,8 +529,8 @@ export const scenes = {
     els: {
       warn: { svg: panelWith(RN_WARN), skel: true, enter: "fade", delay: 0.5 },
       err: { svg: panelWith(RN_ERR), skel: true, enter: "fade", delay: 0.5 },
-      expired: { svg: GATE_EXPIRED, skel: true, enter: "fade", delay: 0.5 },
-      pilih: pilihBtn,
+      expired: { svg: gExpired.svg, skel: true, enter: "fade", delay: 0.5 },
+      pilih: gExpired.btn.choose,
       acct: { svg: dim(0, 0, 1440, 900) + accountWindow(), enter: "pop", origin: [AW.x + AW.w / 2, AW.y + 100], delay: 0.1 }
     },
     steps: [
@@ -555,7 +543,7 @@ export const scenes = {
         mark: [{ box: RN_ERR.box }, { box: tlBox(2), r: 8 }],
         hide: ["warn"], show: ["err"], lens: { src: [72, 100, 327, 154], at: [480, 330] } },
       { caption: "Lewat tenggang: RSVP, ucapan, dan Dashboard pasangan berhenti.", dur: 3.6, focus: [tlBox(3), GATE_AREA, grow(CHIP, 4)],
-        mark: [{ box: GATE_MSG }, { box: tlBox(3), r: 8 }], hide: ["err"],
+        mark: [{ box: gExpired.note }, { box: tlBox(3), r: 8 }], hide: ["err"],
         show: ["expired", "pilih"], lens: { src: GATE_AREA, zoom: 1.6, at: [480, 330] } },
       { caption: "Klik Pilih paket, lalu bayar. RSVP dan ucapan jalan lagi.", dur: 4, focus: GATE_AREA, mark: GATE_EXP_BTN, at: mid(GATE_EXP_BTN), click: true,
         press: "pilih", show: ["acct"], lens: { src: GATE_AREA, zoom: 1.6, at: [480, 440] } }
