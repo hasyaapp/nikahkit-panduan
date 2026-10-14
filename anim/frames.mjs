@@ -1,6 +1,6 @@
-// node anim/frames.mjs <name> [outDir]  →  one PNG per step (mid-step) + the reduced-motion final frame.
-// Opens docs/assets/anim/<name>.svg in headless Chrome, pauses every animation at the sampled time.
-// Needs Chrome for Testing (CHROME env var to override the path). Build first: node anim/build.mjs.
+// node anim/frames.mjs <name> [outDir]  →  one PNG per step + the reduced-motion final frame.
+// Opens docs/assets/anim/<name>.svg in headless Chrome, pauses every animation at the sampled time: FRAC of each step
+// (default 0.8; FRAC=0.3 shows a click step's ring, which leaves just after the click). CHROME overrides the browser.
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -43,7 +43,7 @@ const shoot = async (label, expr) => {
 };
 for (let i = 0; i < steps; i++) {
   const end = i + 1 < steps ? starts[i + 1] : total - 0.5;
-  await shoot(String(i + 1), `document.getAnimations().forEach(a=>{a.pause();a.currentTime=${Math.round((starts[i] + (end - starts[i]) * 0.8) * 1000)}})`);
+  await shoot(String(i + 1), `document.getAnimations().forEach(a=>{a.pause();a.currentTime=${Math.round((starts[i] + (end - starts[i]) * (+process.env.FRAC || 0.8)) * 1000)}})`);
 }
 await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
 await shoot("diam", "0");

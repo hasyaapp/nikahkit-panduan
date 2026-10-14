@@ -1,28 +1,34 @@
-// Animated SVG walkthroughs for the panduan (v2).
+// Animated SVG walkthroughs for the panduan (v4: one full desktop screen, focus + skeleton, precise marks, lens).
 //
-// A scene is drawn in WORLD coordinates = real screen pixels (e.g. a 1440x985 Chrome window with the Scalev editor,
-// or a 390x844 phone screen), so every button keeps its real size and nothing is squashed. The whole world is scaled
-// once to fit the stage (960x536 above the caption bar); there is no camera movement.
-// Measurements come from the real UIs (Scalev editor, NikahKit panel, chrome://extensions, couple dashboard),
-// captured 14 Okt 2026; see the constants below. Scenes import parts from here and compose them.
+// Every scene is ONE desktop screen of 1440x900 real pixels (the size the Scalev editor was measured at), always shown
+// whole on a 960x600 stage (scale 2/3) with the caption bar below: no crop, no camera movement. Pages that live on a
+// phone (couple dashboard, guest invitation, staff) are a plain 390x844 phone screen at PHONE in that desktop
+// (phoneDesk). Per step only what the step discusses is drawn in detail (`focus`); the rest of the base is shown as a
+// skeleton of itself (text = bars of its width, colours = light greys), so every block keeps its real place and size.
+// The element to act on gets a precise ring (`mark`) with the step number, and a straight arrow from a 2x lens or a
+// note to the ring's nearest edge. Measurements come from the real UIs (captured 14 Okt 2026).
 //
 // Scene shape:
-//   { title, desc?, world: { x?, y?, w, h }, bg?, base: [svg], els: { id: svg | { svg, enter, origin } },
-//     steps: [{ caption, dur?, at?, click?, press?, show?, hide?, type?, scroll?, hover? }] }
-//   world: the fixed part of the drawing that fills the stage (crop to the panel or phone you explain; text should
-//          stay >= 9 px on stage, i.e. world text size x scale, where scale = min(960 / w, 536 / h)).
-//   at:     [x, y] world point the pointer moves to (arrives at 35% of the step, at least 0.6 s).
-//   click:  true = ripple at `at`; the step's show/hide/type then happen at the click instead of the step start.
-//   press:  element id that dips to 97% when clicked (buttons). hover: element id shown while the pointer is there.
-//   show/hide: element ids. enter: "fade" | "rise" (8px up) | "pop" (scale .96 from origin) | "slide" (from below);
-//          delay: seconds after the step's moment (its start, or its click); stagger list rows 0.04-0.08 apart.
-//   type:   [{ id, n }] reveals that element left-to-right in n character steps (typing), with a caret.
-//   scroll: { id, dy } moves element id (a scrolling list/panel) by dy world px during the step (ease-in-out).
+//   { title, desc?, bg?, base: [svg], els: { id: svg | { svg, enter, origin, delay } }, cursorStart?: [x, y],
+//     steps: [{ caption, dur?, focus, mark?, lens?, note?, at?, click?, press?, show?, hide?, type?, scroll?, hover? }] }
+//   base:  the whole 1440x900 screen in detail; its skeleton is derived (skeleton()). els are drawn as given, above the
+//          base: wrap an element in skeleton() when it should look greyed (e.g. a panel state outside the focus).
+//   focus: [x, y, w, h] | [[x, y, w, h], ...] | "all" | "none": base parts drawn in detail. Later steps inherit it; the
+//          first step must set it.
+//   mark:  [x, y, w, h] | { box: [x, y, w, h], r } | [...]: exact world bounds and corner radius (default 4) of the
+//          element to act on. Stage ring: 2.5 px, 4 px outside, radius r*2/3 + 4, step number on its top-left corner.
+//   lens:  { src: [x, y, w, h], at?: [sx, sy], zoom? }: magnifier of world rect src at `zoom` (default 2) x the stage,
+//          placed at stage point `at` or beside the mark (clear of it, the focus and the pointer), with an arrow to
+//          the ring. Use it when focused text is under ~20 px in the world (it would be under ~11 px in the docs).
+//   note:  "text" | { text, at }: a pill placed like a lens, with an arrow to the ring (steps without a lens).
+//   at/click/press/show/hide/type/scroll/hover: pointer target (world px), ripple, press dip, visibility, typing,
+//          scroll, hover; on a click step show/hide/type happen at the click.
 // Reduced motion: the final state of every element, no pointer.
 
 import { ICONS } from "../../nikahkit/src/icons.js";
 
-const MAX_W = 960, MAX_VH = 836; // largest stage (the caption bar goes below it)
+export const WORLD = { w: 1440, h: 900 }, PHONE = { x: 525, y: 28, w: 390, h: 844 };
+const W = 960, VH = 600, FIT = W / WORLD.w; // stage (caption bar below), world -> stage scale
 const EASE_OUT = "cubic-bezier(0.23,1,0.32,1)", EASE_IN_OUT = "cubic-bezier(0.77,0,0.175,1)";
 const FONT = `Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif`;
 
@@ -102,9 +108,11 @@ export const iconX = (name, cx, cy, size = 20, color = C.text, sw = 2) => {
 
 // ---- NikahKit panel widgets (nikahkit/src/ui/base.css) --------------------------------------------------------------
 // Button: variant "primary" (action blue), "ghost" (white, blue text+border), "quiet" (white, grey line), "danger".
+// nkBtnBox gives the exact [x, y, w, h] nkBtn draws, for a step's mark (radius 4).
+export const nkBtnBox = (x, y, label, o = {}) => [x, y, o.w ?? tw(label, o.size ?? 12, 500) + 24 + (o.icon ? 20 : 0), o.h ?? 36];
 export function nkBtn(x, y, label, o = {}) {
-  const v = o.variant ?? "primary", h = o.h ?? 36, ic = o.icon, size = o.size ?? 12;
-  const w = o.w ?? tw(label, size, 500) + 24 + (ic ? 20 : 0);
+  const v = o.variant ?? "primary", ic = o.icon, size = o.size ?? 12;
+  const [, , w, h] = nkBtnBox(x, y, label, o);
   const fill = v === "primary" ? C.action : v === "danger" ? C.danger : C.surface;
   const stroke = v === "quiet" ? C.line : v === "danger" ? C.danger : C.action;
   const fg = v === "primary" || v === "danger" ? C.white : v === "quiet" ? C.strong : C.action;
@@ -260,45 +268,97 @@ export function scalevApp(x, y, o = {}) {
 }
 
 // ---- Guide stage pieces ---------------------------------------------------------------------------------------------
-// Callout pinned at a world point (drawn in world space, scales with the camera).
-export const note = (x, y, label, tx, ty, o = {}) => { const w = o.w ?? tw(label, 14, 600) + 28; return line(x + w / 2, y + 32, tx, ty, { stroke: C.accent, sw: 2 }) + circle(tx, ty, 4, { fill: C.accent }) + rect(x, y, w, 32, { r: 16, fill: C.accent }) + text(x + w / 2, y + 21, label, { size: 14, weight: 600, fill: C.white, anchor: "middle" }); };
-// Focus ring around a world rect.
-export const ring = (x, y, w, h, o = {}) => rect(x - 4, y - 4, w + 8, h + 8, { r: o.r ?? 8, stroke: o.color ?? C.accent, sw: o.sw ?? 3 });
 // Dark toast (NikahKit/Scalev snackbar).
 export const toast = (x, y, label, o = {}) => { const w = o.w ?? tw(label, 14) + 40 + (o.action ? tw(o.action, 14, 600) + 24 : 0); return rect(x, y, w, 44, { r: 6, fill: "#323232" }) + text(x + 18, y + 27, label, { size: 14, fill: C.white }) + (o.action ? text(x + w - 18, y + 27, o.action, { size: 14, weight: 600, fill: "#7fd3f5", anchor: "end" }) : ""); };
 // Dimmed backdrop over a world rect (for dialogs).
 export const dim = (x, y, w, h) => rect(x, y, w, h, { fill: "rgba(15,22,30,.42)" });
+// A phone page in the desktop canvas: the plain screen (no device frame) at PHONE, a generic desktop around it (top bar,
+// side cards) that steps leave as skeleton. content: markup drawn at PHONE coordinates, clipped to the screen.
+export const phoneDesk = (content, o = {}) => rect(0, 0, WORLD.w, WORLD.h, { fill: o.bg ?? "#eef1f5" }) +
+  rect(0, 0, WORLD.w, 56, { fill: C.white }) + rect(32, 18, 180, 20, { r: 10, fill: "#c9d1db" }) + rect(1180, 16, 228, 24, { r: 12, fill: "#c9d1db" }) +
+  [0, 1, 2].map((k) => rect(48, 96 + k * 260, 400, 228, { r: 12, fill: C.white }) + rect(992, 96 + k * 260, 400, 228, { r: 12, fill: C.white })).join("") +
+  shadow(PHONE.x, PHONE.y, PHONE.w, PHONE.h, 12, 3) + rect(PHONE.x, PHONE.y, PHONE.w, PHONE.h, { r: 12, fill: o.screen ?? C.white }) +
+  clipped(PHONE.x, PHONE.y, PHONE.w, PHONE.h, content);
+
+// ---- Skeleton -------------------------------------------------------------------------------------------------------
+// The same drawing as a skeleton: every text becomes a rounded bar of its measured width, colours become light greys
+// (alpha kept, near-white surfaces kept), so each block keeps its real place and size. A pure string transform, so it
+// works on primitives and raw markup alike; compile() applies it to the base outside the step's focus.
+const SK = { bar: "#dde2e8", fill: "#eceff3", line: "#e0e4e9" };
+const lum = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+function skColor(kind, v) {
+  if (v === "none" || v === "transparent" || v === "currentColor") return v;
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(v);
+  if (hex) { const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1], [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); return lum(r, g, b) > 238 ? v : kind === "fill" ? SK.fill : SK.line; }
+  const rgba = /^rgba?\(([^)]*)\)$/.exec(v);
+  if (rgba) { const [r, g, b, a = 1] = rgba[1].split(",").map(parseFloat); return lum(r, g, b) > 238 ? v : `rgba(214,219,226,${a})`; }
+  return v === "white" ? v : kind === "fill" ? SK.fill : SK.line;
+}
+const attr = (a, k) => new RegExp(`(?:^|\\s)${k}="([^"]*)"`).exec(a)?.[1];
+const unesc = (s) => s.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+function textBars(attrs, body) {
+  const x0 = +(attr(attrs, "x") ?? 0), y0 = +(attr(attrs, "y") ?? 0), size = +(attr(attrs, "font-size") ?? 14), weight = +(attr(attrs, "font-weight") ?? 400), anchor = attr(attrs, "text-anchor");
+  const spans = [...body.matchAll(/<tspan\b([^>]*)>([\s\S]*?)<\/tspan>/g)];
+  let y = y0;
+  const lines = spans.length ? spans.map(([, a, t]) => [+(attr(a, "x") ?? x0), (y += +(attr(a, "dy") ?? 0)), t]) : [[x0, y0, body]];
+  const pinned = !spans.length && attr(attrs, "textLength"); // a measured line width wins over the tw() estimate
+  return lines.map(([x, ly, t]) => {
+    const s = unesc(t).trim();
+    if (!s) return "";
+    const w = pinned ? +pinned : tw(s, size, weight), h = Math.max(3, +(size * 0.5).toFixed(1)), bx = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
+    return `<rect x="${+bx.toFixed(1)}" y="${+(ly - size * 0.62).toFixed(1)}" width="${w}" height="${h}" rx="${h / 2}" fill="${SK.bar}"/>`;
+  }).join("");
+}
+export const skeleton = (svg) => String(svg)
+  .replace(/\b(fill|stroke)="([^"]+)"/g, (m, k, v) => `${k}="${skColor(k, v)}"`)
+  .replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, a, b) => textBars(a, b));
 
 // ---- Compiler -------------------------------------------------------------------------------------------------------
 const POINTER = `<path d="M0 0 L0 20 L5.5 15 L9.5 24 L13 22.5 L9 13.8 L16.5 13.8 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>`;
+const KEYS = new Set(["caption", "dur", "focus", "mark", "lens", "note", "at", "click", "press", "show", "hide", "type", "scroll", "hover"]);
+const rectsOf = (f) => (f === "all" || f === "none" ? [] : Array.isArray(f[0]) ? f : [f]);
+const marksOf = (m) => (!m ? [] : Array.isArray(m) && Array.isArray(m[0]) ? m.map((b) => ({ box: b })) : Array.isArray(m) && typeof m[0] === "object" ? m : [Array.isArray(m) ? { box: m } : m]);
+const overlap = (a, b, pad = 0) => a[0] < b[0] + b[2] + pad && b[0] < a[0] + a[2] + pad && a[1] < b[1] + b[3] + pad && b[1] < a[1] + a[3] + pad;
+// Where the segment from the centre of rect r towards point p leaves r.
+function edge(r, p) {
+  const cx = r[0] + r[2] / 2, cy = r[1] + r[3] / 2, dx = p[0] - cx, dy = p[1] - cy;
+  const k = Math.min(dx ? r[2] / 2 / Math.abs(dx) : Infinity, dy ? r[3] / 2 / Math.abs(dy) : Infinity);
+  return [cx + dx * k, cy + dy * k];
+}
 export function compile(scene) {
   const steps = scene.steps;
   if (!steps?.length) throw new Error(`${scene.title}: tanpa langkah`);
-  const world = scene.world ?? { w: MAX_W, h: MAX_VH };
-  const els = Object.fromEntries(Object.entries(scene.els ?? {}).map(([id, v]) => [id, typeof v === "string" ? { svg: v } : v]));
+  if (scene.world) throw new Error(`${scene.title}: "world" dihapus; kanvas selalu satu layar ${WORLD.w}x${WORLD.h}`);
+  if (!Array.isArray(scene.base)) throw new Error(`${scene.title}: base harus daftar svg layar penuh`);
+  if (steps[0].focus === undefined) throw new Error(`${scene.title}: langkah 1 harus punya focus`);
+  const els = Object.fromEntries(Object.entries(scene.els ?? {}).map(([id, v]) => [id, typeof v === "string" ? { svg: v } : { ...v }]));
   for (const id of Object.keys(els)) if (!/^[A-Za-z][\w-]*$/.test(id)) throw new Error(`${scene.title}: id "${id}" harus diawali huruf`);
   const durs = steps.map((s) => s.dur ?? 3.2), total = +(durs.reduce((a, b) => a + b, 0) + 1.6).toFixed(2);
-  const start = durs.map((_, i) => +durs.slice(0, i).reduce((a, b) => a + b, 0).toFixed(3));
+  const start = durs.map((_, i) => +durs.slice(0, i).reduce((a, b) => a + b, 0).toFixed(3)), end = durs.map((d, i) => start[i] + d);
   const pct = (t) => +Math.max(0, Math.min(100, (100 * t) / total)).toFixed(3);
-  const css = [];
-  // Static view: the stage takes the world rect's own shape (x, y default 0), scaled to fit MAX_W x MAX_VH, so a phone
-  // crop becomes a tall narrow image and an editor crop a wide one; nothing is letterboxed and nothing moves.
-  const wx = world.x ?? 0, wy = world.y ?? 0;
-  const fit = Math.min(MAX_W / world.w, MAX_VH / world.h), W = Math.round(world.w * fit), VH = Math.round(world.h * fit);
-  const fx = -wx * fit, fy = -wy * fit;
-  const toStage = (p) => [+(fx + p[0] * fit).toFixed(1), +(fy + p[1] * fit).toFixed(1)];
-  // Caption bar: captions wrap to the stage width.
+  const css = [], defs = [];
+  const S = FIT, toStage = (p) => [+(p[0] * S).toFixed(1), +(p[1] * S).toFixed(1)], boxStage = (b) => [b[0] * S, b[1] * S, b[2] * S, b[3] * S];
   const capLines = steps.map((s) => wrap(s.caption ?? "", W - 80, 16, 500));
   const CAP = 24 + 22 * Math.max(...capLines.map((l) => l.length)), H = VH + CAP;
-  // Timing: the pointer reaches `at` at hit[i]; on a click step everything the step changes (show, hide, type, press)
-  // happens at the click, otherwise at the step start.
+  // Timing: the pointer reaches `at` at hit[i]; on a click step everything the step changes happens at the click.
   const MOVE = 0.6;
   const hit = durs.map((d, i) => start[i] + Math.max(MOVE, d * 0.35));
   const act = steps.map((s, i) => (s.click && s.at ? hit[i] + 0.1 : start[i]));
-  // Visibility windows in seconds: [from, to]; from null = visible from the start, to null = stays visible.
+  // One opacity window per [from, to] (seconds; null = from the start / to the end), looping like the rest.
+  const fadeRule = (sel, k, w, on = "opacity:1", offS = "opacity:0", enter = 0.26, exit = 0.16) => {
+    const startsOn = w[0][0] === null, endsOn = w.at(-1)[1] === null, kf = [`0%{${startsOn ? on : offS}}`];
+    for (const [a, b] of w) {
+      if (a !== null) kf.push(`${pct(a)}%{${offS};animation-timing-function:${EASE_OUT}}`, `${pct(a + enter)}%{${on}}`);
+      if (b !== null) kf.push(`${pct(b)}%{${on};animation-timing-function:${EASE_OUT}}`, `${pct(b + exit)}%{${offS}}`);
+    }
+    kf.push(`${pct(total - 0.45)}%{${endsOn ? on : offS}}`, `100%{${startsOn ? on : offS}}`);
+    return `${sel}{${endsOn ? on : offS};animation:${k} ${total}s infinite}@keyframes ${k}{${dedupe(kf)}}`;
+  };
+  // Element visibility windows.
   const win = {};
   const need = (i, kind, id) => { if (!els[id]) throw new Error(`${scene.title}: langkah ${i + 1} ${kind} "${id}" tidak ada`); };
-  const KEYS = new Set(["caption", "dur", "at", "click", "press", "show", "hide", "type", "scroll", "hover"]);
+  let focus = steps[0].focus;
+  const focusOf = steps.map((s) => (focus = s.focus ?? focus));
   steps.forEach((s, i) => {
     for (const k of Object.keys(s)) if (!KEYS.has(k)) throw new Error(`${scene.title}: langkah ${i + 1} kunci "${k}" tidak dikenal`);
     for (const id of s.show ?? []) { need(i, "show", id); (win[id] ??= []).push([act[i] + (els[id].delay ?? 0), null]); }
@@ -308,33 +368,22 @@ export function compile(scene) {
     }
     for (const t of s.type ?? []) need(i, "type", t.id ?? t);
     if (s.press) need(i, "press", s.press);
-    if (s.hover) { need(i, "hover", s.hover); (win[s.hover] ??= []).push([start[i] + durs[i] * 0.3, start[i] + durs[i]]); }
+    if (s.hover) { need(i, "hover", s.hover); (win[s.hover] ??= []).push([start[i] + durs[i] * 0.3, end[i]]); }
     if (s.scroll) need(i, "scroll", s.scroll.id);
+    if (s.lens && !Array.isArray(s.lens.src)) throw new Error(`${scene.title}: langkah ${i + 1} lens butuh src [x, y, w, h]`);
+    // Every click lands on a marked element: the pointer target must sit inside one of the step's mark boxes.
+    if (s.click && s.at && !marksOf(s.mark).some(({ box: b }) => s.at[0] >= b[0] - 2 && s.at[0] <= b[0] + b[2] + 2 && s.at[1] >= b[1] - 2 && s.at[1] <= b[1] + b[3] + 2))
+      throw new Error(`${scene.title}: langkah ${i + 1} klik di [${s.at}] tidak berada di dalam mark`);
   });
-  const ENTER = 0.26, EXIT = 0.16;
-  const off = (el) => {
-    const e = el.enter ?? "rise";
-    if (e === "fade") return "opacity:0";
-    if (e === "pop") return "opacity:0;transform:scale(.96)";
-    if (e === "slide") return "opacity:0;transform:translateY(24px)";
-    return "opacity:0;transform:translateY(8px)";
-  };
+  const off = (el) => ({ fade: "opacity:0", pop: "opacity:0;transform:scale(.96)", slide: "opacity:0;transform:translateY(24px)" })[el.enter ?? "rise"] ?? "opacity:0;transform:translateY(8px)";
   const onState = (el) => ((el.enter ?? "rise") === "fade" ? "opacity:1" : "opacity:1;transform:none");
+  // Element rules use classes, so a copy of an element (inside a lens) animates exactly like the element itself.
   Object.entries(els).forEach(([id, el], k) => {
-    const w = win[id];
-    if (!w) return;
-    const kf = [], startsOn = w[0][0] === null, endsOn = w.at(-1)[1] === null;
-    kf.push(`0%{${startsOn ? onState(el) : off(el)}}`);
-    for (const [a, b] of w) {
-      if (a !== null) kf.push(`${pct(a)}%{${off(el)};animation-timing-function:${EASE_OUT}}`, `${pct(a + ENTER)}%{${onState(el)}}`);
-      if (b !== null) kf.push(`${pct(b)}%{${onState(el)};animation-timing-function:${EASE_OUT}}`, `${pct(b + EXIT)}%{${off(el)}}`);
-    }
-    kf.push(`${pct(total - 0.45)}%{${endsOn ? onState(el) : off(el)}}`, `100%{${startsOn ? onState(el) : off(el)}}`);
+    if (!win[id]) return;
     const origin = el.origin ? `transform-origin:${el.origin[0]}px ${el.origin[1]}px;` : "transform-box:fill-box;transform-origin:center;";
-    css.push(`#e-${id}{${origin}${endsOn ? onState(el) : off(el)};animation:v${k} ${total}s infinite}@keyframes v${k}{${dedupe(kf)}}`);
+    css.push(fadeRule(`.e-${id}`, `v${k}`, win[id], onState(el), off(el)).replace(`.e-${id}{`, `.e-${id}{${origin}`));
   });
   // Typing: clip reveal in character steps + caret, starting at the click (or 0.35 s into the step).
-  const defs = [];
   steps.forEach((s, i) => (s.type ?? []).forEach((t, j) => {
     const id = t.id ?? t, n = t.n ?? 16, cid = `ty${i}_${j}`, t0 = s.click && s.at ? act[i] : start[i] + 0.35, t1 = Math.min(start[i] + durs[i] * 0.85, t0 + n * 0.07);
     const [bx, by, bw, bh] = t.box ?? [-2000, -2000, 8000, 8000]; // box: [x, y, w, h] of the typed text (adds a caret)
@@ -360,6 +409,73 @@ export function compile(scene) {
     els[id].svg = `<g class="pr${i}">${els[id].svg}</g>`;
     css.push(`.pr${i}{transform-box:fill-box;transform-origin:center;animation:pr${i} ${total}s infinite}@keyframes pr${i}{0%,${pct(t)}%{transform:none;animation-timing-function:${EASE_OUT}}${pct(t + 0.08)}%{transform:scale(.97)}${pct(t + 0.24)}%,100%{transform:none}}`);
   });
+  const carets = Object.values(els).filter((e) => e.caret).map((e, k) => {
+    const [x, y, w, h] = e.caret.box;
+    css.push(`.ca${k}{opacity:0;animation:ca${k} ${total}s infinite}@keyframes ca${k}{0%,${pct(e.caret.t0)}%{opacity:0;transform:translateX(0)}${pct(e.caret.t0) + 0.001}%{opacity:1;transform:translateX(0);animation-timing-function:steps(${Math.max(2, Math.round((e.caret.t1 - e.caret.t0) / 0.07))},end)}${pct(e.caret.t1)}%{opacity:1;transform:translateX(${w}px)}${pct(e.caret.t1 + 0.5)}%{opacity:0;transform:translateX(${w}px)}100%{opacity:0;transform:translateX(${w}px)}}`);
+    return { svg: `<rect class="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`, t: [e.caret.t0, e.caret.t1 + 0.5] };
+  });
+  const elMarkup = (keep) => Object.entries(els).filter(([id]) => keep(win[id])).map(([id, e]) => `<g class="e-${id}">${e.svg}</g>`).join("\n");
+  const during = (a, b) => (w) => !w || w.some(([x, y]) => (x ?? -1) < b && (y ?? Infinity) > a);
+  // Focus: one layer per run of steps with the same focus, showing the detailed base inside its rects over the skeleton.
+  const runs = [];
+  focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
+  const layers = runs.filter((r) => r.f !== "none").map((r, k) => {
+    const rects = rectsOf(r.f);
+    if (rects.length) defs.push(`<clipPath id="fz${k}">${rects.map((b) => `<rect x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/>`).join("")}</clipPath>`);
+    css.push(fadeRule(`.fz${k}`, `fz${k}`, [[r.from === 0 ? null : start[r.from], r.to === steps.length - 1 ? null : start[r.to + 1]]], "opacity:1", "opacity:0", 0.3, 0.3));
+    return `<g class="fz${k}"${rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="#db"/></g>`;
+  });
+  // Marks, notes and lenses on the stage (constant size, aligned to world pixels).
+  const overlays = [];
+  steps.forEach((s, i) => {
+    const w = [[start[i] + 0.15, i === steps.length - 1 ? null : end[i]]];
+    const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * S + 4 }; });
+    const lensOf = s.lens && { src: s.lens.src, zoom: s.lens.zoom ?? 2 }, note = typeof s.note === "string" ? { text: s.note } : s.note;
+    let box = null, inner = "", arrow = "";
+    if (lensOf) { const z = lensOf.zoom * S; box = [0, 0, lensOf.src[2] * z, lensOf.src[3] * z]; }
+    else if (note) box = [0, 0, tw(note.text, 15, 600) + 32, 36];
+    if (box) {
+      const target = marks[0]?.box ?? boxStage(lensOf ? lensOf.src : [0, 0, 0, 0]), avoid = [target, ...rectsOf(focusOf[i]).map(boxStage)];
+      if (s.at) avoid.push([...toStage(s.at).map((v) => v - 12), 24, 24]);
+      const place = s.lens?.at ?? note?.at; // stage point; otherwise beside the mark, clear of it, the focus and the pointer
+      const fits = (p) => p[0] >= 12 && p[1] >= 12 && p[0] + box[2] <= W - 12 && p[1] + box[3] <= VH - 12;
+      const tc = [target[0] + target[2] / 2, target[1] + target[3] / 2], gap = 44;
+      const cands = [[target[0] + target[2] + gap, tc[1] - box[3] / 2], [target[0] - gap - box[2], tc[1] - box[3] / 2], [tc[0] - box[2] / 2, target[1] + target[3] + gap], [tc[0] - box[2] / 2, target[1] - gap - box[3]]]
+        .map(([x, y]) => [Math.min(Math.max(x, 12), W - 12 - box[2]), Math.min(Math.max(y, 12), VH - 12 - box[3])]);
+      const free = (p) => fits(p) && !avoid.some((a, k) => overlap([p[0], p[1], box[2], box[3]], a, k ? 0 : 12));
+      const pos = place ?? cands.find(free) ?? cands.find((p) => fits(p) && !overlap([p[0], p[1], box[2], box[3]], target, 12)) ?? cands[0];
+      if (box[2] > W - 24 || box[3] > VH - 24) throw new Error(`${scene.title}: langkah ${i + 1} lens/note lebih besar dari panggung`);
+      box = [pos[0], pos[1], box[2], box[3]];
+      if (marks.some((mk) => overlap(box, mk.box))) throw new Error(`${scene.title}: langkah ${i + 1} lens/note menutupi mark`);
+      if (lensOf) {
+        const [sx, sy, sw, sh] = lensOf.src, z = lensOf.zoom * S, k = `ln${i}`, keep = during(start[i], end[i]);
+        defs.push(`<clipPath id="${k}"><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"/></clipPath>`);
+        inner = rect(box[0] - 1, box[1] + 3, box[2] + 2, box[3], { r: 11, fill: "rgba(16,24,40,.14)" }) + rect(box[0], box[1], box[2], box[3], { r: 10, fill: scene.bg ?? C.white }) +
+          `<g clip-path="url(#lc${i})"><g transform="translate(${+box[0].toFixed(2)} ${+box[1].toFixed(2)}) scale(${+z.toFixed(4)}) translate(${-sx} ${-sy})"><g clip-path="url(#${k})"><use href="#db"/>${elMarkup(keep)}${carets.filter((c) => keep([c.t])).map((c) => c.svg).join("")}</g></g></g>` +
+          rect(box[0], box[1], box[2], box[3], { r: 10, stroke: C.accent, sw: 2.5 });
+        defs.push(`<clipPath id="lc${i}"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}" rx="10"/></clipPath>`);
+      } else inner = rect(box[0], box[1], box[2], box[3], { r: 18, fill: C.accent }) + text(box[0] + box[2] / 2, box[1] + 23, note.text, { size: 15, weight: 600, fill: C.white, anchor: "middle" });
+      if (marks.length || lensOf) { // straight arrow from the lens or note to the nearest edge of the ring
+        const t = marks[0]?.box ?? target, b = [box[0] + box[2] / 2, box[1] + box[3] / 2], tcc = [t[0] + t[2] / 2, t[1] + t[3] / 2];
+        const p = edge(box, tcc), q = edge(t, b), ang = Math.atan2(q[1] - p[1], q[0] - p[0]), L = 11, A = 0.45;
+        const head = [[q[0], q[1]], [q[0] - L * Math.cos(ang - A), q[1] - L * Math.sin(ang - A)], [q[0] - L * Math.cos(ang + A), q[1] - L * Math.sin(ang + A)]];
+        const back = [q[0] - (L - 2) * Math.cos(ang), q[1] - (L - 2) * Math.sin(ang)];
+        arrow = line(p[0], p[1], back[0], back[1], { stroke: C.accent, sw: 2.5, cap: "round" }) + `<path d="M${head.map((v) => v.map((n) => +n.toFixed(1)).join(" ")).join(" L")} Z" fill="${C.accent}"/>`;
+      }
+    }
+    // Step number on the ring's top-left corner, kept fully on the stage for rings at the stage edge (rail, tab row).
+    const rings = marks.map((m) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
+      return rect(m.box[0], m.box[1], m.box[2], m.box[3], { r: m.r, stroke: C.accent, sw: 2.5 }) +
+        circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(i + 1), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); }).join("");
+    // The lens or note stays for the whole step (it shows the result); on a click step the ring and its arrow leave
+    // just after the click, so they never float over a screen the click has changed.
+    if (inner) { css.push(fadeRule(`.ov${i}`, `ov${i}`, w, "opacity:1", "opacity:0", 0.22, 0.14)); overlays.push(`<g class="ov${i}">${inner}</g>`); }
+    if (rings || arrow) {
+      const mw = s.click && s.at ? [[start[i] + 0.15, act[i] + 0.35]] : w;
+      css.push(fadeRule(`.om${i}`, `om${i}`, mw, "opacity:1", "opacity:0", 0.22, 0.2));
+      overlays.push(`<g class="om${i}">${arrow}${rings}</g>`);
+    }
+  });
   // Pointer in stage space (constant size).
   const rest = scene.cursorStart ? toStage(scene.cursorStart) : [W - 60, VH - 50];
   const pts = []; let cur = rest;
@@ -379,31 +495,28 @@ export function compile(scene) {
   const caps = capLines.map((ls, i) => `<g id="c${i}">${para(64, VH + CAP / 2 + 6 - 11 * (ls.length - 1), ls, { size: 16, fill: C.white, weight: 500, lh: 22 })}</g>`).join("");
   steps.forEach((s, i) => {
     if (!s.caption || s.caption.length > 80) throw new Error(`${scene.title}: langkah ${i + 1} caption kosong atau lebih dari 80 huruf`);
-    const a = start[i], b = a + durs[i], last = i === steps.length - 1, end = last ? total - 0.45 : b;
-    css.push(`#c${i},#n${i}{opacity:${last ? 1 : 0};animation:c${i} ${total}s infinite}@keyframes c${i}{${dedupe([`0%{opacity:${i === 0 ? 1 : 0}}`, i ? `${pct(a)}%{opacity:0}` : "", i ? `${pct(a + 0.2)}%{opacity:1}` : "", `${pct(end)}%{opacity:1}`, `${pct(end + 0.2)}%{opacity:0}`, i === 0 ? `${pct(total - 0.05)}%{opacity:0}` : "", `100%{opacity:${i === 0 ? 1 : 0}}`].filter(Boolean))}}`);
+    const a = start[i], last = i === steps.length - 1, e = last ? total - 0.45 : end[i];
+    css.push(`#c${i},#n${i}{opacity:${last ? 1 : 0};animation:c${i} ${total}s infinite}@keyframes c${i}{${dedupe([`0%{opacity:${i === 0 ? 1 : 0}}`, i ? `${pct(a)}%{opacity:0}` : "", i ? `${pct(a + 0.2)}%{opacity:1}` : "", `${pct(e)}%{opacity:1}`, `${pct(e + 0.2)}%{opacity:0}`, i === 0 ? `${pct(total - 0.05)}%{opacity:0}` : "", `100%{opacity:${i === 0 ? 1 : 0}}`].filter(Boolean))}}`);
   });
   const nums = steps.map((_, i) => `<g id="n${i}">${circle(32, VH + CAP / 2, 15, { fill: C.accent })}${text(32, VH + CAP / 2 + 5, String(i + 1), { size: 14, fill: C.white, anchor: "middle", weight: 700 })}</g>`).join("");
   const bar = `<rect x="0" y="${H - CAP}" width="${W}" height="3" fill="rgba(255,255,255,.18)"/><rect id="prog" x="0" y="${H - CAP}" width="${W}" height="3" fill="${C.accent}"/>`;
   css.push(`#prog{transform-origin:0 0;transform:scaleX(1);animation:prog ${total}s linear infinite}@keyframes prog{0%{transform:scaleX(0)}${pct(total - 0.45)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
-  // Carets for typed fields.
-  const carets = Object.entries(els).filter(([, e]) => e.caret).map(([id, e], k) => {
-    const [x, y, w, h] = e.caret.box;
-    css.push(`#ca${k}{opacity:0;animation:ca${k} ${total}s infinite}@keyframes ca${k}{0%,${pct(e.caret.t0)}%{opacity:0;transform:translateX(0)}${pct(e.caret.t0) + 0.001}%{opacity:1;transform:translateX(0);animation-timing-function:steps(${Math.max(2, Math.round((e.caret.t1 - e.caret.t0) / 0.07))},end)}${pct(e.caret.t1)}%{opacity:1;transform:translateX(${w}px)}${pct(e.caret.t1 + 0.5)}%{opacity:0;transform:translateX(${w}px)}100%{opacity:0;transform:translateX(${w}px)}}`);
-    return `<rect id="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`;
-  });
   const reduce = `@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}`;
+  const base = scene.base.join("\n"), bg = rect(0, 0, WORLD.w, WORLD.h, { fill: scene.bg ?? C.white });
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="ttl dsc" font-family='${FONT}' data-total="${total}" data-steps="${start.join(",")}">
 <title id="ttl">${esc(scene.title)}</title>
 <desc id="dsc">${esc(scene.desc ?? steps.map((s, i) => `${i + 1}. ${s.caption}`).join(" "))}</desc>
 <style>${css.join("\n")}
 ${reduce}</style>
-<defs>${defs.join("")}<clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
-${rect(0, 0, W, H, { r: 0, fill: scene.bg ?? "#eef1f5" })}
-<g clip-path="url(#stage)"><g id="world" transform="translate(${+fx.toFixed(2)} ${+fy.toFixed(2)}) scale(${+fit.toFixed(4)})">
-${(scene.base ?? []).join("\n")}
-${Object.entries(els).map(([id, e]) => `<g id="e-${id}">${e.svg}</g>`).join("\n")}
-${carets.join("")}
-</g></g>
+<defs>${defs.join("")}<g id="db">${bg}${base}</g><clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
+<g clip-path="url(#stage)"><g id="world" transform="scale(${+S.toFixed(4)})">
+${skeleton(bg + base)}
+${layers.join("\n")}
+${elMarkup(() => true)}
+${carets.map((c) => c.svg).join("")}
+</g>
+${overlays.join("\n")}
+</g>
 ${ripples.join("")}
 ${usesCursor ? `<g id="cur">${POINTER}</g>` : ""}
 ${rect(0, H - CAP, W, CAP, { fill: C.cocoa })}${bar}
