@@ -662,7 +662,7 @@ export const scenes = {
       { caption: "Cari, atau pilih saringan di kotak sebelahnya.", focus: [BX - 8, DY.tools - 8, BW2 + 16, 54], mark: SEL, lens: { src: [SEL[0] - 4, DY.tools - 4, 243, 194] }, at: center(SEL), click: true, show: ["filter"], dur: 3.6 },
       { caption: "Tiap ucapan punya Balas, Ubah teks, Sembunyikan, dan Hapus.", focus: [BX - 8, DY.items, BW2 + 16, 93], mark: [actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], lens: { src: pad([actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], 10, 12) }, at: center(actBox(1, DY.items)), hide: ["filter"], dur: 3 },
       { caption: "Klik Sembunyikan. Ucapan berlabel Disembunyikan, hilang dari undangan.", focus: [BX - 8, DY.items, BW2 + 16, 186], mark: actBox(2, DY.items), lens: { src: [BX, DY.items + 4, 400, 86] }, at: center(actBox(2, DY.items)), click: true, show: ["d1"], dur: 3.6 },
-      { caption: "Aksi sekaligus: centang kotak di kiri baris. Bar aksi muncul.", focus: [BX - 8, DY.tools - 8, BW2 + 16, DY.items + 260 - DY.tools], mark: { box: [BX + 17, DY.items + 93 + 14, 16, 16], r: 3 }, lens: { src: [BX, DY.tools + 44, 440, 180], zoom: 1.5, at: [480, 330] }, at: [BX + 25, DY.items + 93 + 22], click: true, show: ["d2"], dur: 3.6 },
+      { caption: "Aksi sekaligus: centang kotak di kiri baris. Bar aksi muncul.", focus: [BX - 8, DY.tools - 8, BW2 + 16, DY.items + 260 - DY.tools], mark: { box: [BX + 17, DY.items + 93 + 14, 16, 16], r: 3 }, lens: { src: [BX, DY.tools + 44, 440, 180], zoom: 1.5 }, at: [BX + 25, DY.items + 93 + 22], click: true, show: ["d2"], dur: 3.6 },
       { caption: "Klik Unduh daftar tamu (CSV). File tersimpan di folder unduhan.", mark: CSV, lens: { src: DL }, at: center(CSV), click: true, show: ["dl"], dur: 3.6 }
     ]
   },
