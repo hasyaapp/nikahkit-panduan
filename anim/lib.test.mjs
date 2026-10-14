@@ -73,4 +73,8 @@ assert.ok(/@keyframes fz0\{0%\{opacity:1\}55\.25%\{opacity:1;/.test(fc) && /@key
 assert.ok(fc.includes('<clipPath id="fz2"><rect x="0" y="0" width="30" height="30"/></clipPath>') && /@keyframes fz2\{0%\{opacity:0\}40%\{opacity:0;/.test(fc), "clicked element detailed from its step's start");
 const f1 = compile(scene({ els: {}, steps: [{ caption: "a", focus: [200, 200, 100, 100], at: [10, 10], click: true, mark: [0, 0, 30, 30] }] }));
 assert.ok(/@keyframes fz0\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(f1), "a first-step click shows its focus from the click too (1.22 s of 4.8 s)");
+// Click step with a result mark: the ring on the click point leaves after the click, the result's ring appears at it.
+const rm = compile(scene({ els: {}, steps: [{ caption: "a", focus: "all", at: [10, 10], click: true, mark: [[0, 0, 30, 30], [300, 300, 60, 30]] }] }));
+assert.ok(/<g class="om0_0"><rect x="-4" y="-4" width="28" height="28"/.test(rm) && /<g class="om0_1"><rect x="196" y="196" width="48" height="28"/.test(rm), "target ring and result ring in separate groups");
+assert.ok(/@keyframes om0_1\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(rm), "result ring appears at the click (1.22 s of 4.8 s)");
 console.log("lib.mjs: ok");

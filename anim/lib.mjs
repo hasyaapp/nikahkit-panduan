@@ -319,6 +319,7 @@ const KEYS = new Set(["caption", "dur", "focus", "mark", "lens", "note", "at", "
 const rectsOf = (f) => (f === "all" || f === "none" ? [] : Array.isArray(f[0]) ? f : [f]);
 const marksOf = (m) => (!m ? [] : Array.isArray(m) && Array.isArray(m[0]) ? m.map((b) => ({ box: b })) : Array.isArray(m) && typeof m[0] === "object" ? m : [Array.isArray(m) ? { box: m } : m]);
 const overlap = (a, b, pad = 0) => a[0] < b[0] + b[2] + pad && b[0] < a[0] + a[2] + pad && a[1] < b[1] + b[3] + pad && b[1] < a[1] + a[3] + pad;
+const hits = (p, b) => p[0] >= b[0] - 2 && p[0] <= b[0] + b[2] + 2 && p[1] >= b[1] - 2 && p[1] <= b[1] + b[3] + 2; // click point on a mark box
 // Where the segment from the centre of rect r towards point p leaves r.
 function edge(r, p) {
   const cx = r[0] + r[2] / 2, cy = r[1] + r[3] / 2, dx = p[0] - cx, dy = p[1] - cy;
@@ -372,7 +373,7 @@ export function compile(scene) {
     if (s.scroll) need(i, "scroll", s.scroll.id);
     if (s.lens && !Array.isArray(s.lens.src)) throw new Error(`${scene.title}: langkah ${i + 1} lens butuh src [x, y, w, h]`);
     // Every click lands on a marked element: the pointer target must sit inside one of the step's mark boxes.
-    if (s.click && s.at && !marksOf(s.mark).some(({ box: b }) => s.at[0] >= b[0] - 2 && s.at[0] <= b[0] + b[2] + 2 && s.at[1] >= b[1] - 2 && s.at[1] <= b[1] + b[3] + 2))
+    if (s.click && s.at && !marksOf(s.mark).some(({ box }) => hits(s.at, box)))
       throw new Error(`${scene.title}: langkah ${i + 1} klik di [${s.at}] tidak berada di dalam mark`);
   });
   const off = (el) => ({ fade: "opacity:0", pop: "opacity:0;transform:scale(.96)", slide: "opacity:0;transform:translateY(24px)" })[el.enter ?? "rise"] ?? "opacity:0;transform:translateY(8px)";
@@ -426,7 +427,7 @@ export function compile(scene) {
   const runs = [];
   focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
   const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: act[r.from] > 0 ? act[r.from] : null, b: r.to === steps.length - 1 ? null : act[r.to + 1] }));
-  steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box), a: i === 0 ? null : start[i], b: act[i] + 0.3 }); });
+  steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box).filter((b) => hits(s.at, b)), a: i === 0 ? null : start[i], b: act[i] + 0.3 }); });
   zones.forEach((z, k) => {
     if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
     css.push(fadeRule(`.fz${k}`, `fz${k}`, [[z.a, z.b]], "opacity:1", "opacity:0", 0.3, 0.3));
@@ -437,7 +438,7 @@ export function compile(scene) {
   const overlays = [];
   steps.forEach((s, i) => {
     const w = [[start[i] + 0.15, i === steps.length - 1 ? null : end[i]]];
-    const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * S + 4 }; });
+    const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * S + 4, hit: !!(s.click && s.at && hits(s.at, m.box)) }; });
     const lensOf = s.lens && { src: s.lens.src, zoom: s.lens.zoom ?? 2 }, note = typeof s.note === "string" ? { text: s.note } : s.note;
     let box = null, inner = "", arrow = "";
     if (lensOf) { const z = lensOf.zoom * S; box = [0, 0, lensOf.src[2] * z, lensOf.src[3] * z]; }
@@ -472,17 +473,20 @@ export function compile(scene) {
       }
     }
     // Step number on the ring's top-left corner, kept fully on the stage for rings at the stage edge (rail, tab row).
-    const rings = marks.map((m) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
+    const ring = (m) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
       return rect(m.box[0], m.box[1], m.box[2], m.box[3], { r: m.r, stroke: C.accent, sw: 2.5 }) +
-        circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(i + 1), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); }).join("");
-    // The lens or note stays for the whole step (it shows the result); on a click step the ring and its arrow leave
-    // just after the click, so they never float over a screen the click has changed.
+        circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(i + 1), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); };
+    // The lens or note stays for the whole step (it shows the result). On a click step the ring around the click point
+    // leaves just after the click, so it never floats over a screen the click has changed; the step's other marks point
+    // at the result, so they appear at the click. The arrow goes with the first mark.
     if (inner) { css.push(fadeRule(`.ov${i}`, `ov${i}`, w, "opacity:1", "opacity:0", 0.22, 0.14)); overlays.push(`<g class="ov${i}">${inner}</g>`); }
-    if (rings || arrow) {
-      const mw = s.click && s.at ? [[start[i] + 0.15, act[i] + 0.35]] : w;
-      css.push(fadeRule(`.om${i}`, `om${i}`, mw, "opacity:1", "opacity:0", 0.22, 0.2));
-      overlays.push(`<g class="om${i}">${arrow}${rings}</g>`);
-    }
+    const groups = s.click && s.at ? [[marks.filter((m) => m.hit), [[start[i] + 0.15, act[i] + 0.35]]], [marks.filter((m) => !m.hit), [[act[i], w[0][1]]]]] : [[marks, w]];
+    groups.forEach(([ms, mw], g) => {
+      const withArrow = arrow && (marks.length ? ms.includes(marks[0]) : g === 0);
+      if (!ms.length && !withArrow) return;
+      css.push(fadeRule(`.om${i}_${g}`, `om${i}_${g}`, mw, "opacity:1", "opacity:0", 0.22, 0.2));
+      overlays.push(`<g class="om${i}_${g}">${withArrow ? arrow : ""}${ms.map(ring).join("")}</g>`);
+    });
   });
   // Pointer in stage space (constant size).
   const rest = scene.cursorStart ? toStage(scene.cursorStart) : [W - 60, VH - 50];
