@@ -38,14 +38,14 @@
 <rect x="40" y="438" width="520" height="84" rx="10" fill="#ffffff" stroke="#e6dcd3" stroke-width="1"/><rect x="56" y="467" width="26" height="26" rx="6" fill="#ffffff" stroke="#b9aa9c" stroke-width="1.5"/><text x="100" y="487" font-size="20" fill="#2b1a07" font-weight="500"><tspan x="100" dy="0">10. Atur alamat dan izin domain</tspan></text></g><clipPath id="stage"><rect x="0" y="0" width="960" height="600"/></clipPath></defs>
 <g clip-path="url(#stage)"><g id="world" transform="scale(0.6667)">
 <rect x="0" y="0" width="1440" height="900" rx="0" fill="#ffffff"/><rect x="0" y="0" width="1440" height="900" rx="0" fill="#f7f3ef"/>
-<rect x="40" y="56.9" width="465" height="17" rx="8.5" fill="#dde2e8"/>
-<rect x="40" y="102.8" width="191" height="9" rx="4.5" fill="#dde2e8"/>
+<rect x="40" y="56.9" width="385.2" height="17" rx="8.5" fill="#dde2e8"/>
+<rect x="40" y="102.8" width="163.8" height="9" rx="4.5" fill="#dde2e8"/>
 <rect x="603" y="46" width="800" height="820" rx="12" fill="rgba(214,219,226,0.08)"/>
 <rect x="600" y="40" width="800" height="820" rx="12" fill="#f3f5f9" stroke="#e0e4e9" stroke-width="1"/>
-<rect x="40" y="150" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="179" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="186.6" width="330" height="10" rx="5" fill="#dde2e8"/>
-<rect x="40" y="246" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="275" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="269.6" width="396" height="10" rx="5" fill="#dde2e8"/><rect x="100" y="295.6" width="44" height="10" rx="5" fill="#dde2e8"/>
-<rect x="40" y="342" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="371" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="378.6" width="429" height="10" rx="5" fill="#dde2e8"/>
-<rect x="40" y="438" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="467" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="474.6" width="341" height="10" rx="5" fill="#dde2e8"/>
+<rect x="40" y="150" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="179" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="186.6" width="265.2" height="10" rx="5" fill="#dde2e8"/>
+<rect x="40" y="246" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="275" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="269.6" width="355.8" height="10" rx="5" fill="#dde2e8"/><rect x="100" y="295.6" width="49.8" height="10" rx="5" fill="#dde2e8"/>
+<rect x="40" y="342" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="371" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="378.6" width="364.8" height="10" rx="5" fill="#dde2e8"/>
+<rect x="40" y="438" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="467" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="474.6" width="267.4" height="10" rx="5" fill="#dde2e8"/>
 <use href="#ed-k0"/>
 <use href="#ed-p0"/>
 <use href="#ed-k1"/>

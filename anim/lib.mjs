@@ -58,8 +58,28 @@ export const line = (x1, y1, x2, y2, o = {}) => `<line${attrs({ x1, y1, x2, y2, 
 export const circle = (cx, cy, r, o = {}) => `<circle${attrs({ cx, cy, r, fill: o.fill ?? "none", stroke: o.stroke, "stroke-width": o.stroke ? o.sw ?? 1 : undefined })}/>`;
 export const group = (o, ...kids) => `<g${attrs({ transform: o.transform, opacity: o.opacity, "clip-path": o.clip })}>${kids.join("")}</g>`;
 export const para = (x, y, lines, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, fill: o.fill ?? C.strong, "font-weight": o.weight, "text-anchor": o.anchor })}>${lines.map((l, i) => `<tspan x="${x}" dy="${i ? (o.lh ?? Math.round((o.size ?? 14) * 1.43)) : 0}">${esc(l)}</tspan>`).join("")}</text>`;
-// Approximate text width in Roboto (for sizing buttons and pills around a label).
+// Approximate text width (a flat average per character) for laying out boxes and pills around a label; every scene's
+// layout is built on these numbers. Skeleton bars use textWidth() instead, which follows the glyphs.
 export const tw = (s, size = 14, weight = 400) => Math.round(String(s).length * size * (weight >= 600 ? 0.57 : weight >= 500 ? 0.55 : 0.53));
+// Glyph advances (per 100 px) of the SVG font stack as Chrome draws it on macOS, for weights 400/500/600/700
+// (measured 14 Okt 2026). Their sums land between Roboto (Android) and SF Text (Apple, small sizes), so a skeleton
+// bar ends where the text would end on Android and a little before it on Apple: never past its box.
+const GLYPHS = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~…·•🤍←›×–▸©⌘»→⇣↻“”±↑↓ابحرسلمنهي";
+const ADV = Object.fromEntries(Object.entries({
+  400: "21 27 40 60 60 81 67 25 32 32 40 60 21 43 21 28 61 44 57 59 60 59 62 55 60 62 21 21 60 60 60 49 87 64 60 69 68 55 53 71 70 22 50 60 52 83 70 73 58 73 60 59 58 70 63 92 63 61 62 32 28 32 60 53 50 50 55 50 55 51 30 55 54 21 21 49 20 80 53 53 55 55 31 47 30 53 48 72 47 49 47 32 22 32 60 59 21 43 100 91 40 60 53 43 85 92 62 91 87 82 36 36 60 78 78 23 89 62 34 108 62 51 61 43 72",
+  500: "20 28 42 62 62 84 68 26 34 34 42 62 22 43 22 29 62 46 58 60 62 60 63 56 62 63 22 22 62 62 62 50 88 65 62 69 69 56 53 71 71 24 52 62 53 84 70 74 59 74 61 61 59 70 65 94 65 63 62 34 29 34 62 54 50 52 57 52 57 53 32 56 55 22 22 50 22 82 54 55 56 56 33 48 32 54 50 74 49 50 48 34 22 34 62 62 22 43 100 92 41 62 54 43 85 92 63 92 87 82 38 38 62 79 79 24 91 65 35 112 64 53 64 46 75",
+  600: "20 30 44 63 63 86 69 26 36 36 43 63 23 44 23 30 64 47 59 62 63 61 64 56 63 64 23 23 63 63 63 52 88 67 63 70 69 57 54 72 72 25 54 64 54 85 71 75 60 75 63 62 59 70 66 95 67 65 63 36 30 36 63 56 50 53 58 53 58 54 34 58 57 23 23 52 23 84 56 56 58 58 35 50 34 56 51 77 51 52 49 36 23 36 63 65 23 44 100 93 41 63 56 44 85 93 65 93 87 83 40 40 63 80 80 25 93 67 37 117 66 56 67 48 78",
+  700: "20 32 46 64 65 89 70 27 38 38 45 65 24 44 24 30 66 48 60 63 65 63 65 57 65 65 24 24 65 65 65 53 89 69 64 71 70 57 55 73 73 26 56 65 54 86 71 75 62 75 64 63 60 71 68 97 69 67 63 38 30 38 65 58 50 55 60 55 60 56 36 59 58 24 24 54 24 86 58 57 59 59 36 51 36 58 53 79 53 54 51 38 24 38 65 68 24 44 100 94 42 65 58 44 85 94 66 94 87 84 43 43 65 82 82 26 94 69 38 121 68 58 69 50 80"
+}).map(([w, s]) => [w, s.split(" ").map(Number)]));
+const GLYPH = new Map([...GLYPHS].map((c, i) => [c, i]));
+// Width a line of text takes: glyph advances (combining marks take none, unlisted glyphs 0.6 em, monospace 0.6 em
+// each) plus letter-spacing between glyphs.
+export const textWidth = (s, size = 14, weight = 400, { mono = false, spacing = 0 } = {}) => {
+  const adv = ADV[weight >= 650 ? 700 : weight >= 550 ? 600 : weight >= 450 ? 500 : 400];
+  const glyphs = [...String(s).replace(/\u00a0/g, " ")].filter((c) => !/\p{Mn}/u.test(c));
+  const em = glyphs.reduce((t, c) => t + (mono ? 60 : adv[GLYPH.get(c)] ?? 60), 0) / 100;
+  return +(em * size + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
+};
 // Greedy word wrap to a width, using tw().
 export const wrap = (s, width, size = 14, weight = 400) => String(s).split(" ").reduce((ls, w) => {
   const last = ls.at(-1);
@@ -281,31 +301,48 @@ export const phoneDesk = (content, o = {}) => rect(0, 0, WORLD.w, WORLD.h, { fil
   clipped(PHONE.x, PHONE.y, PHONE.w, PHONE.h, content);
 
 // ---- Skeleton -------------------------------------------------------------------------------------------------------
-// The same drawing as a skeleton: every text becomes a rounded bar of its measured width, colours become light greys
-// (alpha kept, near-white surfaces kept), so each block keeps its real place and size. A pure string transform, so it
-// works on primitives and raw markup alike; compile() applies it to the base outside the step's focus.
+// The same drawing as a skeleton: every text becomes a rounded bar of its glyph width, colours become light greys
+// (alpha kept; near-white surfaces keep their lightness but lose their hue, so a skeleton is one neutral family with
+// no green badge or cream page showing through), so each block keeps its real place and size. A pure string
+// transform, so it works on primitives and raw markup alike; compile() applies it to the world outside the focus.
 const SK = { bar: "#dde2e8", fill: "#eceff3", line: "#e0e4e9" };
 const lum = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
 function skColor(kind, v) {
-  if (v === "none" || v === "transparent" || v === "currentColor") return v;
-  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(v);
-  if (hex) { const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1], [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); return lum(r, g, b) > 238 ? v : kind === "fill" ? SK.fill : SK.line; }
-  const rgba = /^rgba?\(([^)]*)\)$/.exec(v);
-  if (rgba) { const [r, g, b, a = 1] = rgba[1].split(",").map(parseFloat); return lum(r, g, b) > 238 ? v : `rgba(214,219,226,${a})`; }
-  return v === "white" ? v : kind === "fill" ? SK.fill : SK.line;
+  if (v === "none" || v === "transparent" || v === "currentColor" || v === "white") return v;
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(v), rgba = /^rgba?\(([^)]*)\)$/.exec(v);
+  const h = hex && (hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1]);
+  const [r, g, b, a = 1] = hex ? [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) : rgba ? rgba[1].split(",").map(parseFloat) : [0, 0, 0];
+  if ((hex || rgba) && lum(r, g, b) > 238) {
+    if (Math.max(r, g, b) - Math.min(r, g, b) <= 10) return v; // white and neutral page greys stay exactly
+    const l = Math.round(lum(r, g, b)), n = l.toString(16).padStart(2, "0");
+    return hex ? `#${n}${n}${n}` : `rgba(${l},${l},${l},${a})`;
+  }
+  if (rgba) return `rgba(214,219,226,${a})`;
+  return kind === "fill" ? SK.fill : SK.line;
 }
 const attr = (a, k) => new RegExp(`(?:^|\\s)${k}="([^"]*)"`).exec(a)?.[1];
 const unesc = (s) => s.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+// One bar per line. A tspan with an x starts a line (para()); other tspans (a bold run) and bare text continue the
+// line they are on, each run measured at its own weight.
 function textBars(attrs, body) {
   const x0 = +(attr(attrs, "x") ?? 0), y0 = +(attr(attrs, "y") ?? 0), size = +(attr(attrs, "font-size") ?? 14), weight = +(attr(attrs, "font-weight") ?? 400), anchor = attr(attrs, "text-anchor");
-  const spans = [...body.matchAll(/<tspan\b([^>]*)>([\s\S]*?)<\/tspan>/g)];
+  const metrics = { mono: /mono/i.test(attr(attrs, "font-family") ?? ""), spacing: +(attr(attrs, "letter-spacing") ?? 0) };
+  const pinned = !/<tspan/.test(body) && attr(attrs, "textLength"); // a measured line width wins over the glyph estimate
+  const lines = [{ x: x0, y: y0, runs: [] }];
   let y = y0;
-  const lines = spans.length ? spans.map(([, a, t]) => [+(attr(a, "x") ?? x0), (y += +(attr(a, "dy") ?? 0)), t]) : [[x0, y0, body]];
-  const pinned = !spans.length && attr(attrs, "textLength"); // a measured line width wins over the tw() estimate
-  return lines.map(([x, ly, t]) => {
-    const s = unesc(t).trim();
-    if (!s) return "";
-    const w = pinned ? +pinned : tw(s, size, weight), h = Math.max(3, +(size * 0.5).toFixed(1)), bx = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
+  for (const [, a, inner, bare] of body.matchAll(/<tspan\b([^>]*)>([\s\S]*?)<\/tspan>|([^<]+)/g)) {
+    if (bare !== undefined) { lines.at(-1).runs.push([unesc(bare), weight]); continue; }
+    y += +(attr(a, "dy") ?? 0);
+    if (attr(a, "x") !== undefined) lines.push({ x: +attr(a, "x"), y, runs: [] });
+    lines.at(-1).runs.push([unesc(inner), +(attr(a, "font-weight") ?? weight)]);
+  }
+  return lines.map(({ x, y: ly, runs }) => {
+    const s = runs.map(([t]) => t).join("");
+    if (!s.trim()) return "";
+    const lead = s.length - s.trimStart().length, tail = s.trimEnd().length;
+    let at = 0; // trim the line's outer whitespace, then sum the runs
+    const width = runs.reduce((sum, [t, wt]) => { const from = Math.max(lead - at, 0), to = Math.min(tail - at, t.length); at += t.length; return to > from ? sum + textWidth(t.slice(from, to), size, wt, metrics) : sum; }, 0);
+    const w = pinned ? +pinned : +width.toFixed(1), h = Math.max(3, +(size * 0.5).toFixed(1)), bx = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
     return `<rect x="${+bx.toFixed(1)}" y="${+(ly - size * 0.62).toFixed(1)}" width="${w}" height="${h}" rx="${h / 2}" fill="${SK.bar}"/>`;
   }).join("");
 }

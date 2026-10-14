@@ -1,6 +1,6 @@
 // node panduan/anim/lib.test.mjs — the scene compiler's rules (canvas, skeleton, focus, marks, lens, timing, reduced motion).
 import assert from "node:assert/strict";
-import { compile, skeleton, text, rect, tw } from "./lib.mjs";
+import { compile, skeleton, text, rect, textWidth } from "./lib.mjs";
 
 const scene = (over = {}) => ({
   title: "uji",
@@ -26,11 +26,24 @@ assert.throws(() => compile(scene({ steps: [{ caption: "x".repeat(81), focus: "a
 assert.throws(() => compile(scene({ steps: [{ caption: "a", focus: "all", at: [500, 500], click: true, mark: [0, 0, 30, 30] }] })), /tidak berada di dalam mark/, "a click must land on its mark");
 assert.throws(() => compile(scene({ steps: [{ caption: "a", focus: "all", mark: [100, 100, 60, 30], note: { text: "x", at: [60, 60] } }] })), /menutupi mark/, "a note or lens never covers the mark");
 
-// Skeleton: text becomes a bar of its measured width at its place; colours turn light grey; white surfaces stay.
+// Skeleton: text becomes a bar of its glyph width at its place; colours turn light grey; white surfaces stay.
 const sk = skeleton(text(100, 100, "Simpan", { size: 14, weight: 500, anchor: "middle" }) + rect(0, 0, 10, 10, { fill: "#0779a6" }) + rect(0, 0, 10, 10, { fill: "#ffffff" }) + rect(0, 0, 5, 5, { fill: "rgba(15,22,30,.42)" }));
 assert.ok(!/<text/.test(sk), "no text left in a skeleton");
-assert.ok(sk.includes(`<rect x="${100 - tw("Simpan", 14, 500) / 2}" y="91.3" width="${tw("Simpan", 14, 500)}" height="7" rx="3.5"`), "text bar centred on the anchor, measured width: " + sk);
+const ws = textWidth("Simpan", 14, 500);
+assert.ok(sk.includes(`<rect x="${+(100 - ws / 2).toFixed(1)}" y="91.3" width="${ws}" height="7" rx="3.5"`), "text bar centred on the anchor, glyph width: " + sk);
+// The bar follows the glyphs, so it ends where the text ends: narrow letters make a short bar, combining marks add
+// nothing, monospace and letter-spacing widen it.
+assert.ok(textWidth("illi", 14) < textWidth("MWMW", 14) / 2, "narrow glyphs, short bar");
+assert.equal(textWidth("بِسْمِ", 14), textWidth("بسم", 14), "harakat take no width");
+assert.equal(textWidth("K7PM", 14, 400, { mono: true }), 33.6, "monospace: 0.6 em per glyph");
+assert.equal(textWidth("ab", 10, 400, { spacing: 2 }), +(textWidth("ab", 10) + 2).toFixed(1), "letter-spacing between glyphs");
+// A bold run inside a line is part of that line: one bar, its width the sum of the runs at their own weights.
+const run = skeleton('<text x="10" y="20" font-size="10"><tspan font-weight="700">Hadir 8</tspan> · Ragu 4</text>');
+assert.equal((run.match(/<rect/g) || []).length, 1, "inline runs: one bar");
+assert.ok(run.includes(`width="${+(textWidth("Hadir 8", 10, 700) + textWidth(" · Ragu 4", 10)).toFixed(1)}"`), "inline runs: summed width " + run);
 assert.ok(sk.includes('fill="#eceff3"') && sk.includes('fill="#ffffff"') && sk.includes("rgba(214,219,226,0.42)"), "dark fill greyed, white kept, alpha kept");
+// A tinted near-white (green badge, cream page) keeps its lightness and loses its hue: one grey family.
+assert.equal(skeleton('<rect fill="#e8f9ef"/><rect fill="#f6f9fc"/><rect fill="rgba(255,250,240,.5)"/>'), '<rect fill="#f5f5f5"/><rect fill="#f6f9fc"/><rect fill="rgba(250,250,250,0.5)"/>', "tints neutralised, neutral greys kept");
 
 // Focus: the skeleton base under one detailed layer per run of steps with the same focus.
 assert.ok(svg.includes('<clipPath id="fz0"><rect x="72" y="92" width="327" height="808"/></clipPath>'), "step 1-2 focus clip");
