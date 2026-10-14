@@ -4,7 +4,7 @@
 //   the reference template; section positions are generic (laid out for the 390 px screen, not measured);
 // - `kencana`: the Kencana template page (cover with palette/scale/shape/font, sections below it, Menu bawah), as Gaya
 //   changes it; fonts and colours from the template's defaults, guest dock from undangan/widgets/dock.js.
-import { C, rect, text, line, circle, para, clipped, shadow, icon } from "../lib.mjs";
+import { C, rect, text, line, circle, para, wrap, tw, clipped, clipShape, shadow, icon } from "../lib.mjs";
 import { ED } from "./kit.mjs";
 
 const SC = ED.screen, CX = SC.x + SC.w / 2; // plain preview screen 727,106 390x784
@@ -37,16 +37,28 @@ export const dock = (active) => shadow(764, 810, 316, 70, 18) + rect(764, 810, 3
 export const secTitle = (t) => cloud(780, 150, 0.8) + cloud(1064, 150, 0.8) + text(CX, 222, t, { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" });
 // Centred serif line on the screen.
 export const sTxt = (y, s, o = {}) => text(CX, y, s, { size: o.size ?? 14, font: SERIF, fill: o.fill ?? "#3a302b", weight: o.weight, anchor: "middle" });
-export function pvCover(names) {
-  const arch = "M852 400 V282 A70 70 0 0 1 992 282 V400 Z";
+// An arch-topped photo (frame in the accent): clipped photo k and its outline; arch = path d.
+const archPhoto = (arch, x, y, w, h, k) => clipShape(`<path d="${arch}"/>`, photo(x, y, w, h, k, 0)) + `<path d="${arch}" fill="none" stroke="${MAROON}" stroke-width="2"/>`;
+// Cover with the couple's names; o.guest: the guest's name on the "Kepada Yth." line (default Tamu Undangan).
+export function pvCover(names, o = {}) {
   return pvScreen(CREAM, bumps(SC.y + 20, 1), bumps(SC.y + SC.h - 28, -1), cloud(797, 236), cloud(1047, 236),
     `<path d="M796 262 L850 248 L850 384 L796 364 Z M1048 262 L994 248 L994 384 L1048 364 Z" fill="none" stroke="${MAROON}" stroke-width="3"/>`,
     `<path d="M806 280 Q823 300 806 330 Q823 350 812 362 M1038 280 Q1021 300 1038 330 Q1021 350 1032 362" fill="none" stroke="${MAROON}" stroke-width="2"/>`,
-    `<defs><clipPath id="arch"><path d="${arch}"/></clipPath></defs><g clip-path="url(#arch)">${photo(852, 212, 140, 188, 0, 0)}</g><path d="${arch}" fill="none" stroke="${MAROON}" stroke-width="2"/>`,
+    archPhoto("M852 400 V282 A70 70 0 0 1 992 282 V400 Z", 852, 212, 140, 188, 0),
     sTxt(433, "The Wedding Of", { size: 18, fill: INK }), text(CX, 508, names, { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" }),
     sTxt(557, "Minggu, 14 Februari 2027", { size: 15, weight: 700, fill: INK }), sTxt(578, "#RaniDimas", { size: 13 }),
-    sTxt(613, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, weight: 700, fill: INK }), sTxt(637, "Tamu Undangan", { size: 17, fill: MAROON }),
+    sTxt(613, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, weight: 700, fill: INK }), sTxt(637, o.guest ?? "Tamu Undangan", { size: 17, fill: MAROON }),
     rect(836, 673, 171, 48, { r: 24, fill: MAROON }) + icon("mail", 868, 697, 16, C.white) + text(936, 702, "Buka Undangan", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }), disc());
+}
+// Mempelai section (one partner): title, arch portrait, nickname in script, full name, job, parents line (wrapped), city
+// and Instagram pill (both optional), dock with Mempelai active. Defaults: the bride of the sample data.
+export function pvMempelai({ nick = "Rani", full = "Rani Ayu, S.Psi.", job = "Psikolog", parents = "Putri kedua dari Bapak Ahmad & Almh. Ibu Siti", city, ig, k = 2 } = {}) {
+  const lines = wrap(parents, 300, 14), py = 590 + lines.length * 20;
+  return pvScreen(CREAM, bumps(SC.y + 20, 1), secTitle("Mempelai"), archPhoto("M852 450 V318 A70 70 0 0 1 992 318 V450 Z", 852, 248, 140, 202, k),
+    text(CX, 506, nick, { size: 44, font: SCRIPT, fill: MAROON, anchor: "middle" }), sTxt(542, full, { size: 18, weight: 700, fill: INK }), sTxt(566, job, { size: 13 }),
+    ...lines.map((l, i) => sTxt(596 + i * 20, l)), city ? sTxt(py + 8, city, { size: 13 }) : "",
+    ig ? rect(CX - tw(ig, 13) / 2 - 16, py + 22, tw(ig, 13) + 32, 30, { r: 15, fill: MAROON }) + text(CX, py + 42, ig, { size: 13, font: SERIF, fill: C.white, anchor: "middle" }) : "",
+    dock("Mempelai"), disc());
 }
 // The cover name changed to Sinta, drawn over pvCover (maroon) and over pvFolio.
 export const pvSinta = () => rect(760, 462, 324, 64, { fill: CREAM }) + text(CX, 508, "Sinta & Dimas", { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" });
@@ -84,8 +96,7 @@ export const pvDasar = () => pvScreen("#F4F1EA", rect(747.5, 126.5, 349, 743, { 
 const K_SERIF = "Tinos,'Times New Roman',Georgia,serif";
 const K_SCRIPT = "MonteCarlo,'Great Vibes','Snell Roundhand','Apple Chancery',cursive";
 const KENCANA = { bg: "#FFF7E9", surface: "#FFFDF8", heading: "#8E2818", text: "#10001E", muted: "#6B5A55", accent: "#8E2818", on: "#FFFFFF" };
-const hid = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return (h >>> 0).toString(36); };
-const clipPath = (d, ...kids) => { const id = `a4c${hid(d)}`; return `<defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+const clipPath = (d, ...kids) => clipShape(`<path d="${d}"/>`, ...kids);
 const rrPath = (x, y, w, h, r) => (r ? `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1 -${r} ${r}h-${w - 2 * r}a${r} ${r} 0 0 1 -${r} -${r}v-${h - 2 * r}a${r} ${r} 0 0 1 ${r} -${r}z` : `M${x} ${y}h${w}v${h}h-${w}z`);
 // Photos drawn as flat shapes (sky, hills, sun); k picks the colours.
 const TONES = [["#d9c7b0", "#a8875f", "#7d5f3f"], ["#cfdbe0", "#8aa596", "#5d7a66"], ["#ead1c6", "#c48f7f", "#8e5a4c"], ["#d6d3e6", "#9a92b8", "#6a6290"], ["#e8dcc0", "#c2a25c", "#8b6d2f"], ["#d3e1e8", "#7f9eb0", "#4f6f82"], ["#efe1d9", "#b9a093", "#7b6257"], ["#dfe6d2", "#a3b47e", "#6d7f4a"], ["#f0d8c8", "#d49a76", "#9b5e3c"]];

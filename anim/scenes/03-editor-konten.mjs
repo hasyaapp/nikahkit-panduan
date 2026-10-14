@@ -2,11 +2,11 @@
 // Every scene is the whole real 1440x900 Scalev editor (ui/kit scalevEditor): top bar, tabs, rail, panel and preview. The
 // Template and Konten panels come from ui/editor-panels (measured), the preview from ui/invitation (generic layout).
 import { C, rect, text, line, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
-import { ED, nkHead, nkRail, nkBtn, scalevEditor } from "../ui/kit.mjs";
+import { ED, nkHead, nkRail, nkBtn, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
 import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
-import { ACCOUNT, P, PW, I, IW, rich, hintL, inp, typeIn, acc, col, itemBar, itemBox, quietBlock, panelBg, panelBody, lid, LOCKED, kList, kListAt,
-  fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
-  seg, htmlNote, chips, ALL_N, cards, library, TOAST, URUNGKAN, GAL } from "../ui/editor-panels.mjs";
+import { ACCOUNT, P, PW, I, IW, hintL, inp, typeIn, acc, col, itemBar, itemBox, quietBlock, panelBg, panelBody, lid, LOCKED, kList, kListAt,
+  fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillRsvp, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
+  seg, htmlNote, chips, ALL_N, cards, library, GAL } from "../ui/editor-panels.mjs";
 
 // Focus areas (world px): rail + panel, panel body, preview screen, Scalev bars, Simpan buttons, rail foot. Every element
 // in this file is a state of the screen (`skel: true`): skeleton outside the step's focus, detail inside, like the base.
@@ -23,8 +23,8 @@ const ADAT_CHIP = [206, 277]; // centre of the Adat chip with the default counts
 const editor = (rail, o = {}) => [PHOTO_DEFS, scalevEditor(0, 0, { rail, ...o })];
 // Lens around the save status at the rail foot.
 const FOOT_LENS = { src: [0, 852, 72, 48], zoom: 3 };
-// Scalev Simpan button, redrawn so it can dip when clicked.
-const simpanBtn = () => rect(1193, 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong);
+// Toast after a template change (Urungkan button box for the mark).
+const TOAST_TXT = "Template diganti ke Dasar.", TOAST = nkToast(TOAST_TXT), TB = nkToastBoxes(TOAST_TXT);
 
 export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ export const scenes = {
   "editor-peta-simpan": {
     title: "Langkah pertama di editor NikahKit: pratinjau dan Simpan",
     base: [...editor("Konten"), kontenPanel("Sinta"), pvFolio()],
-    els: { pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.6, skel: true }, sBtn: { svg: simpanBtn(), skel: true } },
+    els: { pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.6, skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
       { caption: "Lihat hasilnya di pratinjau: nama yang kamu ketik langsung tampil.", focus: F.pv, mark: [784, 420, 276, 46], show: ["pvName"], at: [922, 560], dur: 3.4 },
       { caption: "Status Tersimpan di kolom kiri? Klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
@@ -95,7 +95,7 @@ export const scenes = {
   "editor-pilih-template-dipakai": {
     title: "Memilih template NikahKit pertama kali: Dipakai dan Konten",
     base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "folio")), pvFolio()],
-    els: { konten: { svg: kontenPanel(), enter: "fade", skel: true }, sBtn: { svg: simpanBtn(), skel: true } },
+    els: { konten: { svg: kontenPanel(), enter: "fade", skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
       { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: [326, 511, 41, 18], r: 9 }, lens: { src: [226, 330, 150, 242] }, at: [346, 520] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", mark: railM("Konten"), lens: { src: [80, 161, 295, 80], at: [290, 90] }, show: ["konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
@@ -157,7 +157,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Periksa pratinjau. Desainnya Dasar, isian Konten tetap ada.", focus: F.pv, mark: [790, 326, 264, 48], at: [922, 420] },
-      { caption: "Tidak suka? Klik Urungkan di pesan bawah panel. Folio kembali.", focus: [[84, 836, 302, 52], F.pv], mark: URUNGKAN, lens: { src: [84, 836, 302, 54] }, at: [342, 863], click: true, show: ["cardsF", "pvF"], dur: 3.4 }
+      { caption: "Tidak suka? Klik Urungkan di pesan bawah panel. Folio kembali.", focus: [TB.toast, F.pv], mark: TB.undo, lens: { src: TB.toast }, at: [342, 863], click: true, show: ["cardsF", "pvF"], dur: 3.4 }
     ]
   },
 
@@ -198,7 +198,7 @@ export const scenes = {
         v4: { svg: v4s.svg, enter: "fade", skel: true },
         v5: { svg: v5.svg, enter: "fade", skel: true },
         lidK: { svg: lid("Konten"), enter: "fade", skel: true },
-        sBtn: { svg: simpanBtn(), skel: true }
+        sBtn: { svg: svSimpan(), skel: true }
       },
       steps: [
         { caption: "Klik Konten di menu kiri. Daftar bagian muncul, di atasnya Bahasa undangan.", focus: F.side, mark: railM("Konten"), lens: { src: [0, 376, 399, 62], at: [290, 200] }, at: ED.rail.Konten, click: true, show: ["railK", "v1", "lidK"] },
@@ -349,7 +349,7 @@ export const scenes = {
         vD: { svg: vD.svg, enter: "fade", skel: true },
         vAll: { svg: kList({ from: 5, top: 191 }).svg, enter: "fade", skel: true },
         lidK: { svg: lid("Konten"), skel: true },
-        sBtn: { svg: simpanBtn(), skel: true }
+        sBtn: { svg: svSimpan(), skel: true }
       },
       steps: [
         { caption: "Klik Konten, lalu Galeri Foto. Foto dari Tambah foto ada di daftar.", focus: [72, 241, 327, 659], mark: accM(249), lens: { src: [80, 241, 295, 60] }, at: [190, 274], click: true, show: ["after"] },
@@ -366,20 +366,9 @@ export const scenes = {
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-rsvp-hadiah": (() => {
-    // RSVP & Ucapan open (sample: allowMaybe off, maxGuests 2, the four "Tanyakan juga" switches on).
-    const rs = col(I, 223, IW).field("Judul", "Ucapan & Kehadiran", { ph: true });
-    const noteY = rs.y;
-    rs.add(rect(I, noteY, IW, 38, { r: 4, fill: C.primarySoft }) + rich(I + 12, noteY + 24, ["Tersambung. ID: ", { t: "365671" }], { fill: C.strong }), 50);
-    const formY = rs.y + 20;
-    rs.field("Isi form", "Ucapan + konfirmasi hadir", { select: true });
-    const guestsY = rs.y + 20;
-    rs.field("Jumlah tamu paling banyak per undangan", "2 orang", { select: true })
-      .field("Tenggat konfirmasi (opsional)", "07/02/2027, 23.59", { icon: "calendar", hint: ["Setelah lewat, form ditutup; daftar ucapan", "tetap tampil."] })
-      .toggle("Tampilkan jumlah kehadiran", true, ["Mis. \"120 konfirmasi hadir\" di atas daftar", "ucapan."])
-      .toggle("Pilihan \"Masih ragu\"", false, ["Mati: tamu hanya memilih Hadir atau Tidak", "hadir."]).h3("Tanyakan juga")
-      .toggle("Tamu dari pihak mana", true).toggle("Acara yang dihadiri", true, ["Butuh minimal 2 acara."]).toggle("Perkiraan jam datang", true)
-      .toggle("Minta nomor WhatsApp tamu", true, ["Tamu mengisi nomornya sendiri di form (boleh", "kosong). Nomor tampil di Dashboard."]).lead("Jawaban tampil di Dashboard.")
-      .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Hanya berlaku bila Undangan khusus menyala", "(di Bagikan). Tamu yang menjawab Hadir", "melihat QR ini di kartu terima kasih RSVP;", "penerima tamu memindainya di halaman Check-in."]);
+    // RSVP & Ucapan open (fillRsvp), then the closed groups below it.
+    const rs = col(I, 223, IW); fillRsvp(rs);
+    const noteY = rs.at["Tersambung"], formY = rs.at["Isi form"] + 20, guestsY = rs.at["Jumlah tamu paling banyak per undangan"] + 20;
     const accY = rs.y + 8;
     const DY = accY + 2 * 58 - 169; // scroll so Amplop Digital's bar lands at y 169, where the opened group stays
     const accs = ["Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang"].map((t, i) => acc(accY + i * 58, t, "Terisi")).join("");
@@ -410,7 +399,7 @@ export const scenes = {
         vF: { svg: vF.svg, enter: "fade", skel: true },
         vKaki: { svg: vKaki.svg, enter: "fade", skel: true },
         lidE: { svg: lid("Konten"), skel: true },
-        sBtn: { svg: simpanBtn(), skel: true }
+        sBtn: { svg: svSimpan(), skel: true }
       },
       steps: [
         { caption: "Klik Konten, lalu klik RSVP & Ucapan. Bagian terbuka.", focus: F.body, mark: accM(169), lens: { src: [80, 161, 295, 120] }, at: [190, 194], click: true, show: ["list1"] },

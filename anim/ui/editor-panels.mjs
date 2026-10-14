@@ -4,15 +4,12 @@
 // accordions 279x50, fields 253 wide; search 219, chips 263/297, cards 337, measured in Chromium); labels and sample
 // values from nikahkit/src/fields.js, model.js (SAMPLE, SAMPLE_CHECKS), ui/panel-content.jsx, ui/panels-style.jsx,
 // ui/fields.jsx, ui/App.jsx (MediaDialog, Toast). Template card thumbnails are drawn (the real ones are screenshots).
-import { C, esc, rect, text, line, circle, para, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
+import { C, rect, text, line, circle, para, clipped, icon, iconX, tw } from "../lib.mjs";
 import { nkHead, nkRail, nkLabel, nkBtn, nkSwitch, nkDialogHead, scalevEditor } from "./kit.mjs";
 import { SERIF, photo } from "./invitation.mjs";
 
 export const ACCOUNT = "Tahunan"; // the account chip shows the member's plan
 export const P = 88, PW = 279, I = 101, IW = 253; // panel content box; inside an open accordion
-
-// Text with inline bold / underlined runs (link buttons, <b> in notes); parts: string | { t, w?, fill?, u? }.
-export const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.faint}">${parts.map((p) => (typeof p === "string" ? esc(p) : `<tspan font-weight="${p.w ?? 700}" fill="${p.fill ?? C.strong}"${p.u ? ' text-decoration="underline"' : ""}>${esc(p.t)}</tspan>`)).join("")}</text>`;
 
 // ---- Panel widgets at measured sizes ------------------------------------------------------------------------------
 export const lbl = (x, y, s) => nkLabel(x, y + 12, s);
@@ -55,8 +52,10 @@ export function col(x, y, w) {
       y += used + 12; return c;
     },
     area(l, lines, rows = 2) { return c.field(l, "", { lines, h: rows * 17 + 14 }); },
+    // Switch row; c.at[first label line] = its top (the switch sits at top + 10).
     toggle(l, on, hint) {
       const ls = [].concat(l);
+      c.at[ls[0]] = y;
       s += para(x, y + 25 - (ls.length - 1) * 10, ls, { size: 14, fill: C.text, lh: 20 }) + nkSwitch(x + w - 36, y + 10, on);
       y += 48;
       if (hint) { s += hintL(x, y - 6, hint); y += -6 + hint.length * 16 + 12; }
@@ -105,7 +104,7 @@ export function kList({ from = 0, top = 169, left = 6, link = "Ganti nama mempel
     const c = col(P, left ? 245 : 169, PW);
     if (left) s += sampleNote(left, link);
     c.field("Bahasa undangan", "Indonesia", { select: true, hint: ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."] });
-    s += c.svg + rich(P, c.y + 12, ["Urutan dan tampilan bagian di ", { t: "Lapisan", w: 500, u: true }, "."]);
+    s += c.svg + text(P, c.y + 12, ["Urutan dan tampilan bagian di ", { t: "Lapisan", w: 500, fill: C.strong, u: true }, "."], { size: 12, fill: C.faint });
     y = c.y + 28;
   }
   const at = {}, f = {};
@@ -145,6 +144,21 @@ export const fillSampul = (c) => c.add(hintL(I, c.y, ["Nama dan tanggal diambil 
 export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi kalimat pembuka, salam,", "kata pengantar, dan salam penutup.", "Tetap bisa diubah."] })
   .field("Kalimat pembuka (opsional)", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", { hint: ["Mis. basmalah. Kosongkan bila tidak", "dipakai."] })
   .field("Salam", "Assalamu'alaikum Warahmatullahi Wabarakatuh").area("Kata pengantar", ["Dengan memohon rahmat dan rida", "Allah SWT, kami bermaksud", "menyelenggarakan pernikahan", "putra-putri kami. Merupakan", "kebahagiaan bagi kami apabila"], 5);
+// RSVP & Ucapan (sample: allowMaybe off, maxGuests 2, the four "Tanyakan juga" switches on), down to the QR switch.
+// c.at["Tersambung"] is the connection note's top; the switch rows are in c.at under their first line.
+export const fillRsvp = (c) => {
+  c.field("Judul", "Ucapan & Kehadiran", { ph: true });
+  c.at["Tersambung"] = c.y;
+  c.add(rect(I, c.y, IW, 38, { r: 4, fill: C.primarySoft }) + text(I + 12, c.y + 24, ["Tersambung. ID: ", { t: "365671", w: 700 }], { size: 12 }), 50)
+    .field("Isi form", "Ucapan + konfirmasi hadir", { select: true })
+    .field("Jumlah tamu paling banyak per undangan", "2 orang", { select: true })
+    .field("Tenggat konfirmasi (opsional)", "07/02/2027, 23.59", { icon: "calendar", hint: ["Setelah lewat, form ditutup; daftar ucapan", "tetap tampil."] })
+    .toggle("Tampilkan jumlah kehadiran", true, ["Mis. \"120 konfirmasi hadir\" di atas daftar", "ucapan."])
+    .toggle("Pilihan \"Masih ragu\"", false, ["Mati: tamu hanya memilih Hadir atau Tidak", "hadir."]).h3("Tanyakan juga")
+    .toggle("Tamu dari pihak mana", true).toggle("Acara yang dihadiri", true, ["Butuh minimal 2 acara."]).toggle("Perkiraan jam datang", true)
+    .toggle("Minta nomor WhatsApp tamu", true, ["Tamu mengisi nomornya sendiri di form (boleh", "kosong). Nomor tampil di Dashboard."]).lead("Jawaban tampil di Dashboard.")
+    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Hanya berlaku bila Undangan khusus menyala", "(di Bagikan). Tamu yang menjawab Hadir", "melihat QR ini di kartu terima kasih RSVP;", "penerima tamu memindainya di halaman Check-in."]);
+};
 const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
 export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { ph: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
   item(c, "Menjalin Hubungan", story("Agustus 2022", "Jakarta", "Menjalin Hubungan", ["Setelah sekian lama berteman,", "kami memutuskan untuk", "melangkah bersama."], 3), false, false); };
@@ -218,10 +232,12 @@ export function card(x, y, id, o = {}) {
 export const cardAt = (i, top) => [i % 2 ? 234 : 88, top + Math.floor(i / 2) * 241];
 export const cards = (top, used, ids = FIRST6) => ids.map((id, i) => card(...cardAt(i, top), id, { on: id === used })).join("");
 const MEGAPHONE = `<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>`;
-// Template / Marketing switch (the Template side active) at the top of the panel body.
-export const seg = () => rect(P + 0.5, 169.5, PW - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(P + 1, 170, 138, 36, { r: 3, fill: C.primarySoft }) +
-  icon("layout-grid", 129, 188, 16, C.action) + text(146, 192, "Template", { size: 12, weight: 600, fill: C.action }) +
-  `<g transform="translate(289 180) scale(.6667)" fill="none" stroke="${C.text}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MEGAPHONE}</g>`;
+// Template / Marketing switch at the top of the panel body; the active half is light blue with its icon and label, the
+// other half shows its icon only.
+const megaphone = (cx, color) => `<g transform="translate(${cx - 8} 180) scale(.6667)" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MEGAPHONE}</g>`;
+export const seg = (active = "template") => rect(P + 0.5, 169.5, PW - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + (active === "template" ?
+  rect(P + 1, 170, 138, 36, { r: 3, fill: C.primarySoft }) + icon("layout-grid", 129, 188, 16, C.action) + text(146, 192, "Template", { size: 12, weight: 600, fill: C.action }) + megaphone(297, C.text) :
+  rect(P + 140, 170, 138, 36, { r: 3, fill: C.primarySoft }) + icon("layout-grid", 157, 188, 16, C.text) + megaphone(264, C.action) + text(279, 192, "Marketing", { size: 12, weight: 600, fill: C.action }));
 // Warning under the switch when the page holds other HTML (moves the library down by 68).
 export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Memilih template", "akan menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
 // Search box and category chips above the cards (panels-style.jsx TemplatePanel; categories from templates/base/categories.json,
@@ -246,10 +262,8 @@ const searchBox = (y, q = "", focus = false) => inp(P, y, PW, q || SEARCH_PH, { 
 // used: id of the card marked Dipakai; o.q: search text, o.n: chip counts, o.cat: active chip, o.ids: the cards shown.
 export const library = (top, used, o = {}) => searchBox(top, o.q) + chips(top + 44, o.n, o.cat) + cards(top + 118, used, o.ids);
 // The Template panel body content (switch + library at 219), unclipped: wrap in panelBody() or clip it yourself.
+// used: id of the card marked Dipakai, or null before a template is picked.
 export const templatePanel = (used, o = {}) => seg() + library(219, used, o);
-// Toast after a template change, with Urungkan; URUNGKAN is the box of its Urungkan text, for a mark.
-export const TOAST = shadow(84, 836, 302, 52, 4, 2) + rect(84, 836, 302, 52, { r: 4, fill: C.strong }) + text(96, 867, "Template diganti ke Dasar.", { size: 14, fill: C.white }) +
-  text(374, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }), URUNGKAN = [304, 850, 76, 26];
 
 // ---- Galeri Foto and the Media dialog (Pilih foto) ------------------------------------------------------------------
 // Konten scrolled so Kisah Cinta's bar is at y 191 and Galeri Foto (opened) at 249. top(n): bars + Judul/Teks pengantar +
