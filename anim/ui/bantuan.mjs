@@ -1,7 +1,7 @@
 // The NikahKit Bantuan dialog (nikahkit/src/ui/help.jsx), drawn in the editor's panel column (x 0..398), one copy for
 // every scene. Owner: 08-bantuan. Layout follows the DOM flow (padding 16, margins from styles.js/base.css); sizes from
 // /tmp/ref/editor-bantuan.png + editor-metrics.json.
-import { C, rect, text, line, circle, para, group, clipped, iconX, tw, wrap } from "../lib.mjs";
+import { C, rect, text, line, circle, para, group, clipped, iconX, textWidth, wrap } from "../lib.mjs";
 import { nkBtn, nkBadge, nkNote, nkH3 } from "./kit.mjs";
 
 // Check rows in help.jsx order.
@@ -11,13 +11,14 @@ export const CHECKS = [...BASE_CHECKS, "Hanya NikahKit yang aktif", "Versi edito
   "Penyimpanan ucapan dan RSVP", "Izin domain di tab Security", "Penulisan ke editor"];
 const DIRECTIVE = { img_src: "Gambar", script_src: "Skrip", frame_src: "Bingkai (iframe)" };
 const STATUS = { exists: ["Sudah diizinkan", false], added: ["Ditambahkan otomatis", false], failed: ["Perlu ditambah manual", true] };
-const badgeW = (l) => tw(l, 10, 500) + 12;
-const cspBadge = (x, y, st) => { const [l, todo] = STATUS[st]; return nkBadge(x, y, l, todo ? { fill: C.warnSoft, fg: C.warnStrong } : {}); };
+// The status badge is kit nkBadge (width textWidth + 12), right-aligned 10 px inside the row.
+const badgeW = (l) => textWidth(l, 10, 500) + 12;
+const cspBadge = (xr, y, st) => { const [l, todo] = STATUS[st]; return nkBadge(xr, y, l, { end: true, ...(todo ? { fill: C.warnSoft, fg: C.warnStrong } : {}) }); };
 // One .nk-csp row: grid 1fr auto (origin + purpose left, badge centred right), padding 8px 10px, 16px lines.
 const cspLi = (r, y) => {
   const bw = badgeW(STATUS[r.st][0]), why = wrap(`${r.why} · ${DIRECTIVE[r.d]} (${r.d})`, 329 - 8 - bw, 12), h = 36 + why.length * 16;
   return { h, svg: rect(16.5, y + 0.5, 350, h - 1, { r: 4, fill: C.white, stroke: C.line }) + text(27, y + 21, r.o, { size: 12, mono: true, fill: C.strong }) +
-    para(27, y + 39, why, { size: 12, fill: C.text, lh: 16 }) + cspBadge(366 - 10 - bw, y + h / 2 - 9, r.st) };
+    para(27, y + 39, why, { size: 12, fill: C.text, lh: 16 }) + cspBadge(366 - 10, y + h / 2 - 9, r.st) };
 };
 const glyph = (y, kind) => kind === "ok" ? circle(30, y + 18, 10, { fill: C.okSoft }) + iconX("check", 30, y + 18, 12, C.ok, 2.6)
   : circle(30, y + 18, 10, { fill: C.warnSoft }) + text(30, y + 22.5, "!", { size: 12, weight: 700, fill: C.warnStrong, anchor: "middle" });
