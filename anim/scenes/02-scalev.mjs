@@ -10,7 +10,7 @@
 // Edit Account, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
 import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw, mid } from "../lib.mjs";
 import {
-  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkInput, nkLabel, nkHint, nkAcc, nkH3, dim, phoneDesk, svSimpan, svTerbitkan
+  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan
 } from "../ui/kit.mjs";
 import {
   SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
@@ -20,9 +20,10 @@ import {
 } from "../ui/scalev.mjs";
 import { helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { shareTop, shareBtns, accessHead, coupleAll, shareAll, shareBox as shareBtnBox, ACC_Y, COUPLE_Y, NO_NOTE } from "../ui/bagikan.mjs";
+import { ACCOUNT, kList, fillMempelai, panelBody, seg, library } from "../ui/editor-panels.mjs";
+import { PHOTO_DEFS, pvCover, MAROON, CREAM, SERIF } from "../ui/invitation.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
-const SERIF = "Georgia,'Times New Roman',serif";
 
 // ---- shared pieces ----------------------------------------------------------------------------------------------------
 // Scalev inside a Chrome window: the frame, and page markup (drawn at 0,0) moved below the toolbar.
@@ -31,8 +32,6 @@ const shifted = (svg) => clipped(0, CT, 1440, 900 - CT, group({ transform: `tran
 const dn = ([x, y, w, h]) => [x, y + CT, w, h];
 const urlSwap = (url) => rect(150, 48, 700, 30, { fill: C.crOmni }) + text(166, 68, url, { size: 14, fill: C.crText });
 const OMNI = { box: [124, 46, 1184, 34], r: 17 };
-// Lucide megaphone (Template panel: Marketing segment), same stroke style as lib icons.
-const megaphone = (cx, cy, size = 16, color = C.text) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></g>`;
 // Clip for a scrolling element: on the element's class, so the clip stays put while its inner group scrolls (also in lenses).
 const clipCss = (id, x, y, w, h) => `<style>.e-${id}{clip-path:url(#cl-${id})}</style><defs><clipPath id="cl-${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs>`;
 // Tab boxes in the editor tab strip (marks), from the label positions scalevEditor draws.
@@ -44,33 +43,12 @@ const TOOLBAR = [1180, 44, 260, 48];
 // Rail tools (Bagikan, Bantuan) and the rail foot, as nkRail draws them.
 const TOOL = { Bagikan: [4, 567, 64, 44], Bantuan: [4, 799, 64, 44] };
 
-// Invitation cover in the plain preview screen (390 wide), from the Dasar template in editor-template.png.
-function cover(sx, sy, h = 784) {
-  const cx = sx + 195, m = "#8c2f1f";
-  let s = rect(sx, sy, 390, h, { fill: "#fdf6ee" }) + rect(sx, sy, 390, 22, { fill: m });
-  for (let i = 0; i < 8; i++) s += circle(sx + 22 + i * 49.4, sy + 22, 18, { fill: m });
-  s += `<path d="M${cx - 70} ${sy + 300} V${sy + 176} a70 70 0 0 1 140 0 V${sy + 300} Z" fill="#d8c6b0" stroke="${m}" stroke-width="2"/>` +
-    circle(cx, sy + 200, 26, { fill: "#efe6da" }) + `<path d="M${cx - 50} ${sy + 300} q50 -90 100 0 Z" fill="#efe6da"/>` +
-    text(cx, sy + 330, "The Wedding Of", { size: 17, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
-    text(cx, sy + 392, "Rani & Dimas", { size: 44, fill: m, anchor: "middle", font: SERIF, italic: true });
-  if (h > 450) s += text(cx, sy + 452, "Minggu, 14 Februari 2027", { size: 15, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
-    text(cx, sy + 474, "#RaniDimas", { size: 13, fill: "#3a3a3a", anchor: "middle", font: SERIF }) +
-    text(cx, sy + 510, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
-    text(cx, sy + 532, "Tamu Undangan", { size: 17, fill: m, anchor: "middle", font: SERIF }) +
-    rect(cx - 86, sy + 568, 172, 48, { r: 24, fill: m }) + icon("mail", cx - 52, sy + 592, 16, C.white) + text(cx + 10, sy + 597, "Buka Undangan", { size: 15, fill: C.white, anchor: "middle", font: SERIF });
-  return s;
-}
 const SC = ED.screen;
-// Konten panel body (editor-konten.png without the update note): language select, Sampul, open Mempelai group.
-const kontenBody = () => nkLabel(88, 181, "Bahasa undangan") + nkInput(88, 189, 279, "Indonesia", { select: true }) +
-  para(88, 245, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
-  text(88, 289, "Urutan dan tampilan bagian di ", { size: 12, fill: C.faint }) + text(88 + tw("Urutan dan tampilan bagian di ", 12), 289, "Lapisan", { size: 12, fill: C.strong, underline: true }) +
-  nkAcc(88, 305, 279, "Sampul", { badge: "Terisi" }) + rect(88.5, 363.5, 278, 600, { r: 4, fill: C.white, stroke: C.line }) + nkAcc(88, 363, 279, "Mempelai", { open: true, badge: "Terisi" }) +
-  nkLabel(101, 433, "Judul") + nkInput(101, 441, 253, "Mempelai") + nkLabel(101, 501, "Urutan nama") + nkInput(101, 509, 253, "Wanita dulu", { select: true }) +
-  nkH3(101, 581, "Mempelai Wanita") + nkLabel(101, 605, "Nama panggilan") + nkInput(101, 613, 253, "Rani") + nkHint(101, 665, "Tampil di sampul.") +
-  nkLabel(101, 693, "Nama lengkap dan gelar") + nkInput(101, 701, 253, "Rani Ayu, S.Psi.") + nkLabel(101, 761, "Profesi") + nkInput(101, 769, 253, "Psikolog") +
-  nkLabel(101, 829, "Keterangan orang tua") + nkInput(101, 837, 253, "Putri kedua dari Bapak Ahmad") + rect(72, 885, 327, 15, { fill: C.white });
-const editorKonten = (o = {}) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten", ...o }) + nkHead(0, 0, "Konten") + kontenBody() + cover(SC.x, SC.y);
+// The invitation cover in the preview screen (../ui/invitation.mjs), with its photo gradients.
+const COVER = PHOTO_DEFS + pvCover("Rani & Dimas");
+// Konten panel (../ui/editor-panels.mjs) with Mempelai open, over the editor's own rail (which carries the save status).
+const editorKonten = (o = {}) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten", ...o }) + rect(72, 92, 327, 808, { fill: C.white }) +
+  nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ open: "Mempelai", fill: fillMempelai("Rani") }).svg + COVER;
 
 // ---- 1. Landing Pages → HTML Mode → NikahKit → Simpan --------------------------------------------------------------
 // Type chooser (not captured): modal with a generic tile and the HTML Mode tile.
@@ -82,27 +60,13 @@ const typeDlg = shadow(DLG.x, DLG.y, DLG.w, DLG.h, 8, 3) + rect(DLG.x, DLG.y, DL
   rect(DLG.x + 24.5, DLG.y + 74.5, 215, 190, { r: 6, fill: C.white, stroke: SV.line }) + icon("layout-grid", DLG.x + 132, DLG.y + 140, 34, "#b8c0ca", 1.6) + bar(DLG.x + 82, DLG.y + 196, 100, 10) + bar(DLG.x + 62, DLG.y + 220, 140, 8) + htmlTile(false);
 // Desktop preview (no NikahKit yet): empty white page across the preview area.
 const desktopPreview = rect(400, 93, 1040, 807, { fill: C.svPreview }) + rect(424, 106, 992, 794, { fill: C.white });
-// Template panel (editor-template.png, update note left out): segment, template cards; the description as the card
-// clamps it (two lines, same text as 03-editor-konten.mjs).
-const TEMPLATES = [["Dasar", "#55524f", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], ["Folio", "#2e2e33", ["Hitam & krem gaya", "majalah, foto penuh…"]],
-  ["Galeri Putih", "#f6f4f1", ["Putih bersih gaya", "majalah, huruf serif…"]], ["Modern Estetik", "#efe7dc", ["Putih & krem, bingkai", "lengkung, bayangan…"]]];
-function templatePanel() {
-  let s = nkHead(0, 0, "Template") + rect(88.5, 169.5, 278, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(89, 170, 138, 36, { r: 3, fill: C.primarySoft }) +
-    icon("layout-grid", 129, 188, 16, C.action) + text(141, 193, "Template", { size: 12, weight: 600, fill: C.action }) + line(227.5, 170, 227.5, 206, { stroke: C.field }) + megaphone(297, 188, 16, C.text);
-  TEMPLATES.forEach(([n, tone, desc], i) => {
-    const cx = 88 + (i % 2) * 145, cy = 219 + Math.floor(i / 2) * 241;
-    s += rect(cx + 0.5, cy + 0.5, 132, 165, { r: 6, fill: "#f2f5fa", stroke: C.line }) + rect(cx + 5, cy + 5, 72, 156, { r: 3, fill: tone }) +
-      [0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => rect(cx + 84 + (k % 2) * 22, cy + 8 + Math.floor(k / 2) * 34, 18, 28, { r: 2, fill: k % 3 ? "#e4e0da" : "#cfc8bf" })).join("") +
-      text(cx + 41, cy + 70, n.split(" ")[0], { size: 9, fill: tone === "#f6f4f1" || tone === "#efe7dc" ? "#6b5b4a" : "#f2ece4", anchor: "middle", font: SERIF }) +
-      text(cx, cy + 184, n, { size: 14, weight: 500, fill: C.strong }) + para(cx, cy + 205, desc, { size: 12, fill: C.text, lh: 16 });
-  });
-  return s + rect(72, 685, 327, 215, { fill: C.white }) + rect(88, 701, 133, 165, { r: 6, fill: "#f2f5fa" }) + rect(233, 701, 133, 165, { r: 6, fill: "#f2f5fa" });
-}
-// Locked rail menus (disabled buttons) and the native title tooltip.
+// Locked rail menus (disabled buttons) and the native title tooltip (hovering Konten).
 const lockRail = ["Gaya", "Audio", "Lapisan", "Konten"].map((n) => rect(0, ED.rail[n][1] - 26, 71, 52, { fill: C.page, opacity: 0.6 })).join("");
-const lockTip = shadow(46, 210, 198, 26, 4) + rect(46.5, 210.5, 197, 25, { r: 4, fill: "#ffffff", stroke: "#c7c7c7" }) + text(56, 227, "Simpan halaman di Scalev dulu.", { size: 12, fill: "#1f1f1f" });
-const edNikahKit = (o) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Template", screenFill: "#ffffff" }) + templatePanel() + (o?.locked ? lockRail : "");
-const SET_PUB = () => settingsEd({ now: "https://tokomu.myscalev.com/undangan-baru" }) + cover(SC.x, SC.y);
+const lockTip = shadow(46, 436, 198, 26, 4) + rect(46.5, 436.5, 197, 25, { r: 4, fill: "#ffffff", stroke: "#c7c7c7" }) + text(56, 453, "Simpan halaman di Scalev dulu.", { size: 12, fill: "#1f1f1f" });
+// The NikahKit tab with the Template panel (../ui/editor-panels.mjs): Template / Marketing switch and the library.
+const edNikahKit = (o) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Template", screenFill: "#ffffff" }) + nkHead(0, 0, "Template", { account: ACCOUNT }) +
+  panelBody(seg(), library(219)) + (o?.locked ? lockRail : "");
+const SET_PUB = () => settingsEd({ now: "https://tokomu.myscalev.com/undangan-baru" }) + COVER;
 
 // ---- 2. Bagikan dialog (../ui/bagikan.mjs): with the unsaved note before Simpan, without it after ---------------------
 const shareDialog = (warn) => warn ? shareTop(0) + shareBtns(0) + accessHead(ACC_Y - NO_NOTE, false) + coupleAll(COUPLE_Y - NO_NOTE) : shareAll(null);
@@ -380,26 +344,26 @@ const phoneWa = rect(PX, PY, 390, PH, { fill: "#efeae2" }) + rect(PX, PY, 390, 6
   text(PX + 90, PY + 44, "Rina WO (Anda)", { size: 16, weight: 500, fill: "#111b21" });
 const BUB = { x: PX + 38, y: PY + 250 };
 const BUB_LINK = [BUB.x + 6, BUB.y + 108, 300, 26];
-// The public page in the phone browser: cover, then a YouTube video and Ucapan & RSVP (labels from the widget in
-// nikahkit/build/nk-render.js), in the Dasar cover's colours. Scrolls as one element.
-const M = "#8c2f1f", P0 = PY + 63;
-const pill = (x, y, w, label, on) => rect(x, y, w, 40, { r: 20, fill: on ? M : "#fdf6ee", stroke: M }) + text(x + w / 2, y + 25, label, { size: 14, fill: on ? C.white : M, anchor: "middle" });
+// The public page in the phone browser: the cover, then a YouTube video and Ucapan & RSVP (labels from the widget in
+// nikahkit/build/nk-render.js), in the invitation's colours (../ui/invitation.mjs). Scrolls as one element.
+const P0 = PY + 63;
+const pill = (x, y, w, label, on) => rect(x, y, w, 40, { r: 20, fill: on ? MAROON : CREAM, stroke: MAROON }) + text(x + w / 2, y + 25, label, { size: 14, fill: on ? C.white : MAROON, anchor: "middle" });
 const phField = (y, h, v) => rect(PX + 24, y, 342, h, { r: 6, fill: C.white, stroke: "#d8c6b0" }) + text(PX + 36, y + 26, v, { size: 14, fill: "#1f1f1f" });
 const phLabel = (y, s) => text(PX + 24, y, s, { size: 13, weight: 700, fill: "#1f1f1f" });
-const phSecs = (y0) => rect(PX, y0, 390, 900, { fill: "#fdf6ee" }) + rect(PX + 20, y0 + 20, 350, 197, { r: 6, fill: "#111" }) +
+const phSecs = (y0) => rect(PX, y0, 390, 900, { fill: CREAM }) + rect(PX + 20, y0 + 20, 350, 197, { r: 6, fill: "#111" }) +
   rect(PX + 161, y0 + 94, 68, 48, { r: 12, fill: "#ff0000" }) + `<path d="M${PX + 188} ${y0 + 107} l18 11 -18 11 z" fill="#fff"/>` +
-  text(PX + 195, y0 + 290, "Ucapan & RSVP", { size: 28, fill: M, anchor: "middle", font: SERIF, italic: true }) +
+  text(PX + 195, y0 + 290, "Ucapan & RSVP", { size: 28, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
   phLabel(y0 + 330, "Nama") + phField(y0 + 340, 42, "Tamu Undangan") + phLabel(y0 + 408, "Kehadiran") +
   pill(PX + 24, y0 + 418, 104, "Hadir", true) + pill(PX + 136, y0 + 418, 112, "Tidak hadir") + pill(PX + 256, y0 + 418, 110, "Masih ragu") +
   phLabel(y0 + 486, "Ucapan") + phField(y0 + 496, 90, "Selamat menempuh hidup baru!") +
-  rect(PX + 24, y0 + 604, 342, 46, { r: 23, fill: M }) + icon("send", PX + 168, y0 + 627, 16, C.white) + text(PX + 204, y0 + 632, "Kirim", { size: 15, fill: C.white, anchor: "middle" });
+  rect(PX + 24, y0 + 604, 342, 46, { r: 23, fill: MAROON }) + icon("send", PX + 168, y0 + 627, 16, C.white) + text(PX + 204, y0 + 632, "Kirim", { size: 15, fill: C.white, anchor: "middle" });
 const phoneWeb = rect(PX, PY, 390, PH, { r: 12, fill: C.white }) + rect(PX + 14, PY + 14, 330, 36, { r: 18, fill: C.crOmni }) + icon("lock", PX + 34, PY + 32, 13, C.crIcon) +
   text(PX + 48, PY + 37, "tokomu.myscalev.com/rani-dimas", { size: 14, fill: C.crText }) + iconX("more-vertical", PX + 366, PY + 32, 18, C.crIcon) + line(PX, PY + 62.5, PX + 390, PY + 62.5, { stroke: "#e3e3e3" });
-const phPage = clipCss("page", PX, P0, 390, PH - 63) + cover(PX, P0, 783) + phSecs(P0 + 783);
+const phPage = clipCss("page", PX, P0, 390, PH - 63) + group({ transform: `translate(${PX - SC.x} ${P0 - SC.y})` }, COVER) + phSecs(P0 + 784);
 const VIDEO = [PX + 20, P0 + 20, 350, 197];
 const KIRIM = { box: [PX + 24, P0 + 604, 342, 46], r: 23 };
 const phPlaying = rect(PX + 20, P0 + 20, 350, 197, { r: 6, fill: "#2b2b2b" }) + rect(PX + 70, P0 + 60, 250, 110, { r: 4, fill: "#444" }) + rect(PX + 32, P0 + 200, 326, 3, { fill: "#666" }) + rect(PX + 32, P0 + 200, 90, 3, { fill: "#ff0000" });
-const phThanks = rect(PX + 24, P0 + 262, 342, 320, { r: 8, fill: C.white, stroke: "#d8c6b0" }) + text(PX + 195, P0 + 400, "Terima Kasih", { size: 28, fill: M, anchor: "middle", font: SERIF, italic: true }) +
+const phThanks = rect(PX + 24, P0 + 262, 342, 320, { r: 8, fill: C.white, stroke: "#d8c6b0" }) + text(PX + 195, P0 + 400, "Terima Kasih", { size: 28, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
   para(PX + 195, P0 + 440, ["Terima kasih, pesan Anda", "sudah kami terima."], { size: 15, fill: "#1f1f1f", anchor: "middle", lh: 22 });
 const PHONE_R = [PX, PY, 390, PH];
 
@@ -466,7 +430,7 @@ export const scenes = {
     steps: [
       { caption: "Editor terbuka dengan tab Code, Media, Security, Settings.", focus: [0, 44, 399, 48], mark: { box: [8, 52, 222, 28], r: 6 }, lens: TABS_LENS, dur: 3.2 },
       { caption: "Tab NikahKit berlogo biru ada di ujung strip tab.", at: ED.tab.NikahKit, mark: tabMark("NikahKit"), lens: TABS_LENS },
-      { caption: "Klik NikahKit. Menu selain Template dan Media terkunci.", focus: PANEL, at: ED.tab.NikahKit, click: true, show: ["edNk", "tip"], dur: 4, mark: tabMark("NikahKit"), lens: { src: [0, 98, 380, 110], at: [300, 70] } }
+      { caption: "Klik NikahKit. Menu selain Template dan Media terkunci.", focus: PANEL, at: ED.tab.NikahKit, click: true, show: ["edNk", "tip"], dur: 4, mark: tabMark("NikahKit"), lens: { src: [0, 98, 72, 230], at: [460, 120] } }
     ]
   },
 
@@ -574,7 +538,7 @@ export const scenes = {
       help: { svg: dlgSheet + dlgHead, enter: "fade" },
       helpBody: { svg: clipCss("helpBody", 0, 154, 398, 746) + hb.svg, enter: "fade" },
       copied: { svg: cspNote(hb, HB_DY, "Tersalin. Tempel di tab Security."), enter: "fade" },
-      secFrame: { svg: scalevEditor(0, 0, { tab: "Security" }) + rect(0, 92, 399, 808, { fill: C.white }) + cover(SC.x, SC.y), skel: true, enter: "fade" },
+      secFrame: { svg: scalevEditor(0, 0, { tab: "Security" }) + rect(0, 92, 399, 808, { fill: C.white }) + COVER, skel: true, enter: "fade" },
       secBody: { svg: clipCss("secBody", 0, 92, 399, 808) + secContent({}), skel: true, enter: "fade" },
       picker: { svg: secPicker({ value: "" }), enter: "fade" },
       pickRow: { svg: secPicker({ value: "https://foto.contoh.com", ticked: false }), enter: "fade", delay: 1.2 },
@@ -760,7 +724,7 @@ export const scenes = {
     title: "Memasang thumbnail di SEO & Page Identity Scalev",
     base: [editorKonten()],
     els: {
-      set: { svg: settingsEd({ now: PUB_URL }) + cover(SC.x, SC.y), skel: true, enter: "fade" },
+      set: { svg: settingsEd({ now: PUB_URL }) + COVER, skel: true, enter: "fade" },
       seo: { svg: seoAfter({ id: "seo" }), enter: "fade" },
       jFocus: { svg: rect(35, 351, 313, 40, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
       judul: text(48, 376, JUDUL, { size: 14, fill: "#0f161e" }),
