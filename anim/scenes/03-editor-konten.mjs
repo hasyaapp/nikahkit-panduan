@@ -168,14 +168,25 @@ const pvDasar = () => scr("#F4F1EA", rect(747.5, 126.5, 349, 743, { stroke: "#3A
   rect(836, 620, 172, 46, { r: 6, fill: "#3A3A3A" }) + text(922, 648, "Buka Undangan", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }));
 
 // ---- Template panel ------------------------------------------------------------------------------------------------
-// Template list in catalogue order (nikahkit/templates/*/template.json name + description).
-const TPL = [
-  ["dasar", "Dasar", ["Polos · 20 bagian · HP &", "desktop · ID/EN"]], ["folio", "Folio", ["20 bagian · HP &", "desktop · ID/EN"]],
-  ["galeri", "Galeri Putih", ["20 bagian · HP &", "desktop · ID/EN"]], ["modern-estetik", "Modern Estetik", ["20 bagian · HP &", "desktop · ID/EN"]],
-  ["cute-gemoy", "Cute Gemoy", ["20 bagian · HP &", "desktop · ID/EN"]], ["tradisional-elegan", "Tradisional Elegan", ["20 bagian · HP &", "desktop · ID/EN"]]
-];
+// Templates as cards show them (build/templates.json name + description, clamped to two lines as measured in Chromium).
+const TPL = {
+  dasar: ["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], folio: ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"]],
+  galeri: ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"]], "modern-estetik": ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"]],
+  "cute-gemoy": ["Cute Gemoy", ["Krem, foto polaroid", "berjepit, bunga kering…"]], "tradisional-elegan": ["Tradisional Elegan", ["Hitam & emas, bingkai", "lengkung, judul huruf…"]],
+  kencana: ["Kencana", ["Krem & merah bata,", "wayang golek…"]], joyo: ["Kembang Joyo", ["Kertas cokelat muda,", "bingkai lengkung dan…"]],
+  ladomudo: ["Lado Mudo", ["Krem merah muda &", "marun, pita ulos dan…"]], pusako: ["Pusako", ["Merah marun, rumah", "gadang bergaris dan…"]],
+  saman: ["Saman", ["Hitam & emas, motif", "Aceh dan bingkai…"]], pendopo: ["Pendopo", ["Krem & cokelat emas,", "bingkai lengkung dan…"]],
+  "sekar-kedaton": ["Sekar Kedaton", ["Krem & merah marun,", "gerbang lengkung…"]], sogan: ["Sogan", ["Krem & cokelat sogan,", "bingkai ukir emas…"]],
+  "sekar-jagad": ["Sekar Jagad", ["Kertas batik putih &", "hijau tua, gunungan…"]], kayon: ["Kayon", ["Kertas krem & cokelat", "tua, gunungan…"]],
+  joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]]
+};
+const FIRST6 = ["dasar", "folio", "galeri", "modern-estetik", "cute-gemoy", "tradisional-elegan"];
+// Section strip colours [light, mid, accent]; adat templates from their default palette (surface, bg, accent).
 const STRIP = { dasar: ["#ffffff", "#e7e3dc", "#3a3a3a"], folio: ["#ffffff", "#e9e3d8", "#2b2a28"], galeri: ["#ffffff", "#eceae6", "#9a948c"],
-  "modern-estetik": ["#ffffff", "#efe7dd", "#7b5a44"], "cute-gemoy": ["#fff3f6", "#fbd9e2", "#e48aa3"], "tradisional-elegan": ["#2b1e16", "#4a3426", "#c9a86a"] };
+  "modern-estetik": ["#ffffff", "#efe7dd", "#7b5a44"], "cute-gemoy": ["#fff3f6", "#fbd9e2", "#e48aa3"], "tradisional-elegan": ["#2a2522", "#1f1c1a", "#ecbb6c"],
+  kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], joyo: ["#E7DCC8", "#D8C9AE", "#18150F"], ladomudo: ["#FFFFFF", "#FFFAF0", "#520000"], pusako: ["#F2EDDC", "#E1DABB", "#520000"],
+  saman: ["#232220", "#181818", "#F0DA86"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], "sekar-kedaton": ["#FFFFFF", "#FFFCF3", "#7A1A1A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
+  "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"] };
 const HS = [10, 16, 8, 20, 12, 18, 9, 14, 22, 11, 16, 8, 13];
 // Catalogue thumbnail: the template's phone cover plus its section strip (the real card image is a screenshot).
 function thumb(x, y, id) {
@@ -190,21 +201,43 @@ function thumb(x, y, id) {
   else if (id === "galeri") s += rect(ix, iy, iw, ih, { r: 3, fill: C.white }) + tline(iy + 14, 30, "#9a948c") + tline(iy + 22, 22, "#c9c3bb") + photo(ix + 12, iy + 40, 50, 64, 0, 2) + tline(iy + 118, 40, "#6b6560") + rect(mx - 18, iy + 132, 36, 7, { fill: "#2F3E4E" });
   else if (id === "modern-estetik") s += rect(ix, iy, iw, ih, { r: 3, fill: C.white }) + tline(iy + 16, 36, "#9b8676") + photo(ix + 17, iy + 30, 40, 52, 4, 20) + tline(iy + 96, 30, "#7b5a44") + tline(iy + 104, 24, "#7b5a44") + rect(mx - 16, iy + 126, 32, 7, { r: 3.5, fill: "#7b5a44" });
   else if (id === "cute-gemoy") s += rect(ix, iy, iw, ih, { r: 3, fill: "#fde7ec" }) + circle(mx, iy + 56, 22, { fill: "#f7b9c8" }) + circle(mx, iy + 56, 16, { fill: "#fff3f6" }) + tline(iy + 96, 40, "#e48aa3") + tline(iy + 106, 28, "#e9a4b6") + rect(mx - 16, iy + 126, 32, 7, { r: 3.5, fill: "#e48aa3" });
-  else s += rect(ix, iy, iw, ih, { r: 3, fill: "#2b1e16" }) + `<path d="M${ix + 14} ${iy + 100} V${iy + 48} A23 23 0 0 1 ${ix + 60} ${iy + 48} V${iy + 100} Z" fill="none" stroke="#c9a86a" stroke-width="1.5"/>` + tline(iy + 116, 40, "#c9a86a") + tline(iy + 126, 26, "#a88b58");
+  // Adat covers: paper colour, arch frame and title lines in the accent.
+  else s += rect(ix, iy, iw, ih, { r: 3, fill: b }) + `<path d="M${ix + 14} ${iy + 100} V${iy + 48} A23 23 0 0 1 ${ix + 60} ${iy + 48} V${iy + 100} Z" fill="none" stroke="${c}" stroke-width="1.5"/>` + tline(iy + 116, 40, c) + tline(iy + 126, 26, c);
   return s;
 }
-function card(x, y, [id, name, desc], o = {}) {
+function card(x, y, id, o = {}) {
+  const [name, desc] = TPL[id];
   return rect(x + 1, y + 1, 132, 165, { r: 8, fill: C.page, stroke: o.on ? C.primary : C.line, sw: 2 }) + clipped(x + 2, y + 2, 130, 163, thumb(x, y, id)) +
     text(x, y + 188, name, { size: 14, weight: 500 }) + (o.on ? badge(x + 133, y + 174, "Dipakai") : "") + para(x, y + 209, desc, { size: 12, fill: C.faint, lh: 16 });
 }
 const CARD = (i, top) => [i % 2 ? 234 : 88, top + Math.floor(i / 2) * 241];
-const cards = (top, used) => TPL.map((t, i) => card(...CARD(i, top), t, { on: t[0] === used })).join("");
+const cards = (top, used, ids = FIRST6) => ids.map((id, i) => card(...CARD(i, top), id, { on: id === used })).join("");
 const MEGAPHONE = `<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>`;
 const seg = () => rect(P + 0.5, 169.5, PW - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(P + 1, 170, 138, 36, { r: 3, fill: C.primarySoft }) +
   icon("layout-grid", 129, 188, 16, C.action) + text(146, 192, "Template", { size: 12, weight: 600, fill: C.action }) +
   `<g transform="translate(289 180) scale(.6667)" fill="none" stroke="${C.text}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MEGAPHONE}</g>`;
 const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Memilih template", "akan menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
-const templatePanel = (used) => body(seg(), cards(219, used));
+// Search box and category chips above the cards (panels-style.jsx TemplatePanel; categories from templates/base/categories.json,
+// counts from the build catalogue). Chips are 28 high, 6 apart, wrap at the panel width; widths measured in Chromium.
+const SEARCH_PH = "Cari: Jawa, bunga, atau tulis keinginan klien…";
+const CATS = ["Semua", "Adat", "Floral", "Elegan", "Minimalis", "Ceria"], ALL_N = [62, 32, 15, 6, 5, 4];
+const CHIP_W = { Semua: [72, 76, 79], Adat: [60, 63, 67], Floral: [65, 70, 70], Elegan: [72], Minimalis: [86], Ceria: [63] }; // 1 digit, 11, other 2 digits
+function chips(y, n = ALL_N, on = "Semua") {
+  let x = P, row = y, s = "";
+  CATS.forEach((c, i) => {
+    const w = CHIP_W[c][n[i] < 10 ? 0 : n[i] === 11 ? 1 : 2], a = c === on;
+    if (x + w > P + PW) { x = P; row += 34; }
+    s += rect(x + 0.5, row + 0.5, w - 1, 27, { r: 14, fill: a ? C.primarySoft : C.white, stroke: a ? C.primary : C.field }) +
+      text(x + 11, row + 18, c, { size: 12, fill: a ? C.action : C.strong }) + text(x + w - 11, row + 18, String(n[i]), { size: 12, fill: C.text, anchor: "end" });
+    x += w + 6;
+  });
+  return s;
+}
+const searchBox = (y, q = "", focus = false) => inp(P, y, PW, q || SEARCH_PH, { ph: !q, focus });
+// The whole library under the Template/Marketing switch: search at top, chips 44 below, cards 118 below (cards at 337
+// when top = 219).
+const library = (top, used, o = {}) => searchBox(top, o.q) + chips(top + 44, o.n, o.cat) + cards(top + 118, used, o.ids);
+const ADAT_CHIP = [206, 277]; // centre of the Adat chip with the default counts
 
 // ---- Konten groups (fields from nikahkit/src/fields.js, sample values from model.js SAMPLE) ---------------------------
 // List item (nk-item) built by build(col); its field tops join c.at (first occurrence wins).
@@ -273,7 +306,7 @@ const typeIn = (x, y, w, val) => [inp(x, y, w, "", { focus: true }), text(x + 11
 // Name on the cover preview changed to Sinta: maroon cover and Folio cover.
 const pvSinta = () => rect(760, 462, 324, 64, { fill: CREAM }) + text(CX, 508, "Sinta & Dimas", { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" });
 const pvSintaFolio = () => rect(752, 420, 340, 44, { fill: "#232220" }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: C.white });
-const FOLIO_C = [301, 302], DASAR_C = [155, 302]; // card centres with the cards at y 219
+const FOLIO_C = [301, 420], DASAR_C = [155, 420]; // card centres with the cards at y 337
 // Galeri Foto: panel scrolled so Kisah Cinta's bar is at y 191 and Galeri Foto (opened) at 249; the Media dialog (Pilih foto)
 // covers rail and panel: Unggah foto, paste link, 3-column grid, Pakai foto footer.
 const GAL = (() => {
@@ -305,9 +338,9 @@ export const scenes = {
     els: {
       rTabs: { svg: ring(10, 52, 210, 30, { r: 6 }), enter: "fade", delay: 0.3 },
       gate: { svg: scalevEditor(0, 0, { rail: "Template", screenFill: C.white }) + rect(0, 93, 399, 807, { fill: C.white }) + text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade" },
-      tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + body(seg(), cards(219)), enter: "fade", delay: 0.5 },
+      tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + body(seg(), library(219)), enter: "fade", delay: 0.5 },
       locked: { svg: LOCKED, enter: "fade", delay: 0.5 },
-      picked: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
+      picked: { svg: body(panelBg(), seg(), library(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
       konten: { svg: kontenPanel(), enter: "fade" }
     },
     steps: [
@@ -340,16 +373,16 @@ export const scenes = {
     base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT })],
     els: {
       locked: LOCKED,
-      cardsA: { svg: seg() + htmlNote() + cards(287), enter: "fade" },
+      cardsA: { svg: seg() + htmlNote() + library(287), enter: "fade" },
       lidT: lid("Template", { inbox: false }),
       rSeg: { svg: ring(P, 169, PW, 38, { r: 6 }), enter: "fade" },
-      selF: { svg: ring(234, 287, 134, 167, { r: 10 }), enter: "pop", origin: [301, 370] }
+      selF: { svg: ring(234, 405, 134, 167, { r: 10 }), enter: "pop", origin: [301, 488] }
     },
     steps: [
       { caption: "Klik Template di menu kiri. Panel Template terbuka.", at: ED.rail.Template, click: true, show: ["cardsA"] },
       { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", show: ["rSeg"], at: [160, 188] },
       { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", hide: ["rSeg"], scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", scroll: { id: "cardsA", dy: -241 }, at: [301, 370], click: true, show: ["selF"], dur: 3.6 }
+      { caption: "Klik kartu yang kamu suka, misalnya Folio.", scroll: { id: "cardsA", dy: -241 }, at: [301, 488], click: true, show: ["selF"], dur: 3.6 }
     ]
   },
 
@@ -373,19 +406,47 @@ export const scenes = {
   "editor-pilih-template-dipakai": {
     title: "Memilih template NikahKit pertama kali: Dipakai dan Konten",
     world: SIDE,
-    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), body(panelBg(), seg(), cards(219, "folio"))],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), body(panelBg(), seg(), library(219, "folio"))],
     els: {
-      rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade" },
+      rDip: { svg: ring(326, 511, 41, 18, { r: 12 }), enter: "fade" },
       konten: { svg: kontenPanel(), enter: "fade" },
       rNote: { svg: ring(P, 169, PW, 64, { r: 6 }), enter: "fade", delay: 0.4 },
       saved: SAVED
     },
     steps: [
-      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", show: ["rDip"], at: [346, 402] },
+      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", show: ["rDip"], at: [346, 520] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", hide: ["rDip"], at: ED.rail.Konten, click: true, show: ["konten", "rNote"], dur: 3.6 },
       { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", hide: ["rNote"], show: ["saved"], at: SAVED_AT }
     ]
   },
+
+  // Search and categories (panels-style.jsx TemplatePanel). Keyword results and counts from model.findTemplates on the build
+  // catalogue; the sentence answer comes from the worker (Jev), so its order here is only an example.
+  "editor-cari-template": (() => {
+    const [qBox, q1, t1] = typeIn(P, 219, PW, "Jawa"), [, q2, t2] = typeIn(P, 219, PW, "Jawa, nuansa hijau");
+    const below = (...kids) => rect(72, 257, 327, 643, { fill: C.white }) + kids.join("");
+    return {
+      title: "Mencari template lewat kata kunci, kategori, atau kalimat",
+      world: SIDE,
+      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), body(panelBg(), seg(), library(219))],
+      els: {
+        adat: { svg: body(below(chips(263, ALL_N, "Adat"), cards(337, null, ["tradisional-elegan", "kencana", "joyo", "ladomudo", "pusako", "saman"]))), enter: "fade" },
+        jawa: { svg: body(below(chips(263, [11, 11, 0, 0, 0, 0], "Adat"), cards(337, null, ["tradisional-elegan", "kencana", "joyo", "pendopo", "sekar-kedaton", "sogan"]))), enter: "fade", delay: 0.5 },
+        busy: { svg: body(below(chips(263, [0, 0, 0, 0, 0, 0], "Adat"), hintL(P, 337, ["Mencari template yang paling cocok…"]))), enter: "fade", delay: 1.4 },
+        smart: { svg: body(below(chips(263, [6, 6, 0, 0, 0, 0], "Adat"), hintL(P, 337, ["Paling cocok untuk “Jawa, nuansa hijau”, urut dari", "yang terdekat."]),
+          cards(369, null, ["sekar-jagad", "kayon", "joglo", "sogan", "kencana", "pendopo"]))), enter: "fade" },
+        qBox: { svg: qBox, enter: "fade" },
+        q1: { svg: q1, enter: "fade" },
+        q2: { svg: q2, enter: "fade" }
+      },
+      steps: [
+        { caption: "Klik kategori, misalnya Adat. Hanya template adat yang tampil.", at: ADAT_CHIP, click: true, show: ["adat"] },
+        { caption: "Ketik kata kunci di kotak Cari, misalnya Jawa. Angka kategori ikut berubah.", at: [228, 237], click: true, show: ["qBox", "q1", "jawa"], type: [{ id: "q1", ...t1 }], dur: 3.6 },
+        { caption: "Tulis keinginan klien dalam kalimat, lalu tekan Enter.", at: [300, 237], click: true, hide: ["q1"], show: ["q2", "busy"], type: [{ id: "q2", ...t2 }], dur: 4.4 },
+        { caption: "Hasilnya diurutkan dari yang paling cocok dengan kalimatmu.", at: [160, 452], show: ["smart"], dur: 3.6 }
+      ]
+    };
+  })(),
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-ganti-template": {
@@ -393,9 +454,9 @@ export const scenes = {
     world: SIDE,
     base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), kontenPanel()],
     els: {
-      tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + body(seg(), cards(219, "folio")), enter: "fade" },
-      rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade", delay: 0.4 },
-      cardsC: { svg: body(panelBg(), seg(), cards(219, "dasar")), enter: "fade" },
+      tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + body(seg(), library(219, "folio")), enter: "fade" },
+      rDip: { svg: ring(326, 511, 41, 18, { r: 12 }), enter: "fade", delay: 0.4 },
+      cardsC: { svg: body(panelBg(), seg(), library(219, "dasar")), enter: "fade" },
       toast: { svg: shadow(84, 836, 302, 52, 4, 2) + rect(84, 836, 302, 52, { r: 4, fill: C.strong }) + text(96, 867, "Template diganti ke Dasar.", { size: 14, fill: C.white }) +
         text(374, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }), enter: "slide", delay: 0.4 }
     },
@@ -441,7 +502,7 @@ export const scenes = {
     return {
       title: "Mengisi Mempelai, Acara, Sampul, dan Salam di Konten",
       world: SIDE,
-      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton")],
+      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), body(seg(), library(219))],
       els: {
         railK: { svg: nkRail(0, 0, "Konten"), enter: "fade" },
         v1: { svg: v1.svg, enter: "fade" },

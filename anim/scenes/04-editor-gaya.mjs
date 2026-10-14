@@ -148,19 +148,25 @@ const DOT = (cy, cx = 12) => `<rect x="4" y="3" width="16" height="18" rx="2"/><
 const FOCUS = [["Atas", DOT(8)], ["Tengah", DOT(12)], ["Bawah", DOT(16)], ["Kiri", DOT(12, 8.5)], ["Kanan", DOT(12, 15.5)]];
 const focusSeg = (x, y, w, active) => segIcons(x, y, w, FOCUS.map(([label, svg]) => ({ label, svg: svg.replace("currentColor", active === FOCUS.findIndex((f) => f[0] === label) ? C.action : C.text) })), active);
 
-// Template panel (panels-style.jsx TemplatePanel): kind tabs + template cards.
+// Template panel (panels-style.jsx TemplatePanel): kind tabs, search box, category chips with counts, template cards
+// (positions measured in Chromium with the real styles: search 219, chips 263/297, cards 337).
 const MEGAPHONE = '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>';
 const GRID = '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>';
+const CHIPS = [["Semua", "62", 88, 263, 79], ["Adat", "32", 173, 263, 67], ["Floral", "15", 246, 263, 70], ["Elegan", "6", 88, 297, 72], ["Minimalis", "5", 166, 297, 86], ["Ceria", "4", 258, 297, 63]];
 function templatePanel() {
   let s = rect(PX + 0.5, BY + 0.5, PW - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(PX + 1, BY + 1, PW / 2 - 1, 36, { fill: C.primarySoft }) + line(PX + PW / 2, BY + 1, PX + PW / 2, BY + 37, { stroke: C.field }) +
-    raw(GRID, PX + 48, BY + 19, 18, C.action) + text(PX + 62, BY + 23, "Template", { size: 12, weight: 600, fill: C.action }) + raw(MEGAPHONE, PX + PW * 0.75, BY + 19, 18, C.text);
-  const cards = [["Dasar", "Polos · 20 bagian · HP &", "#4b4b4b"], ["Folio", "20 bagian · HP &", "#2f3238"], ["Galeri Putih", "20 bagian · HP &", "#f4f2ee"], ["Modern Estetik", "20 bagian · HP &", "#ebe6dc"]];
+    raw(GRID, PX + 48, BY + 19, 18, C.action) + text(PX + 62, BY + 23, "Template", { size: 12, weight: 600, fill: C.action }) + raw(MEGAPHONE, PX + PW * 0.75, BY + 19, 18, C.text) +
+    clipped(PX, 219, PW, 36, nkInput(PX, 219, PW, "Cari: Jawa, bunga, atau tulis keinginan klien…", { placeholder: true }));
+  CHIPS.forEach(([c, n, x, y, w], i) => (s += rect(x + 0.5, y + 0.5, w - 1, 27, { r: 14, fill: i ? C.white : C.primarySoft, stroke: i ? C.field : C.primary }) +
+    text(x + 11, y + 18, c, { size: 12, fill: i ? C.strong : C.action }) + text(x + w - 11, y + 18, n, { size: 12, fill: C.text, anchor: "end" })));
+  const cards = [["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"], "#4b4b4b"], ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"], "#2f3238"],
+    ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"], "#f4f2ee"], ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"], "#ebe6dc"]];
   cards.forEach(([n, d, bg], i) => {
-    const x = PX + (i % 2) * 146, y = BY + 50 + Math.floor(i / 2) * 241;
+    const x = PX + (i % 2) * 146, y = 337 + Math.floor(i / 2) * 241;
     s += rect(x + 0.5, y + 0.5, 132, 165, { r: 8, fill: "#f6f6f6", stroke: C.line }) + rect(x + 5, y + 5, 72, 156, { r: 5, fill: bg }) +
       photo(x + 12, y + 30, 58, 60, i + 2) + rect(x + 18, y + 104, 46, 4, { r: 2, fill: i < 2 ? "rgba(255,255,255,.7)" : "#8a8a8a" }) + rect(x + 26, y + 114, 30, 3, { r: 1.5, fill: i < 2 ? "rgba(255,255,255,.5)" : "#b5b5b5" }) +
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((k) => rect(x + 82 + (k % 2) * 23, y + 8 + Math.floor(k / 2) * 30, 20, 26, { r: 2, fill: k % 3 ? "#ffffff" : "#d9d4cc" })).join("") +
-      text(x, y + 188, n, { size: 14, weight: 500 }) + para(x, y + 209, [d, "desktop · ID/EN"], { size: 12, fill: C.faint, lh: 16 });
+      text(x, y + 188, n, { size: 14, weight: 500 }) + para(x, y + 209, d, { size: 12, fill: C.faint, lh: 16 });
   });
   return s;
 }
@@ -218,19 +224,34 @@ const pal = (y, name, c, o = {}) => {
     (o.badge ? nkBadge(269, y + 18, o.badge, { fill: C.mutedBg, fg: C.text }) : "");
 };
 const KENCANA_STRIP = ["#FFF7E9", "#FFFDF8", "#8E2818", "#8E2818", "#6B5A55"];
-const EARTHY = [["Terakota", ["#F6EFE7", "#FFFBF6", "#5A2E1F", "#A0522D", "#7A6A60"]], ["Sage", ["#F1F3EC", "#FBFCF8", "#2F3D2C", "#5B7553", "#66705F"]], ["Kakao", ["#EFE6DC", "#FAF5EF", "#3A2A22", "#6B4A3A", "#6E5F56"]], ["Pasir", ["#F5EFE3", "#FFFDF8", "#4A3A26", "#7D5F36", "#6E6253"]]];
-// Palette list (model.js paletteChoices for Kencana); sel: 0 = Merah Kencana, 1.. = Earthy rows.
+// Gaya > Warna list for Kencana (model.js paletteChoices): its own palette, then the Jelajah palettes it can wear, grouped
+// by catalogue group in that order. Strip colours: bg, surface, heading, accent, muted.
+const PAL_GROUPS = [
+  ["Earthy", [["Terakota", ["#F6EFE7", "#FFFBF6", "#5A2E1F", "#A0522D", "#7A6A60"]], ["Sage", ["#F1F3EC", "#FBFCF8", "#2F3D2C", "#5B7553", "#66705F"]],
+    ["Kakao", ["#EFE6DC", "#FAF5EF", "#3A2A22", "#6B4A3A", "#6E5F56"]], ["Pasir", ["#F5EFE3", "#FFFDF8", "#4A3A26", "#7D5F36", "#6E6253"]],
+    ["Tanah Liat", ["#F3ECE8", "#FFFAF7", "#5B2F2A", "#9A4A3C", "#73625C"]], ["Olive Vintage", ["#F7F0E8", "#FAF6F0", "#332A24", "#3F4232", "#74675F"]]]],
+  ["Romantic Pastel", [["Blush", ["#FBF1F1", "#FFFFFF", "#6E3A44", "#A04E61", "#76636A"]], ["Lilac", ["#F5F1FA", "#FFFFFF", "#47385E", "#7A5C9E", "#6F6780"]],
+    ["Langit", ["#EEF5FA", "#FFFFFF", "#24435A", "#3F7397", "#5E6E7A"]], ["Peach", ["#FDF3EE", "#FFFFFF", "#7A3E2E", "#A44E38", "#76625C"]],
+    ["Mint", ["#EFF7F3", "#FFFFFF", "#24493D", "#3B735E", "#5A6B64"]], ["Mawar", ["#FBF0F4", "#FFFFFF", "#6B2D46", "#9C3F63", "#75606A"]]]],
+  ["Monokrom", [["Tinta", ["#FFFFFF", "#F5F5F4", "#111111", "#111111", "#666666"]], ["Batu", ["#EEEDEA", "#F8F8F6", "#262626", "#4A4A4A", "#626262"]]]]
+];
+// y = top of the Bold Luxury heading; headings sit 24 below the previous row, rows 50 apart (measured). sel: 0 = Merah
+// Kencana, 1.. = Earthy rows.
 function palettes(y, sel = 0) {
-  let s = nkH3(PX, y + 12, "Bold Luxury") + pal(y + 24, "", KENCANA_STRIP, { h: 54, on: sel === 0, lines: ["Merah", "Kencana"], badge: "Bawaan Kencana" }) + nkH3(PX, y + 126, "Earthy");
-  EARTHY.forEach(([n, c], i) => (s += pal(y + 138 + i * 50, n, c, { on: sel === i + 1 })));
+  let s = nkH3(PX, y + 12, "Bold Luxury") + pal(y + 24, "", KENCANA_STRIP, { h: 54, on: sel === 0, lines: ["Merah", "Kencana"], badge: "Bawaan Kencana" }), top = y + 102;
+  PAL_GROUPS.forEach(([g, rows], k) => {
+    s += nkH3(PX, top + 12, g);
+    rows.forEach(([n, c], i) => (s += pal(top + 24 + i * 50, n, c, { on: k === 0 && sel === i + 1 })));
+    top += 24 + rows.length * 50 + 18;
+  });
   return s;
 }
-const PAL_Y = 597, palRowY = (i) => PAL_Y + 138 + i * 50; // Earthy row i
+const PAL_Y = 609, palRowY = (i) => PAL_Y + 126 + i * 50; // Earthy row i
 const TERAKOTA = { bg: "#F6EFE7", surface: "#FFFBF6", heading: "#5A2E1F", text: "#4A3B33", accent: "#A0522D", on: "#FFFFFF" };
 const SAGE = { bg: "#F1F3EC", surface: "#FBFCF8", heading: "#2F3D2C", text: "#3B4438", accent: "#5B7553", on: "#FFFFFF" };
 // State A: Custom not in use (lead line, colours of the chosen palette), without the sub-tabs.
 function warnaA(p = KENCANA, sel = 0) {
-  let s = white(72, BY + 38, 314, 900) + nkH3(PX, 235, "Custom") + para(PX, 259, ["Mulai dari palet yang dipilih; ubah salah satu warna", "untuk memakai Custom."], { size: 12, fill: C.faint, lh: 16 });
+  let s = white(72, BY + 38, 314, 1400) + nkH3(PX, 235, "Custom") + para(PX, 259, ["Mulai dari palet yang dipilih; ubah salah satu warna", "untuk memakai Custom."], { size: 12, fill: C.faint, lh: 16 });
   ROLES.forEach((r, i) => (s += colorRow(291 + i * 60, r, p[r[2]].toUpperCase())));
   return s + palettes(PAL_Y, sel);
 }
@@ -241,7 +262,7 @@ function warnaB() {
   let s = white(72, 154, 314, 746) + subtabs(0, [0]) + resetBox(223) + nkH3(PX, 297, "Custom") + changed(PX + 50, 297, "dipakai");
   ROLES.forEach((r, i) => (s += colorRow(309 + i * 60, r, r[2] === "accent" ? GOLD : KENCANA[r[2]].toUpperCase())));
   s += nkNote(PX, 609, PW, ["Kurang kontras: Aksen di Latar, Aksen di", "Kartu."], { tone: "warn" }) + quiet(PX, 677, "Kembali ke palet bawaan");
-  return s + palettes(733, -1);
+  return s + palettes(738, -1);
 }
 // Chrome's colour picker popup (generic: gradient, hue bar, hex value; no labels). Opens above the swatch (no room below).
 const PICK = { x: 104, y: 326, w: 232, h: 196 };
@@ -559,7 +580,7 @@ const SCENES = {
 
   // ------------------------------------------------------------------------------------------- Gaya A: palet siap pakai
   "editor-gaya-palet": (() => {
-    const DY = 200, tY = palRowY(0) - DY + 22; // Terakota row centre after scrolling
+    const DY = 300, tY = palRowY(0) - DY + 22; // Terakota row centre after scrolling
     return {
       title: "Memilih palet warna siap pakai",
       world: PANEL,
@@ -572,7 +593,7 @@ const SCENES = {
       },
       steps: [
         { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", at: ED.rail.Gaya, click: true, show: ["gaya", "pane", "tabs"] },
-        { caption: "Gulir ke daftar palet. Palet bawaan diberi label Bawaan Kencana.", at: [250, 470], scroll: { id: "pane", dy: DY }, dur: 3.6 },
+        { caption: "Gulir ke daftar palet. Paling atas palet bawaan, berlabel Bawaan Kencana.", at: [250, 470], scroll: { id: "pane", dy: DY }, dur: 3.6 },
         { caption: "Klik satu palet, misalnya Terakota. Palet itu diberi garis biru.", at: [230, tY], click: true, show: ["terra"], dur: 3.8 }
       ]
     };
