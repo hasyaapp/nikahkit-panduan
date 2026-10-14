@@ -8,11 +8,11 @@
 // (server/pages/src/landing/index.html + server/pages/shared/order-form.js, measured in Chrome at 390 px). The flow
 // diagram and the checklist are guide graphics, not product screens.
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, clipShape, shadow, skeleton, tw, mid } from "../lib.mjs";
-import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk } from "../ui/kit.mjs";
+import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
 import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, MK, MKY, CARD_X, mkCards, dipakaiBox, GAYA_Y, SIMPAN_Y, brandOpen, MENU_H, menuItemY, styleMenu } from "../ui/marketing.mjs";
-import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel } from "../ui/editor-panels.mjs";
+import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvMempelai } from "../ui/invitation.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
@@ -25,10 +25,10 @@ const M = (x, y, w, hh, r = 4) => ({ box: [x, y, w, hh], r });
 const F = { left: [0, 92, 399, 808], panel: [72, 92, 327, 808], rail: [0, 92, 72, 808], tabs: [0, 44, 399, 48], top: [1180, 44, 260, 48], preview: [727, 106, 390, 784] };
 const INBOX = M(218, 104, 36, 36, 8);
 
-// Template cards (Template category). Thumbnails are the worker's images: drawn here as neutral page sketches; the
-// description as the card clamps it (two lines, same text as 03-editor-konten.mjs).
-const TPL = [["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"], ["#ffffff", "#8b8178"]], ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"], ["#f3ece2", "#7a5c3e"]],
-  ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"], ["#fafafa", "#9aa3ad"]], ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"], ["#e9efe7", "#5d7a5a"]]];
+// The designs the Landing page shows (names from editor-panels TPL; palettes for the page sketches drawn here):
+// [name, description, [paper, accent]].
+const DESIGN = (id, pal) => [TPL[id][0], TPL[id][1], pal];
+const DESIGNS = [DESIGN("dasar", ["#ffffff", "#8b8178"]), DESIGN("folio", ["#f3ece2", "#7a5c3e"]), DESIGN("galeri", ["#fafafa", "#9aa3ad"]), DESIGN("modern-estetik", ["#e9efe7", "#5d7a5a"])];
 function pageSketch(x, y, w, h, [bg, ac]) {
   const cx = x + w / 2;
   return rect(x, y, w, h, { fill: bg }) + rect(x, y, w, h * 0.06, { fill: ac, opacity: 0.25 }) +
@@ -101,7 +101,7 @@ const NOTES = {
 const gridItem = (x, t, names, note, pal, act = 287.6) => clipped(x, t, 168, 210, pageSketch(x, t, 168, 210, pal)) + rect(x, t, 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
   names.map((n, k) => h(x, t + 229 + k * 23, n, 20)).join("") + para(x, t + 251 + (names.length - 1) * 23, note, { size: 14, fill: LP.muted, lh: 20.3 }) +
   text(x, t + act + 27.2, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true }) + lpBtn(x + 92, t + act, "Pilih", { small: true, w: 71 });
-const tplGrid = (x0, top) => TPL.map(([n, , pal], i) => gridItem(x0 + 20 + (i % 2) * 182, top + Math.floor(i / 2) * 357.6, [n], NOTES.grid[i], pal)).join("");
+const tplGrid = (x0, top) => DESIGNS.map(([n, , pal], i) => gridItem(x0 + 20 + (i % 2) * 182, top + Math.floor(i / 2) * 357.6, [n], NOTES.grid[i], pal)).join("");
 
 // Fitur undangan digital (.feat-grid, two columns): icons and words from the page. [x, top, height, title, text]; the
 // title starts 75 below the card top, the text 126.6 below (103.8 under a one-line title).
@@ -135,7 +135,7 @@ function landingTop(x0, y0, name) {
   ["Undangan digital", "untuk hari", "bahagia kalian"].forEach((l, i) => (s += h(X, Y([131, 174.8, 218.5][i]), l, 42.9)));
   s += para(X, Y(261.3), ["Pilih desain, pilih paket, lalu isi data", `pernikahan kalian. ${name} menyiapkan`, "undangannya sampai siap dibagikan ke tamu."], { size: 17, fill: LP.muted, lh: 26.3 });
   s += lpBtn(X, Y(LPY.cta), "Pesan undangan", { solid: true, w: 178.8 }) + lpBtn(x0 + 210.8, Y(LPY.cta), "Lihat desain", { w: 143.6 });
-  s += THUMB(X + 10.5, Y(LPY.art + 28), 175, 219, TPL[1][2], -6) + THUMB(X + 164.5, Y(LPY.art + 28), 175, 219, TPL[2][2], 6) + THUMB(X + 87.5, Y(LPY.art), 175, 219, TPL[0][2]);
+  s += THUMB(X + 10.5, Y(LPY.art + 28), 175, 219, DESIGNS[1][2], -6) + THUMB(X + 164.5, Y(LPY.art + 28), 175, 219, DESIGNS[2][2], 6) + THUMB(X + 87.5, Y(LPY.art), 175, 219, DESIGNS[0][2]);
   // katalog: theme buttons, the first four designs
   s += dash(X, Y(LPY.katalog), 350) + h(X, Y(866.3), "Pilih desain undangan", 32) +
     para(X, Y(901.9), ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.3 }) +
@@ -285,11 +285,11 @@ const CKX = 230, CKY = (i) => 172 + i * 68, CKW = 980;
 // ---- Phone screens and dialog extras -----------------------------------------------------------------------------
 // A 390x844 phone viewport onto a long page: the page drawn shifted up by y.
 const scr = (y, ...s) => group({ transform: `translate(0 ${-y})` }, ...s);
-// Pages are drawn in phone px (0..390). ph() puts them on the desktop's phone screen (PHONE), clipped to it; Q, QR and
-// QM turn phone px into world points, rects and marks.
-const onPhone = (...s) => group({ transform: `translate(${PHONE.x} ${PHONE.y})` }, ...s);
-const ph = (...s) => clipped(PHONE.x, PHONE.y, PHONE.w, PHONE.h, onPhone(...s));
-const phBase = (...s) => [phoneDesk(onPhone(...s))];
+// Pages are drawn in phone px (0..390): kit onPhone puts them on the desktop's phone screen (PHONE), clipped to it;
+// atPhone only shifts them (a scrolling page, whose clip would scroll with it). Q, QR and QM turn phone px into world
+// points, rects and marks.
+const atPhone = (...s) => group({ transform: `translate(${PHONE.x} ${PHONE.y})` }, ...s);
+const phBase = (...s) => [phoneDesk(atPhone(...s))];
 const Q = (x, y) => [+(x + PHONE.x).toFixed(1), +(y + PHONE.y).toFixed(1)];
 const QR = (x, y, w, hh) => [...Q(x, y), w, hh];
 const QM = (x, y, w, hh, r = 4) => ({ box: QR(x, y, w, hh), r });
@@ -326,23 +326,23 @@ const CT = LPY.grid - KAT, CHIP_Y = LPY.chips - KAT;
 const catHead = rect(0, 0, 390, 844, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 88, "Pilih desain undangan", 32) +
   para(20, 123.6, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.3 }) + chipRow(0, CHIP_Y);
 // Mozaik with every design: the fourth is a tall tile on the right, the fifth (Cute Gemoy) starts beside it.
-const GEMOY = ["Cute Gemoy", null, ["#fde7ec", "#e48aa3"]];
+const GEMOY = DESIGN("cute-gemoy", ["#fde7ec", "#e48aa3"]);
 const CAT_STYLE = {
   grid: tplGrid(0, CT),
-  daftar: TPL.map(([n, , pal], i) => { const t = CT + i * 153.6;
+  daftar: DESIGNS.map(([n, , pal], i) => { const t = CT + i * 153.6;
     return pic(20, t + 16, 92, 115, pal, 10) + h(128, t + 35, n, 20) + para(128, t + 57, NOTES.daftar[i], { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(128, t + 88.8) +
       lpBtn(220, t + 89.6, "Pilih", { small: true, w: 71 }) + dash(20, t + 151.6, 350); }).join(""),
   // Kartu besar: a third note line makes the card 21.8 taller and moves Lihat demo and Pilih down with it.
-  kartu: [0, 1].map((i) => { const [n, , pal] = TPL[i], note = NOTES.kartu[i], more = (note.length - 2) * 21.8, t = CT + i * 470.6, hh = 450.6 + more;
+  kartu: [0, 1].map((i) => { const [n, , pal] = DESIGNS[i], note = NOTES.kartu[i], more = (note.length - 2) * 21.8, t = CT + i * 470.6, hh = 450.6 + more;
     return rect(20, t, 350, hh, { r: 16, fill: LP.paper }) + clipShape(rect(20, t, 350, hh, { r: 16 }), pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
       rect(20.75, t + 0.75, 348.5, hh - 1.5, { r: 16, stroke: LP.cocoa, sw: 1.5 }) + h(41, t + 303, n, 26) + para(41, t + 331, note, { size: 15, fill: LP.muted, lh: 21.8 }) +
       demoLink(41, t + 379.8 + more) + lpBtn(137, t + 377.5 + more, "Pilih", { solid: true, w: 83.1 }); }).join(""),
   // Geser: on a phone (no arrows) the next section, Fitur undangan digital, starts 778.9 below the dashed line.
-  geser: [0, 1].map((i) => { const [n, , pal] = TPL[i], x = 20 + i * 268, t = CT + 4;
+  geser: [0, 1].map((i) => { const [n, , pal] = DESIGNS[i], x = 20 + i * 268, t = CT + 4;
     return pic(x, t, 252, 315, pal) + h(x, t + 334, n, 20) + para(x, t + 356, NOTES.geser[i], { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(x, t + 391.8) +
       lpBtn(x + 92, t + 392.6, "Pilih", { small: true, w: 71 }); }).join("") + dash(20, 778.9, 350),
   mozaik: `<defs><linearGradient id="mzfade" x1="0" y1="1" x2="0" y2="0"><stop offset="${(79 / 135).toFixed(3)}" stop-color="rgb(20,12,8)" stop-opacity=".88"/><stop offset="1" stop-color="rgb(20,12,8)" stop-opacity="0"/></linearGradient></defs>` +
-    [[TPL[0], 20, CT, 450], [TPL[1], 200, CT, 220], [TPL[2], 200, CT + 230, 220], [TPL[3], 200, CT + 460, 450], [GEMOY, 20, CT + 460, 220]].map(([[n, , pal], x, y, hh]) => { const b = y + hh;
+    [[DESIGNS[0], 20, CT, 450], [DESIGNS[1], 200, CT, 220], [DESIGNS[2], 200, CT + 230, 220], [DESIGNS[3], 200, CT + 460, 450], [GEMOY, 20, CT + 460, 220]].map(([[n, , pal], x, y, hh]) => { const b = y + hh;
       return clipShape(rect(x, y, 170, hh, { r: 14 }), pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
         rect(x + 10, y + 11, 84, 24, { r: 12, fill: "rgba(20,12,8,.3)" }) + rect(x + 10, y + 10, 84, 24, { r: 12, fill: LP.paper }) + text(x + 52, y + 27, "Lihat demo", { size: 12, weight: 800, fill: LP.cocoa, anchor: "middle" }) +
         h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join(""),
@@ -370,7 +370,7 @@ function etalaseView() {
   };
   return `<g font-family="${BOD}">` + rect(0, 0, 390, 844, { fill: ET.tint }) + text(195, 88, "Pilih desain undangan", { size: 32, font: DSP, fill: ET.accent, anchor: "middle" }) +
     para(195, 125.6, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian", "suka."], { size: 17, fill: ET.muted, lh: 26.35, anchor: "middle" }) +
-    chipRow(0, 214.6, "Semua", chips, ET, 28.5) + item(20, TPL[0], "Minimalis", 82.9) + item(314, TPL[1], "Minimalis", 82.9) + "</g>";
+    chipRow(0, 214.6, "Semua", chips, ET, 28.5) + item(20, DESIGNS[0], "Minimalis", 82.9) + item(314, DESIGNS[1], "Minimalis", 82.9) + "</g>";
 }
 // Etalase in the scene: the first design's Lihat demo, name board and Pilih.
 const ET_LENS = [14, 652, 292, 178];
@@ -421,10 +421,11 @@ const toastLens = (lines) => { const [x, y, w, hh] = nkToastBoxes(lines).toast; 
 const pubStep = (caption) => ({ caption, at: ED.terbitkan, click: true, focus: F.top, mark: M(...ED.terbitkanBox), lens: { src: [1180, 44, 260, 50] }, dur: 3.4 });
 
 // ---- Scenes ------------------------------------------------------------------------------------------------------
-const kontenPanel = head("Konten") + kList({ left: 0 }).svg;
-const kontenEd = (page, p) => [...shell({ page, rail: "Konten" }), kontenPanel, pvMempelai(p)];
+// Konten with every group closed (the panel the order data fills); editor-panels kontenPanel has Mempelai open.
+const kontenClosed = head("Konten") + kList({ left: 0 }).svg;
+const kontenEd = (page, p) => [...shell({ page, rail: "Konten" }), kontenClosed, pvMempelai(p)];
 const DATA_TOAST = ["Data pesanan dimasukkan.", "Foto tetap; ganti foto", "contoh bila masih ada."];
-const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + kontenPanel + pvMempelai(RANI), enter: "fade" },
+const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + kontenClosed + pvMempelai(RANI), enter: "fade" },
   t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: o.toast ?? 0.3 } });
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
@@ -624,13 +625,13 @@ export const scenes = {
     title: "Isi Landing page member di HP klien",
     base: phBase(LAND, F0.svg),
     els: {
-      v1: { svg: ph(scr(KAT, LAND, F0.svg)), enter: "fade", delay: 0.1 },
-      dlg: { svg: ph(demoView), enter: "pop", origin: Q(...LIHAT_DEMO) },
-      pick: { svg: ph(demoPick), enter: "pop", origin: Q(...LIHAT_DEMO) },
-      f1: { svg: ph(scr(FORM_Y, LAND, F1.svg)), enter: "fade", delay: 0.2 },
-      vPkg: { svg: ph(scr(PKG_Y, LAND, F1.svg)), enter: "fade" },
-      p2: ph(scr(PKG_Y, body(lpBtn(45, LPY.pkg1 + 218.1, "Pilih paket ini", { solid: true, w: 300 })))),
-      f2: { svg: ph(scr(FORM_Y, LAND, F2.svg)), enter: "fade", delay: 0.3 }
+      v1: { svg: onPhone(scr(KAT, LAND, F0.svg)), enter: "fade", delay: 0.1 },
+      dlg: { svg: onPhone(demoView), enter: "pop", origin: Q(...LIHAT_DEMO) },
+      pick: { svg: onPhone(demoPick), enter: "pop", origin: Q(...LIHAT_DEMO) },
+      f1: { svg: onPhone(scr(FORM_Y, LAND, F1.svg)), enter: "fade", delay: 0.2 },
+      vPkg: { svg: onPhone(scr(PKG_Y, LAND, F1.svg)), enter: "fade" },
+      p2: onPhone(scr(PKG_Y, body(lpBtn(45, LPY.pkg1 + 218.1, "Pilih paket ini", { solid: true, w: 300 })))),
+      f2: { svg: onPhone(scr(FORM_Y, LAND, F2.svg)), enter: "fade", delay: 0.3 }
     },
     steps: [
       { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", focus: PHF,
@@ -652,7 +653,7 @@ export const scenes = {
   "jualan-landing-tema": {
     title: "Pilihan tema di katalog Landing page",
     base: phBase(scr(KAT, LAND, F0.svg)),
-    els: { adat: { svg: ph(scr(KAT, adatView)), enter: "fade", delay: 0.1 } },
+    els: { adat: { svg: onPhone(scr(KAT, adatView)), enter: "fade", delay: 0.1 } },
     steps: [
       { caption: "Di atas katalog ada tombol tema: Semua dan tiap kategori, dengan jumlahnya.", focus: PHF, mark: QM(18, CHIP_Y - 2, 372, 48, 24),
         lens: lensBy(QR(14, CHIP_Y - 8, 212, 60), "l"), dur: 3.8 },
@@ -667,10 +668,10 @@ export const scenes = {
     title: "Demo desain di Landing page dan tautannya",
     base: phBase(urlBar(ADDR), inBrowser(scr(KAT, LAND, F0.svg))),
     els: {
-      demo: { svg: ph(inBrowser(demoView)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
-      pick: { svg: ph(inBrowser(demoPick)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
-      url: { svg: ph(urlBar(`${ADDR}?demo=dasar`)), enter: "fade" },
-      f1: { svg: ph(urlBar(ADDR), inBrowser(scr(FORM_Y, LAND, F1.svg))), enter: "fade", delay: 0.2 }
+      demo: { svg: onPhone(inBrowser(demoView)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
+      pick: { svg: onPhone(inBrowser(demoPick)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
+      url: { svg: onPhone(urlBar(`${ADDR}?demo=dasar`)), enter: "fade" },
+      f1: { svg: onPhone(urlBar(ADDR), inBrowser(scr(FORM_Y, LAND, F1.svg))), enter: "fade", delay: 0.2 }
     },
     steps: [
       { caption: "Di Pilih desain undangan, klien menekan Lihat demo.", at: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56), click: true, show: ["demo", "pick", "url"], focus: PHF,
@@ -686,7 +687,7 @@ export const scenes = {
   "jualan-gaya-katalog": {
     title: "Enam Gaya katalog di Landing page",
     base: phBase(body(catHead)),
-    els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: ph(body(rect(0, CHIP_Y + 52, 390, 844 - CHIP_Y - 52, { fill: LP.paper }), svg)), enter: "fade" }])),
+    els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: onPhone(body(rect(0, CHIP_Y + 52, 390, 844 - CHIP_Y - 52, { fill: LP.paper }), svg)), enter: "fade" }])),
     steps: [
       { caption: "Grid (bawaan): dua desain sejajar, Lihat demo dan Pilih di bawahnya.", show: ["grid"], focus: PHF, lens: lensBy(QR(16, CT + 212, 176, 134), "l"), dur: 3.4 },
       { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], lens: lensBy(QR(14, CT + 10, 372, 140), "r", 1.2), dur: 3.2 },
@@ -718,18 +719,18 @@ export const scenes = {
     base: phBase(scr(FY0, fkHead, K1.svg)),
     els: {
       // The page scrolls inside the screen: unclipped (a clip would scroll with it), under the desktop strips above and below.
-      pgc: { svg: onPhone(scr(FY0, fkHead, K1.svg, qrChk)), enter: "fade" },
+      pgc: { svg: atPhone(scr(FY0, fkHead, K1.svg, qrChk)), enter: "fade" },
       edges: phEdges,
-      s2: { svg: ph(sheet(fkHead, K2.svg)), enter: "fade", delay: 0.15 },
-      err: { svg: ph(sheet(fkHead, K2e.svg)), enter: "fade", delay: 0.1 },
-      nameBg: { svg: ph(scr(FY0, lpFocus(nameY))), enter: "fade" },
-      nameT: ph(scr(FY0, body(text(55.5, nameY + 30, "Rani Kusuma", { size: 16, fill: LP.ink })))),
-      nameOff: { svg: ph(scr(FY0, body(lpRing(nameY, LP.tint)))), enter: "fade" },
-      waBg: { svg: ph(scr(FY0, lpFocus(waY))), enter: "fade" },
-      waT: ph(scr(FY0, body(text(55.5, waY + 30, "0812 3456 7890", { size: 16, fill: LP.ink })))),
-      s10: { svg: ph(sheet(fkHead, K10.svg)), enter: "fade" },
-      sub: ph(scr(FY0, body(lpBtn(41.5, K10.pos.next, "kirim data", { solid: true, w: 307 })))),
-      done: { svg: ph(sheet(fkHead, KD.svg)), enter: "fade", delay: 0.2 }
+      s2: { svg: onPhone(sheet(fkHead, K2.svg)), enter: "fade", delay: 0.15 },
+      err: { svg: onPhone(sheet(fkHead, K2e.svg)), enter: "fade", delay: 0.1 },
+      nameBg: { svg: onPhone(scr(FY0, lpFocus(nameY))), enter: "fade" },
+      nameT: onPhone(scr(FY0, body(text(55.5, nameY + 30, "Rani Kusuma", { size: 16, fill: LP.ink })))),
+      nameOff: { svg: onPhone(scr(FY0, body(lpRing(nameY, LP.tint)))), enter: "fade" },
+      waBg: { svg: onPhone(scr(FY0, lpFocus(waY))), enter: "fade" },
+      waT: onPhone(scr(FY0, body(text(55.5, waY + 30, "0812 3456 7890", { size: 16, fill: LP.ink })))),
+      s10: { svg: onPhone(sheet(fkHead, K10.svg)), enter: "fade" },
+      sub: onPhone(scr(FY0, body(lpBtn(41.5, K10.pos.next, "kirim data", { solid: true, w: 307 })))),
+      done: { svg: onPhone(sheet(fkHead, KD.svg)), enter: "fade", delay: 0.2 }
     },
     steps: [
       { caption: "Langkah 1 dari 10, Pesanan: Paket, Fitur undangan, dan Desain.", focus: PHF, mark: QM(41.5, fy(K1.pos.head) - 64, 307, 42),
@@ -791,7 +792,7 @@ export const scenes = {
         mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
   },
-  "jualan-pesanan-terbit": pubScene("Ganti foto, lalu terbitkan undangan", "Undangan Rani & Dimas", "Konten", kontenPanel, pvMempelai(RANI),
+  "jualan-pesanan-terbit": pubScene("Ganti foto, lalu terbitkan undangan", "Undangan Rani & Dimas", "Konten", kontenClosed, pvMempelai(RANI),
     ["Foto tidak ikut terisi: ganti foto contoh di pratinjau.", "Lalu klik Simpan & Terbitkan."], { mark: M(852, 248, 140, 202, 12), note: "Foto contoh" }),
 
   "jualan-tempel-pesanan": {
