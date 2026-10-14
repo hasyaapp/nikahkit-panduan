@@ -49,14 +49,16 @@ await send("Page.navigate", { url: pathToFileURL(file).href });
 for (let n = -1, still = 0, k = 0; k < 200 && still < 3; k++) { await sleep(300); still = loaded && anims.size && anims.size === n ? still + 1 : 0; n = anims.size; }
 fs.mkdirSync(outDir, { recursive: true });
 const shoot = async (label, ms) => {
-  if (ms != null) {
-    const ids = [...anims];
+  // Seek every reported animation; repeat while new ones are still being reported (late on a loaded machine), then
+  // wait two animation frames so the capture shows the seeked state.
+  for (let seen = -1, k = 0; ms != null && anims.size !== seen && k < 20; k++) {
+    const ids = [...anims]; seen = ids.length;
     await send("Animation.setPaused", { animations: ids, paused: true });
     await send("Animation.seekAnimations", { animations: ids, currentTime: ms });
+    await send("Runtime.evaluate", { expression: "new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))", awaitPromise: true });
+    await sleep(150);
   }
-  // Two animation frames after the seek, so the capture shows the seeked state even on a loaded machine.
-  await send("Runtime.evaluate", { expression: "new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))", awaitPromise: true });
-  await sleep(100);
+  if (ms == null) await send("Runtime.evaluate", { expression: "new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))", awaitPromise: true });
   const r = await send("Page.captureScreenshot", { format: "png" });
   const p = path.join(outDir, `${name}-${label}.png`);
   fs.writeFileSync(p, Buffer.from(r.result.data, "base64"));
