@@ -68,8 +68,9 @@ export const para = (x, y, lines, o = {}) => `<text${attrs({ x, y, "font-size": 
 // Box helpers for [x, y, w, h]: its centre, and the box grown by d on every side.
 export const mid = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
 export const grow = (b, d) => [b[0] - d, b[1] - d, b[2] + 2 * d, b[3] + 2 * d];
-// Approximate text width (a flat average per character) for laying out boxes and pills around a label; every scene's
-// layout is built on these numbers. Skeleton bars use textWidth() instead, which follows the glyphs.
+// Approximate text width, a flat average per character (on median 7% wider than the text on Apple, 21% on Android):
+// the measure for text that fills a column (wrap(), so a line keeps inside its column) and for layouts built on it.
+// A box that hugs its own label with padding (badge, pill) and the skeleton bars use textWidth(), the glyph widths.
 export const tw = (s, size = 14, weight = 400) => Math.round(String(s).length * size * (weight >= 600 ? 0.57 : weight >= 500 ? 0.55 : 0.53));
 // Glyph advances (per 100 px) of the SVG font stack as Chrome draws it on macOS, for weights 400/500/600/700
 // (measured 14 Okt 2026). Their sums land between Roboto (Android) and SF Text (Apple, small sizes), so a skeleton
