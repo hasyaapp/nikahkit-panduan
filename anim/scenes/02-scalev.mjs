@@ -685,8 +685,8 @@ export const scenes = {
       tile: { svg: htmlTile(true), enter: "fade" }
     },
     steps: [
-      { caption: "Klik + Create Landing Page.", focus: [256, 0, 1184, 137], at: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20], click: true, press: "create", show: ["shade", "typeDlg"], mark: CREATE, lens: { src: [264, 62, 330, 72] } },
-      { caption: "Pilih tipe HTML Mode.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [DLG.x + 368, DLG.y + 170], click: true, press: "tile", show: ["tile"], mark: { box: HTML_TILE, r: 6 }, lens: { src: [DLG.x + 260, DLG.y + 170, 216, 70] } }
+      { caption: "Klik + Create Landing Page.", focus: [256, 0, 1184, 137], at: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20], click: true, press: "create", show: ["shade", "typeDlg"], mark: CREATE, lens: { src: [270, 70, 192, 56] } },
+      { caption: "Pilih tipe HTML Mode.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [DLG.x + 368, DLG.y + 170], click: true, press: "tile", show: ["tile"], mark: { box: HTML_TILE, r: 6 }, lens: { src: [DLG.x + 252, DLG.y + 66, 232, 207] } }
     ]
   },
 
@@ -700,7 +700,7 @@ export const scenes = {
     steps: [
       { caption: "Editor terbuka dengan tab Code, Media, Security, Settings.", focus: [0, 44, 399, 48], mark: { box: [8, 52, 222, 28], r: 6 }, lens: TABS_LENS, dur: 3.2 },
       { caption: "Tab NikahKit berlogo biru ada di ujung strip tab.", at: ED.tab.NikahKit, mark: tabMark("NikahKit"), lens: TABS_LENS },
-      { caption: "Klik NikahKit. Menu selain Template dan Media terkunci.", focus: PANEL, at: ED.tab.NikahKit, click: true, show: ["edNk", "tip"], dur: 4, mark: tabMark("NikahKit"), lens: { src: [0, 92, 260, 160], at: [300, 70] } }
+      { caption: "Klik NikahKit. Menu selain Template dan Media terkunci.", focus: PANEL, at: ED.tab.NikahKit, click: true, show: ["edNk", "tip"], dur: 4, mark: tabMark("NikahKit"), lens: { src: [0, 98, 380, 110], at: [300, 70] } }
     ]
   },
 
@@ -721,9 +721,9 @@ export const scenes = {
     },
     steps: [
       { caption: "Tersimpan: alamat jadi app.scalev.com/pages/365671. Angka itu ID undangan.", focus: [OMNI.box, dn(DOMAIN_ACC)], show: ["saved", "now"], dur: 4,
-        mark: { box: [160, 52, tw("app.scalev.com/pages/365671", 14) + 12, 24], r: 4 }, lens: { src: [124, 41, 420, 44] } },
+        mark: { box: [160, 52, tw("app.scalev.com/pages/365671", 14) + 12, 24], r: 4 }, lens: { src: [134, 48, 300, 30] } },
       { caption: "Klik NikahKit lagi, lalu pilih template. Menu lain terbuka.", focus: dn(PANEL), at: [ED.tab.NikahKit[0], ED.tab.NikahKit[1] + CT], click: true, show: ["edNk"], hide: ["now"], dur: 3.6,
-        mark: { box: dn(TAB.NikahKit), r: 6 }, lens: { src: [0, CT + 92, 330, 200], at: [300, 90] } }
+        mark: { box: dn(TAB.NikahKit), r: 6 }, lens: { src: [0, CT + 98, 380, 110], at: [300, 90] } }
     ]
   },
 
@@ -736,7 +736,7 @@ export const scenes = {
       slug: slugText("rani-dimas")
     },
     steps: [
-      { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 275], at: [300, 40] } },
+      { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { src: [0, 44, 392, 280], at: [300, 40] } },
       { caption: "Isi Slug URL, misalnya rani-dimas.", focus: DOMAIN_ACC, at: [SLUG[0] + 200, SLUG[1] + 21], click: true, show: ["focus", "slug"], type: [{ id: "slug", n: 10, box: [48, 285, 76, 22] }], dur: 3.4, mark: SLUG, lens: SLUG_LENS }
     ]
   },
@@ -761,7 +761,7 @@ export const scenes = {
     base: [editorKonten({ saving: "Tersimpan" })],
     els: { shareA: { svg: shareDialog(true), enter: "fade" } },
     steps: [
-      { caption: "Ubah undangan di tab NikahKit. Tunggu kaki rel: Tersimpan.", focus: [0, 851, 72, 49], dur: 3.4, mark: { box: [0, 851, 71, 49], r: 0 }, lens: { src: [0, 800, 240, 100] } },
+      { caption: "Ubah undangan di tab NikahKit. Tunggu kaki rel: Tersimpan.", focus: [0, 851, 72, 49], dur: 3.4, mark: { box: [0, 851, 71, 49], r: 0 }, lens: { src: [0, 792, 72, 108] } },
       { caption: "Klik Bagikan: Perubahan belum disimpan di Scalev.", focus: [0, 92, 399, 808], at: ED.tool.Bagikan, click: true, show: ["shareA"], dur: 3.6, mark: TOOL.Bagikan, lens: { src: [0, 100, 399, 120], at: [300, 70] } }
     ]
   },
@@ -778,8 +778,8 @@ export const scenes = {
     base: [editorKonten()],
     els: { shareB: { svg: shareDialog(false), enter: "fade" }, copied: { svg: nkHint(16, 465, "Tersalin."), enter: "fade" } },
     steps: [
-      { caption: "Klik Bagikan lagi. Peringatan sudah hilang.", focus: [0, 92, 399, 808], at: ED.tool.Bagikan, click: true, show: ["shareB"], mark: TOOL.Bagikan, lens: { src: [0, 100, 399, 150], at: [300, 70] } },
-      { caption: "Klik Salin tautan umum untuk menyalin alamat publik.", at: [199, 431], click: true, show: ["copied"], mark: SALIN_UMUM, lens: { src: [8, 400, 384, 80] } }
+      { caption: "Klik Bagikan lagi. Peringatan sudah hilang.", focus: [0, 92, 399, 808], at: ED.tool.Bagikan, click: true, show: ["shareB"], mark: TOOL.Bagikan, lens: { src: [0, 100, 399, 154], at: [300, 70] } },
+      { caption: "Klik Salin tautan umum untuk menyalin alamat publik.", at: [199, 431], click: true, show: ["copied"], mark: SALIN_UMUM, lens: { src: [8, 407, 384, 66] } }
     ]
   },
 
@@ -794,8 +794,8 @@ export const scenes = {
       thanks: { svg: phThanks, enter: "pop", origin: [PX + 195, P0 + 627] }
     },
     steps: [
-      { caption: "Kirim tautan umum ke WhatsApp-mu sendiri.", focus: PHONE_R, show: ["bubble"], dur: 3.4, mark: { box: [BUB.x, BUB.y, 340, 168], r: 8 }, lens: { src: [BUB.x + 100, BUB.y, 240, 168] } },
-      { caption: "Ketuk tautannya di HP. Halaman publik undangan terbuka.", at: [BUB.x + 120, BUB.y + 121], click: true, show: ["web", "page"], dur: 3.8, mark: BUB_LINK, lens: { src: [PX + 30, PY + 8, 245, 48] } },
+      { caption: "Kirim tautan umum ke WhatsApp-mu sendiri.", focus: PHONE_R, show: ["bubble"], dur: 3.4, mark: { box: [BUB.x, BUB.y, 340, 168], r: 8 }, lens: { src: [BUB.x - 4, BUB.y - 4, 348, 176] } },
+      { caption: "Ketuk tautannya di HP. Halaman publik undangan terbuka.", at: [BUB.x + 120, BUB.y + 121], click: true, show: ["web", "page"], dur: 3.8, mark: BUB_LINK, lens: { src: [PX + 24, PY + 18, 256, 28] } },
       { caption: "Putar video YouTube. Di halaman yang sudah terbit, video berjalan.", scroll: { id: "page", dy: 783 }, at: [PX + 195, P0 + 118], click: true, show: ["playing"], dur: 3.6, mark: { box: VIDEO, r: 6 } },
       { caption: "Kirim ucapan dan konfirmasi hadir. Ucapan & RSVP aktif setelah terbit.", at: [PX + 195, P0 + 627], click: true, show: ["thanks"], hide: ["playing"], dur: 4, mark: KIRIM, lens: { src: [PX + 75, P0 + 365, 240, 110] } }
     ]
@@ -814,9 +814,9 @@ export const scenes = {
       paste: { svg: text(32, secY(1) + 35, "https://foto.contoh.com", { size: 14, fill: SV.ink }), enter: "fade", delay: 0.2 }
     },
     steps: [
-      { caption: "Di tab NikahKit, klik Bantuan di bagian bawah rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help", "helpBody", "helpBar"], mark: TOOL.Bantuan, lens: { src: [0, 150, 390, 150], at: [320, 60] } },
+      { caption: "Di tab NikahKit, klik Bantuan di bagian bawah rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help", "helpBody", "helpBar"], mark: TOOL.Bantuan, lens: { src: [8, 160, 368, 118], at: [320, 60] } },
       { caption: "Gulir ke Izin domain (CSP). Tiap domain punya status.", focus: [0, 92, 399, 808], scroll: { id: "helpBody", dy: HB_DY }, dur: 3.6,
-        mark: [16, up(HB.rows[2][0]), 351, HB.rows[2][1]], lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[3][0] - HB.h3 + 22] } },
+        mark: [16, up(HB.rows[2][0]), 351, HB.rows[2][1]], lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[3][0] - HB.h3 + 8] } },
       { caption: "Ada Perlu ditambah manual? Klik Salin domain kurang.", at: [190, up(HB.copy) + 18], click: true, show: ["copied"], dur: 3.4,
         mark: [16, up(HB.copy), 351, 36], lens: { src: [8, up(HB.recheck) - 8, 380, up(HB.msg) - up(HB.recheck) + 20] } },
       { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 93, 399, 520]], at: ED.tab.Security, click: true, show: ["sec"], hide: ["help", "helpBody", "helpBar", "copied"], mark: tabMark("Security"), lens: TABS_LENS },
@@ -833,9 +833,9 @@ export const scenes = {
       fixed: { svg: cspRow(CSP[2], up(HB.rows[2][0]), HB.rows[2][1], "Sudah diizinkan", false) + nkBtn(16, up(HB.copy), "Salin daftar domain", { w: 351, size: 14, variant: "quiet", icon: "copy" }) + nkHint(16, up(HB.msg), "Diperiksa ulang."), enter: "fade" }
     },
     steps: [
-      { caption: "Setelah terbit, klik Bantuan lagi di rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help"], mark: TOOL.Bantuan, lens: { src: [8, up(HB.h3), 380, 150], at: [320, 60] } },
+      { caption: "Setelah terbit, klik Bantuan lagi di rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help"], mark: TOOL.Bantuan, lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[2][0] - HB.h3 + 8], at: [320, 60] } },
       { caption: "Klik Periksa ulang: statusnya jadi Sudah diizinkan.", focus: [0, 92, 399, 808], at: [190, up(HB.recheck) + 18], click: true, show: ["fixed"], dur: 3.8,
-        mark: [16, up(HB.recheck), 351, 36], lens: { src: [8, up(HB.rows[2][0]) - 8, 380, up(HB.recheck) - up(HB.rows[2][0]) + 52] } }
+        mark: [16, up(HB.recheck), 351, 36], lens: { src: [8, up(HB.rows[2][0]) - 5, 380, up(HB.recheck) - up(HB.rows[2][0]) + 49] } }
     ]
   },
 
@@ -854,9 +854,9 @@ export const scenes = {
       { caption: "Di Settings dasbor Scalev, buka bagian Domain.", focus: SUBMENU, at: subAt("Domain"), click: true, show: ["dom", "addBtn"], mark: subBox("Domain"), lens: { src: [SUB.x, 382, SUB.w, 82] } },
       { caption: "Klik Tambahkan Domain.", focus: [MAIN.x, MAIN.y, MAIN.w, 80], at: [ADD[0] + 80, ADD[1] + 20], click: true, press: "addBtn", show: ["shade", "dlg"], mark: ADD, lens: { src: [ADD[0] - 60, MAIN.y, 240, 72] } },
       { caption: "Ketik domain atau subdomain, misalnya undangan.namabrand.com.", focus: [MD.x, MD.y, MD.w, MD.h], at: [DOM_IN[0] + 200, DOM_IN[1] + 20], click: true, show: ["typed"],
-        type: [{ id: "typed", n: 22, box: [DOM_IN[0] + 12, DOM_IN[1] + 9, 174, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [MD.x + 12, MD.y + 12, 300, 120] } },
+        type: [{ id: "typed", n: 22, box: [DOM_IN[0] + 12, DOM_IN[1] + 9, 174, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [MD.x + 12, MD.y + 16, 476, 112], zoom: 1.5 } },
       { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", focus: [MAIN.x, MAIN.y, MAIN.w, 340], at: [DOM_SAVE[0] + 40, DOM_SAVE[1] + 20], click: true, show: ["done"], hide: ["shade", "dlg", "typed"], dur: 3.6,
-        mark: DOM_SAVE, lens: { src: [MAIN.x + 16, MAIN.y + 84, 420, 140] } }
+        mark: DOM_SAVE, lens: { src: [MAIN.x + 16, MAIN.y + 84, 396, 140] } }
     ]
   },
 
@@ -870,9 +870,9 @@ export const scenes = {
       ok: { svg: verified, enter: "pop" }
     },
     steps: [
-      { caption: "Di Cloudflare buka DNS.", focus: [0, CT + 53, 240, 762], at: [100, CF_DNS[1] + 17], show: ["cf"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 230] } },
+      { caption: "Di Cloudflare buka DNS.", focus: [0, CT + 53, 240, 762], at: [100, CF_DNS[1] + 17], show: ["cf"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 200] } },
       { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", focus: CF_TABLE, at: [CF_ADD[0] + 66, CF_ADD[1] + 18], click: true, show: ["cfForm"], dur: 4,
-        mark: CF_ADD, lens: { src: [320, 330, 560, 150], at: [80, 330] } },
+        mark: CF_ADD, lens: { src: [320, 330, 800, 148], zoom: 1.5, at: [80, 330] } },
       { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["back", "ok"], hide: ["cf", "cfForm"], dur: 4,
         mark: VERIFY, lens: { src: [MAIN.x + 16, MAIN.y + 84, 300, 140], at: [360, 320] } }
     ]
@@ -891,11 +891,11 @@ export const scenes = {
       val: { svg: payDlg + payVal, enter: "fade" }
     },
     steps: [
-      { caption: "Di Stores, klik nama tokomu.", focus: [256, 0, 1184, 70], at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [288, 136, 260, 64] } },
+      { caption: "Di Stores, klik nama tokomu.", focus: [256, 0, 1184, 70], at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [276, 10, 200, 52] } },
       { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], scroll: { id: "detBody", dy: DET_DY }, at: [PICK[0] + 110, PICK[1] + 20], click: true, show: ["shade", "dlg"], dur: 3.8,
-        mark: PICK, lens: { src: [292, PM_Y - DET_DY + 8, 300, 140], at: [40, 330] } },
-      { caption: "Di dialog, klik dropdown.", focus: PAY_DLG, at: [SEL[0] + SEL[2] - 30, SEL[1] + 20], click: true, show: ["menu"], dur: 2.8, mark: SEL, lens: { src: [SEL[0] - 8, SEL[1] - 8, 210, 190] } },
-      { caption: "Pilih Invoice.", at: [SEL[0] + 60, SEL[1] + 108], click: true, show: ["val"], hide: ["menu"], dur: 2.8, mark: INVOICE, lens: { src: [SEL[0] - 8, SEL[1] - 8, 210, 150] } }
+        mark: PICK, note: { text: "Pilih Metode Pembayaran", at: [24, 250] } },
+      { caption: "Di dialog, klik dropdown.", focus: PAY_DLG, at: [SEL[0] + SEL[2] - 30, SEL[1] + 20], click: true, show: ["menu"], dur: 2.8, mark: SEL, lens: { src: [SEL[0] - 8, SEL[1] - 8, 508, 214], zoom: 1.5 } },
+      { caption: "Pilih Invoice.", at: [SEL[0] + 60, SEL[1] + 108], click: true, show: ["val"], hide: ["menu"], dur: 2.8, mark: INVOICE, lens: { src: [SEL[0] - 8, SEL[1] - 8, 508, 214], zoom: 1.5 } }
     ]
   },
 
@@ -911,7 +911,7 @@ export const scenes = {
     steps: [
       { caption: "Centang Aktifkan Metode Pembayaran ALL E-Payment.", focus: PAY_DLG, at: [CHECK[0] + 9, CHECK[1] + 9], click: true, show: ["on", "dlgSave"], mark: { box: CHECK, r: 3 }, lens: { src: [PD.x + 16, PD.y + 136, 360, 48], at: [300, 380] } },
       { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
-        lens: { src: [292, PM_Y - DET_DY + 8, 330, 190], at: [40, 300] } },
+        lens: { src: [298, PM_Y - DET_DY + 8, 428, 182], at: [12, 340] } },
       { caption: "Klik Simpan di kanan atas supaya pengaturan benar-benar tersimpan.", focus: [256, 0, 1184, 70], at: [TOP_SAVE[0] + 50, TOP_SAVE[1] + 20], click: true, press: "topSave", dur: 3.8, mark: TOP_SAVE, lens: { src: [1240, 0, 200, 72] } }
     ]
   },
@@ -928,7 +928,7 @@ export const scenes = {
       wa: { svg: waWeb("+6282125784683") + waDraft + waSend, skel: true, enter: "rise", delay: 0.15 }
     },
     steps: [
-      { caption: "Di Settings bagian Profil, klik Edit.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [EDIT[0] + 40, EDIT[1] + 18], click: true, show: ["edit", "saveBtn"], mark: EDIT, lens: { src: [EDIT[0] - 120, MAIN.y, 240, 72] } },
+      { caption: "Di Settings bagian Profil, klik Edit.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [EDIT[0] + 40, EDIT[1] + 18], click: true, show: ["edit", "saveBtn"], mark: EDIT, note: "Edit" },
       { caption: "Isi nomor WhatsApp yang aktif di kolom nomor telepon.", at: [PHONE_IN.x + 200, PHONE_IN.y + 20], click: true, show: ["num"], type: [{ id: "num", n: 12, box: [PHONE_IN.x + 34, PHONE_IN.y + 9, 104, 22] }], dur: 3.4,
         mark: PHONE_BOX, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 22, 330, 72] } },
       { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", at: [SAVE[0] + 40, SAVE[1] + 20], click: true, press: "saveBtn", show: ["shade", "konf"], dur: 3.4, mark: SAVE, lens: { src: [CD.x + 16, CD.y + 70, 300, 50] } },
@@ -949,7 +949,7 @@ export const scenes = {
       mfa: { svg: mfaCard, enter: "fade" }
     },
     steps: [
-      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 724, 360, 176], at: [300, 150] } },
+      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 728, 352, 84], at: [300, 150] } },
       { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
         mark: CEK, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 10, 470, 60] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [MAIN.x + 16, MAIN.y + 180, 420, 70] } }
@@ -972,16 +972,16 @@ export const scenes = {
       done: { svg: dlBubble, enter: "pop", origin: [DLB.x + 340, DLB.y] }
     },
     steps: [
-      { caption: "Buka galeri template undangan Canva. Mahkota berarti Canva Pro.", focus: [0, 330, 1425, 300], at: CROWN, dur: 3.6, mark: { box: [CROWN[0] - 12, CROWN[1] - 12, 24, 24], r: 12 }, lens: { src: [320, 530, 240, 100] } },
-      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", focus: [0, CT, 1425, 80], at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"], mark: { box: CREATE_CV, r: 8 }, lens: { src: [1100, 95, 300, 60] } },
-      { caption: "Isi 1080 x 1080 px.", at: [CUSTOM[0] + 100, CUSTOM[1] + 20], click: true, show: ["size", "w", "h"], type: [{ id: "w", n: 4 }, { id: "h", n: 4 }], mark: { box: CUSTOM, r: 6 }, lens: { src: [POP.x, POP.y, POP.w, 184], at: [200, 150] } },
+      { caption: "Buka galeri template undangan Canva. Mahkota berarti Canva Pro.", focus: [0, 330, 1425, 300], at: CROWN, dur: 3.6, mark: { box: [CROWN[0] - 12, CROWN[1] - 12, 24, 24], r: 12 }, lens: { src: [322, 520, 196, 108] } },
+      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", focus: [0, CT, 1425, 80], at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"], mark: { box: CREATE_CV, r: 8 }, lens: { src: [1180, 97, 212, 52] } },
+      { caption: "Isi 1080 x 1080 px.", at: [CUSTOM[0] + 100, CUSTOM[1] + 20], click: true, show: ["size", "w", "h"], type: [{ id: "w", n: 4 }, { id: "h", n: 4 }], mark: { box: CUSTOM, r: 6 }, lens: { src: [POP.x - 8, POP.y - 4, POP.w + 16, 196], at: [200, 150] } },
       { caption: "Klik Create new design, lalu salin elemen dari template.", focus: [SQ.x, SQ.y, SQ.s, SQ.s + 50], at: [NEW_CV[0] + 144, NEW_CV[1] + 21], click: true, hide: ["top", "pop", "size", "w", "h"], dur: 3.6,
         mark: { box: NEW_CV, r: 8 }, lens: { src: [SQ.x + 160, SQ.y + SQ.s + 8, 240, 40] } },
       { caption: "Isi nama panggilan dan tanggal dengan huruf besar.", at: [SQ.x + SQ.s / 2, SQ.y + 255], click: true, show: ["sel", "names", "date"], type: [{ id: "names", n: 12 }, { id: "date", n: 14 }], dur: 3.8, mark: NAMES },
       { caption: "Unduh: klik Share, lalu Download.", focus: [SHARE_CV, [SHP.x - 6, 141, SHP.w + 12, 222]], at: [SHARE_CV[0] + 53, SHARE_CV[1] + 17], click: true, show: ["share"], hide: ["sel"],
-        mark: { box: SHARE_CV, r: 8 }, lens: { src: [SHP.x, SHP.y, SHP.w, 220], at: [140, 150] } },
-      { caption: "Pilih PNG atau JPG.", at: [DL_ROW[0] + 100, DL_ROW[1] + 26], click: true, show: ["dl"], mark: { box: DL_ROW, r: 6 }, lens: { src: [SHP.x, SHP.y, SHP.w, 220], at: [140, 150] } },
-      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6, mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x, DLB.y, 400, 96], at: [140, 150] } }
+        mark: { box: SHARE_CV, r: 8 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
+      { caption: "Pilih PNG atau JPG.", at: [DL_ROW[0] + 100, DL_ROW[1] + 26], click: true, show: ["dl"], mark: { box: DL_ROW, r: 6 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
+      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6, mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x + 2, DLB.y + 2, 396, 92], at: [140, 150] } }
     ]
   },
 
@@ -1003,14 +1003,14 @@ export const scenes = {
     },
     steps: [
       { caption: "Di editor halaman, klik tab Settings.", focus: [[0, 44, 399, 48], [0, 520, 399, 100]], at: ED.tab.Settings, click: true, show: ["set"], mark: tabMark("Settings"), lens: { ...TABS_LENS, at: [300, 40] } },
-      { caption: "Buka bagian SEO & PAGE IDENTITY.", focus: [0, 92, 399, 808], at: [200, 567], click: true, show: ["seo"], mark: { box: [17, 538, 364, 58], r: 8 }, lens: { src: [0, 240, 399, 140] } },
+      { caption: "Buka bagian SEO & PAGE IDENTITY.", focus: [0, 92, 399, 808], at: [200, 567], click: true, show: ["seo"], mark: { box: [17, 538, 364, 58], r: 8 }, lens: { src: [8, 240, 382, 160] } },
       { caption: "Isi Judul Tag, misalnya Undangan Rani & Dimas.", at: [190, 371], click: true, show: ["jFocus", "judul", "gTitle"], type: [{ id: "judul", n: 21, box: [48, 361, 160, 22] }], dur: 3.6,
         mark: [34, 350, 315, 42], lens: { src: [26, 318, 340, 80] } },
       { caption: "Isi Meta Description: tanggal dan ucapan singkat.", at: [190, 496], click: true, show: ["dFocus", "desc", "gDesc"], hide: ["jFocus"], type: [{ id: "desc", n: 24 }], dur: 3.6,
-        mark: [34, 433, 315, 126], lens: { src: [26, 586, 340, 100], at: [320, 330] } },
-      { caption: "Gulir ke Pratinjau di Sosial Media.", show: ["down"], hide: ["dFocus"], scroll: { id: "down", dy: SEO_DY }, dur: 2.8, mark: [34, 700 - SEO_DY, 315, 30], lens: { src: [26, 700 - SEO_DY - 6, 340, 50] } },
-      { caption: "Klik Upload Meta Gambar, pilih gambar dari Canva.", at: [191, UPLOAD[1] + 71], click: true, show: ["img"], dur: 3.4, mark: UPLOAD, lens: { src: [42, IMG.y + 290, 320, 90], at: [320, 330] } },
-      { caption: "Sudah ada gambar? Arahkan kursor ke gambar, klik pensil.", at: [146, IMG.y + 150], show: ["hover"], dur: 3.4, mark: PENCIL, lens: { src: [110, IMG.y + 115, 180, 70] } }
+        mark: [34, 433, 315, 126], lens: { src: [26, 578, 340, 118], at: [320, 330] } },
+      { caption: "Gulir ke Pratinjau di Sosial Media.", show: ["down"], hide: ["dFocus"], scroll: { id: "down", dy: SEO_DY }, dur: 2.8, mark: [34, 700 - SEO_DY, 315, 30], lens: { src: [26, 700 - SEO_DY - 6, 340, 40] } },
+      { caption: "Klik Upload Meta Gambar, pilih gambar dari Canva.", at: [191, UPLOAD[1] + 71], click: true, show: ["img"], dur: 3.4, mark: UPLOAD, lens: { src: [34, IMG.y + 302, 320, 80], at: [320, 330] } },
+      { caption: "Sudah ada gambar? Arahkan kursor ke gambar, klik pensil.", at: [146, IMG.y + 150], show: ["hover"], dur: 3.4, mark: PENCIL, lens: { src: [112, IMG.y + 122, 200, 56] } }
     ]
   },
 
@@ -1030,7 +1030,7 @@ export const scenes = {
       back: { svg: guidePage([{ ...GUIDE_TAB, active: true }, { ...TUT_TAB }]), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Tentukan kebutuhanmu: cari kelompoknya, misalnya Domain.", focus: GUIDE_FOCUS, at: [370, CT + 218], dur: 3.4, mark: DOMAIN_H2, lens: { src: [310, CT + 190, 330, 90] } },
+      { caption: "Tentukan kebutuhanmu: cari kelompoknya, misalnya Domain.", focus: GUIDE_FOCUS, at: [370, CT + 218], dur: 3.4, mark: DOMAIN_H2, lens: { src: [310, CT + 192, 160, 60] } },
       { caption: "Klik judul tutorial. Halaman tutorial Scalev terbuka.", focus: [330, CT + 270, 770, 545], at: [AZ_LINK[0] + 110, AZ_LINK[1] + 11], click: true, show: ["tutFrame", "tut"], mark: { box: AZ_LINK, r: 3 } },
       { caption: "Tonton atau baca sampai habis. Ikuti urutannya.", focus: [330, CT, 770, 815], at: [1000, 600], scroll: { id: "tut", dy: 420 }, dur: 3.6 },
       { caption: "Kembali ke tab panduan NikahKit.", focus: [[0, 0, 1440, 41], GUIDE_FOCUS], at: [200, 23], click: true, show: ["back"], hide: ["tutFrame", "tut"], mark: { box: [84, 6, 250, 35], r: 8 }, lens: { src: [76, 0, 520, 41] } }
@@ -1047,9 +1047,9 @@ export const scenes = {
     },
     steps: [
       { caption: "Buka app.scalev.com di Chrome komputer, lalu daftar dan masuk.", focus: OMNI.box, at: [300, 63], click: true, show: ["url", "dash"], type: [{ id: "url", n: 14, box: [166, 54, 108, 20] }], dur: 3.8,
-        mark: OMNI, lens: { src: [124, 41, 360, 44] } },
+        mark: OMNI, lens: { src: [134, 48, 200, 30] } },
       { caption: "Tanda sudah masuk: menu kiri punya Landing Pages.", focus: [0, CT, 256, 815], at: [110, 234 + CT], mark: { box: [28, 220 + CT, 196, 28], r: 6 }, lens: { src: [8, 180 + CT, 248, 110] } },
-      { caption: "Klik nama bisnis. Pilih bisnis untuk merek undanganmu.", at: [127, 86 + CT], click: true, show: ["biz"], dur: 3.6, mark: { box: dn(BIZ), r: 4 }, lens: { src: [16, CT + 112, 290, 240], at: [300, 120] } }
+      { caption: "Klik nama bisnis. Pilih bisnis untuk merek undanganmu.", at: [127, 86 + CT], click: true, show: ["biz"], dur: 3.6, mark: { box: dn(BIZ), r: 4 }, lens: { src: [18, CT + 114, 278, 236], at: [300, 120] } }
     ]
   },
 
@@ -1057,7 +1057,7 @@ export const scenes = {
     title: "Membeli domain saja, tanpa hosting",
     base: [regPage],
     steps: [{ caption: "Beli domain saja di penyedia domain. Hosting tidak usah.", focus: [320, CT + 180, 800, 192], at: [1038, BELI[1] + 22], click: true, dur: 3.6,
-      mark: [{ box: HOSTING, r: 4 }, { box: BELI, r: 6 }], lens: { src: [320, CT + 300, 300, 72], at: [140, 330] } }]
+      mark: [{ box: HOSTING, r: 4 }, { box: BELI, r: 6 }], lens: { src: [326, CT + 306, 140, 60], at: [140, 330] } }]
   },
 
   "scalev-domain-cloudflare": {
@@ -1065,7 +1065,7 @@ export const scenes = {
     base: [cfSign],
     els: { ns: { svg: nsPage, skel: true, enter: "fade", delay: -1 }, nsOk: { svg: icon("circle-check", 484, NS_SAVE[1] + 21, 22, "#15a34a"), enter: "pop" } },
     steps: [
-      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [320, CT + 80, 800, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [124, 41, 360, 44] } },
+      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [320, CT + 80, 800, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [134, 48, 300, 30] } },
       { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: [320, CT + 100, 800, 250], at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
         mark: { box: NS_SAVE, r: 6 }, lens: { src: [336, CT + 150, 540, 130], at: [200, 360] } }
     ]
