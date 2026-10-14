@@ -289,9 +289,11 @@ const DP = { ink: "#070707", sub: "#737373", line: "#e5e5e5", acc: C.accent };
 const SIDE = [["Mulai", "rocket", 120, ["Selamat datang", "Alur kerja dari nol sampai jualan", "Istilah penting"]], ["Gabung dan pasang", "users", 305, ["Pilih paket membership", "Pasang ekstensi NikahKit", "Masuk dan bayar membership", "Hubungkan bisnis Scalev", "Update ekstensi"]],
   ["Siapkan Scalev", "landmark", 570, ["Akun dan paket Scalev", "Buat halaman undangan", "Simpan dan terbitkan", "Thumbnail WhatsApp dan", "sosmed", "Alamat dan domain sendiri", "Izin domain (tab Security)", "Terima pembayaran klien"]]];
 const TOC = ["Langkah", "Akun dan keamanan", "Halaman (landing page)", "Domain", "Toko", "Jualan dan pembayaran", "Tanda berhasil", "Kalau ada masalah", "Lanjut"];
-// One guide bullet: underlined link (measured width) + plain rest, optional second line (page y = text centre).
-const li = (y, link, lw, rest, next) => circle(332, y + CT, 2.5, { fill: DP.ink }) + text(348, y + CT + 5, link, { size: 16, weight: 500, fill: "#1c1c1c" }) +
-  line(348, y + CT + 10, 348 + lw, y + CT + 10, { stroke: DP.acc }) + text(348 + lw, y + CT + 5, rest, { size: 16, fill: "#262626" }) + (next ? text(348, y + CT + 33, next, { size: 16, fill: "#262626" }) : "");
+// One guide bullet (page y = text centre): link + rest flowed as one line (runs, so the rest follows the link in any font),
+// the accent underline at the link's measured width, optional second line.
+const li = (y, link, lw, rest, next) => circle(332, y + CT, 2.5, { fill: DP.ink }) +
+  text(348, y + CT + 5, [{ t: link, w: 500, fill: "#1c1c1c" }, rest], { size: 16, fill: "#262626" }) +
+  line(348, y + CT + 10, 348 + lw, y + CT + 10, { stroke: DP.acc }) + (next ? text(348, y + CT + 33, next, { size: 16, fill: "#262626" }) : "");
 const guidePage = (tabs) => chrome(0, 0, 1440, 900, { tabs, url: GUIDE_URL }) + clipped(0, CT, 1440, 815,
   rect(0, CT, 1440, 815, { fill: C.white }) + rect(0, CT, 1425, 65, { fill: C.white }) + line(0, CT + 64.5, 1425, CT + 64.5, { stroke: DP.line }) +
   rect(20, CT + 16, 24, 24, { r: 6, fill: "#4a9de8" }) + text(56, CT + 33, "Panduan NikahKit", { size: 16, weight: 500, fill: DP.ink }) +
@@ -302,7 +304,7 @@ const guidePage = (tabs) => chrome(0, 0, 1440, 900, { tabs, url: GUIDE_URL }) + 
     items.map((t, i) => text(24, y + CT + 44 + i * 40 - (k === 2 && i > 3 ? 20 : 0), t, { size: 14, fill: k === 2 && i === 7 ? "#b5b5b5" : DP.sub })).join("")).join("") +
   icon("list", 1178, CT + 115, 14, DP.ink) + text(1195, CT + 120, "On this page", { size: 14, fill: DP.ink }) + line(1173.5, CT + 142, 1173.5, CT + 395, { stroke: DP.line }) + rect(1172, CT + 229, 3, 20, { fill: DP.acc }) +
   TOC.map((t, i) => text(1198, CT + 157 + i * 29, t, { size: 14, fill: t === "Domain" ? DP.acc : DP.sub })).join("") +
-  text(348, CT + 79, "setiap kolom tab ", { size: 16, fill: "#262626" }) + text(472, CT + 79, "Security", { size: 16, weight: 600, fill: DP.ink }) + text(535, CT + 79, ".", { size: 16, fill: "#262626" }) +
+  text(348, CT + 79, ["setiap kolom tab ", { t: "Security", w: 600, fill: DP.ink }, "."], { size: 16, fill: "#262626" }) +
   li(110, "Tutorial Cara Optimasi LP dengan Swap Slug", 329, ": cara menukar slug antara halaman lama dan", "duplikatnya. Ingat, halaman duplikat punya ID undangan baru, jadi RSVP lama tidak ikut.") +
   text(320, CT + 229, "Domain", { size: 30, fill: DP.ink }) +
   li(266, "A–Z Custom Domain di Scalev", 223, ": urutan wajib memasang domain sendiri. Mulai dari sini.") +
@@ -555,7 +557,7 @@ export const scenes = {
       { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 92, 399, 808]], at: ED.tab.Security, click: true, show: ["secFrame", "secBody"], hide: ["help", "helpBody", "copied"],
         mark: tabMark("Security"), lens: TABS_LENS },
       { caption: "Gulir ke kolom yang cocok: img_src ke Image Sources. Klik kolomnya.", focus: [0, 92, 399, 330], scroll: { id: "secBody", dy: SECURITY.imageDy }, at: [190, 159], click: true, show: ["picker"], dur: 3.8,
-        mark: SECURITY.imageSelect, lens: { src: [8, 104, 383, 135] } },
+        mark: SECURITY.imageSelect, lens: { src: [8, 104, 383, 140] } },
       { caption: "Tempel domainnya saja di kotak Add image domain, misalnya foto.contoh.com.", at: [190, 205], click: true, show: ["pickRow", "pickVal"],
         type: [{ id: "pickVal", n: 23, box: [40, 195, 152, 22] }], dur: 3.8, mark: SECURITY.pickerInput, lens: { src: [16, 176, 351, 106] } },
       { caption: "Centang domain yang muncul. Image Sources jadi 1 selected.", at: [42, 257], click: true, show: ["ticked"], dur: 3.6, mark: { box: SECURITY.pickerTick, r: 4 }, lens: { src: [8, 132, 367, 150] } }
