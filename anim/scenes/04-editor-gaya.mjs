@@ -5,7 +5,7 @@
 // store.js and canvas/canvas.js (preview toolbar: #223548 bar, Isi / ↑ / ↓ / Sembunyikan, 30px buttons, 3px blue frame).
 // The YouTube, Google Fonts and file windows are generic drawings (not measured), laid out at 1440 wide.
 import { C, ED, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3,
-  scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome } from "../lib.mjs";
+  scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome, skeleton } from "../lib.mjs";
 
 const SC = ED.screen; // preview screen 727,106 390x784
 const PX = 88, PW = 279, BY = 169; // panel body content box (scrolling panels keep 279 next to the scrollbar)
@@ -602,8 +602,8 @@ const SCENES = {
       els: {
         yt: youtube(),
         copied: { svg: rect(...YT_TOAST, { r: 8, fill: "#0f0f0f" }) + text(44, 849, "Link disalin ke papan klip", { size: 14, fill: C.white }), enter: "slide" },
-        // Back to the editor before the next step (the editor screen again, over the YouTube tab).
-        ed: { svg: base.join("\n"), enter: "fade", delay: 2.0 },
+        // Back to the editor (2 s after Salin, before step 2's click moves the focus): drawn as step 2 shows it.
+        ed: { svg: skeleton(base.join("\n")) + clipped(...LEFT, base.join("\n")), skel: false, enter: "fade", delay: 2.0 },
         tabs: { svg: railTabs("Audio"), enter: "fade" },
         musik: { svg: panelOpen("Musik") + A, enter: "fade" },
         b: { svg: B, enter: "fade", delay: 0.3 },
@@ -616,9 +616,9 @@ const SCENES = {
       steps: [
         { caption: "Di YouTube, klik Bagikan, lalu Salin. Centang Mulai pada bila perlu.", focus: [YT_DLG, YT_TOAST], at: [906, 496], click: true, show: ["copied", "ed"],
           mark: { box: SALIN_BOX, r: 18 }, lens: { src: [476, 462, 500, 136], at: [150, 16] }, dur: 3.8 },
-        { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", focus: LEFT, at: ED.rail.Audio, click: true, hide: ["yt", "copied", "ed"], show: ["tabs", "musik"],
+        { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", focus: LEFT, at: ED.rail.Audio, click: true, hide: ["yt", "copied"], show: ["tabs", "musik"],
           mark: railBox("Audio"), lens: { src: [0, 96, 390, 240], at: [300, 40] }, dur: 3.4 },
-        { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.6 },
+        { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, hide: ["ed"], show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.6 },
         { caption: "Isi Mulai dari, contoh 1:05 atau 65 (detik).", at: [200, BY + 130], click: true, show: ["c", "start"], type: [typed("start", PX + 10, BY + 119, "1:05")],
           mark: [PX, BY + 112, AW, 36], lens: { src: [80, BY + 86, 310, 90] }, dur: 3.4 },
         { caption: "Klik Coba putar dari 1:05 untuk mendengar. Klik Hentikan untuk berhenti.", at: [180, BY + 351], click: true, show: ["d"],
@@ -714,11 +714,12 @@ const SCENES = {
       title: "Memakai font sendiri dari Google Fonts",
       base,
       els: {
-        gf: { svg: googleFonts(false), enter: "fade", delay: 1.6 },
+        // The new tab opens before step 2's click moves the focus: drawn as step 2 shows it (address bar, first font).
+        gf: { svg: skeleton(googleFonts(false)) + clipped(0, 41, 1440, 44, googleFonts(false)) + clipped(24, 236, 1392, 260, googleFonts(false)), skel: false, enter: "fade", delay: 1.6 },
         spec: { svg: googleFonts(true), enter: "fade" },
         sel: { svg: gfSel, enter: "fade", delay: 1.0 },
-        // Back to Scalev before the next step (the editor screen again, over the Google Fonts tab).
-        ed: { svg: base.join("\n"), enter: "fade", delay: 2.2 },
+        // Back to Scalev (2.2 s after the copy, before step 3's click moves the focus): drawn as step 3 shows it.
+        ed: { svg: skeleton(base.join("\n")) + clipped(...PANELF, base.join("\n")), skel: false, enter: "fade", delay: 2.2 },
         chk: { svg: HC, enter: "fade" },
         done: { svg: HD, enter: "fade", delay: 1.0 },
         tabs1: { svg: hurufTabs([1]), enter: "fade" },
@@ -729,9 +730,9 @@ const SCENES = {
           mark: nkBtnBox(PX, P0.gf, "Buka Google Fonts", { w: PW, icon: "external-link" }), lens: { src: [80, P0.gf - 72, 310, 120] }, dur: 3.6 },
         { caption: "Klik font, misalnya Playfair Display. Salin alamatnya dari kolom alamat.", focus: [[0, 41, 1440, 44], [24, 236, 1392, 260]], at: [600, 290], click: true, show: ["spec", "sel", "ed"],
           mark: [{ box: OMNI, r: 17 }, { box: GF_ROW0, r: 12 }], lens: { src: [118, 44, 560, 40], at: [100, 92] }, dur: 4.2 },
-        { caption: "Kembali ke Scalev. Tempel link di Font judul dan nama.", focus: PANELF, at: [230, P0.font + 38], click: true, hide: ["gf", "spec", "sel", "ed"], show: ["chk", "tabs1", "bar"],
+        { caption: "Kembali ke Scalev. Tempel link di Font judul dan nama.", focus: PANELF, at: [230, P0.font + 38], click: true, hide: ["gf", "spec", "sel"], show: ["chk", "tabs1", "bar"],
           mark: [PX, P0.font + 20, PW, 36], lens: { src: [80, PC.font - 30, 310, 120] }, dur: 3.4 },
-        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
+        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], hide: ["ed"], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
           lens: { src: [80, PD.font - 10, 310, 120] }, dur: 3.8 },
         { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["chk", "done", "tabs1", "bar"],
           mark: nkBtnBox(PX, PD.back - SDY, "Kembali ke pasangan bawaan"), lens: { src: [80, PD.back - SDY - 100, 310, 150] }, dur: 3.8 }
@@ -835,7 +836,7 @@ const SCENES = {
         { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", focus: PREVF, at: [922, 492], hover: "hover",
           mark: [[SC.x, SC.y, tw(TAG, 12, 500) + 16, 22], NAMES], lens: { src: [SC.x - 4, SC.y - 4, 260, 44] }, dur: 3.4 },
         { caption: "Klik namanya. Mempelai terbuka, kursor langsung di Nama panggilan.", focus: [panelTop, PREVF], at: [922, 492], click: true, show: ["tabs", "konten", "selCover"],
-          mark: [NICK, NAMES], lens: nickLens, dur: 3.6 },
+          mark: NAMES, dur: 3.6 },
         { caption: "Ketik isi baru. Pratinjau ikut berubah, kaki rel Menulis... lalu Tersimpan.", focus: [panelTop, FOOT, PREVF], at: [ACC_X + 120, nY + 18], click: true,
           hide: ["selCover"], show: ["clr", "nama", "busy", "saved", "page", "mask"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], mark: [NICK, FOOT_MARK], lens: nickLens, dur: 4.2 },
         { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", focus: PREVF, at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["pageS"],
@@ -955,6 +956,7 @@ const SCENES = {
     };
   })()
 };
-// Every element here is a state of the screen (lib `skel`): skeleton outside the step's focus, detail inside it.
+// Every element here is a state of the screen (lib `skel`: skeleton outside the focus, detail inside) unless it says
+// skel: false (screens shown before a click moves the focus, drawn with that later focus already).
 export const scenes = Object.fromEntries(Object.entries(SCENES).map(([name, s]) =>
-  [name, { ...s, els: Object.fromEntries(Object.entries(s.els).map(([id, e]) => [id, { ...(typeof e === "string" ? { svg: e } : e), skel: true }])) }]));
+  [name, { ...s, els: Object.fromEntries(Object.entries(s.els).map(([id, e]) => [id, { skel: true, ...(typeof e === "string" ? { svg: e } : e) }])) }]));
