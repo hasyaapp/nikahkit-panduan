@@ -13,7 +13,7 @@ import {
   chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkDialogHead, nkBtn, nkInput, nkLabel, nkHint, nkNote, nkAcc, nkH3, dim, phoneDesk
 } from "../ui/kit.mjs";
 import {
-  SV, bar, svBox, svBtn, check, SVC, tx, tick, head, card, genericBody, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
+  SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
   SLUG_LENS, DOMAIN_ACC, secContent, secPicker, SECURITY, subAt, subBox, SUBMENU, domainPage, TAMBAH, DOM_IN, DOM_SAVE, DOM_DLG, domainDlg, domTyped, domSaveOn,
   VERIFY, dnsTable, verified, profilPage, PROFIL_EDIT, MFA_METHOD, SECURITY_BOX, EA, EA_PHONE, EA_SAVE, editAccount, eaPhone, eaSaveOn, STORE_DY, storeHead,
   storeRight, storeLeft, storeScrolled, ADD_PM, PM_BLOCK, payDialog, PAY_DLG, PAY_DLG_OPEN, ALLPAY_ROW, ALLPAY_TICK, PAY_SAVE, payTicked
@@ -75,35 +75,6 @@ const btnSimpan = rect(1193, 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnL
 const btnPub = rect(1283, 50, 151, 34, { r: 4, fill: C.primary }) + text(1403, 72, "Simpan & Terbitkan", { size: 13, weight: 500, fill: C.white, anchor: "end" }) + iconX("rocket", 1418, 67, 15, C.white);
 
 // ---- 1. Landing Pages → HTML Mode → NikahKit → Simpan --------------------------------------------------------------
-const LP_ROWS = [["Undangan Rani & Dimas", "/rani-dimas"], ["Undangan Sari & Bima", "/sari-bima"], ["Contoh Undangan", "/contoh"], ["Katalog Rina WO", "/katalog"]];
-function lpPage() {
-  return rect(256, 0, 1184, 900, { fill: SV.bg }) + rect(256, 0, 1184, 137, { fill: C.white }) + line(256, 137.5, 1440, 137.5, { stroke: SV.line }) +
-    text(280, 36, "Landing Pages", { size: 18, weight: 600, fill: SV.ink }) + line(280, 58.5, 1400, 58.5, { stroke: SV.line }) +
-    text(469, 93, "Checkout form creation has moved.", { size: 13, fill: "#3b4350" }) + text(469, 112, "Create a checkout form here →", { size: 13, fill: SV.link, underline: true }) +
-    iconX("search", 1203, 97, 15, SV.sub) + text(1223, 103, "Cari landing page...", { size: 13, fill: "#a6adb7" }) +
-    rect(1360.5, 78.5, 40, 40, { r: 4, fill: C.white, stroke: "#d5dae1" }) + `<path d="M1371 89 h18 l-7 9 v7 l-4 2 v-9 z" fill="none" stroke="#4a5361" stroke-width="1.6" stroke-linejoin="round"/>` +
-    rect(280, 163, 1120, 54, { r: 4, fill: "#eef8fb" }) + circle(308, 190, 7, { stroke: SV.blue, sw: 1.5 }) + text(308, 194, "i", { size: 10, weight: 700, fill: SV.blue, anchor: "middle" }) +
-    text(336, 195, "Looking for landing pages with an order form? They're now called Checkout Flows.", { size: 14, fill: SV.ink }) +
-    text(336 + tw("Looking for landing pages with an order form? They're now called Checkout Flows. ", 14) - 12, 195, "Open Checkout Flows", { size: 14, fill: SV.ink, underline: true }) +
-    card(281, 244, 1119, 680) + line(520.5, 244, 520.5, 900, { stroke: SV.line }) +
-    text(297, 275, "Folders", { size: 14, weight: 600, fill: SV.ink }) + para(297, 294, ["Kelompokkan landing page per", "campaign, produk, atau klien."], { size: 11, fill: SV.sub, lh: 16 }) +
-    rect(297, 328, 207, 36, { r: 4, fill: "#eef6fc" }) + icon("layout-grid", 316, 346, 15, SV.blue) + text(335, 351, "All Landing Pages", { size: 14, weight: 500, fill: SV.link }) + text(498, 351, "4", { size: 12, fill: SV.link, anchor: "end" }) +
-    [["Ungrouped", "file-text", 4], ["Page", "folder", 0], ["Undangan", "folder", 0]].map(([n, ic, c], i) => iconX(ic, 316, 384 + i * 38, 15, "#4a5361") + text(335, 389 + i * 38, n, { size: 14, fill: "#3b4350" }) + text(498, 389 + i * 38, String(c), { size: 12, fill: SV.sub, anchor: "end" })).join("") +
-    rect(297.5, 488.5, 206, 41, { r: 4, fill: C.white, stroke: SV.blue }) + text(400, 514, "+  New Folder", { size: 14, weight: 500, fill: SV.link, anchor: "middle" }) +
-    text(537, 273, "All Landing Pages", { size: 14, weight: 600, fill: SV.ink }) + text(667, 273, "4", { size: 12, fill: SV.sub }) +
-    rect(521, 293, 879, 38, { fill: "#f6f8fa" }) + check(537, 303, false) +
-    [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].map(([l, x]) => text(x, 316, l, { size: 12, fill: SV.sub })).join("");
-}
-function lpRow(i) {
-  const [name, slug] = LP_ROWS[i], y = 331 + i * 71;
-  return rect(521, y, 879, 71, { fill: C.white }) + line(521, y + 70.5, 1400, y + 70.5, { stroke: SV.line }) + check(537, y + 27, false) +
-    text(585, y + 41, name, { size: 14, weight: 500, fill: SV.link }) + rect(787, y + 24, 92, 24, { r: 4, fill: "#f3f4f6" }) + iconX("file-text", 800, y + 36, 12, SV.sub) + text(812, y + 40, "Ungrouped", { size: 12, fill: "#3b4350" }) +
-    text(925, y + 41, slug, { size: 14, fill: SV.link }) + rect(1125, y + 22, 83, 28, { r: 3, fill: SV.soft }) + text(1166.5, y + 40, "HTML Mode", { size: 12, weight: 700, fill: SV.blue, anchor: "middle" }) +
-    text(1245, y + 41, "-", { size: 14, fill: SV.sub }) + [0, 1, 2].map((k) => circle(1364 + k * 7, y + 36, 2.2, { fill: "#3b4350" })).join("");
-}
-const lpScreen = () => scalevApp(0, 0, { active: "Landing Pages" }) + lpPage() + LP_ROWS.map((_, i) => lpRow(i)).join("");
-const CREATE = svBox(280, 78, "+ Create Landing Page", { w: 173 });
-const btnCreate = svBtn(280, 78, "+ Create Landing Page", { w: 173 });
 // Type chooser (not captured): modal with a generic tile and the HTML Mode tile.
 const DLG = { x: 470, y: 260, w: 500, h: 300 };
 const HTML_TILE = [DLG.x + 260, DLG.y + 74, 216, 191];
