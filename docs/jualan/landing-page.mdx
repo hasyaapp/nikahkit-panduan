@@ -88,23 +88,34 @@ Demo menutup dan klien turun ke form. Di langkah pertama form tertulis **Pilihan
 </Step>
 </Steps>
 
-## Memperbarui setelah Profil merek berubah
+Demo berisi undangan contoh, bukan undangan klien. Bila klien mencoba mengirim RSVP atau ucapan di demo, formnya menjawab "Ini demo, ucapan tidak dikirim." Tidak ada yang masuk ke data mana pun.
 
-<Image src="/assets/anim/jualan-perbarui-landing.svg" alt="Di halaman Landing page, Template > Marketing menampilkan Profil merek berubah dengan tombol Perbarui halaman ini. Klik tombol itu, muncul pesan Landing page dipasang. Tekan Simpan di Scalev." caption="Perbarui Landing page" />
+## Memperbarui halaman yang terpasang
 
-<Image src="/assets/anim/jualan-perbarui-terbit.svg" alt="Pratinjau berganti ke profil terbaru: nama bisnis lama diganti nama baru. Lalu klik Simpan dan Terbitkan di kanan atas editor Scalev." caption="Terbitkan versi baru" />
+<Image src="/assets/anim/jualan-perbarui-landing.svg" alt="Di halaman Landing page, Template > Marketing menampilkan Versi baru halaman tersedia. dengan tombol Perbarui halaman ini. Bila hanya profil yang berubah, tulisannya Profil merek berubah. Klik tombol itu, muncul pesan Landing page dipasang. Tekan Simpan di Scalev." caption="Perbarui Landing page" />
+
+<Image src="/assets/anim/jualan-perbarui-terbit.svg" alt="Pratinjau berganti ke versi terbaru: nama bisnis lama diganti nama baru. Lalu klik Simpan dan Terbitkan di kanan atas editor Scalev." caption="Terbitkan versi baru" />
 
 <Steps>
 <Step title="Buka halaman Landing page di editor">
 Buka halaman Scalev tempat Landing page terpasang, lalu tab **NikahKit** > **Template** > **Marketing**.
 </Step>
 <Step title="Klik Perbarui halaman ini">
-Bila profil sudah berbeda dari saat halaman dipasang, muncul tulisan **Profil merek berubah.** dengan tombol **Perbarui halaman ini**. Klik tombolnya. Tidak ada dialog konfirmasi: seluruh halaman langsung dipasang ulang dengan profil terbaru, lalu muncul **Landing page dipasang. Tekan Simpan di Scalev.** dengan tombol **Urungkan**.
+Di bawah kotak **Profil merek** muncul tombol **Perbarui halaman ini** dengan salah satu tulisan ini:
+
+- **Versi baru halaman tersedia.** NikahKit membawa versi Landing page yang lebih baru dari yang terpasang, misalnya dengan demo hidup. Halaman yang dipasang sebelum ada penanda versi juga dianggap lama.
+- **Profil merek berubah.** Profil, termasuk Gaya katalog, berbeda dari saat halaman dipasang.
+
+Bila keduanya berlaku, yang tampil **Versi baru halaman tersedia.** Satu klik memperbarui keduanya. Tombol hanya muncul bila Profil merek lengkap (nama bisnis, nomor WhatsApp, minimal satu paket). Tidak ada dialog konfirmasi: seluruh halaman langsung dipasang ulang dengan versi dan profil terbaru, lalu muncul **Landing page dipasang. Tekan Simpan di Scalev.** dengan tombol **Urungkan**.
 </Step>
 <Step title="Klik Simpan & Terbitkan">
-Klien kini melihat nama, WhatsApp, logo, paket, dan Gaya katalog terbaru.
+Klien kini melihat versi halaman terbaru dengan nama, WhatsApp, logo, paket, dan Gaya katalog terbaru.
 </Step>
 </Steps>
+
+<Warning>
+Perbarui membuat ulang seluruh halaman dari Profil merek. Ubahan manual di tab **Code** ikut tertimpa.
+</Warning>
 
 <Info>
 Halaman lama bernama Katalog sudah tidak dilanjutkan. Kalau kamu membuka halaman Katalog lama, panel menulis "Halaman ini memakai versi lama yang tidak dilanjutkan. Landing page menggantikannya." Klik **Pasang Landing page** di sebelahnya.
@@ -132,7 +143,7 @@ Muat ulang editor Scalev, lalu ulangi dari Template > Marketing.
 Gambar dari luar Scalev butuh izin domain di tab **Security**. Lihat [Izin domain](/scalev/izin-domain). Gambar yang gagal dimuat diganti tulisan "Gambar belum bisa dimuat". Logo yang gagal diganti huruf awal nama bisnis.
 </Accordion>
 <Accordion title="Demo desain kosong, tidak termuat, atau belum ada">
-Demo dimuat dari luar Scalev dan butuh izin domain yang ditambahkan NikahKit saat memasang atau memperbarui. Buka halaman Landing page di editor, klik **Perbarui halaman ini** di Template > Marketing bila tombolnya ada, lalu Simpan & Terbitkan. Tombol itu hanya muncul bila profil merek berubah. Landing page yang dipasang sebelum ada demo hidup: klik lagi kartu **Landing page** di Template > Marketing, klik **Pasang**, lalu Simpan & Terbitkan. Isinya dibuat ulang dari profil merek; ubahan manual di tab Code ikut tertimpa. Cek juga tab **Security**, lihat [Izin domain](/scalev/izin-domain).
+Landing page yang dipasang sebelum ada demo hidup perlu diperbarui. Buka halaman Landing page di editor, lalu tab **NikahKit** > **Template** > **Marketing**. Muncul **Versi baru halaman tersedia.** dengan tombol **Perbarui halaman ini**. Klik tombolnya, lalu **Simpan & Terbitkan**. Pembaruan juga menambah izin domain untuk demo. Tulisan itu tidak muncul? Lengkapi Profil merek dulu. Bila masih tidak muncul, klik lagi kartu **Landing page**, klik **Pasang**, lalu Simpan & Terbitkan. Cek juga tab **Security**, lihat [Izin domain](/scalev/izin-domain).
 </Accordion>
 <Accordion title="Klien bilang form gagal terkirim">
 Lihat pesan yang dibaca klien di [Form data klien](/jualan/form-data-klien).

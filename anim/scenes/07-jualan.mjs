@@ -504,6 +504,26 @@ function pubScene(title, page, preview, cap, hl, before) {
     steps: [{ caption: cap[0], show: first, dur: 3 }, { caption: cap[1], at: PUB, click: true, press: "pub", hide: hl ? ["hl"] : [], dur: 3.4 }]
   };
 }
+// Perbarui halaman ini on an installed Marketing page (store.outdated, .nk-reset under Profil merek): "Versi baru halaman
+// tersedia." when the extension carries a newer page (wins), else "Profil merek berubah." (Landing page only).
+const resetText = (lines) => para(99, 298, lines, { size: 12, fill: C.strong, lh: 16 });
+function perbaruiScene(kind, title, page, before, after, toast, steps) {
+  return {
+    title, world: RAILW(848, 44),
+    base: [...shell({ page, rail: "Template" }), ed(before, nkHead(0, 0, "Template", { inbox: false }), bodyBg,
+      bodyClip(kindSeg("marketing"), brandClosed(219), rect(88.5, 277.5, 278, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }),
+        resetText(["Versi baru halaman", "tersedia."]), mkCards(339, kind)))],
+    els: {
+      perbarui: { svg: ed(nkBtn(216, 286, "Perbarui halaman ini", { variant: "quiet", h: 32, w: 140 })) },
+      hl: { svg: ed(ring(88, 277, 279, 50, { r: 6 })), enter: "fade", delay: 0.4 },
+      ...(kind === "landing" ? { brandT: { svg: ed(rect(89, 278, 124, 48, { fill: C.warnSoft }), resetText(["Profil merek", "berubah."])), enter: "fade" } } : {}),
+      after: { svg: ed(bodyBg, bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind)), after), enter: "fade", delay: 0.1 },
+      t1: { svg: ed(nkToast(toast)), enter: "slide", delay: 0.25 }
+    },
+    steps: [...steps, { caption: "Klik Perbarui halaman ini. Halaman langsung dipasang ulang.", at: P(286, 302), click: true, press: "perbarui",
+      hide: kind === "landing" ? ["hl", "brandT"] : ["hl"], show: ["after", "t1"], dur: 3.8 }]
+  };
+}
 
 export const scenes = {
   // ---------------------------------------------------------------- alur-dengan-klien
@@ -663,24 +683,18 @@ export const scenes = {
     ]
   },
 
-  "jualan-perbarui-landing": {
-    title: "Memperbarui Landing page setelah Profil merek diubah",
-    world: RAILW(848, 44),
-    base: [...shell({ page: "Landing Rina WO", rail: "Template" }), ed(clipped(727, 106, 390, 784, landingTop(727, 106, "Rina Undangan")), nkHead(0, 0, "Template", { inbox: false }), bodyBg,
-      bodyClip(kindSeg("marketing"), brandClosed(219), rect(88.5, 277.5, 278, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }),
-        para(99, 298, ["Profil merek", "berubah."], { size: 12, fill: C.strong, lh: 16 }), mkCards(339, "landing")))],
-    els: {
-      perbarui: { svg: ed(nkBtn(216, 286, "Perbarui halaman ini", { variant: "quiet", h: 32, w: 140 })) },
-      hl: { svg: ed(ring(88, 277, 279, 50, { r: 6 })), enter: "fade", delay: 0.4 },
-      after: { svg: ed(bodyBg, bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, "landing")), clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO"))), enter: "fade", delay: 0.1 },
-      t1: { svg: ed(nkToast(["Landing page dipasang. Tekan", "Simpan di Scalev."])), enter: "slide", delay: 0.25 }
-    },
-    steps: [
+  "jualan-perbarui-landing": perbaruiScene("landing", "Memperbarui Landing page yang terpasang", "Landing Rina WO",
+    clipped(727, 106, 390, 784, landingTop(727, 106, "Rina Undangan")), clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
+    ["Landing page dipasang. Tekan", "Simpan di Scalev."], [
       { caption: "Buka halaman Landing page kamu: NikahKit > Template > Marketing.", dur: 3.2 },
-      { caption: "Profil diubah setelah dipasang? Muncul Profil merek berubah.", show: ["hl"], dur: 3.4 },
-      { caption: "Klik Perbarui halaman ini. Halaman langsung dipasang ulang.", at: P(286, 302), click: true, press: "perbarui", hide: ["hl"], show: ["after", "t1"], dur: 3.8 }
-    ]
-  },
+      { caption: "Ada versi baru: tulisannya Versi baru halaman tersedia.", show: ["hl"], dur: 3.6 },
+      { caption: "Hanya profil yang diubah? Tulisannya Profil merek berubah.", show: ["brandT"], dur: 3.4 }
+    ]),
+  "jualan-perbarui-dashboard": perbaruiScene("dashboard", "Memperbarui Dashboard pasangan ke versi baru", "Dashboard Rina WO", dashPreview, dashPreview,
+    ["Dashboard pasangan dipasang.", "Tekan Simpan di Scalev."], [
+      { caption: "Buka halaman Dashboard pasangan: NikahKit > Template > Marketing.", dur: 3.2 },
+      { caption: "Ada versi baru: tulisannya Versi baru halaman tersedia.", show: ["hl"], dur: 3.6 }
+    ]),
   "jualan-perbarui-terbit": pubScene("Menerbitkan Landing page yang diperbarui", "Landing Rina WO", clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
     ["Pratinjau ikut berganti ke profil terbaru, misalnya nama bisnis.", "Klik Simpan & Terbitkan supaya klien melihat versi baru."], null,
     clipped(727, 106, 390, 784, landingTop(727, 106, "Rina Undangan"))),
