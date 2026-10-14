@@ -1,20 +1,14 @@
-// Bantuan: dialog Bantuan (nikahkit/src/ui/help.jsx), Izin domain (CSP) dan tab Security Scalev, pola memperbaiki dari
-// pesan akses (App.jsx AccessGate), mencari pesan di panduan (docs.page), masa aktif (RenewNote, gate expired, pin.html,
-// halaman tamu), dan kirim laporan lewat WhatsApp. Setiap adegan satu layar 1440x900 (lib v4).
+// Bantuan: dialog Bantuan (ui/bantuan.mjs), Izin domain (CSP) dan tab Security Scalev, pola memperbaiki dari pesan akses
+// (App.jsx AccessGate), mencari pesan di panduan (docs.page), masa aktif (RenewNote, gate expired, pin.html, halaman
+// tamu), dan kirim laporan lewat WhatsApp. Setiap adegan satu layar 1440x900 (lib v4).
 // Editor: /tmp/ref/editor-bantuan.png + editor-metrics.json, gaya dari ui/styles.js. docs.page: diukur di Chromium
-// 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (panel dari
-// 02-scalev.mjs). WhatsApp Web: tata letak umum, belum diukur.
-import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, esc, PHONE } from "../lib.mjs";
-import { nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3, chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
+// 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (ui/scalev.mjs).
+// WhatsApp Web: tata letak umum, belum diukur.
+import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, wrap, esc, PHONE } from "../lib.mjs";
+import { nkBtn, nkBtnBox, nkInput, nkLabel, nkAcc, nkH3, chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
+import { CHECKS, helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { securityPanel, SECURITY } from "../ui/scalev.mjs";
 
-const wrap = (s, w, size = 12, weight = 400) => {
-  const out = []; let cur = "";
-  // Roboto/SF average advance ≈ 0.5em (lib's tw() is a deliberate over-estimate for sizing pills).
-  const m = (t) => t.length * size * (weight >= 600 ? 0.56 : 0.5);
-  for (const word of s.split(" ")) { const t = cur ? cur + " " + word : word; if (cur && m(t) > w) { out.push(cur); cur = word; } else cur = t; }
-  return cur ? [...out, cur] : out;
-};
 // Text with mixed weight: parts are strings or { t, w, fill, u }.
 const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 14}" fill="${o.fill ?? C.strong}" xml:space="preserve">${parts.map((p) => typeof p === "string" ? esc(p)
   : `<tspan${p.w ? ` font-weight="${p.w}"` : ""}${p.fill ? ` fill="${p.fill}"` : ""}${p.u ? ` text-decoration="underline"` : ""}>${esc(p.t)}</tspan>`).join("")}</text>`;
@@ -66,77 +60,7 @@ const HELP = [6, 800, 60, 44];
 const XBOX = [357, 111, 22, 22];
 const TABROW = [0, 44, 399, 48];
 
-// ---- Dialog Bantuan (help.jsx) --------------------------------------------------------------------------------------
-const BASE_CHECKS = ["Aplikasi Scalev (Nuxt/Vue)", "Komponen halaman studio", "HTML Mode aktif", "Editor kode (CodeMirror)", "Strip tab sidebar", "Area panel sidebar",
-  "Iframe preview", "Inspect preview", "Sinkron device", "Media Scalev", "Izin CSP otomatis"];
-const CHECKS = [...BASE_CHECKS, "Hanya NikahKit yang aktif", "Versi editor Scalev", "Data undangan terbaca", "Klik di pratinjau", "Kode halaman cocok dengan NikahKit",
-  "Penyimpanan ucapan dan RSVP", "Izin domain di tab Security", "Penulisan ke editor"];
-const DIRECTIVE = { img_src: "Gambar", script_src: "Skrip", frame_src: "Bingkai (iframe)" };
-const STATUS = { exists: ["Sudah diizinkan", false], added: ["Ditambahkan otomatis", false], failed: ["Perlu ditambah manual", true] };
-const badgeW = (l) => tw(l, 10, 500) + 12;
-const cspBadge = (x, y, st) => { const [l, todo] = STATUS[st]; return nkBadge(x, y, l, todo ? { fill: C.warnSoft, fg: C.warnStrong } : {}); };
-// One .nk-csp row: grid 1fr auto (origin + purpose left, badge centred right), padding 8px 10px, 16px lines.
-const cspLi = (r, y) => {
-  const bw = badgeW(STATUS[r.st][0]), why = wrap(`${r.why} · ${DIRECTIVE[r.d]} (${r.d})`, 329 - 8 - bw), h = 36 + why.length * 16;
-  return { h, svg: rect(16.5, y + 0.5, 350, h - 1, { r: 4, fill: C.white, stroke: C.line }) + text(27, y + 21, r.o, { size: 12, mono: true, fill: C.strong }) +
-    para(27, y + 39, why, { size: 12, fill: C.text, lh: 16 }) + cspBadge(366 - 10 - bw, y + h / 2 - 9, r.st) };
-};
-const glyph = (y, kind) => kind === "ok" ? circle(30, y + 18, 10, { fill: C.okSoft }) + iconX("check", 30, y + 18, 12, C.ok, 2.6)
-  : circle(30, y + 18, 10, { fill: C.warnSoft }) + text(30, y + 22.5, "!", { size: 12, weight: 700, fill: C.warnStrong, anchor: "middle" });
-
-// Lays out the dialog body exactly like the DOM flow (padding 16, margins from styles.js/base.css) at scroll 0.
-// o.bad: { feature: detail }, o.csp: [{ o: origin, d: directive, st, why }], o.cspMsg: reserve the status line.
-// Returns the whole body, each item's box (pos) and markup (part; buttons are pressed as their own elements).
-function helpBody(o) {
-  const bad = o.bad ?? {}, csp = o.csp ?? [], nBad = Object.keys(bad).length, pos = {}, part = {};
-  let s = "", y = 169;
-  const add = (k, svg) => { part[k] = (part[k] ?? "") + svg; s += svg; };
-  pos.version = [16, y, 351, 36];
-  add("version", text(16, y + 23, "Versi", { size: 14, fill: C.text }) + nkBtn(270, y, "Cek update", { variant: "quiet", w: 97, size: 14 }));
-  y += 36; add("version", text(16, y + 16, "Sudah versi terbaru.", { size: 12, fill: C.faint })); y += 20 + 12;
-  const st = wrap(nBad ? `${nBad} perlu perhatian. Muat ulang editor; bila tetap, kirim laporan.` : "Semua berjalan normal.", 327);
-  pos.status = [16, y, 351, 20 + st.length * 18];
-  add("status", nkNote(16, y, 351, st, { tone: nBad ? "warn" : "info" })); y += 20 + st.length * 18 + 12;
-  const tip = wrap('Terbit tertahan "not finished previewing"? Muat ulang editor, lalu tekan Simpan & Terbitkan.', 351);
-  pos.tip = [16, y, 351, tip.length * 16 + 4];
-  add("tip", para(16, y + 12, tip, { size: 12, fill: C.faint, lh: 16 })); y += tip.length * 16;
-  pos.rows = {};
-  for (const c of CHECKS) {
-    const det = bad[c] ? wrap(bad[c], 300) : [], h = 36 + (det.length ? 2 + det.length * 20 : 0) + 1;
-    pos.rows[c] = [16, y, 351, h];
-    add(c, glyph(y, bad[c] ? "bad" : "ok") + text(50, y + 23, c, { size: 14, weight: 500, fill: C.strong }) +
-      (det.length ? para(50, y + 44, det, { size: 12, fill: C.text, lh: 20 }) : "") + line(16, y + h - 0.5, 367, y + h - 0.5, { stroke: C.line }));
-    y += h + 2;
-  }
-  y += -2 + 12;
-  pos.salin = [16, y, 351, 36]; pos.wa = [16, y + 44, 351, 36]; pos.panduan = [16, y + 88, 351, 36];
-  add("salin", nkBtn(16, y, "Salin laporan", { variant: "ghost", w: 351, size: 14, icon: "copy" }));
-  add("wa", nkBtn(16, y + 44, "Kirim lewat WhatsApp", { variant: "quiet", w: 351, size: 14, icon: "message-circle" }));
-  add("panduan", nkBtn(16, y + 88, "Panduan", { variant: "quiet", w: 351, size: 14, icon: "book-open" }));
-  y += 124; pos.hint = [16, y + 4, 351, 16];
-  add("hint", text(16, y + 16, "Tanpa data undangan.", { size: 12, fill: C.faint })); y += 20 + 24;
-  pos.cspH3 = y; add("cspH3", nkH3(16, y + 12, "Izin domain (CSP)")); y += 24;
-  pos.csp = [];
-  if (!csp.length) { add("csp", nkNote(16, y, 351, ["Tidak butuh izin tambahan."])); y += 38 + 12; }
-  else {
-    csp.forEach((r, i) => { const li = cspLi(r, y); pos.csp.push([16, y, 351, li.h]); add(`csp${i}`, li.svg); y += li.h + 6; });
-    y += -6 + 10;
-    const failed = csp.some((r) => r.st === "failed");
-    pos.periksa = [16, y, 351, 36]; pos.salinCsp = [16, y + 44, 351, 36];
-    add("periksa", nkBtn(16, y, "Periksa ulang", { variant: "ghost", w: 351, size: 14 }));
-    add("salinCsp", nkBtn(16, y + 44, failed ? "Salin domain kurang" : "Salin daftar domain", { variant: "quiet", w: 351, size: 14, icon: "copy" }));
-    y += 80; pos.cspMsg = [16, y + 4, 351, 16]; if (o.cspMsg) y += 20;
-  }
-  y += 12;
-  add("more", text(20, y + 20, "▸", { size: 12, fill: C.action }) + text(34, y + 20, "Lihat isi laporan", { size: 12, fill: C.action })); y += 32;
-  // White behind the whole body, so its detailed copy (inside a step's focus) hides the skeleton under it.
-  return { svg: white(0, 154, 398, y + 16 - 154) + s, pos, part, end: y + 16 };
-}
-// Dialog pieces: white sheet, header (title + ×), the body scrolled by dy inside the view (y 154..900), and the Scalev
-// bars over the dialog's column (they hide a body that scrolls up past the header).
-const dlgSheet = rect(0, 92, 398, 808, { fill: C.white });
-const dlgHead = white(0, 92, 398, 61) + text(16, 128, "Bantuan", { size: 16, weight: 700, fill: C.strong }) + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
-const dlgView = (b, dy) => white(0, 154, 398, 746) + clipped(0, 154, 398, 746, tr(0, -dy, b.svg));
+// The Scalev bars above the dialog's column (they hide a body that scrolls up past the dialog header).
 const edBars = clipped(0, 0, 399, 92, scalevEditor(0, 0, { rail: "Konten" }));
 const dlgCover = edBars + dlgHead;
 // Box of a dialog item at scroll dy, and a lens source around it (the dialog's full width).
@@ -170,7 +94,7 @@ const IZF = izF.end - 900;
 const izCopied = white(16, iz.pos.cspMsg[1] - IZ1, 351, 18) + text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
 const izDialog = (copied) => dlgSheet + dlgHead + dlgView(iz, IZ1) + (copied ? izCopied : "");
 const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[0][1]];
-// Scalev Security tab: the measured panel from 02-scalev.mjs (Connect Sources on top; at: "image" scrolls to Image Sources,
+// Scalev Security tab: the measured panel (ui/scalev.mjs; Connect Sources on top; at: "image" scrolls to Image Sources,
 // picker = the Add image domain box with the pasted domain as an option). Image Sources starts empty in this example.
 const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PREVIEW + securityPanel(0, o);
 
