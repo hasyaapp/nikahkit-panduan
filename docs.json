@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.page/schema.json",
-  "name": "Panduan NikahKit",
+  "name": "NikahKit",
   "description": "Panduan lengkap member NikahKit: dari gabung, pasang ekstensi, membuat undangan di Scalev, mengurus tamu, sampai menjual undangan ke klien.",
   "logo": { "light": "/assets/logo.png" },
   "favicon": "/assets/favicon.png",
