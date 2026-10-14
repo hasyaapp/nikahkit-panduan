@@ -33,6 +33,17 @@ function svBtn(x, y, label, o = {}) {
 const svInput = (x, y, w, value, o = {}) => rect(x + 0.5, y + 0.5, w - 1, (o.h ?? 40) - 1, { r: 4, fill: C.white, stroke: o.focus ? SV.blue : "#d5dae1", sw: o.focus ? 2 : 1 }) +
   (value ? text(x + 12, y + (o.h ?? 40) / 2 + 5, value, { size: 14, fill: o.placeholder ? "#9aa1ab" : SV.ink, mono: o.mono }) : "") + (o.select ? icon("chevron-down", x + w - 18, y + (o.h ?? 40) / 2, 16, SV.sub) : "");
 const check = (x, y, on) => rect(x + 0.5, y + 0.5, 17, 17, { r: 3, fill: on ? SV.blue : C.white, stroke: on ? SV.blue : "#b8c0ca" }) + (on ? iconX("check", x + 9, y + 9, 13, C.white, 3) : "");
+// Measured Scalev app (14 Okt 2026, /tmp/scalev-ukur): colours, and text placed by its measured line box (top y, CSS px);
+// `w` pins the measured width (textLength) so text and its skeleton bar match the real line.
+const SVC = { blue: "#0899cf", ink: "#111827", title: "#0f161e", text: "#414042", sub: "#5b6675", mute: "#8d8b8f", off: "#b3b2b4", field: "#dbdfe5",
+  fieldBg: "#f6f9fc", red: "#f14756", dark: "#223548", line: "#e8ebef", ph: "#8d97a3", grey: "#77828e", tick: "#09afed" };
+const tx = (x, top, s, size, o = {}) => {
+  const t = text(x, top + Math.round(size * 0.93), s, { size, ...o });
+  return o.w ? t.replace("<text", `<text textLength="${o.w}" lengthAdjust="spacingAndGlyphs"`) : t;
+};
+// Field / button with a 2px border drawn inside its box (Scalev inputs, dialogs).
+const box2 = (x, y, w, h, o = {}) => rect(x + 1, y + 1, w - 2, h - 2, { r: o.r ?? 4, fill: o.fill ?? C.white, stroke: o.stroke ?? SVC.field, sw: 2 });
+const tick = (x, y, on) => on ? rect(x, y, 16, 16, { r: 4, fill: SVC.tick }) + iconX("check", x + 8, y + 8, 12, C.white, 3) : box2(x, y, 16, 16, { stroke: SVC.sub });
 // Page header in the Scalev app main area (x 256..1440), like Landing Pages: title + rule.
 const head = (title) => rect(256, 0, 1184, 900, { fill: SV.bg }) + rect(256, 0, 1184, 70, { fill: C.white }) + line(256, 70.5, 1440, 70.5, { stroke: SV.line }) + text(280, 43, title, { size: 18, weight: 600, fill: SV.ink });
 const card = (x, y, w, h) => rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 6, fill: C.white, stroke: SV.line });
@@ -247,71 +258,129 @@ function helpBody() {
   return s + nkBtn(16, HB.recheck, "Periksa ulang", { w: 351, size: 14, variant: "ghost" }) + nkBtn(16, HB.copy, "Salin domain kurang", { w: 351, size: 14, variant: "quiet", icon: "copy" }) + rect(0, HB.end, 399, 400, { fill: C.white });
 }
 const up = (y) => y - HB_DY; // world y after the scroll
-// Security tab (not captured): the seven source fields the guide names; NikahKit already filled some.
-const SEC = ["Connect Sources", "Image Sources", "Media Sources", "Font Sources", "Style Sources", "Script Sources", "Frame Sources"];
-const SEC_VAL = { "Connect Sources": "https://wedding-guestbook.nikahin.workers.dev", "Frame Sources": "https://www.youtube.com", "Script Sources": "https://www.youtube.com" };
-const secY = (i) => 140 + i * 72;
-const securityPanel = rect(0, 93, 399, 807, { fill: C.white }) + SEC.map((l, i) => text(20, secY(i), l, { size: 13, weight: 500, fill: C.strong }) +
-  svInput(20, secY(i) + 10, 359, SEC_VAL[l] ? (SEC_VAL[l].length > 38 ? SEC_VAL[l].slice(0, 37) + "…" : SEC_VAL[l]) : "", { h: 40 })).join("");
+// Security tab panel (measured 14 Okt 2026, editor-security*.png): source selects with Scalev's auto-allowed domain chips.
+// Coordinates are the panel at scroll 0 (Connect Sources on top); Image Sources is SECURITY.imageDy lower.
+const AUTO_CONNECT = [["Scalev", 224, [[27, 243, 125, "https://api.scalev.com"], [158, 243, 67, "*.scalev.id"], [231, 243, 79, "*.scalev.com"]]],
+  ["Google runtime", 279, [[27, 298, 137, "https://www.google.com"], [170, 298, 137, "https://www.gstatic.com"]]],
+  ["Meta Pixel", 334, [[27, 353, 149, "https://www.facebook.com"]]],
+  ["TikTok Pixel", 389, [[27, 408, 151, "https://analytics.tiktok.com"], [184, 408, 170, "https://analytics-ipv6.tiktokv.us"], [27, 438, 173, "https://analytics-ipv6.tiktokw.us"]]],
+  ["Kwai Pixel", 474, [[27, 493, 158, "https://log-sdk.kwai-pro.com"], [191, 493, 155, "https://logsdk.kwai-pro.com"], [27, 523, 131, "https://api.mythad.com"], [164, 523, 134, "https://ads.mythad.com"],
+    [27, 553, 137, "https://api.adaether.com"], [170, 553, 108, "https://s1.kwai.net"], [27, 583, 154, "https://s16-11187.ap4r.com"]]],
+  ["Google Tag Manager, Analytics, and Ads", 619, [[27, 638, 195, "https://www.googletagmanager.com"], [27, 668, 185, "https://www.google-analytics.com"],
+    [27, 698, 166, "https://*.google-analytics.com"], [27, 728, 164, "https://stats.g.doubleclick.net"], [27, 758, 190, "https://googleads.g.doubleclick.net"]]]];
+const AUTO_IMAGE = [["Browser inline images", 226, [[27, 245, 41, "data:"], [74, 245, 40, "blob:"]]], ["Scalev", 281, [[27, 300, 67, "*.scalev.id"], [100, 300, 79, "*.scalev.com"]]],
+  ["Country flags", 336, [[27, 355, 113, "https://flagcdn.com"]]], ["Meta Pixel", 391, [[27, 410, 149, "https://www.facebook.com"]]], ["TikTok Pixel", 446, [[27, 465, 151, "https://analytics.tiktok.com"]]],
+  ["Kwai Pixel", 501, [[27, 520, 158, "https://log-sdk.kwai-pro.com"], [191, 520, 155, "https://logsdk.kwai-pro.com"], [27, 550, 108, "https://s1.kwai.net"], [141, 550, 154, "https://s16-11187.ap4r.com"]]],
+  ["Google Tag Manager, Analytics, and Ads", 586, [[27, 605, 195, "https://www.googletagmanager.com"], [27, 635, 185, "https://www.google-analytics.com"],
+    [27, 665, 166, "https://*.google-analytics.com"], [27, 695, 164, "https://stats.g.doubleclick.net"], [27, 725, 190, "https://googleads.g.doubleclick.net"]]]];
+const IMG_DY = 699;
+const secSelect = (y, value, ph) => box2(16, y, 351, 43, { fill: SVC.fieldBg }) + clipped(18, y + 2, 320, 39, tx(30, y + 13, value, 14, { fill: ph ? SVC.ph : SVC.dark })) + icon("chevron-down", 351, y + 22, 12, SVC.mute);
+const secAuto = (y, h, groups, dy = 0) => rect(16.5, y + 0.5, 350, h - 1, { r: 4, fill: "#f5f5f5", stroke: SVC.off }) + tx(27, y + 12, "AUTOMATICALLY ALLOWED BY SCALEV", 10, { weight: 600, fill: SVC.sub, w: 184 }) +
+  groups.map(([name, top, chips]) => tx(27, top + dy, name, 11, { weight: 600, fill: SVC.mute }) +
+    chips.map(([x, cy, w, d]) => rect(x, cy + dy, w, 24, { r: 4, fill: C.white }) + tx(x + 8, cy + dy + 6, d, 11, { weight: 500, fill: SVC.grey, w: w - 16 })).join("")).join("");
+const secContent = (o) => tx(16, 110, "Connect Sources", 12, { weight: 500, fill: SVC.sub }) + secSelect(136, `${o.connect ?? 1} selected`) + secAuto(187, 606, AUTO_CONNECT) +
+  tx(16, 811, "Image Sources", 12, { weight: 500, fill: SVC.sub }) +
+  secSelect(837, o.images ? `${o.images} selected` : "Add image domain, e.g. https://images.example.com", !o.images) + secAuto(888, 571, AUTO_IMAGE, IMG_DY) +
+  tx(16, 778 + IMG_DY, "Media Sources", 12, { weight: 500, fill: SVC.sub }) + secSelect(804 + IMG_DY, "Add audio or video domain, e.g. https://media.example.com", true) +
+  secAuto(855 + IMG_DY, 146, [["Browser inline media", 892, []]], IMG_DY);
+// The Image Sources picker under its select (panel scrolled to Image Sources): search box, then the typed domain as an option.
+const secPicker = (p) => shadow(16, 180, 351, p.value ? 105 : 54, 4, 2) + box2(16, 180, 351, p.value ? 105 : 54) + box2(26, 184, 331, 42, { stroke: SVC.blue }) +
+  clipped(28, 186, 300, 38, tx(40, 197, p.value || "Add image domain, e.g. https://images.example.com", 14, { fill: p.value ? SVC.dark : SVC.ph })) + iconX("search", 340, 205, 16, SVC.sub) +
+  (p.value ? tick(34, 249, p.ticked) + tx(64, 248, p.value, 14, { weight: 500, fill: "#676569" }) : "");
+// Scalev editor Security tab panel body for an editor drawn at top y (x 0..399, y+92..y+900). o: { at: "connect" | "image"
+// (scrolled to Image Sources), connect: n selected, images: n selected (0 = placeholder), picker: { value, ticked } (with at "image") }.
+export function securityPanel(y = 0, o = {}) {
+  const body = rect(0, 92, 399, 808, { fill: C.white }) + clipped(0, 92, 399, 808, group({ transform: `translate(0 ${o.at === "image" ? -IMG_DY : 0})` }, secContent(o)) + (o.picker && o.at === "image" ? secPicker(o.picker) : ""));
+  return y ? group({ transform: `translate(0 ${y})` }, body) : body;
+}
+// Exact boxes (editor at y 0, panel scrolled to Image Sources) for marks: the select, the picker's search box, the option's tick.
+export const SECURITY = { imageDy: IMG_DY, imageSelect: [16, 138, 351, 43], pickerInput: [26, 184, 331, 42], pickerTick: [34, 249, 16, 16], pickerOption: [26, 240, 331, 34] };
 
-// ---- 4/6. Settings dashboard: sub-menu list (measured); Domain and Profil laid out generic at 1440 (not captured) -----
-const SUB = { x: 280, y: 94, w: 200 };
+// ---- 4/6. Settings dashboard (measured 14 Okt 2026, domain/profil*.png): sub-menu card, content card, Domain, Profil ----
 const SUB_ITEMS = ["Bisnis", "Verifikasi", "Anggota", "Peran", "Gudang", "Payment Methods", "Bank Transfer", "Discount Code", "Courier", "Analitik", "Privasi pelanggan",
   "Domain", "Integrations", "Billing", "Add-ons", "Bahasa", "Suppressed IPs", "Apps", "Developers", "Profil"];
-const subAt = (n) => [SUB.x + 70, SUB.y + 26 + SUB_ITEMS.indexOf(n) * 27.5];
-const subBox = (n) => [SUB.x + 12, subAt(n)[1] - 13, SUB.w - 24, 26];
-function settingsPage(active) {
-  let s = scalevApp(0, 0, { active: "Settings" }) + head("Settings") + card(SUB.x, SUB.y, SUB.w, 590);
+const subTop = (n) => 113 + SUB_ITEMS.indexOf(n) * 27.5;
+const subAt = (n) => [345, subTop(n) + 8];
+const subBox = (n) => [304, subTop(n) - 6, 150, 28];
+const SUBMENU = [280, 83, 200, 735];
+// tall: the content runs below the fold (Profil): card to the bottom, page scrollbar, no footer.
+function settingsPage(active, tall) {
+  let s = scalevApp(0, 0, { active: "Settings" }) + rect(256, 0, 1184, 900, { fill: SV.bg }) + tx(280, 26, "Settings", 26, { weight: 700, fill: SVC.ink }) + rect(280, 83, 200, tall ? 817 : 735, { fill: C.white });
   SUB_ITEMS.forEach((n) => {
-    const [, cy] = subAt(n), on = n === active;
-    if (on) s += rect(SUB.x + 12, cy - 13, SUB.w - 24, 26, { r: 4, fill: "#f3f5f7" });
-    s += text(SUB.x + 22, cy + 5, n, { size: 13, weight: on ? 500 : 400, fill: on ? "#344157" : "#9aa1ab" });
+    const on = n === active;
+    if (on) s += rect(...subBox(n), { r: 4, fill: SVC.fieldBg });
+    s += tx(314, subTop(n), n, 13, { weight: 500, fill: on ? SVC.text : SVC.off });
   });
-  return s;
+  if (tall) return s + rect(480, 83, 921, 817, { fill: C.white }) + rect(1425, 0, 15, 900, { fill: "#f6f6f6" }) + rect(1428, 4, 8, 516, { r: 4, fill: "#c4c4c4" });
+  return s + rect(480, 83, 936, 735, { fill: C.white }) + tx(280, 852, "© 2026 Scalev PT Interna Cipta Asia", 12, { fill: SVC.mute }) +
+    [["Kebijakan Privasi", 1144], ["Syarat dan Ketentuan", 1246], ["Bantuan", 1372]].map(([t, x]) => tx(x, 852, t, 12, { fill: SVC.blue })).join("");
 }
-const SUBMENU = [SUB.x, SUB.y, SUB.w, 590];
-const MAIN = { x: 496, y: 94, w: 904 };
-const profileCard = () => {
-  const x = MAIN.x, y = MAIN.y;
-  return card(x, y, MAIN.w, 330) + text(x + 24, y + 36, "Profil", { size: 16, weight: 600, fill: SV.ink }) + circle(x + 60, y + 104, 36, { fill: "#dbe7f3" }) + text(x + 60, y + 113, "R", { size: 26, weight: 600, fill: SV.blue, anchor: "middle" }) +
-    bar(x + 120, y + 86, 180, 14, "#dfe4ea") + bar(x + 120, y + 114, 240) + [0, 1, 2].map((k) => bar(x + 24, y + 180 + k * 44, 100, 9, "#d5dae1") + bar(x + 220, y + 180 + k * 44, [220, 160, 0][k] || 1, 10)).join("") +
-    icon("smartphone", x + 228, y + 273, 15, SV.sub) + bar(x + 244, y + 268, 120) + svBtn(x + MAIN.w - 104, y + 16, "Edit", { variant: "plain", w: 80, h: 36 });
-};
-const EDIT = svBox(MAIN.x + MAIN.w - 104, MAIN.y + 16, "Edit", { w: 80, h: 36 });
-const PHONE_IN = { x: MAIN.x + 24, y: MAIN.y + 236, w: 300 };
-const editForm = card(MAIN.x, MAIN.y, MAIN.w, 400) + text(MAIN.x + 24, MAIN.y + 36, "Profil", { size: 16, weight: 600, fill: SV.ink }) +
-  [0, 1].map((k) => bar(MAIN.x + 24, MAIN.y + 72 + k * 78, 90, 9, "#d5dae1") + svInput(MAIN.x + 24, MAIN.y + 88 + k * 78, 360, "") + bar(MAIN.x + 36, MAIN.y + 103 + k * 78, [160, 210][k])).join("") +
-  bar(MAIN.x + 24, MAIN.y + 222, 90, 9, "#d5dae1") + svInput(PHONE_IN.x, PHONE_IN.y, PHONE_IN.w, "", { focus: true }) + icon("smartphone", PHONE_IN.x + 18, PHONE_IN.y + 20, 15, SV.sub) +
-  svBtn(MAIN.x + 24, MAIN.y + 318, "Save", { w: 80 });
-const editPage = rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }) + editForm;
-const SAVE = svBox(MAIN.x + 24, MAIN.y + 318, "Save", { w: 80 });
-const PHONE_BOX = [PHONE_IN.x, PHONE_IN.y, PHONE_IN.w, 40];
-const phoneNum = text(PHONE_IN.x + 34, PHONE_IN.y + 25, "081234567890", { size: 14, fill: SV.ink });
-const CEK = svBox(PHONE_IN.x + PHONE_IN.w + 12, PHONE_IN.y, "Cek Verifikasi", { w: 140 });
-const cekBtn = svBtn(CEK[0], CEK[1], "Cek Verifikasi", { variant: "outline", w: 140 });
-// Domain section
-const domainSection = card(MAIN.x, MAIN.y, MAIN.w, 520) + text(MAIN.x + 24, MAIN.y + 38, "Domain", { size: 16, weight: 600, fill: SV.ink }) +
-  svBtn(MAIN.x + MAIN.w - 184, MAIN.y + 16, "Tambahkan Domain", { w: 160 }) + line(MAIN.x, MAIN.y + 72.5, MAIN.x + MAIN.w, MAIN.y + 72.5, { stroke: SV.line }) +
-  icon("map", MAIN.x + MAIN.w / 2, MAIN.y + 170, 34, "#c3cad3", 1.6) + bar(MAIN.x + MAIN.w / 2 - 110, MAIN.y + 214, 220);
-const ADD = svBox(MAIN.x + MAIN.w - 184, MAIN.y + 16, "Tambahkan Domain", { w: 160 });
-const MD = { x: 470, y: 300, w: 500, h: 210 };
-const DOM_IN = [MD.x + 24, MD.y + 82, 452, 40];
-const domainDlg = shadow(MD.x, MD.y, MD.w, MD.h, 8, 3) + rect(MD.x, MD.y, MD.w, MD.h, { r: 8, fill: C.white }) + text(MD.x + 24, MD.y + 40, "Tambahkan Domain", { size: 16, weight: 600, fill: SV.ink }) +
-  iconX("x", MD.x + MD.w - 30, MD.y + 34, 18, SV.sub) + svInput(DOM_IN[0], DOM_IN[1], DOM_IN[2], "", { focus: true }) + svBtn(MD.x + MD.w - 104, MD.y + 146, "Simpan", { w: 80 });
-const DOM_SAVE = svBox(MD.x + MD.w - 104, MD.y + 146, "Simpan", { w: 80 });
-const DNS_ROWS = [["A", "undangan"], [null, null], [null, null]];
-const DNS_COL = { Type: 40, Name: 200, Target: 420 };
-const dnsHead = rect(MAIN.x + 1, MAIN.y + 73, MAIN.w - 2, 446, { fill: C.white }) + text(MAIN.x + 24, MAIN.y + 110, "undangan.namabrand.com", { size: 15, weight: 600, fill: SV.ink, mono: true }) +
-  rect(MAIN.x + 24, MAIN.y + 130, MAIN.w - 48, 36, { fill: "#f6f8fa" }) + Object.entries(DNS_COL).map(([l, dx]) => text(MAIN.x + dx, MAIN.y + 153, l, { size: 12, weight: 600, fill: SV.sub })).join("") +
-  svBtn(MAIN.x + MAIN.w - 144, MAIN.y + 88, "Verifikasi", { variant: "outline", w: 120, h: 36 });
-const VERIFY = svBox(MAIN.x + MAIN.w - 144, MAIN.y + 88, "Verifikasi", { w: 120, h: 36 });
-const dnsRow = (i) => {
-  const y = MAIN.y + 166 + i * 52, [t, n] = DNS_ROWS[i];
-  return line(MAIN.x + 24, y + 51.5, MAIN.x + MAIN.w - 24, y + 51.5, { stroke: SV.line }) + (t ? text(MAIN.x + DNS_COL.Type, y + 31, t, { size: 14, weight: 600, fill: SV.ink, mono: true }) : bar(MAIN.x + DNS_COL.Type, y + 21, 40)) +
-    (n ? text(MAIN.x + DNS_COL.Name, y + 31, n, { size: 14, fill: SV.ink, mono: true }) : bar(MAIN.x + DNS_COL.Name, y + 21, 110)) + bar(MAIN.x + DNS_COL.Target, y + 21, [140, 160, 150][i]) + iconX("file-text", MAIN.x + MAIN.w - 50, y + 26, 15, SV.sub);
-};
-const dnsTable = dnsHead + DNS_ROWS.map((_, i) => dnsRow(i)).join("");
-const verified = icon("circle-check", MAIN.x + 246, MAIN.y + 105, 20, "#15a34a");
+// Domain: heading with + Tambah Domain and quota, table Nama Domain / Store / Homepage / Status (rows 66 high).
+const domRow = (y, name, o = {}) => rect(512, y, 872, 66, { r: 4, fill: SVC.fieldBg }) + tx(528, y + 25, name, 14, { weight: 500, fill: SVC.blue }) +
+  (o.added ? "" : iconX("external-link", 700, y + 34, 18, SVC.sub)) + tx(906, y + 25, "Rina WO", 14, { fill: SVC.blue }) + (o.added ? bar(1047, y + 29, 60) : tx(1047, y + 25, "Rina WO", 14, { fill: SVC.blue })) +
+  (o.added ? "" : rect(1303, y + 20, 34, 26, { r: 4, fill: "#e3f2f1" }) + tx(1307, y + 26, "Aktif", 12, { weight: 500, fill: "#15c15d" }));
+const domainPage = () => settingsPage("Domain") + tx(512, 118, "Domain", 16, { weight: 700, fill: SVC.ink }) + tx(578, 120, "+ Tambah Domain", 14, { weight: 500, fill: SVC.blue, w: 115 }) +
+  tx(701, 119, "0", 14, { weight: 600, fill: SVC.dark }) + tx(714, 119, "dari", 14, { fill: SVC.dark, w: 26 }) + tx(744, 119, "3", 14, { weight: 600, fill: SVC.dark }) +
+  tx(757, 119, "jatah telah digunakan.", 14, { fill: SVC.dark, w: 139 }) +
+  [["Nama Domain", 528, 77], ["Store", 906, 29], ["Homepage", 1047, 59], ["Status", 1301, 35]].map(([t, x, w]) => tx(x, 179, t, 12, { weight: 500, fill: SVC.mute, w })).join("") +
+  domRow(211, "tokomu.myscalev.com");
+const TAMBAH = [574, 116, 123, 25];
+const DOMAIN_CARD = [480, 83, 936, 735];
+// Dialog Tambah Domain (measured): Save stays disabled until a domain is typed (enabled look inferred).
+const DOM_IN = [506, 441, 428, 42], DOM_SAVE = [869, 499, 65, 44], DOM_DLG = [490, 342, 460, 217];
+const domainDlg = shadow(490, 342, 460, 217, 4, 2) + rect(490, 342, 460, 217, { r: 4, fill: C.white }) + tx(506, 359, "Tambah Domain", 16, { weight: 700, fill: SVC.text }) +
+  tx(506, 385, "Masukkan domain pribadi Kamu di bawah ini.", 12, { fill: SVC.sub, w: 248 }) + tx(506, 415, "Domain", 12, { weight: 500, fill: SVC.sub }) + tx(551, 415, "*", 12, { weight: 500, fill: SVC.red }) +
+  box2(...DOM_IN, { fill: SVC.fieldBg }) + tx(520, 454, "Contoh: budi.contoh.com", 14, { fill: SVC.ph }) +
+  box2(792, 499, 65, 44, { stroke: "#eaeaeb" }) + tx(803, 512, "Cancel", 14, { weight: 500, fill: SVC.text, w: 43 }) + rect(869, 499, 65, 44, { r: 4, fill: "#f0f1f3" }) + tx(886, 512, "Save", 14, { weight: 500, fill: SVC.grey, w: 30 });
+const domTyped = rect(508, 443, 424, 38, { fill: SVC.fieldBg }) + tx(520, 454, "undangan.namabrand.com", 14, { fill: SVC.title });
+const domSaveOn = rect(869, 499, 65, 44, { r: 4, fill: SVC.blue }) + tx(886, 512, "Save", 14, { weight: 500, fill: C.white, w: 30 });
+// After Save (not observed: generic): the new domain row with Verifikasi in its Status cell, and its DNS records below.
+const VERIFY = [1268, 298, 100, 36];
+const NEW_ROW = [512, 283, 872, 66], DNS_CARD = [512, 365, 872, 212];
+const dnsTable = domRow(283, "undangan.namabrand.com", { added: true }) + box2(...VERIFY, { stroke: SVC.blue }) + tx(1318, 307, "Verifikasi", 14, { weight: 500, fill: SVC.blue, anchor: "middle" }) +
+  box2(...DNS_CARD, { stroke: SVC.line }) + rect(528, 381, 840, 36, { r: 4, fill: SVC.fieldBg }) +
+  [["Type", 544], ["Name", 704], ["Target", 924]].map(([t, x]) => tx(x, 392, t, 12, { weight: 500, fill: SVC.mute })).join("") +
+  [0, 1, 2].map((i) => {
+    const y = 417 + i * 52;
+    return line(528, y + 51.5, 1368, y + 51.5, { stroke: SVC.line }) + (i ? bar(544, y + 21, 40) + bar(704, y + 21, 110) : tx(544, y + 18, "A", 14, { weight: 600, fill: SVC.title, mono: true }) + tx(704, y + 18, "undangan", 14, { fill: SVC.title, mono: true })) +
+      bar(924, y + 21, [150, 170, 160][i]) + iconX("copy", 1344, y + 26, 15, SVC.sub);
+  }).join("");
+const verified = icon("circle-check", 528 + tw("undangan.namabrand.com", 14, 500) + 26, 317, 18, "#15c15d");
+// Profil (measured; example account data): fields, Telegram cards, Password, Log out, then Security with the MFA method row.
+const profilPage = (o = {}) => settingsPage("Profil", true) + tx(512, 118, "Profil", 16, { weight: 700, fill: SVC.ink, w: 38 }) + tx(556, 122, "Edit", 12, { weight: 500, fill: SVC.blue, underline: true }) +
+  [["Nama Lengkap", 512, 161], ["Alamat Email", 807, 161], ["Nomor Telepon", 512, 222], ["Akun Telegram", 512, 283], ["Password", 512, 446]].map(([t, x, y]) => tx(x, y, t, 12, { fill: SVC.sub })).join("") +
+  tx(1126, 161, "Avatar", 12, { fill: SVC.mute }) + rect(1126, 183, 82, 82, { r: 4, fill: "#e8f6fb" }) + text(1167, 237, "R", { size: 36, fill: SVC.text, anchor: "middle" }) +
+  tx(512, 185, "Rina", 14, { weight: 500, fill: SVC.text }) + tx(807, 185, "rina.wo@gmail.com", 14, { weight: 500, fill: SVC.text }) +
+  icon("circle-check", 807 + tw("rina.wo@gmail.com", 14, 500) + 12, 193, 13, SVC.blue) + tx(512, 246, o.phone ?? "Belum Ditambahkan", 14, { weight: 500, fill: SVC.text }) +
+  [[512, "Notifikasi Order", ["Khusus update pesanan dan status", "pembayaran."]], [808, "Diskusi LMS", ["Untuk komentar dan balasan baru di", "kelas LMS."]]].map(([x, t, d]) =>
+    rect(x, 307, 286, 119, { r: 4, fill: SVC.fieldBg }) + tx(x + 12, 321, t, 14, { weight: 600, fill: SVC.text }) + tx(x + 235, 325, "Belum", 11, { weight: 500, fill: SVC.mute }) +
+    tx(x + 12, 346, d[0], 12, { fill: SVC.sub }) + tx(x + 12, 364, d[1], 12, { fill: SVC.sub }) + tx(x + 12, 397, "Hubungkan akun Telegram", 12, { weight: 500, fill: SVC.blue, underline: true, w: 144 })).join("") +
+  tx(569, 444, "Edit", 14, { weight: 500, fill: SVC.blue, underline: true }) + [0, 1, 2, 3, 4, 5].map((k) => circle(515 + k * 6, 475, 3, { fill: "#676569" })).join("") +
+  shadow(512, 514, 156, 52, 4, 1) + box2(512, 514, 156, 52, { stroke: SVC.red }) + tx(528, 532, "Log out", 14, { weight: 500, fill: SVC.red, italic: true }) + tx(583, 532, "dari Scalev", 14, { weight: 500, fill: SVC.red }) +
+  tx(512, 604, "Terakhir diubah 14 Okt 2026, 09.30", 12, { fill: SVC.sub }) + line(480, 645.5, 1401, 645.5, { stroke: SVC.line }) +
+  tx(512, 681, "Security", 16, { weight: 700, fill: SVC.ink }) + rect(512, 724, 857, 78, { r: 4, fill: "rgba(41,152,117,.1)" }) + iconX("check", 540, 754, 18, "#299875", 2.5) +
+  tx(568, 744, "Multi-Factor Authentication (MFA) is Always Active", 14, { weight: 600, fill: SVC.dark, w: 331 }) + tx(899, 744, "•", 14, { fill: SVC.dark }) +
+  tx(908, 744, "By default, MFA method is using Email OTP, and you can switch to", 14, { fill: SVC.dark, w: 419 }) +
+  tx(568, 765, "use Authenticator App for better security. MFA is used for:", 14, { fill: SVC.dark, w: 372 }) +
+  tx(940, 765, "login, fund withdrawal, and change business owner.", 14, { weight: 700, fill: SVC.dark, w: 329 }) +
+  tx(512, 853, "Multi-Factor Authentication Method", 12, { weight: 500, fill: SVC.mute, w: 193 }) + tx(512, 880, "Email OTP", 14, { weight: 500, fill: SVC.text }) +
+  box2(1198, 851, 171, 44) + bar(1230, 869, 107, 8, "#dde2e8"); // the switch button's label was not observed
+const PROFIL_EDIT = [553, 118, 27, 22], MFA_METHOD = [506, 849, 230, 50], SECURITY_BOX = [496, 665, 905, 235];
+// Dialog Edit Account (measured): note, Avatar, Nama Lengkap, Alamat Email, Nomor Telepon with +62 picker; Save disabled until edited.
+const EA = [481, 190, 478, 520], EA_PHONE = [767, 571, 158, 42], EA_SAVE = [863, 654, 80, 40];
+const editAccount = shadow(481, 190, 478, 520, 4, 2) + rect(481, 190, 478, 520, { r: 4, fill: C.white }) + tx(497, 207, "Edit Account", 16, { weight: 700, fill: SVC.text }) +
+  tx(497, 233, "Pastikan Anda mengisi data dengan benar.", 12, { fill: SVC.sub, w: 232 }) + iconX("x", 937, 216, 14, SVC.red, 2.5) +
+  rect(497, 271, 446, 78, { r: 4, fill: "rgba(251,191,56,.1)" }) + circle(525, 301, 9, { stroke: "#f5a524", sw: 1.6 }) + line(525, 299.5, 525, 305.5, { stroke: "#f5a524", sw: 1.8, cap: "round" }) + circle(525, 296, 1.1, { fill: "#f5a524" }) +
+  tx(553, 291, "Jika nomor telepon diubah, akun ini perlu melakukan", 14, { fill: SVC.dark, w: 333 }) + tx(553, 312, "verifikasi ulang melalui WhatsApp.", 14, { fill: SVC.dark, w: 217 }) +
+  rect(497, 359, 446, 275, { r: 4, fill: SVC.fieldBg }) + tx(513, 377, "Avatar", 12, { fill: SVC.mute }) + rect(513, 403, 134, 134, { r: 4, fill: "#e8f6fb" }) + text(580, 484, "R", { size: 36, fill: SVC.text, anchor: "middle" }) +
+  tx(669, 377, "Nama Lengkap", 12, { weight: 500, fill: SVC.sub, w: 86 }) + tx(755, 377, "*", 12, { weight: 500, fill: SVC.red }) + box2(669, 403, 258, 42) + tx(683, 416, "Rina", 14, { fill: SVC.title }) +
+  tx(669, 460, "Alamat Email", 12, { weight: 500, fill: SVC.sub, w: 76 }) + tx(745, 460, "*", 12, { weight: 500, fill: SVC.red }) + tx(927, 460, "Terverifikasi", 12, { weight: 500, fill: "#299875", anchor: "end" }) +
+  box2(669, 486, 258, 42) + tx(683, 499, "rina.wo@gmail.com", 14, { fill: SVC.title }) + tx(669, 543, "Nomor Telepon", 12, { weight: 500, fill: SVC.sub, w: 83 }) +
+  box2(669, 569, 258, 46, { fill: SVC.fieldBg }) + rect(671, 571, 95, 42, { fill: C.white }) + rect(683, 583, 24, 9, { fill: "#e70011" }) + rect(683, 592, 24, 9, { fill: C.white, stroke: "#e5e5e5", sw: 0.5 }) +
+  tx(711, 584, "+62", 14, { fill: SVC.dark }) + icon("chevron-down", 750, 592, 10, SVC.sub) + rect(767, 571, 158, 42, { r: 4, fill: C.white }) + tx(779, 584, "812345678", 14, { fill: SVC.ph }) +
+  rect(767, 654, 80, 40, { r: 4, fill: "#f5f5f5" }) + tx(786, 666, "Cancel", 14, { weight: 500, fill: SVC.red, w: 43 }) + rect(863, 654, 80, 40, { r: 4, fill: SVC.fieldBg }) + tx(888, 666, "Save", 14, { weight: 500, fill: SVC.grey, w: 30 });
+const eaPhone = rect(768, 572, 156, 40, { fill: C.white }) + tx(779, 584, "81234567890", 14, { fill: SVC.title });
+const eaSaveOn = rect(863, 654, 80, 40, { r: 4, fill: SVC.blue }) + tx(888, 666, "Save", 14, { weight: 500, fill: C.white, w: 30 });
 // Cloudflare dashboard, DNS records (not captured): generic, with the labels the guide names.
 const cfOrange = "#f38020", cfBlue = "#0051c3";
 const cloud = (x, y, k, fill) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 0 a8 8 0 0 1 3 -14 a10 10 0 0 1 19 3 a6 6 0 0 1 2 11 z" fill="${fill}"/>`;
@@ -342,42 +411,66 @@ const cfForm = rect(312.5, 316.5, 1055, 219, { r: 6, fill: "#f8f9fb", stroke: "#
   rect(1144.5, 482.5, 92, 35, { r: 4, fill: C.white, stroke: "#c9c9c9" }) + bar(1162, 495, 56, 9, "#d9d9d9") + rect(1248, 482, 104, 36, { r: 4, fill: cfBlue }) + bar(1270, 495, 60, 9, "#9fbbe6");
 const CF_FORM = [312, 316, 1056, 220];
 
-// ---- 5. Stores (not captured): generic, laid out across the 1440 main area ------------------------------------------
-const storesPage = scalevApp(0, 0, { active: "Stores" }) + head("Stores") + card(280, 94, 1120, 300) + rect(281, 95, 1118, 40, { fill: "#f6f8fa" }) +
-  [304, 640, 980].map((x) => bar(x, 111, 80, 9, "#d5dae1")).join("") +
-  rect(281, 135, 1118, 64, { fill: C.white }) + circle(320, 167, 18, { fill: "#dbe7f3" }) + iconX("home", 320, 167, 16, SV.blue) +
-  text(352, 172, "Rina WO", { size: 14, weight: 600, fill: SV.link }) + bar(640, 162, 180) + bar(980, 162, 120) + line(281, 199.5, 1399, 199.5, { stroke: SV.line }) +
-  bar(352, 226, 130) + bar(640, 226, 160) + bar(980, 226, 90);
-const STORE = [346, 155, 70, 24];
-const STORES_TABLE = [280, 94, 1120, 170];
-const DET_TOP = 70;
-const TOP_SAVE = svBox(1300, 16, "Simpan", { w: 100 });
-const detHead = rect(256, 0, 1184, 70, { fill: C.white }) + line(256, 70.5, 1440, 70.5, { stroke: SV.line }) + iconX("arrow-left", 290, 36, 18, SV.ink) + text(316, 43, "Rina WO", { size: 18, weight: 600, fill: SV.ink });
-const topSave = svBtn(TOP_SAVE[0], TOP_SAVE[1], "Simpan", { w: 100 });
-const PM_Y = 94 + 3 * 200; // Metode Pembayaran card top (before scroll)
-const DET_DY = 520;
-const PM_CARD = [280, PM_Y, 1120, 200];
-const detContent = rect(256, DET_TOP, 1184, 1500, { fill: SV.bg }) +
-  [0, 1, 2].map((k) => card(280, 94 + k * 200, 1120, 176) + bar(304, 124 + k * 200, 160, 12, "#dfe4ea") + bar(304, 160 + k * 200, 360) + rect(304.5, 186.5 + k * 200, 520, 39, { r: 4, fill: C.white, stroke: "#d5dae1" }) + bar(316, 201 + k * 200, 200)).join("") +
-  card(...PM_CARD) + text(304, PM_Y + 38, "Metode Pembayaran", { size: 16, weight: 600, fill: SV.ink }) + bar(304, PM_Y + 62, 420) +
-  svBtn(304, PM_Y + 90, "Pilih Metode Pembayaran", { variant: "outline", w: 220 }) + card(280, PM_Y + 224, 1120, 176) + bar(304, PM_Y + 254, 160, 12, "#dfe4ea");
-const PICK = svBox(304, PM_Y + 90 - DET_DY, "Pilih Metode Pembayaran", { w: 220 });
-const chosenRow = rect(304, PM_Y + 146 - DET_DY, 300, 36, { r: 4, fill: SV.soft }) + iconX("credit-card", 324, PM_Y + 164 - DET_DY, 16, SV.blue) + text(342, PM_Y + 169 - DET_DY, "Invoice · ALL E-Payment", { size: 14, weight: 500, fill: SV.ink });
-// The store page after the dialog closes (body already scrolled).
-const detAfter = scalevApp(0, 0, { active: "Stores" }) + clipped(256, DET_TOP + 1, 1184, 900, `<g transform="translate(0 ${-DET_DY})">${detContent}</g>`) + chosenRow + detHead;
-const PD = { x: 450, y: 250, w: 540, h: 290 };
-const SEL = [PD.x + 24, PD.y + 72, 492, 40];
-const payDlg = shadow(PD.x, PD.y, PD.w, PD.h, 8, 3) + rect(PD.x, PD.y, PD.w, PD.h, { r: 8, fill: C.white }) + bar(PD.x + 24, PD.y + 32, 200, 12, "#dfe4ea") + iconX("x", PD.x + PD.w - 30, PD.y + 38, 18, SV.sub) +
-  svInput(SEL[0], SEL[1], SEL[2], "", { select: true }) + bar(SEL[0] + 12, SEL[1] + 15, 140) + check(PD.x + 24, PD.y + 150, false) +
-  text(PD.x + 52, PD.y + 164, "Aktifkan Metode Pembayaran ALL E-Payment", { size: 14, fill: SV.ink }) + line(PD.x, PD.y + 210.5, PD.x + PD.w, PD.y + 210.5, { stroke: SV.line }) +
-  svBtn(PD.x + PD.w - 104, PD.y + 230, "Simpan", { w: 80 });
-const PAY_DLG = [PD.x, PD.y, PD.w, PD.h];
-const payMenu = shadow(SEL[0], SEL[1] + 44, SEL[2], 132, 6, 2) + rect(SEL[0], SEL[1] + 44, SEL[2], 132, { r: 6, fill: C.white }) + bar(SEL[0] + 14, SEL[1] + 64, 160) +
-  rect(SEL[0] + 4, SEL[1] + 88, SEL[2] - 8, 40, { r: 4, fill: SV.soft }) + text(SEL[0] + 14, SEL[1] + 113, "Invoice", { size: 14, weight: 500, fill: SV.ink }) + bar(SEL[0] + 14, SEL[1] + 150, 120);
-const INVOICE = [SEL[0] + 4, SEL[1] + 88, SEL[2] - 8, 40];
-const payVal = rect(SEL[0] + 2, SEL[1] + 2, SEL[2] - 40, 36, { fill: C.white }) + text(SEL[0] + 12, SEL[1] + 25, "Invoice", { size: 14, fill: SV.ink });
-const CHECK = [PD.x + 24, PD.y + 150, 18, 18];
-const DLG_SAVE = svBox(PD.x + PD.w - 104, PD.y + 230, "Simpan", { w: 80 });
+// ---- 5. Stores (measured 14 Okt 2026, stores/store-payment*.png): with one store, Stores opens it directly ----------------
+// Header (title + breadcrumb), right column of settings cards, left column that scrolls: store name + Save, Products Offered,
+// then Payment Methods (chips, PayLink card, + Add Payment Method) and Extra Charges. Products and chips use example data.
+const PMY = 917, STORE_DY = PMY - 116; // Payment Methods block top in the unscrolled column; scroll that brings it under the header
+const storeHead = rect(256, 0, 1184, 88, { fill: C.white }) + line(256, 88.5, 1440, 88.5, { stroke: SVC.line }) + tx(280, 20, "Rina WO", 18, { weight: 700, fill: SVC.title }) +
+  tx(280, 54, "Stores", 12, { weight: 700, fill: SVC.blue, w: 35 }) + tx(319, 54, "/", 12, { weight: 500, fill: SVC.sub }) + tx(328, 54, "Rina WO", 12, { weight: 500, fill: SVC.sub });
+const RIGHT = [["Storefront Settings", 136, 155, ["Kamu bisa mengatur tampilan Checkout Page dan", "Analytics Setting."], 253], ["LMS Settings", 279, 109, ["Atur banner di halaman LMS untuk menyapa", "member, membagikan info kelas terbaru, atau", "promo khusus member."], 464],
+  ["Notification Settings", 490, 168, ["Configure WhatsApp and email notification", "settings to automatically notify customers."], 575], ["Unique Code", 601, 104, ["This feature will add unique code as a discount to", "orders with bank transfer payment method. This", "code can be used to identify the order when the", "customer makes a payment."], 718],
+  ["Public Order Page", 744, 148, ["Settings related to order page which can be", "accessed by your customers publicly. Public order", "page is your main channel to inform your", "customers related to order information."], 861], ["Order Shield", 887, 101, [], 0]];
+const storeRight = rect(1054, 112, 325, 788, { r: 4, fill: C.white }) + RIGHT.map(([t, y, w, d, end]) => tx(1078, y, t, 18, { weight: 700, fill: SVC.title, w }) + tx(1327, y + 4, "Open", 12, { weight: 500, fill: SVC.blue }) +
+  d.map((l, k) => tx(1078, y + 30 + k * 16, l, 12, { fill: SVC.sub })).join("") + (end ? line(1054, end + 0.5, 1379, end + 0.5, { stroke: SVC.line, sw: 2 }) : "")).join("") +
+  tx(1078, 211, "Tidak dapat diakses publik", 14, { weight: 500, fill: SVC.text, w: 170 }) + icon("lock", 1259, 219, 14, SVC.mute) + tx(1078, 370, "LMS Access Link", 12, { weight: 500, fill: SVC.sub }) +
+  box2(1078, 396, 277, 44, { fill: SVC.fieldBg }) + tx(1092, 410, "https://tokomu.myscalev.com/m...", 14, { fill: SVC.ink, w: 201 }) + tx(1314, 411, "Copy", 12, { weight: 500, fill: SVC.blue }) +
+  rect(1384, 92, 6, 180, { r: 3, fill: "#c4c4c4" });
+const PRODUCTS = ["Undangan Digital Basic", "Undangan Digital Premium", "Undangan Digital Eksklusif", "Tambahan: Musik Pilihan", "Tambahan: Buku Tamu Digital"];
+const chip = (x, y, label, w, color) => box2(x, y, w, 44, { stroke: SVC.line }) + rect(x + 10, y + 14, 24, 16, { r: 3, fill: color }) + tx(x + 42, y + 14, label, 14, { weight: 500, fill: SVC.title }) +
+  iconX("x", x + w - 22, y + 22, 12, "#d42a2a", 3);
+const ALLPAY_CHIP = [665, 219, 177, 44];
+const storeLeft = (o = {}) => rect(280, 112, 750, 2000, { r: 4, fill: C.white }) + rect(304, 136, 702, 96, { r: 4, fill: SVC.fieldBg }) + rect(328, 160, 48, 48, { fill: C.white }) + icon("image", 352, 184, 16, SVC.mute) +
+  box2(400, 163, 494, 42) + tx(414, 176, "Rina WO", 14, { fill: SVC.title }) + rect(902, 164, 80, 40, { r: 4, fill: SVC.fieldBg }) + tx(927, 176, "Save", 14, { weight: 500, fill: SVC.grey, w: 30 }) +
+  rect(304, 256, 702, 637, { r: 4, fill: SVC.fieldBg }) + tx(328, 280, "Products Offered", 18, { weight: 700, fill: SVC.title, w: 140 }) + rect(328, 325, 654, 477, { r: 4, fill: C.white }) +
+  tx(355, 352, "Product Name", 12, { weight: 500, fill: SVC.mute, w: 78 }) + tx(811, 343, "# of", 12, { weight: 500, fill: SVC.mute }) + tx(790, 361, "variants", 12, { weight: 500, fill: SVC.mute, w: 43 }) +
+  tx(865, 352, "Visibility", 12, { weight: 500, fill: SVC.mute, w: 46 }) +
+  PRODUCTS.map((p, i) => {
+    const y = 393 + i * 67;
+    return rect(355, y + 19, 24, 24, { r: 4, fill: "#e5e7eb" }) + tx(395, y + 12, p, 14, { fill: SVC.title }) + tx(395, y + 35, "Digital", 12, { fill: SVC.sub }) + tx(825, y + 22, "1", 14, { fill: SVC.title }) +
+      rect(880, y + 23, 32, 16, { r: 8, fill: SVC.blue }) + circle(903, y + 31, 6, { fill: C.white }) + iconX("x", 949, y + 31, 12, "#d42a2a", 3);
+  }).join("") +
+  tx(621, 745, "Show More", 12, { weight: 500, fill: SVC.blue }) + tx(339, 774, "+ Add Products", 12, { weight: 500, fill: SVC.blue }) + rect(328, 826, 654, 43, { r: 4, fill: C.white }) + tx(339, 840, "+ Add Bundles", 12, { weight: 500, fill: SVC.blue }) +
+  rect(304, PMY, 702, 305, { r: 4, fill: SVC.fieldBg }) + tx(328, PMY + 24, "Payment Methods", 18, { weight: 700, fill: SVC.title, w: 148 }) + tx(328, PMY + 71, "Selected Payment Methods:", 12, { weight: 500, fill: SVC.sub, w: 153 }) +
+  chip(328, PMY + 103, "QRIS", 111, "#1f2937") + chip(447, PMY + 103, "BCA Virtual Account", 210, "#0b4ea2") + (o.allepay ? chip(665, PMY + 103, "ALL E-Payment", 177, "#2bb3a3") : "") +
+  box2(328, PMY + 167, 654, 77, { stroke: SVC.line }) + rect(346, PMY + 188, 36, 36, { r: 4, fill: SVC.fieldBg }) + icon("link", 364, PMY + 206, 18, SVC.sub) +
+  tx(394, PMY + 187, "Pengaturan PayLink", 14, { weight: 500, fill: SVC.title }) + circle(399, PMY + 217, 5, { fill: "#2b1a07" }) + tx(410, PMY + 210, "Bahasa Indonesia · Pemilih bahasa nonaktif", 12, { fill: SVC.sub, w: 233 }) +
+  tx(909, PMY + 199, "Kelola", 12, { weight: 500, fill: SVC.blue }) + iconX("arrow-right", 957, PMY + 206, 14, SVC.blue, 2.5) + tx(328, PMY + 263, "+ Add Payment Method", 12, { weight: 500, fill: SVC.blue, w: 126 }) +
+  rect(304, PMY + 329, 702, 600, { r: 4, fill: SVC.fieldBg }) + tx(328, PMY + 353, "Extra Charges", 18, { weight: 700, fill: SVC.title, w: 114 }) +
+  tx(328, PMY + 380, "Kelola biaya tambahan yang ditagihkan kepada customer berdasarkan metode pembayaran tertentu.", 12, { fill: SVC.grey, w: 544 }) +
+  rect(902, PMY + 354, 80, 40, { r: 4, fill: SVC.fieldBg }) + tx(927, PMY + 366, "Save", 14, { weight: 500, fill: SVC.grey, w: 30 }) + box2(328, PMY + 416, 654, 400, { stroke: SVC.line }) +
+  rect(330, PMY + 418, 650, 102, { fill: SVC.fieldBg }) + [["Metode", 342, 46], ["Service Fee", 578, 16], ["Biaya Lainnya", 733, 30], ["Total", 930, 46]].map(([t, x, d]) => tx(x, PMY + 416 + d, t, 12, { weight: 700, fill: SVC.grey })).join("");
+// The page with the column scrolled to Payment Methods (static, for the scenes that start there).
+const storeScrolled = (o) => scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg }) + clipped(256, 89, 790, 811, group({ transform: `translate(0 ${-STORE_DY})` }, storeLeft(o))) + storeRight + storeHead;
+const ADD_PM = [326, 374, 130, 24], PM_BLOCK = [304, 116, 702, 305];
+// Dialog Add Payment Method (measured): accordion rows, ALL E-Payment open shows one inner row with a checkbox; Cancel / Save.
+const PAY_ROWS = [["QRIS", "#1f2937"], ["E-Wallet", "#3b82f6"], ["ALL E-Payment", "#2bb3a3"], ["Virtual Account", "#0b4ea2"], ["Cash on Delivery (COD)", "#6b8e23"], ["No Payment", "#f5a524"], ["Bank Transfer", "#1e3a8a"]];
+function payDialog(open, n) {
+  const y0 = open ? 134 : 176, h = open ? 632 : 548;
+  let s = shadow(497, y0, 431, h, 4, 2) + rect(497, y0, 431, h, { r: 4, fill: C.white }) + tx(521, y0 + 27, "Add Payment Method", 16, { weight: 700, fill: SVC.text, w: 157 }) +
+    tx(904, y0 + 29, `${n} selected`, 12, { fill: SVC.sub, anchor: "end" });
+  let y = y0 + 64;
+  PAY_ROWS.forEach(([t, c], i) => {
+    const big = open && i === 2, rh = big ? 136 : 52;
+    s += box2(521, y, 368, rh) + rect(523, y + 2, 364, 48, { fill: SVC.fieldBg }) + rect(535, y + 16, 24, 16, { r: 3, fill: c }) + tx(567, y + 18, t, 14, { weight: 500, fill: SVC.title }) +
+      icon(big ? "chevron-up" : "chevron-down", 868, y + 26, 14, SVC.mute);
+    if (big) s += rect(539, y + 66, 332, 52, { r: 4, fill: SVC.fieldBg }) + rect(555, y + 84, 24, 16, { r: 3, fill: c }) + tx(587, y + 84, "ALL E-Payment", 14, { weight: 500, fill: SVC.dark }) + tick(839, y + 84, false);
+    y += rh + 6;
+  });
+  return s + box2(723, y0 + h - 68, 80, 44, { stroke: SVC.line }) + tx(742, y0 + h - 54, "Cancel", 14, { weight: 500, fill: SVC.dark, w: 43 }) +
+    rect(824, y0 + h - 66, 80, 40, { r: 4, fill: SVC.blue }) + tx(849, y0 + h - 54, "Save", 14, { weight: 500, fill: C.white, w: 30 });
+}
+const PAY_DLG = [497, 176, 431, 548], PAY_DLG_OPEN = [497, 134, 431, 632], ALLPAY_ROW = [521, 356, 368, 52], ALLPAY_TICK = [839, 398, 16, 16], PAY_SAVE = [824, 700, 80, 40];
+const payTicked = tick(839, 398, true) + rect(820, 155, 90, 20, { fill: C.white }) + tx(904, 163, "3 selected", 12, { fill: SVC.sub, anchor: "end" });
 
 // ---- 6. WhatsApp Web (not captured): generic chat list and one chat ------------------------------------------------
 const favWa = (cx, cy) => circle(cx, cy, 8, { fill: "#25d366" });
@@ -400,11 +493,12 @@ const waSend = circle(1404, 869, 21, { fill: "#008069" }) + icon("send", 1403, 8
 const ticks = (x, y) => `<path d="M${x} ${y} l3 3 l6 -7 M${x + 6} ${y} l3 3 l6 -7" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round"/>`;
 const waBubble = rect(477, WA.foot + 10, 887, 42, { r: 8, fill: C.white }) + rect(1088, 740, 336, 64, { r: 8, fill: "#d9fdd3" }) + bar(1104, 758, 230, 10, "#a8c9a2") + bar(1104, 778, 100, 10, "#7fa978") + ticks(1394, 788);
 const WA_CHAT = [461, CT, 979, 815];
+// After Save in Edit Account (not observed, generic): a confirmation that shows the number with Verifikasi, later Cek Verifikasi.
 const CD = { x: 520, y: 300 };
-const confirmDlg = shadow(CD.x, CD.y, 400, 220, 8, 3) + rect(CD.x, CD.y, 400, 220, { r: 8, fill: C.white }) + bar(CD.x + 24, CD.y + 32, 200, 12, "#dfe4ea") +
-  icon("smartphone", CD.x + 40, CD.y + 92, 18, SV.sub) + text(CD.x + 58, CD.y + 99, "081234567890", { size: 20, weight: 600, fill: SV.ink, mono: true }) + bar(CD.x + 24, CD.y + 124, 300) +
-  svBtn(CD.x + 256, CD.y + 160, "Verifikasi", { w: 120 });
-const VERIF = svBox(CD.x + 256, CD.y + 160, "Verifikasi", { w: 120 });
+const confirmDlg = (btn, w) => shadow(CD.x, CD.y, 400, 220, 4, 2) + rect(CD.x, CD.y, 400, 220, { r: 4, fill: C.white }) + bar(CD.x + 24, CD.y + 32, 200, 12, "#dfe4ea") +
+  icon("smartphone", CD.x + 40, CD.y + 92, 18, SVC.sub) + tx(CD.x + 58, CD.y + 80, "+62 81234567890", 20, { weight: 600, fill: SVC.title, mono: true }) + bar(CD.x + 24, CD.y + 124, 300) +
+  rect(CD.x + 376 - w, CD.y + 160, w, 40, { r: 4, fill: SVC.blue }) + tx(CD.x + 376 - w / 2, CD.y + 172, btn, 14, { weight: 500, fill: C.white, anchor: "middle" });
+const VERIF = [CD.x + 256, CD.y + 160, 120, 40], CEK = [CD.x + 236, CD.y + 160, 140, 40];
 
 // ---- 7. Thumbnail: the square image, SEO & PAGE IDENTITY (measured), WhatsApp link card ---------------------------------
 const JUDUL = "Undangan Rani & Dimas", DESC = ["Minggu, 14 Februari 2027.", "Mohon doa restu."], PUB_URL = "https://tokomu.myscalev.com/rani-dimas";
@@ -635,14 +729,6 @@ const bizMenu = shadow(24, 120, 268, 223, 6, 2) + rect(24, 120, 268, 223, { r: 6
   rect(41, 227, 234, 53, { r: 4, fill: "#f8fafc", stroke: SV.blue, sw: 2 }) + text(66, 258, "R", { size: 12, weight: 700, fill: "#3b4350", anchor: "middle" }) + text(86, 258, "Rina WO", { size: 14, weight: 500, fill: SV.ink }) +
   text(158, 314, "+ Buat Bisnis Baru", { size: 12, weight: 500, fill: SV.link, anchor: "middle" });
 const BIZ = [24, 62, 206, 48];
-const mfaCard = rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }) + card(MAIN.x, MAIN.y, MAIN.w, 330) + text(MAIN.x + 24, MAIN.y + 38, "Security", { size: 16, weight: 600, fill: SV.ink }) +
-  rect(MAIN.x + 24, MAIN.y + 58, MAIN.w - 48, 110, { r: 6, fill: "#ecf8f1" }) + iconX("check", MAIN.x + 48, MAIN.y + 84, 16, "#15a34a") +
-  text(MAIN.x + 72, MAIN.y + 88, "Multi-Factor Authentication (MFA) is Always Active", { size: 14, weight: 600, fill: SV.ink }) +
-  para(MAIN.x + 72, MAIN.y + 110, ["By default, MFA method is using Email OTP, and you can switch", "to use Authenticator App for better security. MFA is used for:", "login, fund withdrawal, and change business owner."], { size: 13, fill: "#3b4350", lh: 18 }) +
-  text(MAIN.x + 24, MAIN.y + 206, "Multi-Factor Authentication Method", { size: 12, fill: SV.sub }) + text(MAIN.x + 24, MAIN.y + 232, "Email OTP", { size: 15, weight: 500, fill: SV.ink }) +
-  line(MAIN.x + 24, MAIN.y + 254.5, MAIN.x + MAIN.w - 24, MAIN.y + 254.5, { stroke: SV.line }) + text(MAIN.x + 24, MAIN.y + 280, "Backup Codes", { size: 12, fill: SV.sub }) +
-  text(MAIN.x + 24, MAIN.y + 304, "Emergency access codes for account recovery", { size: 14, fill: SV.ink });
-const MFA_METHOD = [MAIN.x + 20, MAIN.y + 190, 320, 52];
 
 // ---- 12. Domain preparation: registrar and Cloudflare sign-up (not captured: generic, 1440 wide) ------------------------
 const genWin = (title, url, fav) => chrome(0, 0, 1440, 900, { tabs: [{ title, active: true, w: 260, fav }], url }) + rect(0, CT, 1440, 815, { fill: C.white });
@@ -809,9 +895,12 @@ export const scenes = {
       helpBody: { svg: clipCss("helpBody", 0, 154, 386, 746) + helpBody(), enter: "fade" },
       helpBar: { svg: rect(388, 160, 6, 120, { r: 3, fill: "#c9ced6" }), enter: "fade" },
       copied: { svg: nkHint(16, up(HB.msg), "Tersalin. Tempel di tab Security."), enter: "fade" },
-      sec: { svg: scalevEditor(0, 0, { tab: "Security" }) + securityPanel + cover(SC.x, SC.y), skel: true, enter: "fade" },
-      secFocus: { svg: rect(20.5, secY(1) + 10.5, 358, 39, { r: 4, stroke: SV.blue, sw: 2 }), enter: "fade" },
-      paste: { svg: text(32, secY(1) + 35, "https://foto.contoh.com", { size: 14, fill: SV.ink }), enter: "fade", delay: 0.2 }
+      secFrame: { svg: scalevEditor(0, 0, { tab: "Security" }) + rect(0, 92, 399, 808, { fill: C.white }) + cover(SC.x, SC.y), skel: true, enter: "fade" },
+      secBody: { svg: clipCss("secBody", 0, 92, 399, 808) + secContent({}), skel: true, enter: "fade" },
+      picker: { svg: secPicker({ value: "" }), enter: "fade" },
+      pickRow: { svg: secPicker({ value: "https://foto.contoh.com", ticked: false }), enter: "fade", delay: 1.2 },
+      pickVal: rect(28, 186, 300, 38, { fill: C.white }) + tx(40, 197, "https://foto.contoh.com", 14, { fill: SVC.dark }),
+      ticked: { svg: tick(34, 249, true) + rect(18, 140, 320, 39, { fill: SVC.fieldBg }) + tx(30, 151, "1 selected", 14, { fill: SVC.dark }), enter: "fade" }
     },
     steps: [
       { caption: "Di tab NikahKit, klik Bantuan di bagian bawah rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help", "helpBody", "helpBar"], mark: TOOL.Bantuan, lens: { src: [8, 160, 368, 118], at: [320, 60] } },
@@ -819,9 +908,13 @@ export const scenes = {
         mark: [16, up(HB.rows[2][0]), 351, HB.rows[2][1]], lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[3][0] - HB.h3 + 8] } },
       { caption: "Ada Perlu ditambah manual? Klik Salin domain kurang.", at: [190, up(HB.copy) + 18], click: true, show: ["copied"], dur: 3.4,
         mark: [16, up(HB.copy), 351, 36], lens: { src: [8, up(HB.recheck) - 8, 380, up(HB.msg) - up(HB.recheck) + 20] } },
-      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 93, 399, 520]], at: ED.tab.Security, click: true, show: ["sec"], hide: ["help", "helpBody", "helpBar", "copied"], mark: tabMark("Security"), lens: TABS_LENS },
-      { caption: "Tempel domainnya saja di kolom yang cocok: img_src ke Image Sources.", at: [200, secY(1) + 30], click: true, show: ["secFocus", "paste"], dur: 3.8,
-        mark: [20, secY(1) + 10, 359, 40], lens: { src: [10, secY(1) - 22, 380, 80] } }
+      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 92, 399, 808]], at: ED.tab.Security, click: true, show: ["secFrame", "secBody"], hide: ["help", "helpBody", "helpBar", "copied"],
+        mark: tabMark("Security"), lens: TABS_LENS },
+      { caption: "Gulir ke kolom yang cocok: img_src ke Image Sources. Klik kolomnya.", focus: [0, 92, 399, 330], scroll: { id: "secBody", dy: IMG_DY }, at: [190, 159], click: true, show: ["picker"], dur: 3.8,
+        mark: SECURITY.imageSelect, lens: { src: [8, 104, 383, 135] } },
+      { caption: "Tempel domainnya saja di kotak Add image domain, misalnya foto.contoh.com.", at: [190, 205], click: true, show: ["pickRow", "pickVal"],
+        type: [{ id: "pickVal", n: 23, box: [40, 195, 152, 22] }], dur: 3.8, mark: SECURITY.pickerInput, lens: { src: [16, 176, 351, 106] } },
+      { caption: "Centang domain yang muncul. Image Sources jadi 1 selected.", at: [42, 257], click: true, show: ["ticked"], dur: 3.6, mark: { box: SECURITY.pickerTick, r: 4 }, lens: { src: [8, 132, 367, 150] } }
     ]
   },
 
@@ -841,118 +934,115 @@ export const scenes = {
 
   "scalev-custom-domain": {
     title: "Menambahkan domain sendiri di Settings Scalev",
-    base: [settingsPage("Profil"), profileCard()],
+    base: [profilPage()],
     els: {
-      dom: { svg: settingsPage("Domain") + domainSection, skel: true, enter: "fade" },
-      addBtn: { svg: svBtn(ADD[0], ADD[1], "Tambahkan Domain", { w: 160 }), enter: "fade" },
+      dom: { svg: domainPage(), skel: true, enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
-      dlg: { svg: domainDlg, enter: "pop", origin: [ADD[0] + 80, ADD[1] + 20] },
-      typed: text(DOM_IN[0] + 12, DOM_IN[1] + 25, "undangan.namabrand.com", { size: 14, fill: SV.ink }),
-      done: { svg: settingsPage("Domain") + domainSection + dnsTable, skel: true, enter: "fade" }
+      dlg: { svg: domainDlg, enter: "pop", origin: [720, 450] },
+      typed: domTyped,
+      saveOn: { svg: domSaveOn, enter: "fade", delay: 1.6 },
+      done: { svg: domainPage() + dnsTable, skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Di Settings dasbor Scalev, buka bagian Domain.", focus: SUBMENU, at: subAt("Domain"), click: true, show: ["dom", "addBtn"], mark: subBox("Domain"), lens: { src: [SUB.x, 382, SUB.w, 82] } },
-      { caption: "Klik Tambahkan Domain.", focus: [MAIN.x, MAIN.y, MAIN.w, 80], at: [ADD[0] + 80, ADD[1] + 20], click: true, press: "addBtn", show: ["shade", "dlg"], mark: ADD, lens: { src: [ADD[0] - 60, MAIN.y, 240, 72] } },
-      { caption: "Ketik domain atau subdomain, misalnya undangan.namabrand.com.", focus: [MD.x, MD.y, MD.w, MD.h], at: [DOM_IN[0] + 200, DOM_IN[1] + 20], click: true, show: ["typed"],
-        type: [{ id: "typed", n: 22, box: [DOM_IN[0] + 12, DOM_IN[1] + 9, 174, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [MD.x + 12, MD.y + 16, 476, 112], zoom: 1.5 } },
-      { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", focus: [MAIN.x, MAIN.y, MAIN.w, 340], at: [DOM_SAVE[0] + 40, DOM_SAVE[1] + 20], click: true, show: ["done"], hide: ["shade", "dlg", "typed"], dur: 3.6,
-        mark: DOM_SAVE, lens: { src: [MAIN.x + 16, MAIN.y + 84, 396, 140] } }
+      { caption: "Di Settings dasbor Scalev, buka bagian Domain.", focus: [SUBMENU, [480, 83, 936, 220]], at: subAt("Domain"), click: true, show: ["dom"], mark: { box: subBox("Domain"), r: 4 }, lens: { src: [292, 377, 176, 92] } },
+      { caption: "Klik + Tambah Domain.", focus: DOM_DLG, at: [635, 128], click: true, show: ["shade", "dlg"], mark: TAMBAH, lens: { src: [504, 110, 400, 36] } },
+      { caption: "Ketik domain atau subdomain, misalnya undangan.namabrand.com.", at: [720, 462], click: true, show: ["typed", "saveOn"],
+        type: [{ id: "typed", n: 22, box: [520, 452, 170, 22] }], dur: 3.6, mark: DOM_IN, lens: { src: [498, 432, 444, 60], at: [40, 420] } },
+      { caption: "Klik Save. Scalev menampilkan kode DNS (Type, Name, Target).", focus: [496, 270, 904, 320], at: [901, 521], click: true, show: ["done"], hide: ["shade", "dlg", "typed", "saveOn"], dur: 3.6,
+        mark: DOM_SAVE, lens: { src: [528, 381, 600, 96], zoom: 1.25, at: [380, 420] } }
     ]
   },
 
   "scalev-domain-verifikasi": {
     title: "Menyalin record DNS ke Cloudflare lalu verifikasi di Scalev",
-    base: [settingsPage("Domain"), domainSection, dnsTable],
+    base: [domainPage(), dnsTable],
     els: {
       cf: { svg: cfPage, skel: true, enter: "fade" },
       cfForm: { svg: cfForm, enter: "pop", origin: [CF_ADD[0] + 66, CF_ADD[1] + 36] },
-      back: { svg: settingsPage("Domain") + domainSection + dnsTable, skel: true, enter: "fade", delay: -1 },
+      back: { svg: domainPage() + dnsTable, skel: true, enter: "fade", delay: -1 },
       ok: { svg: verified, enter: "pop" }
     },
     steps: [
       { caption: "Di Cloudflare buka DNS.", focus: [0, CT + 53, 240, 762], at: [100, CF_DNS[1] + 17], show: ["cf"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 200] } },
       { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", focus: CF_TABLE, at: [CF_ADD[0] + 66, CF_ADD[1] + 18], click: true, show: ["cfForm"], dur: 4,
         mark: CF_ADD, lens: { src: [320, 330, 800, 148], zoom: 1.5, at: [80, 330] } },
-      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["back", "ok"], hide: ["cf", "cfForm"], dur: 4,
-        mark: VERIFY, lens: { src: [MAIN.x + 16, MAIN.y + 84, 300, 140], at: [360, 320] } }
+      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [496, 270, 904, 320], at: [1318, 316], click: true, show: ["back", "ok"], hide: ["cf", "cfForm"], dur: 4,
+        mark: VERIFY, lens: { src: [516, 289, 300, 54], at: [360, 330] } }
     ]
   },
 
   "scalev-epayment": {
-    title: "Memilih metode pembayaran Invoice di toko Scalev",
-    base: [storesPage],
+    title: "Membuka Add Payment Method di toko Scalev",
+    base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
     els: {
-      det: { svg: scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg }), skel: true, enter: "fade" },
-      detBody: { svg: clipCss("detBody", 256, DET_TOP + 1, 1184, 900) + detContent, skel: true, enter: "fade" },
-      detHead: { svg: detHead + topSave, skel: true, enter: "fade" },
+      storeFrame: { svg: scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg }) + storeRight + storeHead, skel: true, enter: "fade" },
+      storeBody: { svg: clipCss("storeBody", 256, 89, 790, 811) + storeLeft(), skel: true, enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
-      dlg: { svg: payDlg, enter: "pop", origin: [PICK[0] + 110, PICK[1] + 20] },
-      menu: { svg: payMenu, enter: "pop", origin: [SEL[0] + SEL[2] / 2, SEL[1] + 40] },
-      val: { svg: payDlg + payVal, enter: "fade" }
+      dlg: { svg: payDialog(false, 2), enter: "pop", origin: [712, 450] },
+      dlgOpen: { svg: payDialog(true, 2), enter: "fade" }
     },
     steps: [
-      { caption: "Di Stores, klik nama tokomu.", focus: [256, 0, 1184, 70], at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [276, 10, 200, 52] } },
-      { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], scroll: { id: "detBody", dy: DET_DY }, at: [PICK[0] + 110, PICK[1] + 20], click: true, show: ["shade", "dlg"], dur: 3.8,
-        mark: PICK, note: { text: "Pilih Metode Pembayaran", at: [24, 250] } },
-      { caption: "Di dialog, klik dropdown.", focus: PAY_DLG, at: [SEL[0] + SEL[2] - 30, SEL[1] + 20], click: true, show: ["menu"], dur: 2.8, mark: SEL, lens: { src: [SEL[0] - 8, SEL[1] - 8, 508, 214], zoom: 1.5 } },
-      { caption: "Pilih Invoice.", at: [SEL[0] + 60, SEL[1] + 108], click: true, show: ["val"], hide: ["menu"], dur: 2.8, mark: INVOICE, lens: { src: [SEL[0] - 8, SEL[1] - 8, 508, 214], zoom: 1.5 } }
+      { caption: "Klik Stores. Dengan satu toko, halaman tokomu langsung terbuka.", focus: [256, 0, 1184, 232], at: svMenuAt("Stores"), click: true, show: ["storeFrame", "storeBody"], dur: 3.4,
+        mark: { box: [28, 412, 196, 28], r: 6 }, lens: { src: [8, 380, 248, 92] } },
+      { caption: "Gulir ke Payment Methods, klik + Add Payment Method.", focus: PAY_DLG, scroll: { id: "storeBody", dy: STORE_DY }, at: [391, 386], click: true, show: ["shade", "dlg"], dur: 3.8,
+        mark: ADD_PM, lens: { src: [318, 366, 148, 40], zoom: 2, at: [16, 300] } },
+      { caption: "Di dialog Add Payment Method, buka ALL E-Payment.", focus: PAY_DLG_OPEN, at: [700, 382], click: true, show: ["dlgOpen"], hide: ["dlg"], dur: 3.4,
+        mark: ALLPAY_ROW, lens: { src: [513, 309, 384, 144] } }
     ]
   },
 
   "scalev-epayment-simpan": {
-    title: "Mencentang ALL E-Payment lalu menyimpan toko",
-    base: [detAfter, topSave, dim(0, 0, 1440, 900), payDlg, payVal],
+    title: "Mencentang ALL E-Payment lalu Save",
+    base: [storeScrolled(), dim(0, 0, 1440, 900), payDialog(true, 2)],
     els: {
-      on: { svg: check(PD.x + 24, PD.y + 150, true), enter: "pop" },
-      dlgSave: svBtn(DLG_SAVE[0], DLG_SAVE[1], "Simpan", { w: 80 }),
-      after: { svg: detAfter, skel: true, enter: "fade" },
-      topSave
+      ticked: { svg: payTicked, enter: "pop" },
+      after: { svg: storeScrolled({ allepay: true }), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Centang Aktifkan Metode Pembayaran ALL E-Payment.", focus: PAY_DLG, at: [CHECK[0] + 9, CHECK[1] + 9], click: true, show: ["on", "dlgSave"], mark: { box: CHECK, r: 3 }, lens: { src: [PD.x + 16, PD.y + 136, 360, 48], at: [300, 380] } },
-      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
-        lens: { src: [298, PM_Y - DET_DY + 8, 428, 182], at: [12, 340] } },
-      { caption: "Klik Simpan di kanan atas supaya pengaturan benar-benar tersimpan.", focus: [256, 0, 1184, 70], at: [TOP_SAVE[0] + 50, TOP_SAVE[1] + 20], click: true, press: "topSave", dur: 3.8, mark: TOP_SAVE, lens: { src: [1240, 0, 200, 72] } }
+      { caption: "Centang ALL E-Payment.", focus: PAY_DLG_OPEN, at: [847, 406], click: true, show: ["ticked"], mark: { box: ALLPAY_TICK, r: 4 }, lens: { src: [531, 372, 348, 68] } },
+      { caption: "Klik Save. ALL E-Payment masuk ke Selected Payment Methods.", focus: PM_BLOCK, at: [864, 720], click: true, show: ["after"], hide: ["ticked"], dur: 3.8,
+        mark: PAY_SAVE, lens: { src: [320, 211, 530, 60] } }
     ]
   },
 
   "scalev-verifikasi-wa": {
     title: "Mengisi nomor WhatsApp di Profil Scalev",
-    base: [settingsPage("Profil"), profileCard()],
+    base: [profilPage()],
     els: {
-      edit: { svg: editPage, enter: "fade" },
-      num: phoneNum,
-      saveBtn: { svg: svBtn(SAVE[0], SAVE[1], "Save", { w: 80 }), enter: "fade" },
       shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
-      konf: { svg: confirmDlg, enter: "pop", origin: [SAVE[0] + 40, SAVE[1] + 20] },
+      edit: { svg: editAccount, enter: "pop", origin: [720, 450] },
+      num: eaPhone,
+      saveOn: { svg: eaSaveOn, enter: "fade", delay: 1.2 },
+      konf: { svg: confirmDlg("Verifikasi", 120), enter: "pop", origin: [903, 674] },
       wa: { svg: waWeb("+6282125784683") + waDraft + waSend, skel: true, enter: "rise", delay: 0.15 }
     },
     steps: [
-      { caption: "Di Settings bagian Profil, klik Edit.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [EDIT[0] + 40, EDIT[1] + 18], click: true, show: ["edit", "saveBtn"], mark: EDIT, note: "Edit" },
-      { caption: "Isi nomor WhatsApp yang aktif di kolom nomor telepon.", at: [PHONE_IN.x + 200, PHONE_IN.y + 20], click: true, show: ["num"], type: [{ id: "num", n: 12, box: [PHONE_IN.x + 34, PHONE_IN.y + 9, 104, 22] }], dur: 3.4,
-        mark: PHONE_BOX, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 22, 330, 72] } },
-      { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", at: [SAVE[0] + 40, SAVE[1] + 20], click: true, press: "saveBtn", show: ["shade", "konf"], dur: 3.4, mark: SAVE, lens: { src: [CD.x + 16, CD.y + 70, 300, 50] } },
-      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [WA.head, [461, WA.foot, 979, 62]], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf", "edit", "num", "saveBtn"], dur: 3.8,
+      { caption: "Di Settings bagian Profil, klik Edit. Jendela Edit Account terbuka.", focus: EA, at: [566, 129], click: true, show: ["shade", "edit"], mark: { box: PROFIL_EDIT, r: 4 }, lens: { src: [500, 110, 200, 36] } },
+      { caption: "Isi nomor WhatsApp yang aktif di Nomor Telepon (kode +62 sudah ada).", at: [846, 592], click: true, show: ["num", "saveOn"], type: [{ id: "num", n: 11, box: [779, 582, 96, 22] }], dur: 3.6,
+        mark: EA_PHONE, lens: { src: [661, 535, 274, 88] } },
+      { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", focus: [CD.x, CD.y, 400, 220], at: [903, 674], click: true, show: ["konf"], hide: ["edit", "num", "saveOn"], dur: 3.4,
+        mark: EA_SAVE, lens: { src: [CD.x + 16, CD.y + 70, 330, 50] } },
+      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [WA.head, [461, WA.foot, 979, 62]], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf"], dur: 3.8,
         mark: VERIF, lens: { src: [470, CT, 320, 60] } }
     ]
   },
 
   "scalev-wa-otp": {
     title: "Mengirim OTP lewat WhatsApp, Cek Verifikasi, lalu MFA",
-    base: [settingsPage("Profil"), editPage, phoneNum, cekBtn],
+    base: [profilPage(), dim(0, 0, 1440, 900), confirmDlg("Cek Verifikasi", 140)],
     els: {
       wa: { svg: waWeb("+6282125784683") + waDraft, skel: true },
       send: waSend,
       bubble: { svg: waBubble, enter: "slide" },
-      back: { svg: settingsPage("Profil") + editPage + phoneNum + cekBtn, skel: true, enter: "fade", delay: -1 },
-      ok: { svg: icon("circle-check", PHONE_IN.x + PHONE_IN.w - 22, PHONE_IN.y + 20, 20, "#15a34a"), enter: "pop" },
-      mfa: { svg: mfaCard, enter: "fade" }
+      back: { svg: profilPage() + dim(0, 0, 1440, 900) + confirmDlg("Cek Verifikasi", 140), skel: true, enter: "fade", delay: -1 },
+      ok: { svg: icon("circle-check", CD.x + 274, CD.y + 92, 20, "#15c15d"), enter: "pop" },
+      mfa: { svg: profilPage({ phone: "+62 81234567890" }), skel: true, enter: "fade" }
     },
     steps: [
       { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 728, 352, 84], at: [300, 150] } },
-      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
-        mark: CEK, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 10, 470, 60] } },
-      { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [MAIN.x + 16, MAIN.y + 180, 420, 70] } }
+      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [CD.x, CD.y, 400, 220], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
+        mark: CEK, lens: { src: [CD.x + 16, CD.y + 70, 370, 50] } },
+      { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", focus: SECURITY_BOX, at: [580, 890], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [504, 845, 240, 55], at: [470, 400] } }
     ]
   },
 
