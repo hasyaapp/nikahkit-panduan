@@ -36,9 +36,28 @@
 <g clip-path="url(#stage)"><g id="world" transform="scale(0.6667)">
 <rect x="0" y="0" width="1440" height="900" rx="0" fill="#f7efe9"/><rect x="0" y="0" width="1440" height="900" rx="0" fill="#f7efe9"/>
 <rect x="400" y="30.9" width="640" height="17" rx="8.5" fill="#dde2e8"/>
-
 <g class="fz0"><use href="#db"/></g>
-<use href="#ed-c0"/><use href="#ed-a0"/><use href="#ed-c1"/><use href="#ed-a1"/><use href="#ed-c2"/><use href="#ed-a2"/><use href="#ed-c3"/><use href="#ed-a3"/><use href="#ed-c4"/><use href="#ed-a4"/><use href="#ed-c5"/><use href="#ed-a5"/><use href="#ed-c6"/><use href="#ed-a6"/><use href="#ed-c7"/><use href="#ed-a7"/><use href="#ed-c8"/><use href="#ed-a8"/><use href="#ed-c9"/><use href="#ed-a9"/><use href="#ed-c10"/>
+<use href="#ed-c0"/>
+<use href="#ed-a0"/>
+<use href="#ed-c1"/>
+<use href="#ed-a1"/>
+<use href="#ed-c2"/>
+<use href="#ed-a2"/>
+<use href="#ed-c3"/>
+<use href="#ed-a3"/>
+<use href="#ed-c4"/>
+<use href="#ed-a4"/>
+<use href="#ed-c5"/>
+<use href="#ed-a5"/>
+<use href="#ed-c6"/>
+<use href="#ed-a6"/>
+<use href="#ed-c7"/>
+<use href="#ed-a7"/>
+<use href="#ed-c8"/>
+<use href="#ed-a8"/>
+<use href="#ed-c9"/>
+<use href="#ed-a9"/>
+<use href="#ed-c10"/>
 
 </g>
 

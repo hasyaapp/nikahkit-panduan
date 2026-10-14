@@ -547,7 +547,7 @@ const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + nkHead(0, 
 const undoMark = (lines) => { const [, y, , hh] = toastBox(lines), w = tw("Urungkan", 14, 700); return M(374 - w - 4, y + hh / 2 - 11, w + 8, 22); };
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
-function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
+function pasangScenes(kind, title, page, after, result, toast, caps) {
   const name = MK[kind][0], slug = `jualan-pasang-${kind}`, cx = CARD_X[kind];
   const donePanel = bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind));
   const bw = tw("Dipakai", 10, 500) + 12, bx = cx + 134 - bw; // mkCard's wrapped-name badge
@@ -561,7 +561,7 @@ function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
         tabStep(caps[0], 3),
         { caption: caps[1], at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING, lens: { src: [80, 160, 295, 120] }, dur: 3.2 },
         { caption: `Klik kartu ${name}. Layar meredup: dialog konfirmasi muncul.`, at: CARD_AT[kind], click: true, show: ["veil"], mark: M(cx, MKY, 134, 167, 8),
-          lens: { src: [548, 396, 344, 56], at: [300, 380] }, dur: 3.6 }
+          lens: { src: [84, MKY + 168, 290, 64] }, dur: 3.6 }
       ]
     },
     [`${slug}-dialog`]: {
@@ -572,7 +572,7 @@ function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
       steps: [
         { caption: `Muncul dialog Pasang ${name} di halaman ini?`, show: ["dlg", "pasang"], focus: DLG, mark: M(...DLG, 8), lens: { src: [548, 396, 344, 56] }, dur: 3.2 },
         { caption: `Klik Pasang. ${result}`, at: [848, 479], click: true, press: "pasang", hide: ["dlg", "pasang"], show: ["done"], focus: F.preview, mark: M(816, 461, 64, 36),
-          lens: { ...resLens, at: [12, 330] }, dur: 3.8 }
+          lens: { src: [724, 452, 176, 54] }, dur: 3.8 }
       ]
     },
     [`${slug}-hasil`]: {
@@ -619,7 +619,7 @@ function perbaruiScene(kind, title, page, before, after, toast, steps) {
       { ...steps[0], focus: F.panel, mark: MARKETING, lens: { src: [80, 160, 295, 120] } },
       ...steps.slice(1).map((s) => ({ ...s, mark: RESET, lens: RESET_LENS })),
       { caption: "Klik Perbarui halaman ini. Halaman langsung dipasang ulang.", at: [286, 302], click: true, press: "perbarui", hide: kind === "landing" ? ["brandT"] : [],
-        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: { src: [84, 812, 302, 80], at: [12, 400] }, dur: 3.8 }
+        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: RESET_LENS, dur: 3.8 }
     ]
   };
 }
@@ -705,8 +705,7 @@ export const scenes = {
   },
 
   // ---------------------------------------------------------------- pasang-dashboard-pasangan
-  ...pasangScenes("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview, { src: [743, 326, 358, 160], zoom: 1.4 },
-    "Pratinjau berubah menjadi Kelola undangan.",
+  ...pasangScenes("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview, "Pratinjau berubah menjadi Kelola undangan.",
     ["Dashboard pasangan dipasang.", "Tekan Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Di Kategori, klik Marketing."]),
   "jualan-pasang-dashboard-terbit": pubScene("Menerbitkan halaman Dashboard pasangan", "Dashboard Rina WO", "Template", tplDone("dashboard"), dashPreview,
@@ -736,7 +735,7 @@ export const scenes = {
   },
 
   // ---------------------------------------------------------------- landing-page
-  ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", landPreview("Rina WO"), { src: [727, 106, 300, 150] },
+  ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", landPreview("Rina WO"),
     "Pratinjau berubah menjadi Landing page.", ["Landing page dipasang. Tekan", "Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Klik Marketing. Profil merek harus berlabel Terisi."]),
   "jualan-pasang-landing-terbit": pubScene("Menerbitkan Landing page", "Landing Rina WO", "Template", tplDone("landing"), landPreview("Rina WO"),
@@ -755,9 +754,11 @@ export const scenes = {
       f2: { svg: ph(scr(FORM_Y, LAND, F2.svg)), enter: "fade", delay: 0.3 }
     },
     steps: [
-      { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", at: Q(283, LPY.cta + 26), click: true, show: ["v1"], focus: PHF,
-        mark: QM(210.8, LPY.cta, 143.6, 52, 20), lens: lensBy(QR(12, 20, 320, 120), "l", 1.4), dur: 3.4 },
-      { caption: "Lihat desain turun ke katalog. Klien menekan Lihat demo.", at: Q(...LIHAT_DEMO), click: true, show: ["dlg", "pick"], mark: QM(...LIHAT_BOX),
+      { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", focus: PHF,
+        mark: [QM(20, LPY.cta, 178.8, 52, 20), QM(210.8, LPY.cta, 143.6, 52, 20)], lens: lensBy(QR(12, 20, 320, 120), "l", 1.4), dur: 3.2 },
+      { caption: "Klik Lihat desain: halaman turun ke katalog Pilih desain undangan.", at: Q(283, LPY.cta + 26), click: true, show: ["v1"],
+        mark: QM(210.8, LPY.cta, 143.6, 52, 20), lens: lensBy(QR(150, LPY.cta - 20, 240, 92), "r"), dur: 3.2 },
+      { caption: "Di katalog, klien menekan Lihat demo.", at: Q(...LIHAT_DEMO), click: true, show: ["dlg", "pick"], mark: QM(...LIHAT_BOX),
         lens: lensBy(QR(12, LIHAT_DEMO[1] - 106, 230, 136), "l"), dur: 3.4 },
       { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: Q(...DEMO_PICK), click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"],
         mark: QM(181, 8, 147, 46, 20), lens: lensBy(QR(0, 0, 390, 92), "r", 1.2), dur: 3.4 },
@@ -932,7 +933,7 @@ export const scenes = {
       { caption: "Klik di kotak, tekan Ctrl+V (Windows) atau Cmd+V (Mac).", at: [200, 428], click: true, show: ["pasted", "isi"], mark: M(28, 381, 341, 95),
         lens: { src: [20, 372, 358, 160] }, dur: 3.4 },
       { caption: "Klik Isi undangan: panel pindah ke Konten, ada tombol Urungkan.", at: [70, 506], click: true, press: "isi", hide: ["inbox", "paste", "pasted", "isi"],
-        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: { src: [84, 806, 302, 90] }, dur: 4 }
+        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: { src: [20, 372, 358, 160] }, dur: 4 }
     ]
   },
 
