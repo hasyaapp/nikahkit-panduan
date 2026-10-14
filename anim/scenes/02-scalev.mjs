@@ -986,8 +986,8 @@ export const scenes = {
         mark: { box: [28, 412, 196, 28], r: 6 }, lens: { src: [8, 380, 248, 92] } },
       { caption: "Gulir ke Payment Methods, klik + Add Payment Method.", focus: PAY_DLG, scroll: { id: "storeBody", dy: STORE_DY }, at: [391, 386], click: true, show: ["shade", "dlg"], dur: 3.8,
         mark: ADD_PM, lens: { src: [318, 366, 148, 40], zoom: 2, at: [16, 300] } },
-      { caption: "Di dialog Add Payment Method, buka ALL E-Payment.", focus: PAY_DLG_OPEN, at: [700, 382], click: true, show: ["dlgOpen"], hide: ["dlg"], dur: 3.4,
-        mark: ALLPAY_ROW, lens: { src: [513, 309, 384, 144] } }
+      { caption: "Di dialog Add Payment Method, buka ALL E-Payment.", focus: PAY_DLG_OPEN, at: [640, 366], click: true, show: ["dlgOpen"], hide: ["dlg"], dur: 3.4,
+        mark: ALLPAY_ROW, lens: { src: [531, 372, 348, 68] } }
     ]
   },
 
@@ -1017,7 +1017,7 @@ export const scenes = {
       wa: { svg: waWeb("+6282125784683") + waDraft + waSend, skel: true, enter: "rise", delay: 0.15 }
     },
     steps: [
-      { caption: "Di Settings bagian Profil, klik Edit. Jendela Edit Account terbuka.", focus: EA, at: [566, 129], click: true, show: ["shade", "edit"], mark: { box: PROFIL_EDIT, r: 4 }, lens: { src: [500, 110, 200, 36] } },
+      { caption: "Di Settings bagian Profil, klik Edit. Jendela Edit Account terbuka.", focus: EA, at: [566, 129], click: true, show: ["shade", "edit"], mark: { box: PROFIL_EDIT, r: 4 }, lens: { src: [489, 197, 300, 58] } },
       { caption: "Isi nomor WhatsApp yang aktif di Nomor Telepon (kode +62 sudah ada).", at: [846, 592], click: true, show: ["num", "saveOn"], type: [{ id: "num", n: 11, box: [779, 582, 96, 22] }], dur: 3.6,
         mark: EA_PHONE, lens: { src: [661, 535, 274, 88] } },
       { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", focus: [CD.x, CD.y, 400, 220], at: [903, 674], click: true, show: ["konf"], hide: ["edit", "num", "saveOn"], dur: 3.4,
@@ -1034,13 +1034,14 @@ export const scenes = {
       wa: { svg: waWeb("+6282125784683") + waDraft, skel: true },
       send: waSend,
       bubble: { svg: waBubble, enter: "slide" },
-      back: { svg: profilPage() + dim(0, 0, 1440, 900) + confirmDlg("Cek Verifikasi", 140), skel: true, enter: "fade", delay: -1 },
+      back: { svg: profilPage() + dim(0, 0, 1440, 900) + confirmDlg("Cek Verifikasi", 140), skel: true, enter: "fade" },
       ok: { svg: icon("circle-check", CD.x + 274, CD.y + 92, 20, "#15c15d"), enter: "pop" },
       mfa: { svg: profilPage({ phone: "+62 81234567890" }), skel: true, enter: "fade" }
     },
     steps: [
       { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 728, 352, 84], at: [300, 150] } },
-      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [CD.x, CD.y, 400, 220], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
+      { caption: "Kembali ke tab Scalev.", focus: [CD.x, CD.y, 400, 220], at: [720, 640], show: ["back"], hide: ["wa", "send", "bubble"], dur: 2.4 },
+      { caption: "Klik Cek Verifikasi. Nomor jadi terverifikasi.", at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["ok"], dur: 3.4,
         mark: CEK, lens: { src: [CD.x + 16, CD.y + 70, 370, 50] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", focus: SECURITY_BOX, at: [580, 890], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [504, 845, 240, 55], at: [470, 400] } }
     ]
