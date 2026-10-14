@@ -890,7 +890,7 @@ export const scenes = {
       val: { svg: payDlg + payVal, enter: "fade" }
     },
     steps: [
-      { caption: "Di Stores, klik nama tokomu.", focus: STORES_TABLE, at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [288, 136, 260, 64] } },
+      { caption: "Di Stores, klik nama tokomu.", focus: [256, 0, 1184, 70], at: [STORE[0] + 35, STORE[1] + 12], click: true, show: ["det", "detBody", "detHead"], dur: 3.4, mark: STORE, lens: { src: [288, 136, 260, 64] } },
       { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], scroll: { id: "detBody", dy: DET_DY }, at: [PICK[0] + 110, PICK[1] + 20], click: true, show: ["shade", "dlg"], dur: 3.8,
         mark: PICK, lens: { src: [292, PM_Y - DET_DY + 8, 300, 140], at: [40, 330] } },
       { caption: "Di dialog, klik dropdown.", focus: PAY_DLG, at: [SEL[0] + SEL[2] - 30, SEL[1] + 20], click: true, show: ["menu"], dur: 2.8, mark: SEL, lens: { src: [SEL[0] - 8, SEL[1] - 8, 210, 190] } },
@@ -909,7 +909,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Centang Aktifkan Metode Pembayaran ALL E-Payment.", focus: PAY_DLG, at: [CHECK[0] + 9, CHECK[1] + 9], click: true, show: ["on", "dlgSave"], mark: { box: CHECK, r: 3 }, lens: { src: [PD.x + 16, PD.y + 136, 360, 48], at: [300, 380] } },
-      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", focus: [PAY_DLG, [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]]], at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
+      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", focus: [PM_CARD[0], PM_CARD[1] - DET_DY, PM_CARD[2], PM_CARD[3]], at: [DLG_SAVE[0] + 40, DLG_SAVE[1] + 20], click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"], mark: DLG_SAVE,
         lens: { src: [292, PM_Y - DET_DY + 8, 330, 190], at: [40, 300] } },
       { caption: "Klik Simpan di kanan atas supaya pengaturan benar-benar tersimpan.", focus: [256, 0, 1184, 70], at: [TOP_SAVE[0] + 50, TOP_SAVE[1] + 20], click: true, press: "topSave", dur: 3.8, mark: TOP_SAVE, lens: { src: [1240, 0, 200, 72] } }
     ]
@@ -943,12 +943,13 @@ export const scenes = {
       wa: { svg: waWeb("+6282125784683") + waDraft, skel: true },
       send: waSend,
       bubble: { svg: waBubble, enter: "slide" },
+      back: { svg: settingsPage("Profil") + editPage + phoneNum + cekBtn, skel: true, enter: "fade", delay: -1 },
       ok: { svg: icon("circle-check", PHONE_IN.x + PHONE_IN.w - 22, PHONE_IN.y + 20, 20, "#15a34a"), enter: "pop" },
       mfa: { svg: mfaCard, enter: "fade" }
     },
     steps: [
       { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [470, CT, 320, 60], at: [440, 200] } },
-      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
+      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
         mark: CEK, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 10, 470, 60] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [MAIN.x + 16, MAIN.y + 180, 420, 70] } }
     ]
@@ -1063,7 +1064,7 @@ export const scenes = {
     base: [cfSign],
     els: { ns: { svg: nsPage, skel: true, enter: "fade", delay: -1 }, nsOk: { svg: icon("circle-check", 484, NS_SAVE[1] + 21, 22, "#15a34a"), enter: "pop" } },
     steps: [
-      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [500, CT + 80, 440, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [124, 41, 360, 44] } },
+      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [320, CT + 80, 800, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [124, 41, 360, 44] } },
       { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: [320, CT + 100, 800, 250], at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
         mark: { box: NS_SAVE, r: 6 }, lens: { src: [336, CT + 150, 540, 130], at: [200, 360] } }
     ]
