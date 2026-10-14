@@ -8,9 +8,9 @@
 // tutorial.scalev.com/azcustomdomain at 1440x900 in headless Chromium (14 Okt 2026).
 // Not measured, so generic (grey bars, only the labels the guide pages name): the type chooser, the confirmation after
 // Edit Account, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
-import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw } from "../lib.mjs";
+import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw, mid } from "../lib.mjs";
 import {
-  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkDialogHead, nkBtn, nkInput, nkLabel, nkHint, nkNote, nkAcc, nkH3, dim, phoneDesk
+  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkInput, nkLabel, nkHint, nkAcc, nkH3, dim, phoneDesk, svSimpan, svTerbitkan
 } from "../ui/kit.mjs";
 import {
   SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
@@ -18,6 +18,8 @@ import {
   VERIFY, dnsTable, verified, profilPage, PROFIL_EDIT, MFA_METHOD, SECURITY_BOX, EA, EA_PHONE, EA_SAVE, editAccount, eaPhone, eaSaveOn, STORE_DY, storeHead,
   storeRight, storeLeft, storeScrolled, ADD_PM, PM_BLOCK, payDialog, PAY_DLG, PAY_DLG_OPEN, ALLPAY_ROW, ALLPAY_TICK, PAY_SAVE, payTicked
 } from "../ui/scalev.mjs";
+import { helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
+import { shareTop, shareBtns, accessHead, coupleAll, shareAll, shareBox as shareBtnBox, ACC_Y, COUPLE_Y, NO_NOTE } from "../ui/bagikan.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
 const SERIF = "Georgia,'Times New Roman',serif";
@@ -69,10 +71,6 @@ const kontenBody = () => nkLabel(88, 181, "Bahasa undangan") + nkInput(88, 189, 
   nkLabel(101, 693, "Nama lengkap dan gelar") + nkInput(101, 701, 253, "Rani Ayu, S.Psi.") + nkLabel(101, 761, "Profesi") + nkInput(101, 769, 253, "Psikolog") +
   nkLabel(101, 829, "Keterangan orang tua") + nkInput(101, 837, 253, "Putri kedua dari Bapak Ahmad") + rect(72, 885, 327, 15, { fill: C.white });
 const editorKonten = (o = {}) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten", ...o }) + nkHead(0, 0, "Konten") + kontenBody() + cover(SC.x, SC.y);
-// The Simpan / Simpan & Terbitkan buttons again, as elements that can dip when pressed (boxes as scalevEditor draws them).
-const SIMPAN = [1193, 50, 82, 34], TERBIT = [1283, 50, 151, 34];
-const btnSimpan = rect(1193, 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong);
-const btnPub = rect(1283, 50, 151, 34, { r: 4, fill: C.primary }) + text(1403, 72, "Simpan & Terbitkan", { size: 13, weight: 500, fill: C.white, anchor: "end" }) + iconX("rocket", 1418, 67, 15, C.white);
 
 // ---- 1. Landing Pages → HTML Mode → NikahKit → Simpan --------------------------------------------------------------
 // Type chooser (not captured): modal with a generic tile and the HTML Mode tile.
@@ -106,72 +104,22 @@ const lockTip = shadow(46, 210, 198, 26, 4) + rect(46.5, 210.5, 197, 25, { r: 4,
 const edNikahKit = (o) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Template", screenFill: "#ffffff" }) + templatePanel() + (o?.locked ? lockRail : "");
 const SET_PUB = () => settingsEd({ now: "https://tokomu.myscalev.com/undangan-baru" }) + cover(SC.x, SC.y);
 
-// ---- 2. Bagikan dialog (editor-bagikan.png) ---------------------------------------------------------------------------
-const SHARE_URL = ["https://tokomu.myscalev.com/rani-dimas?", "to=Nama+Tamu"];
-function shareDialog(warn) {
-  const d = warn ? 0 : -50;
-  return nkDialogHead(0, 0, "Bagikan") + (warn ? nkNote(16, 169, 366, ["Perubahan belum disimpan di Scalev."], { tone: "warn", h: 38 }) : "") +
-    nkLabel(16, 231 + d, "Nama tamu") + nkInput(16, 239 + d, 366, "Nama Tamu") + nkHint(16, 295 + d, "Ditambahkan sebagai ?to=Nama.") +
-    rect(16, 311 + d, 366, 52, { r: 4, fill: C.mutedBg }) + para(26, 332 + d, SHARE_URL, { size: 12, fill: C.strong, lh: 18 }).replace("<text", `<text font-family="'Roboto Mono',ui-monospace,Menlo,monospace"`) +
-    nkBtn(16, 375 + d, "Lihat sebagai tamu", { w: 366, size: 14, icon: "eye" }) + nkBtn(16, 419 + d, "Salin tautan tamu", { w: 366, size: 14, variant: "ghost", icon: "copy" }) +
-    nkBtn(16, 463 + d, "Salin tautan umum", { w: 366, size: 14, variant: "quiet", icon: "link" }) +
-    nkH3(16, 535 + d, "Undangan khusus") + text(16, 572 + d, "Undangan khusus", { size: 14, fill: C.text }) + rect(346, 558 + d, 36, 20, { r: 10, fill: C.off }) + circle(356, 568 + d, 8, { fill: C.white }) +
-    para(16, 601 + d, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkH3(16, 653 + d, "Untuk pengantin") + nkBtn(16, 665 + d, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" }) + nkBtn(16, 709 + d, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" }) +
-    nkHint(16, 761 + d, "Masuk dengan PIN dashboard.") + nkH3(16, 801 + d, "PIN dashboard") + nkBtn(16, 813 + d, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" }) +
-    nkHint(16, 865 + d, "PIN hanya tampil di jendela NikahKit.");
-}
-const SALIN_UMUM = [16, 413, 366, 36];
-// ---- 3. Bantuan dialog with Izin domain (CSP) (editor-bantuan.png + help.jsx) -------------------------------------------
-const CHECKS = ["Aplikasi Scalev (Nuxt/Vue)", "Komponen halaman studio", "HTML Mode aktif", "Editor kode (CodeMirror)", "Strip tab sidebar", "Area panel sidebar", "Iframe preview",
-  "Inspect preview", "Sinkron device", "Media Scalev", "Izin CSP otomatis", "Hanya NikahKit yang aktif", "Versi editor Scalev", "Data undangan terbaca", "Klik di pratinjau",
-  "Kode halaman cocok dengan NikahKit", "Penyimpanan ucapan dan RSVP", "Izin domain di tab Security", "Penulisan ke editor"];
-const CSP = [
-  { origin: ["https://wedding-guestbook.", "nikahin.workers.dev"], st: "Sudah diizinkan", why: ["Ucapan & RSVP (Nikahin) · Koneksi", "data (connect_src)"] },
-  { origin: ["https://www.youtube.com"], st: "Ditambahkan otomatis", why: ["Musik atau video YouTube ·", "Bingkai (iframe) (frame_src)"] },
-  { origin: ["https://foto.contoh.com"], st: "Perlu ditambah manual", why: ["Foto dari luar Media Scalev ·", "Gambar (img_src)"], todo: true },
-  { origin: ["https://fonts.gstatic.com"], st: "Sudah diizinkan", why: ["Font Google · Font (font_src)"] }
-];
-const HB = (() => { // layout of the Bantuan body (world y), computed top-down like the real flex column
-  const L = {};
-  let y = 169;
-  L.update = y; y += 36 + 12;
-  L.note = y; y += 56 + 12;
-  L.hint = y; y += 32 + 8;
-  L.checks = [];
-  CHECKS.forEach((c) => { L.checks.push(y); y += c === "Izin domain di tab Security" ? 58 : 39; });
-  y += 12; L.actions = y; y += 3 * 36 + 2 * 8 + 4; L.actionsHint = y + 12; y += 16 + 24;
-  L.h3 = y; y += 16 + 8;
-  L.rows = [];
-  CSP.forEach((r) => { const h = 18 + 2 + r.origin.length * 16 + r.why.length * 16 + 2; L.rows.push([y, h]); y += h + 6; });
-  y += 4; L.recheck = y; L.copy = y + 44; L.msg = y + 44 + 36 + 16;
-  L.end = y + 140;
-  return L;
-})();
-const HB_DY = HB.h3 - 186; // scroll so the CSP heading sits under the dialog head
-// Badge sized like the real one (10px medium; "Sudah diizinkan" is 83px wide in Scalev's Roboto, this font runs wider).
-const bw = (label) => Math.round(label.length * 5.3) + 12;
-const badge = (x, y, label, todo) => { const w = bw(label); return rect(x, y, w, 18, { r: 9, fill: todo ? C.warnSoft : C.okSoft }) + text(x + w / 2, y + 12.5, label, { size: 10, weight: 500, fill: todo ? C.warnStrong : C.ok, anchor: "middle" }); };
-const cspRow = (r, y, h, st = r.st, todo = r.todo) => rect(16.5, y + 0.5, 350, h - 1, { r: 4, fill: C.white, stroke: C.line }) +
-  para(27, y + 21, r.origin, { size: 12, fill: C.strong, lh: 16 }).replace("<text", `<text font-family="'Roboto Mono',ui-monospace,Menlo,monospace"`) +
-  para(27, y + 21 + r.origin.length * 16 + 2, r.why, { size: 12, fill: C.text, lh: 16 }) +
-  badge(356 - bw(st), y + h / 2 - 9, st, todo);
-function helpBody() {
-  let s = text(16, HB.update + 23, "Sudah versi terbaru.", { size: 14, fill: C.text }) + nkBtn(270, HB.update, "Cek update", { w: 97, size: 14, variant: "quiet" }) +
-    nkNote(16, HB.note, 351, ["1 perlu perhatian. Muat ulang editor; bila tetap,", "kirim laporan."], { tone: "warn" }) +
-    para(16, HB.hint + 12, ["Terbit tertahan \"not finished previewing\"? Muat ulang editor, lalu", "tekan Simpan & Terbitkan."], { size: 12, fill: C.faint, lh: 16 });
-  CHECKS.forEach((c, i) => {
-    const y = HB.checks[i], bad = c === "Izin domain di tab Security";
-    s += circle(30, y + 18, 10, { fill: bad ? C.dangerSoft : C.okSoft }) + (bad ? text(30, y + 22, "!", { size: 12, weight: 700, fill: C.danger, anchor: "middle" }) : iconX("check", 30, y + 18, 12, C.ok, 2.6)) +
-      text(50, y + 23, c, { size: 14, weight: 500, fill: C.strong }) + (bad ? text(50, y + 41, "https://foto.contoh.com (img_src)", { size: 12, fill: C.text }) : "") +
-      line(16, (HB.checks[i + 1] ?? y + 39) - 0.5, 367, (HB.checks[i + 1] ?? y + 39) - 0.5, { stroke: C.line });
-  });
-  s += nkBtn(16, HB.actions, "Salin laporan", { w: 351, size: 14, variant: "ghost", icon: "copy" }) + nkBtn(16, HB.actions + 44, "Kirim lewat WhatsApp", { w: 351, size: 14, variant: "quiet", icon: "message-circle" }) +
-    nkBtn(16, HB.actions + 88, "Panduan", { w: 351, size: 14, variant: "quiet", icon: "book-open" }) + nkHint(16, HB.actionsHint, "Tanpa data undangan.") + nkH3(16, HB.h3 + 12, "Izin domain (CSP)");
-  CSP.forEach((r, i) => (s += cspRow(r, ...HB.rows[i])));
-  return s + nkBtn(16, HB.recheck, "Periksa ulang", { w: 351, size: 14, variant: "ghost" }) + nkBtn(16, HB.copy, "Salin domain kurang", { w: 351, size: 14, variant: "quiet", icon: "copy" }) + rect(0, HB.end, 399, 400, { fill: C.white });
-}
-const up = (y) => y - HB_DY; // world y after the scroll
+// ---- 2. Bagikan dialog (../ui/bagikan.mjs): with the unsaved note before Simpan, without it after ---------------------
+const shareDialog = (warn) => warn ? shareTop(0) + shareBtns(0) + accessHead(ACC_Y - NO_NOTE, false) + coupleAll(COUPLE_Y - NO_NOTE) : shareAll(null);
+const SALIN_UMUM = shareBtnBox("umum", NO_NOTE);
+// ---- 3. Bantuan dialog (../ui/bantuan.mjs) with Izin domain (CSP): one domain to add by hand, then rechecked -----------
+const CSP_ROWS = [{ o: "https://www.youtube.com", d: "script_src", st: "exists", why: "Musik atau video YouTube" },
+  { o: "https://www.youtube.com", d: "frame_src", st: "added", why: "Musik atau video YouTube" },
+  { o: "https://foto.contoh.com", d: "img_src", st: "failed", why: "Foto dari luar Media Scalev" }];
+const hb = helpBody({ bad: { "Izin domain di tab Security": "https://foto.contoh.com (img_src)" }, csp: CSP_ROWS, cspMsg: true });
+// After Periksa ulang the Security tab is read again: the row turns Sudah diizinkan and the check row OK.
+const hbOk = helpBody({ csp: CSP_ROWS.map((r) => ({ ...r, st: r.st === "failed" ? "exists" : r.st })), cspMsg: true });
+const HB_DY = hb.end - 900, OK_DY = hbOk.end - 900; // scrolled to the end: Izin domain (CSP) in view
+const up = (b, dy = HB_DY) => [b[0], b[1] - dy, b[2], b[3]]; // a body box after the scroll
+// Lens source over the CSP heading and its rows (whole rows), and over the two buttons with the status line.
+const cspLens = (body, dy) => [8, body.pos.cspH3 - dy - 8, 382, body.pos.csp.at(-1)[1] + body.pos.csp.at(-1)[3] - body.pos.cspH3 + 16];
+const btnLens = (body, dy) => [8, body.pos.periksa[1] - dy - 8, 382, body.pos.cspMsg[1] + 16 - body.pos.periksa[1] + 16];
+const cspNote = (body, dy, s) => nkHint(16, body.pos.cspMsg[1] - dy + 12, s);
 
 // Cloudflare dashboard, DNS records (not captured): generic, with the labels the guide names.
 const cfOrange = "#f38020", cfBlue = "#0051c3";
@@ -525,8 +473,8 @@ export const scenes = {
   "scalev-slug-simpan": {
     title: "Klik Simpan di kanan atas editor",
     base: [settingsEd({ pub: false }), desktopPreview, slugText("rani-dimas")],
-    els: { simpan: btnSimpan },
-    steps: [{ caption: "Klik Simpan di kanan atas editor.", focus: [[...TOOLBAR], DOMAIN_ACC], at: ED.simpan, click: true, press: "simpan", dur: 3.4, mark: SIMPAN, lens: { src: [1180, 44, 260, 50] } }]
+    els: { simpan: svSimpan() },
+    steps: [{ caption: "Klik Simpan di kanan atas editor.", focus: [[...TOOLBAR], DOMAIN_ACC], at: ED.simpan, click: true, press: "simpan", dur: 3.4, mark: ED.simpanBox, lens: { src: [1180, 44, 260, 50] } }]
   },
 
   "scalev-slug-id": {
@@ -587,8 +535,8 @@ export const scenes = {
   "scalev-terbitkan": {
     title: "Klik Simpan & Terbitkan di kanan atas editor Scalev",
     base: [editorKonten()],
-    els: { pub: btnPub },
-    steps: [{ caption: "Klik Simpan & Terbitkan di kanan atas editor. Tunggu sampai selesai.", focus: TOOLBAR, at: ED.terbitkan, click: true, press: "pub", dur: 3.4, mark: TERBIT, lens: { src: [1180, 44, 260, 50] } }]
+    els: { pub: svTerbitkan() },
+    steps: [{ caption: "Klik Simpan & Terbitkan di kanan atas editor. Tunggu sampai selesai.", focus: TOOLBAR, at: ED.terbitkan, click: true, press: "pub", dur: 3.4, mark: ED.terbitkanBox, lens: { src: [1180, 44, 260, 50] } }]
   },
 
   "scalev-bagikan-salin": {
@@ -623,10 +571,9 @@ export const scenes = {
     title: "Izin domain (CSP) di Bantuan NikahKit dan tab Security Scalev",
     base: [editorKonten()],
     els: {
-      help: { svg: nkDialogHead(0, 0, "Bantuan"), enter: "fade" },
-      helpBody: { svg: clipCss("helpBody", 0, 154, 386, 746) + helpBody(), enter: "fade" },
-      helpBar: { svg: rect(388, 160, 6, 120, { r: 3, fill: "#c9ced6" }), enter: "fade" },
-      copied: { svg: nkHint(16, up(HB.msg), "Tersalin. Tempel di tab Security."), enter: "fade" },
+      help: { svg: dlgSheet + dlgHead, enter: "fade" },
+      helpBody: { svg: clipCss("helpBody", 0, 154, 398, 746) + hb.svg, enter: "fade" },
+      copied: { svg: cspNote(hb, HB_DY, "Tersalin. Tempel di tab Security."), enter: "fade" },
       secFrame: { svg: scalevEditor(0, 0, { tab: "Security" }) + rect(0, 92, 399, 808, { fill: C.white }) + cover(SC.x, SC.y), skel: true, enter: "fade" },
       secBody: { svg: clipCss("secBody", 0, 92, 399, 808) + secContent({}), skel: true, enter: "fade" },
       picker: { svg: secPicker({ value: "" }), enter: "fade" },
@@ -635,12 +582,13 @@ export const scenes = {
       ticked: { svg: tick(34, 249, true) + rect(18, 140, 320, 39, { fill: SVC.fieldBg }) + tx(30, 151, "1 selected", 14, { fill: SVC.dark }), enter: "fade" }
     },
     steps: [
-      { caption: "Di tab NikahKit, klik Bantuan di bagian bawah rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help", "helpBody", "helpBar"], mark: TOOL.Bantuan, lens: { src: [8, 160, 368, 118], at: [320, 60] } },
+      { caption: "Di tab NikahKit, klik Bantuan di bagian bawah rel kiri.", focus: [0, 92, 399, 808], at: ED.tool.Bantuan, click: true, show: ["help", "helpBody"], mark: TOOL.Bantuan,
+        lens: { src: [8, 161, 382, hb.pos.status[1] + hb.pos.status[3] - 153], at: [440, 120] } },
       { caption: "Gulir ke Izin domain (CSP). Tiap domain punya status.", focus: [0, 92, 399, 808], scroll: { id: "helpBody", dy: HB_DY }, dur: 3.6,
-        mark: [16, up(HB.rows[2][0]), 351, HB.rows[2][1]], lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[3][0] - HB.h3 + 8] } },
-      { caption: "Ada Perlu ditambah manual? Klik Salin domain kurang.", at: [190, up(HB.copy) + 18], click: true, show: ["copied"], dur: 3.4,
-        mark: [16, up(HB.copy), 351, 36], lens: { src: [8, up(HB.recheck) - 8, 380, up(HB.msg) - up(HB.recheck) + 20] } },
-      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 92, 399, 808]], at: ED.tab.Security, click: true, show: ["secFrame", "secBody"], hide: ["help", "helpBody", "helpBar", "copied"],
+        mark: up(hb.pos.csp[2]), lens: { src: cspLens(hb, HB_DY) } },
+      { caption: "Ada Perlu ditambah manual? Klik Salin domain kurang.", at: mid(up(hb.pos.salinCsp)), click: true, show: ["copied"], dur: 3.4,
+        mark: up(hb.pos.salinCsp), lens: { src: btnLens(hb, HB_DY) } },
+      { caption: "Lihat hasil salinan, lalu klik tab Security.", focus: [[0, 44, 399, 48], [0, 92, 399, 808]], at: ED.tab.Security, click: true, show: ["secFrame", "secBody"], hide: ["help", "helpBody", "copied"],
         mark: tabMark("Security"), lens: TABS_LENS },
       { caption: "Gulir ke kolom yang cocok: img_src ke Image Sources. Klik kolomnya.", focus: [0, 92, 399, 330], scroll: { id: "secBody", dy: SECURITY.imageDy }, at: [190, 159], click: true, show: ["picker"], dur: 3.8,
         mark: SECURITY.imageSelect, lens: { src: [8, 104, 383, 135] } },
@@ -654,13 +602,13 @@ export const scenes = {
     title: "Memeriksa ulang izin domain di Bantuan",
     base: [editorKonten()],
     els: {
-      help: { svg: nkDialogHead(0, 0, "Bantuan") + clipped(0, 154, 386, 746, `<g transform="translate(0 ${-HB_DY})">${helpBody()}</g>`), enter: "fade" },
-      fixed: { svg: cspRow(CSP[2], up(HB.rows[2][0]), HB.rows[2][1], "Sudah diizinkan", false) + nkBtn(16, up(HB.copy), "Salin daftar domain", { w: 351, size: 14, variant: "quiet", icon: "copy" }) + nkHint(16, up(HB.msg), "Diperiksa ulang."), enter: "fade" }
+      help: { svg: dlgSheet + dlgHead + dlgView(hb, HB_DY), enter: "fade" },
+      fixed: { svg: dlgView(hbOk, OK_DY) + cspNote(hbOk, OK_DY, "Diperiksa ulang."), enter: "fade" }
     },
     steps: [
-      { caption: "Setelah terbit, klik Bantuan lagi di rel kiri.", focus: [0, 790, 72, 60], at: ED.tool.Bantuan, click: true, show: ["help"], mark: TOOL.Bantuan, lens: { src: [8, up(HB.h3) - 10, 380, HB.rows[2][0] - HB.h3 + 8], at: [320, 60] } },
-      { caption: "Klik Periksa ulang: statusnya jadi Sudah diizinkan.", focus: [0, 92, 399, 808], at: [190, up(HB.recheck) + 18], click: true, show: ["fixed"], dur: 3.8,
-        mark: [16, up(HB.recheck), 351, 36], lens: { src: [8, up(HB.rows[2][0]) - 5, 380, up(HB.recheck) - up(HB.rows[2][0]) + 49] } }
+      { caption: "Setelah terbit, klik Bantuan lagi di rel kiri.", focus: [0, 92, 399, 808], at: ED.tool.Bantuan, click: true, show: ["help"], mark: TOOL.Bantuan, lens: { src: cspLens(hb, HB_DY), at: [440, 120] } },
+      { caption: "Klik Periksa ulang: statusnya jadi Sudah diizinkan.", focus: [0, 92, 399, 808], at: mid(up(hb.pos.periksa)), click: true, show: ["fixed"], dur: 3.8,
+        mark: up(hb.pos.periksa), lens: { src: cspLens(hbOk, OK_DY), at: [440, 120] } }
     ]
   },
 
