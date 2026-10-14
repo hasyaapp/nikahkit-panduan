@@ -415,7 +415,7 @@ export const scenes = {
       tile: { svg: htmlTile(true), enter: "fade" }
     },
     steps: [
-      { caption: "Klik + Create Landing Page.", focus: [256, 0, 1184, 137], at: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20], click: true, press: "create", show: ["shade", "typeDlg"], mark: CREATE, lens: { src: [270, 70, 192, 56] } },
+      { caption: "Klik + Create Landing Page.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20], click: true, press: "create", show: ["shade", "typeDlg"], mark: CREATE, lens: { src: [270, 70, 192, 56] } },
       { caption: "Pilih tipe HTML Mode.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [DLG.x + 368, DLG.y + 170], click: true, press: "tile", show: ["tile"], mark: { box: HTML_TILE, r: 6 }, lens: { src: [DLG.x + 252, DLG.y + 66, 232, 207] } }
     ]
   },
@@ -481,7 +481,7 @@ export const scenes = {
       slug: slugText("rani-dimas")
     },
     steps: [
-      { caption: "Di editor halaman, klik tab Settings.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set", "old"], mark: tabMark("Settings"), lens: { src: [0, 44, 390, 300], at: [300, 40] } },
+      { caption: "Di editor halaman, klik tab Settings.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set", "old"], mark: tabMark("Settings"), lens: { ...TABS_LENS, at: [300, 40] } },
       { caption: "Ganti Slug URL, misalnya rani-dimas.", focus: DOMAIN_ACC, at: [SLUG[0] + 200, SLUG[1] + 21], click: true, show: ["clear", "slug"], hide: ["old"], type: [{ id: "slug", n: 10, box: [48, 285, 76, 22] }], dur: 3.4, mark: SLUG, lens: SLUG_LENS }
     ]
   },
@@ -708,7 +708,8 @@ export const scenes = {
     },
     steps: [
       { caption: "Buka galeri template undangan Canva. Mahkota berarti Canva Pro.", focus: [0, 330, 1425, 300], at: CROWN, dur: 3.6, mark: { box: [CROWN[0] - 12, CROWN[1] - 12, 24, 24], r: 12 }, lens: { src: [322, 520, 196, 108] } },
-      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", focus: [0, CT, 1425, 80], at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"], mark: { box: CREATE_CV, r: 8 }, lens: { src: [1180, 97, 212, 52] } },
+      { caption: "Jadikan persegi: klik Create a design, lalu Custom size.", focus: [[0, CT, 1425, 80], [POP.x - 8, POP.y, POP.w + 16, 178]], at: [CREATE_CV[0] + 70, CREATE_CV[1] + 16], click: true, show: ["top", "pop"], hide: ["down"],
+        mark: { box: CREATE_CV, r: 8 }, lens: { src: [1180, 97, 212, 52], at: [560, 260] } },
       { caption: "Isi 1080 x 1080 px.", at: [CUSTOM[0] + 100, CUSTOM[1] + 20], click: true, show: ["size", "w", "h"], type: [{ id: "w", n: 4 }, { id: "h", n: 4 }], mark: { box: CUSTOM, r: 6 }, lens: { src: [POP.x - 8, POP.y - 4, POP.w + 16, 196], at: [200, 150] } },
       { caption: "Klik Create new design, lalu salin elemen dari template.", focus: [SQ.x, SQ.y, SQ.s, SQ.s + 50], at: [NEW_CV[0] + 144, NEW_CV[1] + 21], click: true, hide: ["top", "pop", "size", "w", "h"], dur: 3.6,
         mark: { box: NEW_CV, r: 8 }, lens: { src: [SQ.x + 160, SQ.y + SQ.s + 8, 240, 40] } },
@@ -716,7 +717,8 @@ export const scenes = {
       { caption: "Unduh: klik Share, lalu Download.", focus: [SHARE_CV, [SHP.x - 6, 141, SHP.w + 12, 222]], at: [SHARE_CV[0] + 53, SHARE_CV[1] + 17], click: true, show: ["share"], hide: ["sel"],
         mark: { box: SHARE_CV, r: 8 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
       { caption: "Pilih PNG atau JPG.", at: [DL_ROW[0] + 100, DL_ROW[1] + 26], click: true, show: ["dl"], mark: { box: DL_ROW, r: 6 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
-      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6, mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x + 2, DLB.y + 2, 396, 92], at: [140, 150] } }
+      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", focus: [[0, CT, 1440, 56], [DLB.x - 8, DLB.y, 416, 104]], at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6,
+        mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x + 2, DLB.y + 2, 396, 92], at: [140, 150] } }
     ]
   },
 
@@ -766,7 +768,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Tentukan kebutuhanmu: cari kelompoknya, misalnya Domain.", focus: GUIDE_FOCUS, at: [370, CT + 218], dur: 3.4, mark: DOMAIN_H2, lens: { src: [310, CT + 192, 160, 60] } },
-      { caption: "Klik judul tutorial. Halaman tutorial Scalev terbuka.", focus: [330, CT + 270, 770, 545], at: [AZ_LINK[0] + 110, AZ_LINK[1] + 11], click: true, show: ["tutFrame", "tut"], mark: { box: AZ_LINK, r: 3 } },
+      { caption: "Klik judul tutorial. Halaman tutorial Scalev terbuka.", focus: TUT_ART, at: [AZ_LINK[0] + 110, AZ_LINK[1] + 11], click: true, show: ["tutFrame", "tut"], mark: { box: AZ_LINK, r: 3 } },
       { caption: "Tonton atau baca sampai habis. Ikuti urutannya.", focus: [330, CT, 770, 815], at: [1000, 600], scroll: { id: "tut", dy: 420 }, dur: 3.6 },
       { caption: "Kembali ke tab panduan NikahKit.", focus: [[0, 0, 1440, 41], GUIDE_FOCUS], at: [200, 23], click: true, show: ["back"], hide: ["tutFrame", "tut"], mark: { box: [84, 6, 250, 35], r: 8 }, lens: { src: [76, 0, 520, 41] } }
     ]
@@ -801,7 +803,7 @@ export const scenes = {
     els: { ns: { svg: nsPage, skel: true, enter: "fade", delay: -1 }, nsOk: { svg: icon("circle-check", 484, NS_SAVE[1] + 21, 22, "#15a34a"), enter: "pop" } },
     steps: [
       { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", focus: [OMNI.box, [320, CT + 80, 800, 340]], dur: 3.4, mark: { box: CF_URL, r: 4 }, lens: { src: [134, 48, 300, 30] } },
-      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: [320, CT + 100, 800, 250], at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
+      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", focus: [300, CT + 36, 840, 330], at: [404, NS_SAVE[1] + 21], click: true, show: ["ns", "nsOk"], dur: 4,
         mark: { box: NS_SAVE, r: 6 }, lens: { src: [336, CT + 150, 540, 130], at: [200, 360] } }
     ]
   }
