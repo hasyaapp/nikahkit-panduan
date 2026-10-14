@@ -163,7 +163,7 @@ function landingTop(x0, y0, name) {
   s += THUMB(X + 10.5, Y(469 + 28), 175, 219, TPL[1][2], -6) + THUMB(X + 164.5, Y(469 + 28), 175, 219, TPL[2][2], 6) + THUMB(X + 87.5, Y(469), 175, 219, TPL[0][2]);
   // katalog
   s += dash(X, Y(LPY.katalog), 350) + h(X, Y(892), "Pilih desain undangan", 32) +
-    para(X, Y(930), ["Buka demo untuk melihat desainnya lebih", "besar, lalu pilih yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.35 });
+    para(X, Y(930), ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.35 });
   TPL.forEach(([n, note, pal], i) => {
     const cx = X + (i % 2) * 182, ry = LPY.grid + Math.floor(i / 2) * 418;
     s += clipped(cx, Y(ry), 168, 210, pageSketch(cx, Y(ry), 168, 210, pal)) + rect(cx, Y(ry), 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
@@ -265,7 +265,7 @@ const mkPanel = (on, extra = "") => nkHead(0, 0, "Template", { inbox: false }) +
 const BOX = 219;
 function brandOpen(v = {}) {
   const fx = 101, fw = 253;
-  let s = rect(85.5, BOX - 2.5, 284, 884, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, 878, { r: 4, fill: C.white, stroke: C.primary }) +
+  let s = rect(85.5, BOX - 2.5, 284, 1004, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, 998, { r: 4, fill: C.white, stroke: C.primary }) +
     text(101, BOX + 30, "Profil merek", { size: 14, weight: 500 }) + badgeAt(354, BOX + 16, v.ready ? "Terisi" : "Belum diisi", v.ready ? "ok" : "plain") + line(89, BOX + 49, 366, BOX + 49);
   s += nkLabel(fx, 292, "Nama bisnis") + nkInput(fx, 300, fw, v.name ?? "") +
     nkLabel(fx, 360, "Nomor WhatsApp") + nkInput(fx, 368, fw, v.wa ?? "0812 3456 7890", { placeholder: !v.wa }) +
@@ -280,10 +280,19 @@ function brandOpen(v = {}) {
     nkLabel(111, 728, "Harga (Rp)") + nkInput(111, 736, 233, v.price ?? "150.000", { placeholder: !v.price }) +
     nkLabel(111, 796, "Isi paket (opsional)") + rect(111.5, 804.5, 232, 133, { r: 4, fill: C.white, stroke: C.field }) +
     para(111, 954, ["Satu baris satu isi, maksimal 6 baris, 80", "huruf per baris."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkBtn(fx, 1005, "Tambah paket", { variant: "quiet", w: fw, icon: "plus" }) + nkBtn(fx, 1049, "Simpan profil", { w: 110 });
+    nkBtn(fx, 1005, "Tambah paket", { variant: "quiet", w: fw, icon: "plus" }) +
+    nkLabel(fx, 1061, "Gaya katalog") + nkInput(fx, GAYA_Y, fw, v.style ?? "Grid", { select: true }) +
+    para(fx, 1121, ["Cara daftar desain tampil di Landing", "page. Berlaku setelah profil disimpan", "dan halaman dipasang atau diperbarui."], { size: 12, fill: C.faint, lh: 16 }) +
+    nkBtn(fx, SIMPAN_Y, "Simpan profil", { w: 110 });
   return s;
 }
-const SCROLL = 300;
+const GAYA_Y = 1069, SIMPAN_Y = 1169, SCROLL = 420;
+// Gaya katalog's native select list (CATALOG_STYLES labels), under the select; the current value has a check.
+const STYLE_LABELS = ["Grid", "Daftar", "Kartu besar", "Geser", "Mozaik"];
+const MENU_Y = GAYA_Y - SCROLL + 40, menuItemY = (i) => MENU_Y + 4 + i * 32;
+const styleMenu = shadow(101, MENU_Y, 253, 168, 6, 2) + rect(101.5, MENU_Y + 0.5, 252, 167, { r: 6, fill: C.white, stroke: C.line }) +
+  rect(105, menuItemY(0), 245, 32, { r: 4, fill: C.primarySoft }) + iconX("check", 120, menuItemY(0) + 16, 14, C.strong, 2.4) +
+  STYLE_LABELS.map((l, i) => text(134, menuItemY(i) + 21, l, { size: 14 })).join("");
 
 // Bagikan dialog (editor-bagikan.png, saved state: no unsaved note, so 50 px higher).
 const shareDlg = nkDialogHead(0, 0, "Bagikan") + nkLabel(16, 181, "Nama tamu") + nkInput(16, 189, 366, "Nama Tamu") + nkHint(16, 245, "Ditambahkan sebagai ?to=Nama.") +
@@ -354,13 +363,44 @@ const LAND = landingTop(0, 0, "Rina WO");
 const F0 = formTail(0, LPY.card, PESANAN);
 const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain Dasar"], desain: "Dasar" });
 const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Dasar"], desain: "Dasar", paket: "Basic" });
-// Lihat demo dialog: viewport = katalog top (805) .. +844; dialog 358 wide, centred.
-const KAT = LPY.katalog, DLG_TOP = 919, DLG = { img: DLG_TOP + 1.5, body: DLG_TOP + 449 };
-const demoDlg = body(rect(0, KAT, 390, 844, { fill: "rgba(23,16,8,.55)" }) + rect(16.75, DLG_TOP + 0.75, 356.5, 614, { r: 16, fill: LP.paper, stroke: LP.cocoa, sw: 1.5 }) +
-  clipped(18, DLG.img, 354, 446, pageSketch(18, DLG.img, 354, 446, TPL[0][2])) + line(18, DLG.body, 372, DLG.body, { stroke: LP.cocoa, sw: 1 }) +
-  h(37, DLG.body + 43, "Dasar", 26) + text(37, DLG.body + 74, "Polos · 20 bagian · HP & desktop · ID/EN", { size: 15, fill: LP.muted }) +
-  lpBtn(37 + lpBtnW("Pakai desain ini") + 10, DLG.body + 100, "Tutup", { secondary: true }));
-const DLG_PICK = [37 + lpBtnW("Pakai desain ini") / 2, DLG.body + 126 - KAT];
+// Live demo (dialog.demo, full screen): bar 63 px (name, Pakai desain ini 147x46, close 44), the sample invitation below.
+const DEMO_PICK = [181 + 147 / 2, 31], DEMO_X = [360, 31];
+const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + clipped(0, 63, 390, 781, group({ transform: "translate(-727 -43)" }, invite(RANI))) +
+  rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Dasar", 19, { weight: 600 }) +
+  iconX("x", DEMO_X[0], DEMO_X[1], 24, LP.cocoa, 2.2));
+const demoPick = body(lpBtn(181, 8, "Pakai desain ini", { small: true, solid: true, w: 147 }));
+const KAT = LPY.katalog, LIHAT_DEMO = [62, LPY.grid + 322 - KAT];
+// The phone's address bar (56 px) above a 844 viewport, for the shareable ?demo= link.
+const ADDR = "tokomu.myscalev.com/rina-wo";
+const urlBar = (u) => rect(0, 0, 390, 56, { fill: "#f1f3f4" }) + rect(12, 8, 366, 40, { r: 20, fill: "#e3e5e8" }) + icon("lock", 32, 28, 14, C.text) + text(46, 33, u, { size: 14, fill: C.strong });
+const inBrowser = (...s) => clipped(0, 56, 390, 844, group({ transform: "translate(0 56)" }, ...s));
+
+// Gaya katalog (renderCatalog + .cat-* CSS at 390 px, measured in Chrome): y from the katalog's dashed line.
+let rcN = 0;
+const rclip = (x, y, w, hh, r, ...kids) => { const id = `rc${rcN++}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="${r}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+const pic = (x, y, w, hh, pal, r = 14) => rclip(x, y, w, hh, r, pageSketch(x, y, w, hh, pal)) + rect(x, y, w, hh, { r, stroke: LP.cocoa, sw: 1.5 });
+const demoLink = (x, top) => text(x, top + 28, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true });
+const NOTE = "20 bagian · HP & desktop · ID/EN", NOTE2 = ["20 bagian · HP & desktop ·", "ID/EN"], CT = 187;
+const catHead = rect(0, 0, 390, 844, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 87, "Pilih desain undangan", 32) +
+  para(20, 125, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.35 });
+const CAT_STYLE = {
+  grid: TPL.map(([n, , pal], i) => { const x = 20 + (i % 2) * 182, t = CT + Math.floor(i / 2) * 357;
+    return pic(x, t, 168, 210, pal) + h(x, t + 230, n, 20) + para(x, t + 252, NOTE2, { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(x, t + 288) + lpBtn(x + 92, t + 287, "Pilih", { small: true, w: 71 }); }).join(""),
+  daftar: TPL.map(([n, , pal], i) => { const t = CT + i * 149;
+    return pic(20, t + 16, 92, 115, pal, 10) + h(128, t + 34, n, 20) + text(128, t + 57, NOTE, { size: 14, fill: LP.muted }) + demoLink(128, t + 70) + lpBtn(220, t + 69, "Pilih", { small: true, w: 71 }) + dash(20, t + 147, 350); }).join(""),
+  kartu: TPL.slice(0, 2).map(([n, , pal], i) => { const t = CT + i * 448;
+    return rect(20, t, 350, 429, { r: 16, fill: LP.paper }) + rclip(20, t, 350, 429, 16, pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
+      rect(20.75, t + 0.75, 348.5, 427.5, { r: 16, stroke: LP.cocoa, sw: 1.5 }) + h(41, t + 302, n, 26) + text(41, t + 332, NOTE, { size: 15, fill: LP.muted }) +
+      demoLink(41, t + 359) + lpBtn(137, t + 355, "Pilih", { solid: true, w: 83 }); }).join(""),
+  geser: TPL.slice(0, 2).map(([n, , pal], i) => { const x = 20 + i * 268, t = CT + 4;
+    return pic(x, t, 252, 315, pal) + h(x, t + 335, n, 20) + text(x, t + 357, NOTE, { size: 14, fill: LP.muted }) + demoLink(x, t + 373) + lpBtn(x + 92, t + 372, "Pilih", { small: true, w: 71 }); }).join("") +
+    rect(0, 735, 390, 109, { fill: LP.tint }) + h(20, 828, "Paket dan harga", 32),
+  mozaik: `<defs><linearGradient id="mzfade" x1="0" y1="1" x2="0" y2="0"><stop offset="${(79 / 135).toFixed(3)}" stop-color="rgb(20,12,8)" stop-opacity=".88"/><stop offset="1" stop-color="rgb(20,12,8)" stop-opacity="0"/></linearGradient></defs>` +
+    [[20, CT, 450], [200, CT, 220], [200, CT + 230, 220], [20, CT + 460, 220]].map(([x, y, hh], i) => { const [n, , pal] = TPL[i], b = y + hh;
+      return rclip(x, y, 170, hh, 14, pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
+        rect(x + 10, y + 11, 84, 24, { r: 12, fill: "rgba(20,12,8,.3)" }) + rect(x + 10, y + 10, 84, 24, { r: 12, fill: LP.paper }) + text(x + 52, y + 27, "Lihat demo", { size: 12, weight: 800, fill: LP.cocoa, anchor: "middle" }) +
+        h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join("")
+};
 const PKG_Y = LPY.pkg1 - 40, FORM_Y = LPY.card - 20;
 
 // form-klien: the #pesan section from its top; the phone shows it from FY0.
@@ -497,13 +537,17 @@ export const scenes = {
       waFocus: { svg: ed(nkInput(101, 368, 253, "", { focus: true })), enter: "fade" },
       waV: { svg: ed(text(111, 391, "0812 3456 7890", { size: 14 })) },
       logoHl: { svg: ed(ring(101, 464, 253, 82, { r: 6 })), enter: "fade" },
-      body2: { svg: ed(rect(72, 153, 327, 1100, { fill: C.white }), kindSeg("marketing"), brandOpen({ name: "Rina WO", wa: "0812 3456 7890" })), enter: "fade" },
-      pkFocus: { svg: ed(nkInput(111, 368, 233, "", { focus: true })), enter: "fade" },
-      pkBlur: { svg: ed(nkInput(111, 368, 233, "")), enter: "fade" },
-      pkName: { svg: ed(text(121, 391, "Basic", { size: 14 })) },
-      prFocus: { svg: ed(nkInput(111, 436, 233, "", { focus: true })), enter: "fade" },
-      pkPrice: { svg: ed(text(121, 459, "150.000", { size: 14 })) },
+      body2: { svg: ed(rect(72, 153, 327, 1200, { fill: C.white }), kindSeg("marketing"), brandOpen({ name: "Rina WO", wa: "0812 3456 7890" })), enter: "fade" },
+      pkFocus: { svg: ed(nkInput(111, 668 - SCROLL, 233, "", { focus: true })), enter: "fade" },
+      pkBlur: { svg: ed(nkInput(111, 668 - SCROLL, 233, "")), enter: "fade" },
+      pkName: { svg: ed(text(121, 691 - SCROLL, "Basic", { size: 14 })) },
+      prFocus: { svg: ed(nkInput(111, 736 - SCROLL, 233, "", { focus: true })), enter: "fade" },
+      pkPrice: { svg: ed(text(121, 759 - SCROLL, "150.000", { size: 14 })) },
       addHl: { svg: ed(ring(101, 1005 - SCROLL, 253, 36, { r: 6 })), enter: "fade", delay: 0.5 },
+      prBlur: { svg: ed(nkInput(111, 736 - SCROLL, 233, ""), text(121, 759 - SCROLL, "150.000", { size: 14 })), enter: "fade" },
+      selFocus: { svg: ed(nkInput(101, GAYA_Y - SCROLL, 253, "Grid", { select: true, focus: true })), enter: "fade" },
+      menu: { svg: ed(styleMenu), enter: "fade" },
+      selV: { svg: ed(nkInput(101, GAYA_Y - SCROLL, 253, "Kartu besar", { select: true, focus: true })), enter: "fade" },
       done: { svg: ed(bodyBg, bodyClip(kindSeg("marketing"), brandClosed(BOX), mkCards(MKY))), enter: "fade", delay: 0.15 },
       cover: cover({ page: "Undangan Rani & Dimas", rail: "Template" }, "Template")
     },
@@ -514,10 +558,12 @@ export const scenes = {
       { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: P(228, 318), click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [111, 303 + OY, 70, 30] }], dur: 3.2 },
       { caption: "Klik Nomor WhatsApp, lalu ketik nomornya, misalnya 0812 3456 7890.", at: P(228, 386), click: true, show: ["nameBlur", "waFocus", "waV"], type: [{ id: "waV", n: 14, box: [111, 371 + OY, 110, 30] }], dur: 3.4 },
       { caption: "Logo (opsional): tempel alamat gambar https, atau kosongkan.", show: ["logoHl"], dur: 3 },
-      { caption: "Gulir ke paket pertama, lalu isi Nama paket.", at: P(228, 386), click: true, show: ["body2", "pkFocus", "pkName"],
-        hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV", "logoHl"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [121, 371 + OY, 36, 30] }], dur: 3.6 },
-      { caption: "Isi Harga (Rp) dan Isi paket. Tambah paket untuk paket kedua dan ketiga.", at: P(228, 454), click: true, show: ["pkBlur", "prFocus", "pkPrice", "addHl"], type: [{ id: "pkPrice", n: 7, box: [121, 439 + OY, 50, 30] }], dur: 3.6 },
-      { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: P(156, 1067 - SCROLL), click: true, hide: ["addHl"], show: ["done"], dur: 3.4 }
+      { caption: "Gulir ke paket pertama, lalu isi Nama paket.", at: P(228, 686 - SCROLL), click: true, show: ["body2", "pkFocus", "pkName"],
+        hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV", "logoHl"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [121, 671 - SCROLL + OY, 36, 30] }], dur: 3.6 },
+      { caption: "Isi Harga (Rp) dan Isi paket. Tambah paket untuk paket kedua dan ketiga.", at: P(228, 754 - SCROLL), click: true, show: ["pkBlur", "prFocus", "pkPrice", "addHl"], type: [{ id: "pkPrice", n: 7, box: [121, 739 - SCROLL + OY, 50, 30] }], dur: 3.6 },
+      { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, atau Mozaik.", at: P(228, GAYA_Y - SCROLL + 18), click: true, hide: ["addHl", "prFocus"], show: ["prBlur", "selFocus", "menu"], dur: 3.4 },
+      { caption: "Pilih gayanya, misalnya Kartu besar. Bawaannya Grid.", at: P(180, menuItemY(2) + 16), click: true, hide: ["menu", "selFocus"], show: ["selV"], dur: 3 },
+      { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: P(156, SIMPAN_Y + 18 - SCROLL), click: true, show: ["done"], dur: 3.4 }
     ]
   },
 
@@ -564,8 +610,8 @@ export const scenes = {
     base: [scr(0, LAND, F0.svg)],
     els: {
       v1: { svg: scr(KAT, LAND, F0.svg), enter: "fade", delay: 0.1 },
-      dlg: { svg: scr(KAT, demoDlg), enter: "pop", origin: [195, 422] },
-      pick: { svg: scr(KAT, body(lpBtn(37, DLG.body + 100, "Pakai desain ini", { solid: true }))), enter: "pop", origin: [195, 422] },
+      dlg: { svg: demoView, enter: "pop", origin: LIHAT_DEMO },
+      pick: { svg: demoPick, enter: "pop", origin: LIHAT_DEMO },
       f1: { svg: scr(FORM_Y, LAND, F1.svg), enter: "fade", delay: 0.2 },
       vPkg: { svg: scr(PKG_Y, LAND, F1.svg), enter: "fade" },
       p2: { svg: scr(PKG_Y, body(lpBtn(45, LPY.pkg1 + 218, "Pilih paket ini", { solid: true, w: 300 }))) },
@@ -573,11 +619,47 @@ export const scenes = {
     },
     steps: [
       { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", at: [287, LPY.cta + 26], click: true, show: ["v1"], dur: 3.4 },
-      { caption: "Lihat desain turun ke katalog. Klien menekan Lihat demo.", at: [62, LPY.grid + 322 - KAT], click: true, show: ["dlg", "pick"], dur: 3.4 },
-      { caption: "Gambar desain tampil lebih besar. Klik Pakai desain ini.", at: DLG_PICK, click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"], dur: 3.4 },
+      { caption: "Lihat desain turun ke katalog. Klien menekan Lihat demo.", at: LIHAT_DEMO, click: true, show: ["dlg", "pick"], dur: 3.4 },
+      { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: DEMO_PICK, click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"], dur: 3.4 },
       { caption: "Form menulis Pilihan kalian: desain Dasar.", dur: 2.6 },
       { caption: "Di Paket dan harga, setiap paket punya Pilih paket ini.", hide: ["f1"], show: ["vPkg", "p2"], dur: 2.8 },
       { caption: "Pilih paket ini: form mencatat Paket Basic, desain Dasar.", at: [195, LPY.pkg1 + 244 - PKG_Y], click: true, press: "p2", show: ["f2"], dur: 3.8 }
+    ]
+  },
+
+  "jualan-landing-demo": {
+    title: "Demo desain di Landing page dan tautannya",
+    world: { w: 390, h: 900 },
+    base: [urlBar(ADDR), inBrowser(scr(KAT, LAND, F0.svg))],
+    els: {
+      demo: { svg: inBrowser(demoView), enter: "pop", origin: [LIHAT_DEMO[0], LIHAT_DEMO[1] + 56] },
+      pick: { svg: inBrowser(demoPick), enter: "pop", origin: [LIHAT_DEMO[0], LIHAT_DEMO[1] + 56] },
+      url: { svg: urlBar(`${ADDR}?demo=dasar`), enter: "fade" },
+      urlHl: { svg: ring(12, 8, 366, 40, { r: 22 }), enter: "fade", delay: 0.3 },
+      xHl: { svg: ring(DEMO_X[0] - 22, DEMO_X[1] + 56 - 22, 44, 44, { r: 24 }), enter: "fade", delay: 0.3 },
+      f1: { svg: urlBar(ADDR) + inBrowser(scr(FORM_Y, LAND, F1.svg)), enter: "fade", delay: 0.2 }
+    },
+    steps: [
+      { caption: "Di Pilih desain undangan, klien menekan Lihat demo.", at: [LIHAT_DEMO[0], LIHAT_DEMO[1] + 56], click: true, show: ["demo", "pick", "url"], dur: 3.4 },
+      { caption: "Undangan contoh desain itu terbuka satu layar penuh.", dur: 2.8 },
+      { caption: "Alamatnya mendapat ?demo=dasar. Bagikan tautan ini ke klien.", show: ["urlHl"], dur: 3.6 },
+      { caption: "Tombol silang, Esc, atau tombol kembali menutup demo.", hide: ["urlHl"], show: ["xHl"], dur: 3.4 },
+      { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Dasar.", at: [DEMO_PICK[0], DEMO_PICK[1] + 56], click: true, press: "pick",
+        hide: ["demo", "pick", "url", "xHl"], show: ["f1"], dur: 3.8 }
+    ]
+  },
+
+  "jualan-gaya-katalog": {
+    title: "Lima Gaya katalog di Landing page",
+    world: PHONE,
+    base: [body(catHead)],
+    els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: body(rect(0, 160, 390, 684, { fill: LP.paper }), svg), enter: "fade" }])),
+    steps: [
+      { caption: "Grid (bawaan): dua desain sejajar, Lihat demo dan Pilih di bawahnya.", show: ["grid"], dur: 3.4 },
+      { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], dur: 3.2 },
+      { caption: "Kartu besar: satu kartu selebar layar, tombol Pilih berwarna.", hide: ["daftar"], show: ["kartu"], dur: 3.2 },
+      { caption: "Geser: satu baris desain yang digeser ke samping.", hide: ["kartu"], show: ["geser"], dur: 3.2 },
+      { caption: "Mozaik: kolase gambar. Ketuk gambar untuk membuka demo.", hide: ["geser"], show: ["mozaik"], dur: 3.4 }
     ]
   },
 
