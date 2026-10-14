@@ -2,7 +2,7 @@
 // every scene. Owner: 08-bantuan. Layout follows the DOM flow (padding 16, margins from styles.js/base.css); sizes from
 // /tmp/ref/editor-bantuan.png + editor-metrics.json.
 import { C, rect, text, line, circle, para, group, clipped, iconX, tw, wrap } from "../lib.mjs";
-import { nkBtn, nkBadge, nkNote, nkH3 } from "./kit.mjs";
+import { nkBtn, nkBadge, nkBadgeBox, nkNote, nkH3 } from "./kit.mjs";
 
 // Check rows in help.jsx order.
 const BASE_CHECKS = ["Aplikasi Scalev (Nuxt/Vue)", "Komponen halaman studio", "HTML Mode aktif", "Editor kode (CodeMirror)", "Strip tab sidebar", "Area panel sidebar",
@@ -11,8 +11,8 @@ export const CHECKS = [...BASE_CHECKS, "Hanya NikahKit yang aktif", "Versi edito
   "Penyimpanan ucapan dan RSVP", "Izin domain di tab Security", "Penulisan ke editor"];
 const DIRECTIVE = { img_src: "Gambar", script_src: "Skrip", frame_src: "Bingkai (iframe)" };
 const STATUS = { exists: ["Sudah diizinkan", false], added: ["Ditambahkan otomatis", false], failed: ["Perlu ditambah manual", true] };
-// The status badge is kit nkBadge (width tw + 12), right-aligned 10 px inside the row.
-const badgeW = (l) => tw(l, 10, 500) + 12;
+// The status badge is kit nkBadge, right-aligned 10 px inside the row.
+const badgeW = (l) => nkBadgeBox(0, 0, l)[2];
 const cspBadge = (xr, y, st) => { const [l, todo] = STATUS[st]; return nkBadge(xr, y, l, { end: true, ...(todo ? { fill: C.warnSoft, fg: C.warnStrong } : {}) }); };
 // One .nk-csp row: grid 1fr auto (origin + purpose left, badge centred right), padding 8px 10px, 16px lines.
 const cspLi = (r, y) => {

@@ -68,13 +68,16 @@ export const para = (x, y, lines, o = {}) => `<text${attrs({ x, y, "font-size": 
 // Box helpers for [x, y, w, h]: its centre, and the box grown by d on every side.
 export const mid = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
 export const grow = (b, d) => [b[0] - d, b[1] - d, b[2] + 2 * d, b[3] + 2 * d];
-// Approximate text width, a flat average per character (on median 7% wider than the text on Apple, 21% on Android):
-// the measure for text that fills a column (wrap(), so a line keeps inside its column) and for layouts built on it.
-// A box that hugs its own label with padding (badge, pill) and the skeleton bars use textWidth(), the glyph widths.
+// Approximate text width, a flat average per character: on median 5-8% wider than a Mac draws the text, though one
+// short label can come out up to 20% narrower. The measure for text that fills a column: every line wrap() makes in
+// the guide keeps inside its column on a Mac (checked 14 Okt 2026), and older layouts are built on it. A box that hugs
+// its own label (badge, pill) and the skeleton bars use textWidth().
 export const tw = (s, size = 14, weight = 400) => Math.round(String(s).length * size * (weight >= 600 ? 0.57 : weight >= 500 ? 0.55 : 0.53));
 // Glyph advances (per 100 px) of the SVG font stack as Chrome draws it on macOS, for weights 400/500/600/700
-// (measured 14 Okt 2026). Their sums land between Roboto (Android) and SF Text (Apple, small sizes), so a skeleton
-// bar ends where the text would end on Android and a little before it on Apple: never past its box.
+// (measured 14 Okt 2026). At UI sizes macOS switches to SF's text design, which runs wider (OPSZ: median ratio over
+// the guide's 1851 texts, measured the same day, p05-p95 within 3% of it). Other systems draw the stack narrower
+// (Roboto on Android about 10% at 14 px), so textWidth() is the width a Mac draws, the widest: a box sized from it
+// holds its text everywhere, and a skeleton bar ends where the text ends on a Mac.
 const GLYPHS = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~…·•🤍←›×–▸©⌘»→⇣↻“”±↑↓ابحرسلمنهي";
 const ADV = Object.fromEntries(Object.entries({
   400: "21 27 40 60 60 81 67 25 32 32 40 60 21 43 21 28 61 44 57 59 60 59 62 55 60 62 21 21 60 60 60 49 87 64 60 69 68 55 53 71 70 22 50 60 52 83 70 73 58 73 60 59 58 70 63 92 63 61 62 32 28 32 60 53 50 50 55 50 55 51 30 55 54 21 21 49 20 80 53 53 55 55 31 47 30 53 48 72 47 49 47 32 22 32 60 59 21 43 100 91 40 60 53 43 85 92 62 91 87 82 36 36 60 78 78 23 89 62 34 108 62 51 61 43 72",
@@ -83,13 +86,20 @@ const ADV = Object.fromEntries(Object.entries({
   700: "20 32 46 64 65 89 70 27 38 38 45 65 24 44 24 30 66 48 60 63 65 63 65 57 65 65 24 24 65 65 65 53 89 69 64 71 70 57 55 73 73 26 56 65 54 86 71 75 62 75 64 63 60 71 68 97 69 67 63 38 30 38 65 58 50 55 60 55 60 56 36 59 58 24 24 54 24 86 58 57 59 59 36 51 36 58 53 79 53 54 51 38 24 38 65 68 24 44 100 94 42 65 58 44 85 94 66 94 87 84 43 43 65 82 82 26 94 69 38 121 68 58 69 50 80"
 }).map(([w, s]) => [w, s.split(" ").map(Number)]));
 const GLYPH = new Map([...GLYPHS].map((c, i) => [c, i]));
-// Width a line of text takes: glyph advances (combining marks take none, unlisted glyphs 0.6 em, monospace 0.6 em
-// each) plus letter-spacing between glyphs.
+const OPSZ = [[10, 1.143], [12, 1.113], [14, 1.091], [16, 1.071], [18, 1.051], [20, 1.037], [24, 1.023], [36, 1.019], [48, 1.009]];
+const opsz = (size) => {
+  const i = OPSZ.findIndex(([s]) => s >= size);
+  if (i <= 0) return OPSZ.at(i)[1]; // below 10 px: as 10 px; above 48 px: as 48 px
+  const [[s0, r0], [s1, r1]] = [OPSZ[i - 1], OPSZ[i]];
+  return r0 + ((r1 - r0) * (size - s0)) / (s1 - s0);
+};
+// Width a line of text takes: glyph advances at its size (combining marks take none, unlisted glyphs 0.6 em,
+// monospace 0.6 em each) plus letter-spacing between glyphs.
 export const textWidth = (s, size = 14, weight = 400, { mono = false, spacing = 0 } = {}) => {
   const adv = ADV[weight >= 650 ? 700 : weight >= 550 ? 600 : weight >= 450 ? 500 : 400];
   const glyphs = [...String(s).replace(/\u00a0/g, " ")].filter((c) => !/\p{Mn}/u.test(c));
   const em = glyphs.reduce((t, c) => t + (mono ? 60 : adv[GLYPH.get(c)] ?? 60), 0) / 100;
-  return +(em * size + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
+  return +(em * size * (mono ? 1 : opsz(size)) + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
 };
 // Greedy word wrap to a width, using tw(); a word longer than the width (a URL) is split where the line is full.
 export function wrap(s, width, size = 14, weight = 400) {
