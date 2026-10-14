@@ -1,7 +1,7 @@
 // Drawings of the product UIs the scenes compose: NikahKit panel widgets, the Chrome window, the Scalev editor and
 // dashboard shell, and the guide's stage pieces (dim, phone page). lib.mjs is the compiler and its primitives;
 // every drawing of a real screen lives under ui/, so scenes never import from each other.
-import { C, PHONE, WORLD, rect, text, line, circle, para, tw, textWidth, clipped, shadow, icon, iconX } from "../lib.mjs";
+import { C, PHONE, WORLD, rect, text, line, circle, group, para, tw, textWidth, clipped, shadow, icon, iconX } from "../lib.mjs";
 
 // ---- NikahKit panel widgets (nikahkit/src/ui/base.css) --------------------------------------------------------------
 // Button: variant "primary" (action blue), "ghost" (white, blue text+border), "quiet" (white, grey line), "danger".
@@ -207,4 +207,11 @@ export const phoneDesk = (content, o = {}) => rect(0, 0, WORLD.w, WORLD.h, { fil
   [0, 1, 2].map((k) => rect(48, 96 + k * 260, 400, 228, { r: 12, fill: C.white }) + rect(992, 96 + k * 260, 400, 228, { r: 12, fill: C.white })).join("") +
   shadow(PHONE.x, PHONE.y, PHONE.w, PHONE.h, 12, 3) + rect(PHONE.x, PHONE.y, PHONE.w, PHONE.h, { r: 12, fill: o.screen ?? C.white }) +
   clipped(PHONE.x, PHONE.y, PHONE.w, PHONE.h, content);
+// Markup drawn in the phone's own coordinates (0..390 x 0..844), placed on the phone screen and clipped to it.
+export const onPhone = (...s) => clipped(PHONE.x, PHONE.y, PHONE.w, PHONE.h, group({ transform: `translate(${PHONE.x} ${PHONE.y})` }, ...s));
+// Chrome's download bubble under the toolbar (generic, not measured): a 360 x 76 card at (x, y) with a file glyph, or
+// o.thumb(x, y, 36) for an image, the file name and a status line. Box for marks: [x, y, 360, 76].
+export const crDownload = (x, y, name, o = {}) => shadow(x, y, 360, 76, 10, 2) + rect(x, y, 360, 76, { r: 10, fill: C.white }) +
+  (o.thumb ? clipped(x + 16, y + 20, 36, 36, o.thumb(x + 16, y + 20, 36)) : rect(x + 20, y + 21, 28, 34, { r: 4, fill: "#e8eaed", stroke: "#c4c7c5" })) +
+  text(x + 64, y + 33, name, { size: 14, fill: C.crText }) + text(x + 64, y + 55, o.sub ?? "Selesai", { size: 12, fill: C.crSub });
 
