@@ -385,38 +385,38 @@ export const scenes = {
       PV.dialog({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
     ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
   ]),
-  "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 7 sampai 10.", [
-    ["7. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
+  "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 1 sampai 4.", [
+    ["1. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
       pv(lpScreen(), 276, 220, LP_ALL(0), { lens: [281, 256, 500, 148] })],
-    ["8. Buat halaman undangan dengan HTML Mode", "Buat Landing Page HTML Mode, isi slug di Settings, lalu Simpan.",
+    ["2. Buat halaman undangan dengan HTML Mode", "Buat Landing Page HTML Mode, isi slug di Settings, lalu Simpan.",
       pv(edLeft(settingsP(), { tab: "Settings", top: 44 }), -184, 44, SLUG_FIELD(0), { lens: SLUG_LENS.src })],
-    ["9. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
+    ["3. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
       pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + pvCover("Rani & Dimas"), 672, 0, SAVE_PAIR, { lens: grow(SAVE_PAIR, 5) })],
-    ["10. Atur alamat dan izin domain", "Atur alamat di Settings dan izin domain di tab Security.",
+    ["4. Atur alamat dan izin domain", "Atur alamat di Settings dan izin domain di tab Security.",
       pv(edLeft(securityPanel(0, { at: "connect" }), { tab: "Security", rail: "", top: 44 }), -184, 44, [107, 57, 169 + tw("Settings", 12, 500) + 2 - 107, 18], { lens: [0, 44, 340, 48] })]
   ]),
-  "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 11 sampai 15.", [
-    ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(tplPanel()), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
-    ["12. Pilih template", "Pilih template di panel Template.", PV.template()],
-    ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(kontenP(), { rail: "Konten" }), -184, 92, KONTEN_TOP3, { lens: grow(KONTEN_TOP3, 8), zoom: 1.5 })],
-    ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(tplPanel()), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
-    ["15. Simpan & Terbitkan", "Tekan Simpan & Terbitkan supaya tamu melihat versi terbaru.",
+  "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 1 sampai 5.", [
+    ["1. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(tplPanel()), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
+    ["2. Pilih template", "Pilih template di panel Template.", PV.template()],
+    ["3. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(kontenP(), { rail: "Konten" }), -184, 92, KONTEN_TOP3, { lens: grow(KONTEN_TOP3, 8), zoom: 1.5 })],
+    ["4. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(tplPanel()), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
+    ["5. Simpan & Terbitkan", "Tekan Simpan & Terbitkan supaya tamu melihat versi terbaru.",
       pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + pvCover("Rani & Dimas"), 672, 0, ED.terbitkanBox, { lens: grow(SAVE_PAIR, 5) })]
   ]),
-  "mulai-alur-serahkan": checklist("Bagian 4: bagikan dan serahkan", "Bagian 4: Bagikan dan serahkan", "Langkah 16 sampai 20.", [
-    ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg), -184, 92, shareBox("lihat", NO_NOTE), { lens: [8, 166, 384, 204] })],
-    ["17. Pasang Dashboard pasangan milikmu (sekali saja)", "Template > Marketing: pasang Dashboard pasangan, sekali saja.",
+  "mulai-alur-serahkan": checklist("Bagian 4: bagikan dan serahkan", "Bagian 4: Bagikan dan serahkan", "Langkah 1 sampai 5.", [
+    ["1. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg), -184, 92, shareBox("lihat", NO_NOTE), { lens: [8, 166, 384, 204] })],
+    ["2. Pasang Dashboard pasangan milikmu (sekali saja)", "Template > Marketing: pasang Dashboard pasangan, sekali saja.",
       pv(edLeft(marketing()), -184, 92, [...cardXY("dashboard"), 134, 167], { lens: [cardXY("dashboard")[0] - 8, MKY - 8, 150, 245] })],
-    ["18. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 8, 408, 104] })],
-    ["19. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 58, 408, 148] })],
-    ["20. Siapkan hari-H (opsional)", "Hari-H: tamu di-check-in dari Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })]
+    ["3. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 8, 408, 104] })],
+    ["4. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 58, 408, 148] })],
+    ["5. Siapkan hari-H (opsional)", "Hari-H: tamu di-check-in dari Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })]
   ]),
-  "mulai-alur-jualan": checklist("Bagian 5: jualan", "Bagian 5: Jualan", "Langkah 21 sampai 24.", [
-    ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
-    ["22. Pasang Landing page jualan", "Pasang salah satu Landing page (Klasik, Etalase, Langit) di Marketing.", pv(edLeft(marketing()), -184, 92, [...cardXY("landing"), 134, 167], { lens: [cardXY("landing")[0] - 8, MKY - 8, 150, 245] })],
-    ["23. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
+  "mulai-alur-jualan": checklist("Bagian 5: jualan", "Bagian 5: Jualan", "Langkah 1 sampai 4.", [
+    ["1. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
+    ["2. Pasang Landing page jualan", "Pasang salah satu Landing page (Klasik, Etalase, Langit) di Marketing.", pv(edLeft(marketing()), -184, 92, [...cardXY("landing"), 134, 167], { lens: [cardXY("landing")[0] - 8, MKY - 8, 150, 245] })],
+    ["3. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
       pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, SALIN_BOX, { lens: [8, 369, 382, 217] })],
-    ["24. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
+    ["4. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
       pv(clipped(0, 92, 399, 808, ordersDlg + pasteOpen(true)), -184, 92, nkBtnBox(28, 488, "Isi undangan"), { lens: [20, 373, 358, 160] })]
   ]),
 
