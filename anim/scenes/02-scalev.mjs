@@ -10,7 +10,7 @@
 // Edit Account, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
 import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw, mid } from "../lib.mjs";
 import {
-  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan
+  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan, crDownload
 } from "../ui/kit.mjs";
 import {
   SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
@@ -20,7 +20,7 @@ import {
 } from "../ui/scalev.mjs";
 import { helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { shareTop, shareBtns, accessHead, coupleAll, shareAll, shareBox as shareBtnBox, ACC_Y, COUPLE_Y, NO_NOTE } from "../ui/bagikan.mjs";
-import { ACCOUNT, kList, fillMempelai, panelBody, seg, library } from "../ui/editor-panels.mjs";
+import { ACCOUNT, kontenPanel, panelBody, seg, library } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvCover, MAROON, CREAM, SERIF } from "../ui/invitation.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
@@ -47,8 +47,7 @@ const SC = ED.screen;
 // The invitation cover in the preview screen (../ui/invitation.mjs), with its photo gradients.
 const COVER = PHOTO_DEFS + pvCover("Rani & Dimas");
 // Konten panel (../ui/editor-panels.mjs) with Mempelai open, over the editor's own rail (which carries the save status).
-const editorKonten = (o = {}) => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten", ...o }) + rect(72, 92, 327, 808, { fill: C.white }) +
-  nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ open: "Mempelai", fill: fillMempelai("Rani") }).svg + COVER;
+const editorKonten = () => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten" }) + kontenPanel() + COVER;
 
 // ---- 1. Landing Pages → HTML Mode → NikahKit → Simpan --------------------------------------------------------------
 // Type chooser (not captured): modal with a generic tile and the HTML Mode tile.
@@ -278,9 +277,8 @@ const cvDl = shareBox(220) + iconX("arrow-left", SHP.x + 28, SHP.y + 32, 18, CV.
   text(SHP.x + 34, SHP.y + 115, "PNG", { size: 14, fill: CV.ink }) + icon("chevron-down", SHP.x + SHP.w - 40, SHP.y + 109, 16, CV.ink) +
   rect(SHP.x + 20, SHP.y + 152, SHP.w - 40, 44, { r: 8, fill: CV.p }) + text(SHP.x + SHP.w / 2, SHP.y + 179, "Download", { size: 15, weight: 600, fill: C.white, anchor: "middle" });
 const DL_BTN = [SHP.x + 20, SHP.y + 152, SHP.w - 40, 44];
-const DLB = { x: 1012, y: 89 };
-const dlBubble = shadow(DLB.x, DLB.y, 400, 96, 10, 2) + rect(DLB.x, DLB.y, 400, 96, { r: 10, fill: C.white }) + clipped(DLB.x + 22, DLB.y + 20, 56, 56, thumb(DLB.x + 22, DLB.y + 20, 56)) +
-  text(DLB.x + 94, DLB.y + 42, "rani-dimas.png", { size: 14, fill: C.crText }) + text(DLB.x + 94, DLB.y + 64, "Selesai · siap dipasang di Scalev", { size: 13, fill: C.crSub });
+const DLB = { x: 1052, y: 89 };
+const dlBubble = crDownload(DLB.x, DLB.y, "rani-dimas.png", { sub: "Selesai · siap dipasang di Scalev", thumb });
 
 // ---- 9. Tutorial resmi: this guide on docs.page and tutorial.scalev.com, both measured at 1440x900 (14 Okt 2026) --------
 const GUIDE_TAB = { title: "Tutorial resmi Scalev yang berg…", w: 250 }, TUT_TAB = { title: "A – Z Custom Domain di Scal…", w: 250, fav: favScalev };
@@ -490,7 +488,7 @@ export const scenes = {
 
   "scalev-simpan-terbitkan": {
     title: "Simpan dan Simpan & Terbitkan di editor Scalev",
-    base: [editorKonten({ saving: "Tersimpan" })],
+    base: [editorKonten()],
     els: { shareA: { svg: shareDialog(true), enter: "fade" } },
     steps: [
       { caption: "Ubah undangan di tab NikahKit. Tunggu kaki rel: Tersimpan.", focus: [0, 851, 72, 49], dur: 3.4, mark: { box: [0, 851, 71, 49], r: 0 }, lens: { src: [0, 792, 72, 108] } },
@@ -719,8 +717,8 @@ export const scenes = {
       { caption: "Unduh: klik Share, lalu Download.", focus: [SHARE_CV, [SHP.x - 6, 141, SHP.w + 12, 222]], at: [SHARE_CV[0] + 53, SHARE_CV[1] + 17], click: true, show: ["share"], hide: ["sel"],
         mark: { box: SHARE_CV, r: 8 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
       { caption: "Pilih PNG atau JPG.", at: [DL_ROW[0] + 100, DL_ROW[1] + 26], click: true, show: ["dl"], mark: { box: DL_ROW, r: 6 }, lens: { src: [SHP.x - 6, 142, SHP.w + 12, 220], at: [140, 150] } },
-      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", focus: [[0, CT, 1440, 56], [DLB.x - 8, DLB.y, 416, 104]], at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6,
-        mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x + 2, DLB.y + 2, 396, 92], at: [140, 150] } }
+      { caption: "Klik Download. Gambar persegi tersimpan di komputermu.", focus: [[0, CT, 1440, 56], [DLB.x - 8, DLB.y, 376, 84]], at: [DL_BTN[0] + 170, DL_BTN[1] + 22], click: true, show: ["done"], hide: ["share", "dl"], dur: 3.6,
+        mark: { box: DL_BTN, r: 8 }, lens: { src: [DLB.x + 2, DLB.y + 2, 356, 72], at: [140, 150] } }
     ]
   },
 
