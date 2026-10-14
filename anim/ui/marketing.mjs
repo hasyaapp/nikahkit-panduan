@@ -3,8 +3,8 @@
 // /tmp/ref/editor-marketing.png (Profil merek box, cards); the open BrandForm follows panels-style.jsx and base.css at
 // the panel metrics (fields 253 wide at x 101, package item 233 wide at x 111). The Template | Marketing switch above
 // it is editor-panels seg("marketing").
-import { C, icon, iconX, rect, text, para, line, circle, group, shadow, tw } from "../lib.mjs";
-import { nkBtn, nkInput, nkLabel } from "./kit.mjs";
+import { C, icon, iconX, rect, text, para, line, circle, group, shadow } from "../lib.mjs";
+import { nkBtn, nkInput, nkLabel, nkBadgeBox } from "./kit.mjs";
 import { badgeAt } from "./pesanan.mjs";
 
 // The switch's click points and the Marketing half's box (for a mark), as editor-panels seg() draws it.
@@ -34,7 +34,7 @@ function mkCard(x, y, id, on) {
 export const MKY = 281, CARD_X = { dashboard: 88, landing: 234 };
 export const mkCards = (y, on) => mkCard(CARD_X.dashboard, y, "dashboard", on === "dashboard") + mkCard(CARD_X.landing, y, "landing", on === "landing");
 // The Dipakai badge box on card id (its name wraps to two lines), for a mark.
-export const dipakaiBox = (id, y = MKY) => { const w = tw("Dipakai", 10, 500) + 12; return [CARD_X[id] + 134 - w, y + 185, w, 18]; };
+export const dipakaiBox = (id, y = MKY) => nkBadgeBox(CARD_X[id] + 134, y + 185, "Dipakai", { end: true });
 
 // Profil merek open (BrandForm) from BOX, unscrolled; v: { name, wa, pkg, pkgName, price, style, ready }. The box is
 // 1030 high; GAYA_Y and SIMPAN_Y are the Gaya katalog select and the Simpan profil button tops.

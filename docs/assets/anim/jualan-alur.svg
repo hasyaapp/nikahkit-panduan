@@ -35,7 +35,7 @@
 <text x="720" y="52" font-size="34" font-weight="700" fill="#1f1f1f" text-anchor="middle">Alur kerja vendor dengan NikahKit</text></g><clipPath id="stage"><rect x="0" y="0" width="960" height="600"/></clipPath></defs>
 <g clip-path="url(#stage)"><g id="world" transform="scale(0.6667)">
 <rect x="0" y="0" width="1440" height="900" rx="0" fill="#f0f0f0"/><rect x="0" y="0" width="1440" height="900" rx="0" fill="#f0f0f0"/>
-<rect x="457.4" y="30.9" width="525.3" height="17" rx="8.5" fill="#dde2e8"/>
+<rect x="452.2" y="30.9" width="535.6" height="17" rx="8.5" fill="#dde2e8"/>
 <use href="#ed-c0"/>
 <use href="#ed-a0"/>
 <use href="#ed-c1"/>

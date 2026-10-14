@@ -7,9 +7,9 @@
 // (/tmp/ref/dash-gate-hp.png), the WhatsApp message bubble (generic), and the member Landing page and its form
 // (server/pages/src/landing/index.html + server/pages/shared/order-form.js, measured in Chrome at 390 px). The flow
 // diagram and the checklist are guide graphics, not product screens.
-import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, clipShape, shadow, skeleton, tw } from "../lib.mjs";
-import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkHint, nkToast, nkToastBoxes, phoneDesk } from "../ui/kit.mjs";
-import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_W, HAPUS_W, HAPUS_X, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, clipShape, shadow, skeleton, tw, mid } from "../lib.mjs";
+import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk } from "../ui/kit.mjs";
+import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, MK, MKY, CARD_X, mkCards, dipakaiBox, GAYA_Y, SIMPAN_Y, brandOpen, MENU_H, menuItemY, styleMenu } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel } from "../ui/editor-panels.mjs";
@@ -541,16 +541,16 @@ export const scenes = {
       mk: { svg: panelBody(panelBg(), seg("marketing"), brandOpen()), enter: "fade" },
       nameFocus: { svg: nkInput(101, 300, 253, "", { focus: true }), enter: "fade" },
       nameBlur: { svg: nkInput(101, 300, 253, ""), enter: "fade" },
-      nameV: text(111, 323, "Rina WO", { size: 14 }),
+      nameV: text(112, 323, "Rina WO", { size: 14 }),
       waFocus: { svg: nkInput(101, 368, 253, "", { focus: true }), enter: "fade" },
-      waV: text(111, 391, "0812 3456 7890", { size: 14 }),
+      waV: text(112, 391, "0812 3456 7890", { size: 14 }),
       body2: { svg: rect(72, 153, 327, 1200, { fill: C.white }) + seg("marketing") + brandOpen({ name: "Rina WO", wa: "0812 3456 7890" }), enter: "fade" },
       pkFocus: { svg: nkInput(111, 668 - SCROLL, 233, "", { focus: true }), enter: "fade" },
       pkBlur: { svg: nkInput(111, 668 - SCROLL, 233, ""), enter: "fade" },
-      pkName: text(121, 691 - SCROLL, "Basic", { size: 14 }),
+      pkName: text(122, 691 - SCROLL, "Basic", { size: 14 }),
       prFocus: { svg: nkInput(111, 736 - SCROLL, 233, "", { focus: true }), enter: "fade" },
-      pkPrice: text(121, 759 - SCROLL, "150.000", { size: 14 }),
-      prBlur: { svg: nkInput(111, 736 - SCROLL, 233, "") + text(121, 759 - SCROLL, "150.000", { size: 14 }), enter: "fade" },
+      pkPrice: text(122, 759 - SCROLL, "150.000", { size: 14 }),
+      prBlur: { svg: nkInput(111, 736 - SCROLL, 233, "150.000"), enter: "fade" },
       selFocus: { svg: nkInput(101, GAYA_Y - SCROLL, 253, "Grid", { select: true, focus: true }), enter: "fade" },
       menu: { svg: styleMenu(GAYA_Y - SCROLL), enter: "fade" },
       selV: { svg: nkInput(101, GAYA_Y - SCROLL, 253, "Kartu besar", { select: true, focus: true }), enter: "fade" },
@@ -562,16 +562,16 @@ export const scenes = {
       { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["rail", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 220, 64] }, dur: 3 },
       { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING,
         lens: { src: [80, 161, 295, 54] }, dur: 3.4 },
-      { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: [228, 318], click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [111, 303, 70, 30] }],
+      { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: [228, 318], click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [112, 303, 70, 30] }],
         mark: M(101, 300, 253, 36), lens: { src: [92, 276, 282, 68] }, dur: 3.2 },
       { caption: "Klik Nomor WhatsApp, lalu ketik nomornya, misalnya 0812 3456 7890.", at: [228, 386], click: true, show: ["nameBlur", "waFocus", "waV"],
-        type: [{ id: "waV", n: 14, box: [111, 371, 110, 30] }], mark: M(101, 368, 253, 36), lens: { src: [92, 344, 282, 100] }, dur: 3.4 },
+        type: [{ id: "waV", n: 14, box: [112, 371, 110, 30] }], mark: M(101, 368, 253, 36), lens: { src: [92, 344, 282, 100] }, dur: 3.4 },
       { caption: "Logo (opsional): tempel alamat gambar https, atau kosongkan.", mark: M(101, 452, 253, 94, 6), lens: { src: [92, 446, 282, 106] }, dur: 3 },
       { caption: "Gulir ke paket pertama, lalu isi Nama paket.", at: [228, 686 - SCROLL], click: true, show: ["body2", "cover", "pkFocus", "pkName"],
-        hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [121, 671 - SCROLL, 36, 30] }],
+        hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [122, 671 - SCROLL, 36, 30] }],
         mark: M(111, 668 - SCROLL, 233, 36), lens: { src: [96, 196, 268, 92] }, dur: 3.6 },
       { caption: "Isi Harga (Rp) dan Isi paket. Tambah paket untuk paket kedua dan ketiga.", at: [228, 754 - SCROLL], click: true, show: ["pkBlur", "prFocus", "pkPrice"],
-        type: [{ id: "pkPrice", n: 7, box: [121, 739 - SCROLL, 50, 30] }], mark: [M(111, 736 - SCROLL, 233, 36), M(101, 1005 - SCROLL, 253, 36)],
+        type: [{ id: "pkPrice", n: 7, box: [122, 739 - SCROLL, 50, 30] }], mark: [M(111, 736 - SCROLL, 233, 36), M(101, 1005 - SCROLL, 253, 36)],
         lens: { src: [96, 286, 268, 74] }, dur: 3.6 },
       { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, Mozaik, atau Etalase.", at: [228, GAYA_Y - SCROLL + 18], click: true, hide: ["prFocus"], show: ["prBlur", "selFocus", "menu"],
         mark: M(101, GAYA_Y - SCROLL, 253, 36), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3.4 },
@@ -758,7 +758,7 @@ export const scenes = {
       inbox: { svg: ordersDlg, enter: "fade" },
       link: { svg: rect(16, 372, 366, 260, { fill: C.white }) + linkOpen, enter: "fade" },
       salin: { svg: salinBtn, enter: "fade" },
-      ok: { svg: nkHint(28 + SALIN_W + 8, 557, "Tersalin."), enter: "fade", delay: 0.15 }
+      ok: { svg: nkHint(SALIN_BOX[0] + SALIN_BOX[2] + 8, 557, "Tersalin."), enter: "fade", delay: 0.15 }
     },
     steps: [
       tabStep("Buka panel NikahKit di halaman undangan.", 2.6),
@@ -766,8 +766,8 @@ export const scenes = {
         lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
       { caption: "Klik Link form klien (opsional). Alamat link form tampil.", at: [200, 402], click: true, show: ["link", "salin"], mark: M(16, 377, 366, 50),
         lens: { src: [12, 372, 374, 212] }, dur: 3.4 },
-      { caption: "Klik Salin link form: Tersalin. Tempel di chat WhatsApp klien.", at: [28 + SALIN_W / 2, 552], click: true, press: "salin", show: ["ok"],
-        mark: M(28, 534, SALIN_W, 36), lens: { src: [12, 472, 374, 108] }, dur: 3.6 }
+      { caption: "Klik Salin link form: Tersalin. Tempel di chat WhatsApp klien.", at: mid(SALIN_BOX), click: true, press: "salin", show: ["ok"],
+        mark: M(...SALIN_BOX), lens: { src: [12, 472, 374, 108] }, dur: 3.6 }
     ]
   },
 
@@ -784,8 +784,8 @@ export const scenes = {
       tabStep("Buka halaman undangan klien di editor, tab NikahKit.", 2.6),
       { caption: "Angka merah di ikon kotak masuk: ada pesanan yang belum diisi.", focus: F.left, mark: INBOX, lens: { src: [150, 96, 240, 52] }, dur: 3 },
       { caption: "Klik ikonnya. Layar Pesanan masuk terbuka, terbaru di atas.", at: ED.inbox, click: true, show: ["inbox"], mark: INBOX, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
-      { caption: "Baru: belum dipakai. Sudah diisi: sudah pernah kamu klik.", mark: [M(331 - tw("Baru", 10, 500) - 12, ROW1 + 19, tw("Baru", 10, 500) + 12, 18, 9),
-        M(331 - tw("Sudah diisi", 10, 500) - 12, ROW2 + 19, tw("Sudah diisi", 10, 500) + 12, 18, 9)], lens: { src: [12, 186, 374, 120] }, dur: 3.2 },
+      { caption: "Baru: belum dipakai. Sudah diisi: sudah pernah kamu klik.", mark: [M(...nkBadgeBox(331, ROW1 + 19, "Baru", { end: true }), 9),
+        M(...nkBadgeBox(331, ROW2 + 19, "Sudah diisi", { end: true }), 9)], lens: { src: [12, 186, 374, 120] }, dur: 3.2 },
       { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, 182, 374, 70] }, dur: 3 },
       { caption: "Semua kolom terisi sesuai paketnya. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
         mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
@@ -828,8 +828,8 @@ export const scenes = {
     steps: [
       { caption: "Klik ikon tempat sampah di baris pesanan. Muncul Hapus? merah.", at: [357, ROW2 + 28], click: true, show: ["row", "hapus"], focus: F.left,
         mark: M(345, ROW2 + 16, 24, 24), lens: { src: [12, 182, 374, 134] }, dur: 3.4 },
-      { caption: "Klik Hapus? untuk memastikan. Pesanan hilang dari daftar.", at: [HAPUS_X + HAPUS_W / 2, ROW2 + 28], click: true, press: "hapus", hide: ["row", "hapus"],
-        show: ["gone"], mark: M(HAPUS_X, ROW2 + 10, HAPUS_W, 36), lens: { src: [12, 182, 374, 134] }, dur: 3.6 }
+      { caption: "Klik Hapus? untuk memastikan. Pesanan hilang dari daftar.", at: mid(HAPUS_BOX), click: true, press: "hapus", hide: ["row", "hapus"],
+        show: ["gone"], mark: M(...HAPUS_BOX), lens: { src: [12, 182, 374, 134] }, dur: 3.6 }
     ]
   },
 
