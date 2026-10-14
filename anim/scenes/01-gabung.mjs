@@ -570,10 +570,10 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka halaman di editor Scalev. Angka di alamat adalah ID undangan.", focus: [TOOLBAR], at: mid(idBox), mark: { box: idBox, r: 3 }, lens: { src: [130, 46, 330, 36] }, dur: 3.6 },
-        { caption: "Klik tab Settings. Di sini kamu mengisi slug, bagian akhir alamat.", focus: [LEFT], at: [191, CT + 66], click: true, show: ["settings"],
-          mark: [tabBox("Settings", 169, false), SLUG_FIELD(CT)], lens: { src: [0, CT + 44, 400, 290], at: [296, 70] }, dur: 3.8 },
-        { caption: "Klik tab NikahKit. Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", at: TAB_NK, click: true, hide: ["settings"], show: ["nk"],
-          mark: [[0, CT + 104, 72, 332], TAB_NK_BOX], lens: { src: [0, CT + 100, 150, 340], at: [296, 70] }, dur: 3.8 },
+        { caption: "Klik tab Settings di editor Scalev.", focus: [LEFT], at: [191, CT + 66], click: true, show: ["settings"], mark: tabBox("Settings", 169, false), lens: { src: [0, CT + 44, 330, 48] } },
+        { caption: "Kolom Slug URL berisi slug, bagian akhir alamat: rani-dimas.", mark: SLUG_FIELD(CT), lens: { src: [16, CT + 240, 368, 90] }, dur: 3.6 },
+        { caption: "Klik tab NikahKit.", at: TAB_NK, click: true, hide: ["settings"], show: ["nk"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 330, 48] }, dur: 3 },
+        { caption: "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", mark: [0, CT + 104, 72, 332], lens: { src: [0, CT + 100, 150, 340], at: [296, 70] }, dur: 3.6 },
         { caption: "Cocokkan istilah: alamat umum, lalu tautan pribadi berisi nama tamu.", focus: [CARD], show: ["terms"], dur: 4 },
         { caption: "PIN dashboard untuk pasangan, kode staff untuk penerima tamu.", show: ["keys"], dur: 3.8 }
       ]
@@ -710,7 +710,8 @@ export const scenes = {
         { caption: "Buka app.scalev.com. Editor sudah terbuka? Muat ulang dengan F5.", focus: [TOOLBAR], at: [330, 63], mark: { box: urlBox("app.scalev.com"), r: 3 }, lens: { src: [124, 44, 300, 40] }, dur: 3 },
         { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [LPROW, [256, CT, 1184, 420]], at: [lp[0], CT + lp[1]], click: true, show: ["list"], mark: LPROW, lens: { src: [0, CT + 190, 260, 90] } },
         { caption: "Klik halaman undangan yang memakai HTML Mode. Editor terbuka.", focus: [TOP], at: mid(LP_NAME(CT)), click: true, hide: ["dash", "list"], mark: LP_NAME(CT), note: PAGE, dur: 3.4 },
-        { caption: "Klik tab NikahKit: Masuk ke NikahKit. dan tombol Masuk dengan Google.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: [TAB_NK_BOX, g.at.google], lens: { src: [0, CT + 44, 400, 230] }, dur: 4 }
+        { caption: "Klik tab NikahKit di samping Settings.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
+        { caption: "Panel menampilkan Masuk ke NikahKit. dan tombol Masuk dengan Google.", mark: g.at.google, lens: { src: [0, CT + 160, 330, 120] }, dur: 3.6 }
       ]
     };
   })(),
