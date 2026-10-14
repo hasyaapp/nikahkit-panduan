@@ -34,7 +34,7 @@ assert.ok(sk.includes('fill="#eceff3"') && sk.includes('fill="#ffffff"') && sk.i
 
 // Focus: the skeleton base under one detailed layer per run of steps with the same focus.
 assert.ok(svg.includes('<clipPath id="fz0"><rect x="72" y="92" width="327" height="808"/></clipPath>'), "step 1-2 focus clip");
-assert.ok(/<g class="fz0" clip-path="url\(#fz0\)"><use href="#db"\/><\/g>/.test(svg) && /<g class="fz1"><use href="#db"\/><\/g>/.test(svg), "two focus layers, the second unclipped (all)");
+assert.ok(/<g class="fz0" clip-path="url\(#fz0\)"><use href="#db"\/>/.test(svg) && /<g class="fz1"><use href="#db"\/>/.test(svg), "two focus layers, the second unclipped (all)");
 assert.ok(svg.indexOf('fill="#dde2e8"') < svg.indexOf('class="fz0"'), "skeleton drawn under the detailed layers");
 
 // Visibility (class rules, so lens copies animate the same) and what reduced motion shows: the final state.
@@ -60,9 +60,10 @@ assert.ok(tip && +tip[1] === 264 && +tip[2] >= 96 && +tip[2] <= 124, "arrow tip 
 const l = compile(scene({ els: { later: "<rect/>" }, steps: [{ caption: "a", focus: [72, 92, 327, 200], show: ["later"], mark: [100, 120, 80, 30], lens: { src: [72, 92, 300, 120] } }] }));
 assert.ok(/scale\(1\.3333\) translate\(-72 -92\)"><g clip-path="url\(#ln0\)"><use href="#db"\/><use href="#ed-later"\/>/.test(l), "lens = detailed base + the step's elements at 2x");
 assert.equal((l.match(/<rect\/>/g) || []).length, 1, "each element is drawn once, whatever the number of lenses");
-// skel element: part of the screen, a skeleton everywhere and detailed inside the focus.
+// skel element: part of the screen, a skeleton everywhere; inside the focus the whole world is detailed and opaque
+// (base first), so the skeleton bars never show through the detailed text.
 const k = compile(scene({ els: { panel: { svg: text(100, 300, "Nama panggilan", { size: 14 }), skel: true } }, steps: [{ caption: "a", focus: [72, 92, 327, 808] }] }));
-assert.ok(/<g class="e-panel"><rect [^>]*fill="#dde2e8"\/><\/g><g class="fz0" clip-path="url\(#fz0\)"><use href="#ed-panel"\/><\/g>/.test(k), "skel element: bar outside, detail inside the focus");
+assert.ok(/<g class="e-panel"><rect [^>]*fill="#dde2e8"\/><\/g>/.test(k) && k.includes('<g class="fz0" clip-path="url(#fz0)"><use href="#db"/><use href="#ed-panel"/></g>'), "skel element: bar outside, opaque detail inside the focus");
 // Paint order is declaration order, skel or not: a skel screen declared later covers an earlier element.
 const po = compile(scene({ els: { pop: "<rect/>", page: { svg: "<circle/>", skel: true } }, steps: [{ caption: "a", focus: "all" }] }));
 assert.ok(po.indexOf('<use href="#ed-pop"/>') < po.indexOf('<g class="e-page">'), "later skel element paints above an earlier element");

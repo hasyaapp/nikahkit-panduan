@@ -416,8 +416,9 @@ export function compile(scene) {
     return { svg: `<rect class="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`, t: [e.caret.t0, e.caret.t1 + 0.5] };
   });
   // Every element is drawn once (in defs, with its animation class) and placed by <use>: its class rules animate each
-  // instance the same, so the screen, the focus zones and the lenses share one copy. An element with `skel: true` is
-  // part of the screen: skeleton outside the focus, detail inside it, like the base. Paint order = declaration order.
+  // instance the same, so the screen, the focus zones and the lenses share one copy. The world is drawn twice, in
+  // declaration order: as skeleton (base and `skel: true` elements greyed, other elements detailed), and fully detailed
+  // inside each focus zone, which is opaque, so no skeleton shows through detailed text.
   const ids = Object.keys(els);
   defs.push(...ids.map((id) => `<g id="ed-${id}" class="e-${id}">${els[id].svg}</g>`), `<g id="carets">${carets.map((c) => c.svg).join("")}</g>`);
   const during = (a, b) => (w) => !w || w.some(([x, y]) => (x ?? -1) < b && (y ?? Infinity) > a);
@@ -432,8 +433,7 @@ export function compile(scene) {
     if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
     css.push(fadeRule(`.fz${k}`, `fz${k}`, [[z.a, z.b]], "opacity:1", "opacity:0", 0.3, 0.3));
   });
-  // The detail of the base, or of one skel element (visibility windows w), in every zone it can appear in.
-  const detail = (href, w) => zones.map((z, k) => (during(z.a ?? 0, z.b ?? total)(w) ? `<g class="fz${k}"${z.rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="${href}"/></g>` : "")).join("");
+  const zoneLayers = zones.map((z, k) => `<g class="fz${k}"${z.rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="#db"/>${uses(during(z.a ?? 0, z.b ?? total))}</g>`);
   // Marks, notes and lenses on the stage (constant size, aligned to world pixels).
   const overlays = [];
   steps.forEach((s, i) => {
@@ -523,8 +523,8 @@ ${reduce}</style>
 <defs>${defs.join("")}<g id="db">${bg}${base}</g><clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
 <g clip-path="url(#stage)"><g id="world" transform="scale(${+S.toFixed(4)})">
 ${skeleton(bg + base)}
-${detail("#db")}
-${ids.map((id) => (els[id].skel ? `<g class="e-${id}">${skeleton(els[id].svg)}</g>${detail(`#ed-${id}`, win[id])}` : `<use href="#ed-${id}"/>`)).join("\n")}
+${ids.map((id) => (els[id].skel ? `<g class="e-${id}">${skeleton(els[id].svg)}</g>` : `<use href="#ed-${id}"/>`)).join("\n")}
+${zoneLayers.join("\n")}
 ${carets.length ? '<use href="#carets"/>' : ""}
 </g>
 ${overlays.join("\n")}
