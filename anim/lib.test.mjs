@@ -62,5 +62,13 @@ assert.ok(/scale\(1\.3333\) translate\(-72 -92\)"><g clip-path="url\(#ln0\)"><us
 assert.equal((l.match(/<rect\/>/g) || []).length, 1, "each element is drawn once, whatever the number of lenses");
 // skel element: part of the screen, a skeleton everywhere and detailed inside the focus.
 const k = compile(scene({ els: { panel: { svg: text(100, 300, "Nama panggilan", { size: 14 }), skel: true } }, steps: [{ caption: "a", focus: [72, 92, 327, 808] }] }));
-assert.ok(/<g class="e-panel"><rect [^>]*fill="#dde2e8"\/><\/g>/.test(k) && /<g class="fz0" clip-path="url\(#fz0\)"><use href="#db"\/><use href="#ed-panel"\/><\/g>/.test(k), "skel element: bar outside, detail inside the focus");
+assert.ok(/<g class="e-panel"><rect [^>]*fill="#dde2e8"\/><\/g><g class="fz0" clip-path="url\(#fz0\)"><use href="#ed-panel"\/><\/g>/.test(k), "skel element: bar outside, detail inside the focus");
+// Paint order is declaration order, skel or not: a skel screen declared later covers an earlier element.
+const po = compile(scene({ els: { pop: "<rect/>", page: { svg: "<circle/>", skel: true } }, steps: [{ caption: "a", focus: "all" }] }));
+assert.ok(po.indexOf('<use href="#ed-pop"/>') < po.indexOf('<g class="e-page">'), "later skel element paints above an earlier element");
+// A click step changes the focus at the click (4.42 s of 8 s), like show/hide; the clicked element is detailed from
+// the step's start, so the ring never circles a skeleton.
+const fc = compile(scene({ els: {}, steps: [{ caption: "a", focus: [0, 0, 100, 100] }, { caption: "b", focus: [200, 200, 100, 100], at: [10, 10], click: true, mark: [0, 0, 30, 30] }] }));
+assert.ok(/@keyframes fz0\{0%\{opacity:1\}55\.25%\{opacity:1;/.test(fc) && /@keyframes fz1\{0%\{opacity:0\}55\.25%\{opacity:0;/.test(fc), "old focus until the click, new focus from it");
+assert.ok(fc.includes('<clipPath id="fz2"><rect x="0" y="0" width="30" height="30"/></clipPath>') && /@keyframes fz2\{0%\{opacity:0\}40%\{opacity:0;/.test(fc), "clicked element detailed from its step's start");
 console.log("lib.mjs: ok");

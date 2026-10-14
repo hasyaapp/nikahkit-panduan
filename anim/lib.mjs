@@ -415,22 +415,24 @@ export function compile(scene) {
     return { svg: `<rect class="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`, t: [e.caret.t0, e.caret.t1 + 0.5] };
   });
   // Every element is drawn once (in defs, with its animation class) and placed by <use>: its class rules animate each
-  // instance the same, so the screen, the focus layers and the lenses share one copy. An element with `skel: true` is
-  // part of the screen: skeleton outside the focus, detail inside it, like the base.
+  // instance the same, so the screen, the focus zones and the lenses share one copy. An element with `skel: true` is
+  // part of the screen: skeleton outside the focus, detail inside it, like the base. Paint order = declaration order.
   const ids = Object.keys(els);
   defs.push(...ids.map((id) => `<g id="ed-${id}" class="e-${id}">${els[id].svg}</g>`), `<g id="carets">${carets.map((c) => c.svg).join("")}</g>`);
   const during = (a, b) => (w) => !w || w.some(([x, y]) => (x ?? -1) < b && (y ?? Infinity) > a);
-  const uses = (keep, pick) => ids.filter((id) => pick(els[id]) && keep(win[id])).map((id) => `<use href="#ed-${id}"/>`).join("");
-  // Focus: one layer per run of steps with the same focus, showing the detailed base (and skel elements) inside its
-  // rects over the skeleton.
+  const uses = (keep) => ids.filter((id) => keep(win[id])).map((id) => `<use href="#ed-${id}"/>`).join("");
+  // Detail zones over the skeleton: one per run of steps with the same focus, changing at the click on a click step
+  // (like show/hide), plus each clicked element from its step's start, so the target is detailed before the click.
   const runs = [];
   focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
-  const layers = runs.filter((r) => r.f !== "none").map((r, k) => {
-    const rects = rectsOf(r.f), a = r.from === 0 ? null : start[r.from], b = r.to === steps.length - 1 ? null : start[r.to + 1];
-    if (rects.length) defs.push(`<clipPath id="fz${k}">${rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
-    css.push(fadeRule(`.fz${k}`, `fz${k}`, [[a, b]], "opacity:1", "opacity:0", 0.3, 0.3));
-    return `<g class="fz${k}"${rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="#db"/>${uses(during(a ?? 0, b ?? total), (e) => e.skel)}</g>`;
+  const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: r.from === 0 ? null : act[r.from], b: r.to === steps.length - 1 ? null : act[r.to + 1] }));
+  steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box), a: i === 0 ? null : start[i], b: act[i] + 0.3 }); });
+  zones.forEach((z, k) => {
+    if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
+    css.push(fadeRule(`.fz${k}`, `fz${k}`, [[z.a, z.b]], "opacity:1", "opacity:0", 0.3, 0.3));
   });
+  // The detail of the base, or of one skel element (visibility windows w), in every zone it can appear in.
+  const detail = (href, w) => zones.map((z, k) => (during(z.a ?? 0, z.b ?? total)(w) ? `<g class="fz${k}"${z.rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="${href}"/></g>` : "")).join("");
   // Marks, notes and lenses on the stage (constant size, aligned to world pixels).
   const overlays = [];
   steps.forEach((s, i) => {
@@ -457,7 +459,7 @@ export function compile(scene) {
         const [sx, sy, sw, sh] = lensOf.src, z = lensOf.zoom * S, k = `ln${i}`, keep = during(start[i], end[i]);
         defs.push(`<clipPath id="${k}"><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"/></clipPath>`);
         inner = rect(box[0] - 1, box[1] + 3, box[2] + 2, box[3], { r: 11, fill: "rgba(16,24,40,.14)" }) + rect(box[0], box[1], box[2], box[3], { r: 10, fill: scene.bg ?? C.white }) +
-          `<g clip-path="url(#lc${i})"><g transform="translate(${+box[0].toFixed(2)} ${+box[1].toFixed(2)}) scale(${+z.toFixed(4)}) translate(${-sx} ${-sy})"><g clip-path="url(#${k})"><use href="#db"/>${uses(keep, () => true)}${carets.length ? '<use href="#carets"/>' : ""}</g></g></g>` +
+          `<g clip-path="url(#lc${i})"><g transform="translate(${+box[0].toFixed(2)} ${+box[1].toFixed(2)}) scale(${+z.toFixed(4)}) translate(${-sx} ${-sy})"><g clip-path="url(#${k})"><use href="#db"/>${uses(keep)}${carets.length ? '<use href="#carets"/>' : ""}</g></g></g>` +
           rect(box[0], box[1], box[2], box[3], { r: 10, stroke: C.accent, sw: 2.5 });
         defs.push(`<clipPath id="lc${i}"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}" rx="10"/></clipPath>`);
       } else inner = rect(box[0], box[1], box[2], box[3], { r: 18, fill: C.accent }) + text(box[0] + box[2] / 2, box[1] + 23, note.text, { size: 15, weight: 600, fill: C.white, anchor: "middle" });
@@ -517,9 +519,8 @@ ${reduce}</style>
 <defs>${defs.join("")}<g id="db">${bg}${base}</g><clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
 <g clip-path="url(#stage)"><g id="world" transform="scale(${+S.toFixed(4)})">
 ${skeleton(bg + base)}
-${ids.filter((id) => els[id].skel).map((id) => `<g class="e-${id}">${skeleton(els[id].svg)}</g>`).join("\n")}
-${layers.join("\n")}
-${uses(() => true, (e) => !e.skel)}
+${detail("#db")}
+${ids.map((id) => (els[id].skel ? `<g class="e-${id}">${skeleton(els[id].svg)}</g>${detail(`#ed-${id}`, win[id])}` : `<use href="#ed-${id}"/>`)).join("\n")}
 ${carets.length ? '<use href="#carets"/>' : ""}
 </g>
 ${overlays.join("\n")}
