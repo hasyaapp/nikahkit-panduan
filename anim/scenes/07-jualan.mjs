@@ -533,7 +533,7 @@ const DLG_O = [720, 450];
 
 // Shared step parts: the NikahKit tab, Kategori > Marketing, the panel toast, Simpan & Terbitkan.
 const NK_TAB = M(224, 52, 92, 32), MARKETING = M(227.5, 169, 139.5, 38);
-const tabStep = (caption, dur = 2.8) => ({ caption, dur, focus: [F.tabs, F.left], mark: NK_TAB, lens: { src: [84, 44, 300, 116] } });
+const tabStep = (caption, dur = 2.8) => ({ caption, dur, focus: [F.tabs, F.left], mark: NK_TAB, lens: { src: [100, 46, 222, 46] } });
 const toastBox = (lines) => { const hh = Math.max(52, lines.length * 18 + 20); return [84, 888 - hh, 302, hh]; };
 const pubStep = (caption) => ({ caption, at: PUB, click: true, focus: F.top, mark: M(...PUB_BOX), lens: { src: [1180, 44, 260, 50] }, dur: 3.4 });
 
@@ -547,7 +547,7 @@ const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + nkHead(0, 
 const undoMark = (lines) => { const [, y, , hh] = toastBox(lines), w = tw("Urungkan", 14, 700); return M(374 - w - 4, y + hh / 2 - 11, w + 8, 22); };
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
-function pasangScenes(kind, title, page, after, result, toast, caps) {
+function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
   const name = MK[kind][0], slug = `jualan-pasang-${kind}`, cx = CARD_X[kind];
   const donePanel = bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind));
   const bw = tw("Dipakai", 10, 500) + 12, bx = cx + 134 - bw; // mkCard's wrapped-name badge
@@ -559,9 +559,9 @@ function pasangScenes(kind, title, page, after, result, toast, caps) {
       els: { mk: { svg: mkPanel(), enter: "fade" }, veil: { svg: veil + pasangDlg(name) + pasangBtn, enter: "fade" } },
       steps: [
         tabStep(caps[0], 3),
-        { caption: caps[1], at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING, lens: { src: [80, 160, 295, 120] }, dur: 3.2 },
+        { caption: caps[1], at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING, lens: { src: [80, 161, 295, 54] }, dur: 3.2 },
         { caption: `Klik kartu ${name}. Layar meredup: dialog konfirmasi muncul.`, at: CARD_AT[kind], click: true, show: ["veil"], mark: M(cx, MKY, 134, 167, 8),
-          lens: { src: [84, MKY + 168, 290, 64] }, dur: 3.6 }
+          lens: { src: [548, 396, 344, 56] }, dur: 3.6 }
       ]
     },
     [`${slug}-dialog`]: {
@@ -572,7 +572,7 @@ function pasangScenes(kind, title, page, after, result, toast, caps) {
       steps: [
         { caption: `Muncul dialog Pasang ${name} di halaman ini?`, show: ["dlg", "pasang"], focus: DLG, mark: M(...DLG, 8), lens: { src: [548, 396, 344, 56] }, dur: 3.2 },
         { caption: `Klik Pasang. ${result}`, at: [848, 479], click: true, press: "pasang", hide: ["dlg", "pasang"], show: ["done"], focus: F.preview, mark: M(816, 461, 64, 36),
-          lens: { src: [724, 452, 176, 54] }, dur: 3.8 }
+          lens: resLens, dur: 3.8 }
       ]
     },
     [`${slug}-hasil`]: {
@@ -581,7 +581,7 @@ function pasangScenes(kind, title, page, after, result, toast, caps) {
       els: { t1: { svg: nkToast(toast), enter: "slide", delay: 0.3 } },
       steps: [
         { caption: `Muncul pesan: ${toast.join(" ")}`, show: ["t1"], focus: F.panel, mark: M(...toastBox(toast)), lens: { src: [84, 820, 302, 72] }, dur: 3.4 },
-        { caption: `Kartu ${name} kini berlabel Dipakai.`, mark: M(bx, MKY + 185, bw, 18, 9), lens: { src: [84, MKY + 166, 290, 86] }, dur: 3 }
+        { caption: `Kartu ${name} kini berlabel Dipakai.`, mark: M(bx, MKY + 185, bw, 18, 9), lens: { src: [84, MKY + 170, 294, 80] }, dur: 3 }
       ]
     }
   };
@@ -597,12 +597,12 @@ function pubScene(title, page, rail, panel, preview, cap, first, before) {
 }
 const tplDone = (kind) => nkHead(0, 0, "Template", { inbox: false }) + bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind));
 // The landing header in the preview (logo, business name, Pesan) and the gate card of the couple dashboard.
-const LAND_HEAD = { mark: M(727, 106, 390, 74, 0), lens: { src: [727, 106, 300, 74] } };
+const LAND_HEAD = { mark: M(727, 106, 390, 74, 0), lens: { src: [727, 106, 390, 74], zoom: 1.6 } };
 const landPreview = (n) => clipped(727, 106, 390, 784, landingTop(727, 106, n));
 // Perbarui halaman ini on an installed Marketing page (store.outdated, .nk-reset under Profil merek): "Versi baru halaman
 // tersedia." when the extension carries a newer page (wins), else "Profil merek berubah." (Landing page only).
 const resetText = (lines) => para(99, 298, lines, { size: 12, fill: C.strong, lh: 16 });
-const RESET = M(88, 277, 279, 50), RESET_LENS = { src: [80, 268, 295, 68] };
+const RESET = M(88, 277, 279, 50), RESET_LENS = { src: [80, 272, 295, 62] };
 function perbaruiScene(kind, title, page, before, after, toast, steps) {
   return {
     title,
@@ -616,10 +616,10 @@ function perbaruiScene(kind, title, page, before, after, toast, steps) {
       t1: { svg: nkToast(toast), enter: "slide", delay: 0.25 }
     },
     steps: [
-      { ...steps[0], focus: F.panel, mark: MARKETING, lens: { src: [80, 160, 295, 120] } },
+      { ...steps[0], focus: F.panel, mark: MARKETING, lens: { src: [80, 161, 295, 113] } },
       ...steps.slice(1).map((s) => ({ ...s, mark: RESET, lens: RESET_LENS })),
       { caption: "Klik Perbarui halaman ini. Halaman langsung dipasang ulang.", at: [286, 302], click: true, press: "perbarui", hide: kind === "landing" ? ["brandT"] : [],
-        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: RESET_LENS, dur: 3.8 }
+        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: { src: [84, 820, 302, 72] }, dur: 3.8 }
     ]
   };
 }
@@ -681,14 +681,14 @@ export const scenes = {
     }).map(([id, e]) => [id, { ...(typeof e === "string" ? { svg: e } : e), skel: true }])),
     steps: [
       tabStep("Di editor halaman, buka tab NikahKit.", 2.6),
-      { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["rail", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 230, 120] }, dur: 3 },
+      { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["rail", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 220, 64] }, dur: 3 },
       { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING,
-        lens: { src: [84, 160, 290, 150] }, dur: 3.4 },
+        lens: { src: [80, 161, 295, 54] }, dur: 3.4 },
       { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: [228, 318], click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [111, 303, 70, 30] }],
-        mark: M(101, 300, 253, 36), lens: { src: [92, 276, 272, 68] }, dur: 3.2 },
+        mark: M(101, 300, 253, 36), lens: { src: [92, 276, 282, 68] }, dur: 3.2 },
       { caption: "Klik Nomor WhatsApp, lalu ketik nomornya, misalnya 0812 3456 7890.", at: [228, 386], click: true, show: ["nameBlur", "waFocus", "waV"],
-        type: [{ id: "waV", n: 14, box: [111, 371, 110, 30] }], mark: M(101, 368, 253, 36), lens: { src: [92, 344, 272, 100] }, dur: 3.4 },
-      { caption: "Logo (opsional): tempel alamat gambar https, atau kosongkan.", mark: M(101, 452, 253, 94, 6), lens: { src: [92, 446, 272, 106] }, dur: 3 },
+        type: [{ id: "waV", n: 14, box: [111, 371, 110, 30] }], mark: M(101, 368, 253, 36), lens: { src: [92, 344, 282, 100] }, dur: 3.4 },
+      { caption: "Logo (opsional): tempel alamat gambar https, atau kosongkan.", mark: M(101, 452, 253, 94, 6), lens: { src: [92, 446, 282, 106] }, dur: 3 },
       { caption: "Gulir ke paket pertama, lalu isi Nama paket.", at: [228, 686 - SCROLL], click: true, show: ["body2", "cover", "pkFocus", "pkName"],
         hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [121, 671 - SCROLL, 36, 30] }],
         mark: M(111, 668 - SCROLL, 233, 36), lens: { src: [96, 196, 268, 92] }, dur: 3.6 },
@@ -698,19 +698,20 @@ export const scenes = {
       { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, atau Mozaik.", at: [228, GAYA_Y - SCROLL + 18], click: true, hide: ["prFocus"], show: ["prBlur", "selFocus", "menu"],
         mark: M(101, GAYA_Y - SCROLL, 253, 36), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 236] }, dur: 3.4 },
       { caption: "Pilih gayanya, misalnya Kartu besar. Bawaannya Grid.", at: [180, menuItemY(2) + 16], click: true, hide: ["menu", "selFocus"], show: ["selV"],
-        mark: M(105, menuItemY(2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 200] }, dur: 3 },
+        mark: M(105, menuItemY(2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 236] }, dur: 3 },
       { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: [156, SIMPAN_Y + 18 - SCROLL], click: true, show: ["done"],
         mark: M(...nkBtnBox(101, SIMPAN_Y - SCROLL, "Simpan profil", { w: 110 })), lens: { src: [84, 210, 290, 68] }, dur: 3.4 }
     ]
   },
 
   // ---------------------------------------------------------------- pasang-dashboard-pasangan
-  ...pasangScenes("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview, "Pratinjau berubah menjadi Kelola undangan.",
+  ...pasangScenes("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview, { src: [737, 320, 370, 204], zoom: 1.4 },
+    "Pratinjau berubah menjadi Kelola undangan.",
     ["Dashboard pasangan dipasang.", "Tekan Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Di Kategori, klik Marketing."]),
   "jualan-pasang-dashboard-terbit": pubScene("Menerbitkan halaman Dashboard pasangan", "Dashboard Rina WO", "Template", tplDone("dashboard"), dashPreview,
     ["Pratinjau sudah Kelola undangan. Tinggal diterbitkan.", "Klik Simpan & Terbitkan. Alamat halaman ini jadi alamat Dashboard."],
-    { mark: M(743, 326, 358, 303, 24), lens: { src: [743, 326, 358, 150], zoom: 1.6 } }),
+    { mark: M(743, 326, 358, 303, 24), lens: { src: [737, 320, 370, 204], zoom: 1.4 } }),
 
   // Bagikan in an invitation after the dashboard is installed.
   "jualan-bagikan-pengantin": {
@@ -725,17 +726,17 @@ export const scenes = {
     },
     steps: [
       tabStep("Buka undangan klien di editor, tab NikahKit."),
-      { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(6, 566, 60, 46), lens: { src: [0, 556, 140, 64], zoom: 2.5 }, dur: 3.2 },
+      { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(6, 566, 60, 46), note: "Bagikan", dur: 3.2 },
       { caption: "Untuk pengantin: Kirim undangan dan Buka Dashboard.", mark: M(16, 615, 366, 80), lens: { src: [12, 588, 374, 136] }, dur: 3.4 },
       { caption: "Buka Check-in muncul bila Undangan khusus dan QR masuk menyala.", mark: M(16, 468, 366, 106), lens: { src: [12, 464, 374, 114] }, dur: 3.8 },
       { caption: "Klik Buka Dashboard: Kelola undangan terbuka di tab baru.", at: [199, 677], click: true, press: "buka", show: ["tab"], mark: M(16, 659, 366, 36),
-        lens: { src: [12, 650, 374, 54] }, dur: 3.4 },
+        note: "Buka Dashboard", dur: 3.4 },
       { caption: "Pengantin masuk dengan PIN dashboard.", focus: "none", mark: M(561, 448, 318, 44, 8), lens: { src: [541, 300, 358, 250], zoom: 1.4, at: [12, 180] }, dur: 3 }
     ]
   },
 
   // ---------------------------------------------------------------- landing-page
-  ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", landPreview("Rina WO"),
+  ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", landPreview("Rina WO"), LAND_HEAD.lens,
     "Pratinjau berubah menjadi Landing page.", ["Landing page dipasang. Tekan", "Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Klik Marketing. Profil merek harus berlabel Terisi."]),
   "jualan-pasang-landing-terbit": pubScene("Menerbitkan Landing page", "Landing Rina WO", "Template", tplDone("landing"), landPreview("Rina WO"),
@@ -755,16 +756,16 @@ export const scenes = {
     },
     steps: [
       { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", focus: PHF,
-        mark: [QM(20, LPY.cta, 178.8, 52, 20), QM(210.8, LPY.cta, 143.6, 52, 20)], lens: lensBy(QR(12, 20, 320, 120), "l", 1.4), dur: 3.2 },
+        mark: [QM(20, LPY.cta, 178.8, 52, 20), QM(210.8, LPY.cta, 143.6, 52, 20)], lens: lensBy(QR(0, LPY.cta - 8, 390, 68), "l", 1.2), dur: 3.2 },
       { caption: "Klik Lihat desain: halaman turun ke katalog Pilih desain undangan.", at: Q(283, LPY.cta + 26), click: true, show: ["v1"],
-        mark: QM(210.8, LPY.cta, 143.6, 52, 20), lens: lensBy(QR(150, LPY.cta - 20, 240, 92), "r"), dur: 3.2 },
+        mark: QM(210.8, LPY.cta, 143.6, 52, 20), dur: 3.2 },
       { caption: "Di katalog, klien menekan Lihat demo.", at: Q(...LIHAT_DEMO), click: true, show: ["dlg", "pick"], mark: QM(...LIHAT_BOX),
-        lens: lensBy(QR(12, LIHAT_DEMO[1] - 106, 230, 136), "l"), dur: 3.4 },
+        lens: lensBy(QR(12, LIHAT_DEMO[1] - 98, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: Q(...DEMO_PICK), click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"],
-        mark: QM(181, 8, 147, 46, 20), lens: lensBy(QR(0, 0, 390, 92), "r", 1.2), dur: 3.4 },
-      { caption: "Form menulis Pilihan kalian: desain Dasar.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 12, 236, 70), "l"), dur: 2.6 },
+        mark: QM(181, 8, 147, 46, 20), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 3.4 },
+      { caption: "Form menulis Pilihan kalian: desain Dasar.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 2.6 },
       { caption: "Di Paket dan harga, setiap paket punya Pilih paket ini.", hide: ["f1"], show: ["vPkg", "p2"], mark: [QM(...PKG_BTN(0), 20), QM(...PKG_BTN(1), 20)],
-        lens: lensBy(QR(36, 36, 236, 290), "l"), dur: 2.8 },
+        lens: lensBy(QR(14, 34, 362, 306), "l", 1.2), dur: 2.8 },
       { caption: "Pilih paket ini: form mencatat Paket Basic, desain Dasar.", at: Q(195, PKG_BTN(0)[1] + 26), click: true, press: "p2", show: ["f2"], mark: QM(...PKG_BTN(0), 20),
         lens: lensBy(QR(36, PICKED - 12, 320, 94), "r", 1.4), dur: 3.8 }
     ]
@@ -776,11 +777,11 @@ export const scenes = {
     els: { adat: { svg: ph(scr(KAT, adatView)), enter: "fade", delay: 0.1 } },
     steps: [
       { caption: "Di atas katalog ada tombol tema: Semua dan tiap kategori, dengan jumlahnya.", focus: PHF, mark: QM(18, CHIP_Y - 2, 372, 48, 24),
-        lens: lensBy(QR(16, CHIP_Y - 10, 230, 64), "l"), dur: 3.8 },
+        lens: lensBy(QR(14, CHIP_Y - 8, 212, 60), "l"), dur: 3.8 },
       { caption: "Klik Adat: katalog hanya menampilkan desain adat.", at: Q(chipX("Adat"), CHIP_Y + 22), click: true, show: ["adat"], mark: QM(...CHIP_BOX("Adat"), 22),
-        lens: lensBy(QR(12, CT + 204, 370, 90), "l", 1.2), dur: 3.6 },
+        lens: lensBy(QR(12, CT + 212, 370, 71), "l", 1.2), dur: 3.6 },
       { caption: "Klik Semua untuk menampilkan lagi seluruh desain.", at: Q(chipX("Semua"), CHIP_Y + 22), click: true, hide: ["adat"], mark: QM(...CHIP_BOX("Semua"), 22),
-        lens: lensBy(QR(12, CT + 204, 370, 90), "r", 1.2), dur: 3.2 }
+        lens: lensBy(QR(12, CT + 212, 370, 71), "r", 1.2), dur: 3.2 }
     ]
   },
 
@@ -795,12 +796,12 @@ export const scenes = {
     },
     steps: [
       { caption: "Di Pilih desain undangan, klien menekan Lihat demo.", at: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56), click: true, show: ["demo", "pick", "url"], focus: PHF,
-        mark: QM(LIHAT_BOX[0], LIHAT_BOX[1] + 56, LIHAT_BOX[2], LIHAT_BOX[3]), lens: lensBy(QR(12, LIHAT_DEMO[1] - 50, 230, 136), "l"), dur: 3.4 },
+        mark: QM(LIHAT_BOX[0], LIHAT_BOX[1] + 56, LIHAT_BOX[2], LIHAT_BOX[3]), lens: lensBy(QR(12, LIHAT_DEMO[1] - 42, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh desain itu terbuka satu layar penuh.", mark: QM(0, 56, 390, 63, 0), lens: lensBy(QR(0, 56, 390, 63), "l", 1.2), dur: 2.8 },
-      { caption: "Alamatnya mendapat ?demo=dasar. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(20, 8, 330, 40), "l", 1.4), dur: 3.6 },
+      { caption: "Alamatnya mendapat ?demo=dasar. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(4, 2, 382, 52), "l", 1.2), dur: 3.6 },
       { caption: "Tombol silang, Esc, atau tombol kembali menutup demo.", mark: QM(DEMO_X[0] - 22, DEMO_X[1] + 56 - 22, 44, 44, 22), lens: lensBy(QR(150, 56, 240, 63), "r"), dur: 3.4 },
       { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Dasar.", at: Q(DEMO_PICK[0], DEMO_PICK[1] + 56), click: true, press: "pick",
-        hide: ["demo", "pick", "url"], show: ["f1"], mark: QM(181, 64, 147, 46, 20), lens: lensBy(QR(36, PICKED + 44, 236, 70), "r"), dur: 3.8 }
+        hide: ["demo", "pick", "url"], show: ["f1"], mark: QM(181, 64, 147, 46, 20), lens: lensBy(QR(36, PICKED + 48, 318, 62), "r", 1.4), dur: 3.8 }
     ]
   },
 
@@ -809,10 +810,10 @@ export const scenes = {
     base: phBase(body(catHead)),
     els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: ph(body(rect(0, CHIP_Y + 52, 390, 844 - CHIP_Y - 52, { fill: LP.paper }), svg)), enter: "fade" }])),
     steps: [
-      { caption: "Grid (bawaan): dua desain sejajar, Lihat demo dan Pilih di bawahnya.", show: ["grid"], focus: PHF, lens: lensBy(QR(16, CT + 206, 176, 140), "l"), dur: 3.4 },
-      { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], lens: lensBy(QR(16, CT + 10, 360, 140), "r", 1.2), dur: 3.2 },
+      { caption: "Grid (bawaan): dua desain sejajar, Lihat demo dan Pilih di bawahnya.", show: ["grid"], focus: PHF, lens: lensBy(QR(16, CT + 212, 176, 134), "l"), dur: 3.4 },
+      { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], lens: lensBy(QR(14, CT + 10, 372, 140), "r", 1.2), dur: 3.2 },
       { caption: "Kartu besar: satu kartu selebar layar, tombol Pilih berwarna.", hide: ["daftar"], show: ["kartu"], lens: lensBy(QR(30, CT + 274, 340, 154), "l", 1.4), dur: 3.2 },
-      { caption: "Geser: satu baris desain yang digeser ke samping.", hide: ["kartu"], show: ["geser"], lens: lensBy(QR(16, CT + 310, 236, 130), "l"), dur: 3.2 },
+      { caption: "Geser: satu baris desain yang digeser ke samping.", hide: ["kartu"], show: ["geser"], lens: lensBy(QR(16, CT + 321, 260, 127), "l", 1.8), dur: 3.2 },
       { caption: "Mozaik: kolase gambar. Ketuk gambar untuk membuka demo.", hide: ["geser"], show: ["mozaik"], lens: lensBy(QR(196, CT - 4, 178, 228), "r"), dur: 3.4 }
     ]
   },
@@ -853,21 +854,21 @@ export const scenes = {
     },
     steps: [
       { caption: "Langkah 1 dari 10, Pesanan: Paket, Fitur undangan, dan Desain.", focus: PHF, mark: QM(41.5, fy(K1.pos.head) - 64, 307, 42),
-        lens: lensBy(QR(36, fy(K1.pos.head) - 70, 320, 150), "l", 1.4), dur: 3.2 },
+        lens: lensBy(QR(36, fy(K1.pos.head) - 70, 320, 154), "l", 1.4), dur: 3.2 },
       { caption: "Centang fitur yang dipesan, misalnya QR check-in tamu.", at: Q(70, fy(qr[1] + qr[2] / 2)), click: true, show: ["pgc"], mark: QM(41.5, fy(qr[1]), 307, qr[2], 8),
-        lens: lensBy(QR(36, fy(qr[1]) - 8, 236, qr[2] + 16), "l"), dur: 3.2 },
+        lens: lensBy(QR(36, fy(qr[1]) - 8, 318, qr[2] + 16), "l", 1.4), dur: 3.2 },
       { caption: "Gulir ke bawah, lalu tekan lanjut.", scroll: { id: "pgc", dy: FDY }, at: Q(195, fy(K1.pos.next) + 26 - FDY), click: true, show: ["s2"],
-        mark: QM(...btnBox(K1.pos.next - FDY), 20), lens: lensBy(QR(36, fy(K1.pos.next) - FDY - 6, 236, 64), "l"), dur: 3.6 },
+        mark: QM(...btnBox(K1.pos.next - FDY), 20), note: "lanjut", dur: 3.6 },
       { caption: "Langkah 2, Pemesan. Lanjut saat Nama kosong: Nama wajib diisi.", at: Q(195, fy(K2.pos.next) + 26), click: true, show: ["err"], mark: QM(...btnBox(K2.pos.next), 20),
         lens: lensBy(QR(36, fy(K2.pos.next) - 6, 320, 160), "l", 1.4), dur: 3.4 },
       { caption: "Kolom bertanda * wajib. Klik Nama, lalu ketik namanya.", at: Q(195, fy(nameY) + 24), click: true, show: ["nameBg", "nameT"],
-        type: [{ id: "nameT", n: 11, box: QR(55, fy(nameY) + 4, 100, 40) }], mark: QM(...fieldBox(nameY), 8), lens: lensBy(QR(36, fy(nameY) - 34, 236, 90), "l"), dur: 3.4 },
+        type: [{ id: "nameT", n: 11, box: QR(55, fy(nameY) + 4, 100, 40) }], mark: QM(...fieldBox(nameY), 8), lens: lensBy(QR(36, fy(nameY) - 34, 318, 90), "l", 1.4), dur: 3.4 },
       { caption: "Isi juga WhatsApp, lalu tekan lanjut sampai langkah terakhir.", at: Q(195, fy(waY) + 24), click: true, show: ["nameOff", "waBg", "waT"],
-        type: [{ id: "waT", n: 14, box: QR(55, fy(waY) + 4, 120, 40) }], mark: QM(...fieldBox(waY), 8), lens: lensBy(QR(36, fy(waY) - 34, 236, 90), "l"), dur: 3.4 },
+        type: [{ id: "waT", n: 14, box: QR(55, fy(waY) + 4, 120, 40) }], mark: QM(...fieldBox(waY), 8), lens: lensBy(QR(36, fy(waY) - 34, 318, 90), "l", 1.4), dur: 3.4 },
       { caption: "Langkah 10, Catatan: hal lain untuk undangan.", hide: ["err", "nameBg", "nameT", "nameOff", "waBg", "waT", "s2", "pgc"], show: ["s10", "sub"],
-        mark: QM(41.5, fy(K10.pos.head) - 64, 307, 42), lens: lensBy(QR(36, fy(K10.pos.head) - 70, 320, 150), "l", 1.4), dur: 2.8 },
+        mark: QM(41.5, fy(K10.pos.head) - 64, 307, 42), lens: lensBy(QR(36, fy(K10.pos.head) - 70, 320, 156), "l", 1.4), dur: 2.8 },
       { caption: "Tekan kirim data: Data terkirim ke Pesanan masuk.", at: Q(195, fy(K10.pos.next) + 26), click: true, press: "sub", show: ["done"],
-        mark: QM(...btnBox(K10.pos.next), 20), lens: lensBy(QR(36, fy(FK.card) + 20, 320, 120), "l", 1.4), dur: 3.4 }
+        mark: QM(...btnBox(K10.pos.next), 20), lens: lensBy(QR(36, fy(FK.card) + 20, 320, 144), "l", 1.4), dur: 3.4 }
     ]
   },
 
@@ -885,9 +886,9 @@ export const scenes = {
       { caption: "Klik ikon kotak masuk di kepala panel. Pesanan masuk terbuka.", at: ED.inbox, click: true, show: ["inbox"], focus: F.left, mark: INBOX,
         lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
       { caption: "Klik Link form klien (opsional). Alamat link form tampil.", at: [200, 402], click: true, show: ["link", "salin"], mark: M(16, 377, 366, 50),
-        lens: { src: [12, 372, 374, 166] }, dur: 3.4 },
+        lens: { src: [12, 372, 374, 212] }, dur: 3.4 },
       { caption: "Klik Salin link form: Tersalin. Tempel di chat WhatsApp klien.", at: [28 + SALIN_W / 2, 552], click: true, press: "salin", show: ["ok"],
-        mark: M(28, 534, SALIN_W, 36), lens: { src: [12, 470, 374, 110] }, dur: 3.6 }
+        mark: M(28, 534, SALIN_W, 36), lens: { src: [12, 472, 374, 108] }, dur: 3.6 }
     ]
   },
 
@@ -933,7 +934,7 @@ export const scenes = {
       { caption: "Klik di kotak, tekan Ctrl+V (Windows) atau Cmd+V (Mac).", at: [200, 428], click: true, show: ["pasted", "isi"], mark: M(28, 381, 341, 95),
         lens: { src: [20, 372, 358, 160] }, dur: 3.4 },
       { caption: "Klik Isi undangan: panel pindah ke Konten, ada tombol Urungkan.", at: [70, 506], click: true, press: "isi", hide: ["inbox", "paste", "pasted", "isi"],
-        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: { src: [20, 372, 358, 160] }, dur: 4 }
+        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: { src: [84, 806, 302, 90] }, dur: 4 }
     ]
   },
 
@@ -947,9 +948,9 @@ export const scenes = {
     },
     steps: [
       { caption: "Klik ikon tempat sampah di baris pesanan. Muncul Hapus? merah.", at: [357, ROW2 + 28], click: true, show: ["row", "hapus"], focus: F.left,
-        mark: M(345, ROW2 + 16, 24, 24), lens: { src: [12, 182, 374, 124] }, dur: 3.4 },
+        mark: M(345, ROW2 + 16, 24, 24), lens: { src: [12, 182, 374, 134] }, dur: 3.4 },
       { caption: "Klik Hapus? untuk memastikan. Pesanan hilang dari daftar.", at: [HAPUS_X + HAPUS_W / 2, ROW2 + 28], click: true, press: "hapus", hide: ["row", "hapus"],
-        show: ["gone"], mark: M(HAPUS_X, ROW2 + 10, HAPUS_W, 36), lens: { src: [12, 182, 374, 124] }, dur: 3.6 }
+        show: ["gone"], mark: M(HAPUS_X, ROW2 + 10, HAPUS_W, 36), lens: { src: [12, 182, 374, 134] }, dur: 3.6 }
     ]
   },
 
