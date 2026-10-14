@@ -71,4 +71,6 @@ assert.ok(po.indexOf('<use href="#ed-pop"/>') < po.indexOf('<g class="e-page">')
 const fc = compile(scene({ els: {}, steps: [{ caption: "a", focus: [0, 0, 100, 100] }, { caption: "b", focus: [200, 200, 100, 100], at: [10, 10], click: true, mark: [0, 0, 30, 30] }] }));
 assert.ok(/@keyframes fz0\{0%\{opacity:1\}55\.25%\{opacity:1;/.test(fc) && /@keyframes fz1\{0%\{opacity:0\}55\.25%\{opacity:0;/.test(fc), "old focus until the click, new focus from it");
 assert.ok(fc.includes('<clipPath id="fz2"><rect x="0" y="0" width="30" height="30"/></clipPath>') && /@keyframes fz2\{0%\{opacity:0\}40%\{opacity:0;/.test(fc), "clicked element detailed from its step's start");
+const f1 = compile(scene({ els: {}, steps: [{ caption: "a", focus: [200, 200, 100, 100], at: [10, 10], click: true, mark: [0, 0, 30, 30] }] }));
+assert.ok(/@keyframes fz0\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(f1), "a first-step click shows its focus from the click too (1.22 s of 4.8 s)");
 console.log("lib.mjs: ok");

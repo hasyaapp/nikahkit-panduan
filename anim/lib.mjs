@@ -425,7 +425,7 @@ export function compile(scene) {
   // (like show/hide), plus each clicked element from its step's start, so the target is detailed before the click.
   const runs = [];
   focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
-  const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: r.from === 0 ? null : act[r.from], b: r.to === steps.length - 1 ? null : act[r.to + 1] }));
+  const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: act[r.from] > 0 ? act[r.from] : null, b: r.to === steps.length - 1 ? null : act[r.to + 1] }));
   steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box), a: i === 0 ? null : start[i], b: act[i] + 0.3 }); });
   zones.forEach((z, k) => {
     if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
