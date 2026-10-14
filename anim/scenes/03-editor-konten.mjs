@@ -17,6 +17,8 @@ const SIMPAN = ED.simpanBox, FOOT = { box: [0, 851, 71, 49], r: 0 };
 const railM = (n) => ({ box: [0, ED.rail[n][1] - 26, 71, 52], r: 0 });
 const accM = (y) => [88, y, 279, 50];
 const cardM = (x, y) => ({ box: [x, y, 134, 167], r: 8 });
+// Box of a kit nkBadge with its right edge at xr (width as nkBadge draws it), stretched down by `more` for a column of badges.
+const badgeM = (label, xr, y, more = 0) => { const w = tw(label, 10, 500) + 12; return [xr - w, y, w, 18 + more]; };
 const FOLIO_C = [301, 420], DASAR_C = [155, 420]; // card centres with the cards at y 337
 const ADAT_CHIP = [206, 277]; // centre of the Adat chip with the default counts
 // The whole editor with a rail tab active (gradients for the photo placeholders first).
@@ -97,7 +99,7 @@ export const scenes = {
     base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "folio")), pvFolio()],
     els: { konten: { svg: kontenPanel(), enter: "fade", skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
-      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: [326, 511, 41, 18], r: 9 }, lens: { src: [226, 330, 150, 242] }, at: [346, 520] },
+      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: badgeM("Dipakai", 367, 511), r: 9 }, lens: { src: [226, 330, 150, 242] }, at: [346, 520] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", mark: railM("Konten"), lens: { src: [80, 161, 295, 80], at: [290, 90] }, show: ["konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
       { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
     ]
@@ -211,7 +213,7 @@ export const scenes = {
         { caption: "Hapus acara yang tidak dipakai dengan ikon tempat sampah.", mark: [I + IW - 35, 333, 22, 22], lens: { src: [96, 314, 262, 52] }, hide: ["v1b", "v1bA"], show: ["v2d"], scroll: { id: "v2", dy: D6 }, at: [I + IW - 24, 344], click: true, dur: 3.6 },
         { caption: "Klik Sampul. Pilih Foto sampul; teks sampul boleh dibiarkan kosong.", mark: accM(yS), lens: { src: [80, yS - 8, 295, 96] }, hide: ["v2"], show: ["v3"], scroll: { id: "v2d", dy: -(dyA + D6) }, at: [190, yS + 25], click: true, dur: 3.6 },
         { caption: "Klik Salam Pembuka dan pilih Preset salam. Lalu buka Ayat / Kutipan.", mark: accM(420), lens: { src: [80, 412, 295, 126] }, hide: ["v2d"], show: ["v4"], scroll: { id: "v3", dy: D8 }, at: [190, 445], click: true, dur: 3.6 },
-        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: [317, y5 + 16, 37, 18 + 58 * 5], r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
+        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: badgeM("Terisi", P + PW - 13, y5 + 16, 58 * 5), r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
           lens: { src: [84, y5 - 4, 287, 236] }, hide: ["v3"], show: ["v5"], at: ED.simpan, press: "sBtn", dur: 3.8 }
       ]
     };
@@ -358,7 +360,7 @@ export const scenes = {
         { caption: "Klik Kisah Cinta. Ganti Waktu, Judul, dan Cerita tiap momen.", focus: [72, 183, 327, 717], mark: accM(191), lens: { src: [80, 183, 295, 126] }, hide: ["dClear", "dTyped"], at: [190, 216], click: true, show: ["vK"], dur: 3.4 },
         { caption: "Klik Video. Ganti Tautan YouTube dengan video klien.", focus: F.body, mark: accM(330), lens: { src: [80, 322, 295, 320] }, hide: ["after"], scroll: { id: "vK", dy: DK }, at: [190, 355], click: true, show: ["vV"], dur: 3.6 },
         { caption: "Isi Dress Code dan Susunan Acara bila dipakai.", mark: accM(330), lens: { src: [80, 322, 295, 238] }, hide: ["vK"], scroll: { id: "vV", dy: DV }, at: [190, 355], click: true, show: ["vD"], dur: 3.6 },
-        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: [317, 207, 37, 18 + 58 * 8], r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
+        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: badgeM("Terisi", P + PW - 13, 207, 58 * 8), r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
           lens: { src: [84, 183, 287, 240] }, hide: ["vV"], show: ["vAll"], at: ED.simpan, press: "sBtn", dur: 3.8 }
       ]
     };

@@ -1,7 +1,7 @@
 // Drawings of the product UIs the scenes compose: NikahKit panel widgets, the Chrome window, the Scalev editor and
 // dashboard shell, and the guide's stage pieces (dim, phone page). lib.mjs is the compiler and its primitives;
 // every drawing of a real screen lives under ui/, so scenes never import from each other.
-import { C, PHONE, WORLD, rect, text, line, circle, para, tw, textWidth, clipped, shadow, icon, iconX } from "../lib.mjs";
+import { C, PHONE, WORLD, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX } from "../lib.mjs";
 
 // ---- NikahKit panel widgets (nikahkit/src/ui/base.css) --------------------------------------------------------------
 // Button: variant "primary" (action blue), "ghost" (white, blue text+border), "quiet" (white, grey line), "danger".
@@ -34,8 +34,9 @@ export function nkInput(x, y, w, value, o = {}) {
 export const nkLabel = (x, y, s) => text(x, y, s, { size: 12, weight: 500, fill: C.strong });
 export const nkHint = (x, y, s, o = {}) => text(x, y, s, { size: 12, fill: o.fill ?? C.faint });
 export const nkSwitch = (x, y, on) => rect(x, y, 36, 20, { r: 10, fill: on ? C.primary : C.off }) + circle(on ? x + 26 : x + 10, y + 10, 8, { fill: C.white });
-// Status pill (CSS padding 2px 6px): left edge x, or right edge x with o.end; tones via o.fill / o.fg (default ok green).
-export const nkBadge = (x, y, label, o = {}) => { const w = textWidth(label, 10, 500) + 12, bx = o.end ? x - w : x; return rect(bx, y, w, 18, { r: 9, fill: o.fill ?? C.okSoft }) + text(bx + w / 2, y + 12.5, label, { size: 10, weight: 500, fill: o.fg ?? C.ok, anchor: "middle" }); };
+// Status pill (CSS padding 2px 6px; width from the layout measure tw): left edge x, or right edge x with o.end; tones via
+// o.fill / o.fg (default ok green).
+export const nkBadge = (x, y, label, o = {}) => { const w = tw(label, 10, 500) + 12, bx = o.end ? x - w : x; return rect(bx, y, w, 18, { r: 9, fill: o.fill ?? C.okSoft }) + text(bx + w / 2, y + 12.5, label, { size: 10, weight: 500, fill: o.fg ?? C.ok, anchor: "middle" }); };
 export const nkNote = (x, y, w, lines, o = {}) => { const h = o.h ?? 20 + lines.length * 18; const tone = o.tone ?? "info"; const bg = tone === "warn" ? C.warnSoft : tone === "err" ? C.dangerSoft : tone === "ok" ? C.okSoft : C.primarySoft; const fg = tone === "warn" ? C.warnStrong : tone === "err" ? C.danger : tone === "ok" ? C.ok : C.strong; return rect(x, y, w, h, { r: 4, fill: bg }) + para(x + 12, y + 23, lines, { size: 12, fill: fg, lh: 18 }); };
 // Accordion (nk-acc, measured in Konten): 50 px bar, 18 px chevron at x + 22, title at x + 43, badge (Terisi green,
 // anything else warn) with its right edge at x + w - 13. o.open: chevron down; o.h: open with a body, the box h high and a
