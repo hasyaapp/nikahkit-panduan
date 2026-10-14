@@ -2,10 +2,11 @@
 // pesan akses (App.jsx AccessGate), mencari pesan di panduan (docs.page), masa aktif (RenewNote, gate expired, pin.html,
 // halaman tamu), dan kirim laporan lewat WhatsApp. Setiap adegan satu layar 1440x900 (lib v4).
 // Editor: /tmp/ref/editor-bantuan.png + editor-metrics.json, gaya dari ui/styles.js. docs.page: diukur di Chromium
-// 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Isi tab Security Scalev dan WhatsApp Web: tata letak
-// umum, belum diukur.
+// 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (panel dari
+// 02-scalev.mjs). WhatsApp Web: tata letak umum, belum diukur.
 import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3,
   chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, tw, esc, phoneDesk, PHONE } from "../lib.mjs";
+import { securityPanel, SECURITY } from "./02-scalev.mjs";
 
 const wrap = (s, w, size = 12, weight = 400) => {
   const out = []; let cur = "";
@@ -169,14 +170,9 @@ const IZF = izF.end - 900;
 const izCopied = white(16, iz.pos.cspMsg[1] - IZ1, 351, 18) + text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
 const izDialog = (copied) => dlgSheet + dlgHead + dlgView(iz, IZ1) + (copied ? izCopied : "");
 const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[0][1]];
-// Scalev Security tab (column names from the guide's Izin domain page and Scalev's tutorial; layout not measured).
-const SOURCES = ["Connect Sources", "Image Sources", "Media Sources", "Font Sources", "Style Sources", "Script Sources", "Frame Sources"];
-const srcY = (i) => 116 + i * 72;
-const securityBody = rect(0, 93, 398, 807, { fill: C.white }) +
-  SOURCES.map((l, i) => text(20, srcY(i) + 14, l, { size: 13, weight: 500, fill: C.strong }) + rect(20.5, srcY(i) + 24.5, 357, 36, { r: 4, fill: C.white, stroke: C.svDivider })).join("");
-const IMG_IN = [20, srcY(1) + 24, 358, 37];
-const pasted = rect(20, srcY(1) + 24, 358, 37, { r: 4, fill: C.white, stroke: C.primary, sw: 2 }) + text(32, srcY(1) + 48, ORIGIN, { size: 14, fill: C.strong });
-const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PREVIEW + securityBody + (o.pasted ? pasted : "");
+// Scalev Security tab: the measured panel from 02-scalev.mjs (Connect Sources on top; at: "image" scrolls to Image Sources,
+// picker = the Add image domain box with the pasted domain as an option). Image Sources starts empty in this example.
+const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PREVIEW + securityPanel(0, o);
 
 // ---- bantuan-cek-gejala: AccessGate ----------------------------------------------------------------------------------
 function gate(lines, o = {}) {
@@ -570,20 +566,29 @@ export const scenes = {
     base: [editorSecurity()],
     els: {
       before: { svg: clipped(0, 44, 399, 856, scalevEditor(0, 0, { rail: "Konten" }) + izDialog(true)), skel: true },
-      pasted: { svg: pasted, enter: "fade", delay: 0.1 }
+      img: { svg: securityPanel(0, { at: "image" }), skel: true },
+      open: { svg: securityPanel(0, { at: "image", picker: {} }), skel: true },
+      typed: { svg: securityPanel(0, { at: "image", picker: { value: ORIGIN } }), skel: true, enter: "fade" },
+      ticked: { svg: securityPanel(0, { at: "image", images: 1, picker: { value: ORIGIN, ticked: true } }), skel: true }
     },
     steps: [
       { caption: "Buka tab Security di deretan tab editor Scalev.", dur: 3.4, focus: TABROW, mark: TAB.Security, at: mid(TAB.Security), click: true, hide: ["before"],
         lens: { src: [0, 46, 330, 46] } },
-      { caption: "Tempel di kolom yang sesuai: img_src masuk ke Image Sources.", dur: 3.6, focus: [0, srcY(1) - 6, 399, 76], mark: IMG_IN, at: [190, srcY(1) + 42], click: true,
-        show: ["pasted"], lens: { src: [0, srcY(1) - 6, 399, 76] } }
+      { caption: "Gulir panel sampai Image Sources: img_src masuk ke kolom ini.", dur: 3.4, focus: [0, 100, 399, 88], mark: SECURITY.imageSelect, show: ["img"],
+        lens: { src: [0, 102, 399, 86] } },
+      { caption: "Klik kolom Image Sources. Kotak Add image domain terbuka.", dur: 3.4, focus: [0, 100, 399, 136], mark: SECURITY.imageSelect,
+        at: mid(SECURITY.imageSelect), click: true, hide: ["img"], show: ["open"], lens: { src: [0, 176, 399, 58] } },
+      { caption: "Tempel https://foto.contoh.com di kotak itu. Domainnya muncul di bawah.", dur: 3.8, focus: [0, 100, 399, 187], mark: SECURITY.pickerInput,
+        hide: ["open"], show: ["typed"], lens: { src: [0, 176, 399, 109] } },
+      { caption: "Centang domain itu. Kolom Image Sources menulis 1 selected.", dur: 3.6, mark: SECURITY.pickerOption, at: mid(SECURITY.pickerTick), click: true,
+        hide: ["typed"], show: ["ticked"], lens: { src: [0, 102, 399, 183] } }
     ]
   },
 
   "bantuan-izin-simpan": {
     title: "Menyimpan tab Security di Scalev",
     cursorStart: [1300, 400],
-    base: [editorSecurity({ pasted: true })],
+    base: [editorSecurity({ at: "image", images: 1 })],
     els: {
       simpan: rect(SIMPAN[0], SIMPAN[1], SIMPAN[2], SIMPAN[3], { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong)
     },
