@@ -12,6 +12,7 @@ import {
   C, CHROME_TOP, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, esc, nkBtn, nkBtnBox, nkInput, nkLabel,
   nkHint, nkSeg, nkHead, nkDialogHead, nkAcc, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp, svMenuAt, favScalev, favChrome
 } from "../lib.mjs";
+import { securityPanel } from "./02-scalev.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;
@@ -521,7 +522,7 @@ export const scenes = {
     ["9. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
       pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1193, 50, 241, 34], { lens: [1183, 45, 257, 44] })],
     ["10. Atur alamat dan izin domain", "Atur alamat di Settings dan izin domain di tab Security.",
-      pv(edLeft("", { tab: "Security", rail: "", top: 44 }), -184, 44, [107, 57, 169 + tw("Settings", 12, 500) + 2 - 107, 18], { lens: [0, 44, 340, 48] })]
+      pv(edLeft(securityPanel(0, { at: "connect" }), { tab: "Security", rail: "", top: 44 }), -184, 44, [107, 57, 169 + tw("Settings", 12, 500) + 2 - 107, 18], { lens: [0, 44, 340, 48] })]
   ]),
   "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 11 sampai 15.", [
     ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
