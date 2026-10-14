@@ -32,16 +32,21 @@ for (let i = 0; i < 300 && !target; i++) { // up to 60 s: Chrome starts slowly w
 if (!target) { chrome.kill(); throw new Error(`Chrome tidak siap dalam 60 dtk: ${CHROME}`); }
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener("open", r));
-let id = 0; const pending = new Map(), anims = new Set();
+let id = 0; const pending = new Map(), anims = new Set(); let loaded = false;
 ws.addEventListener("message", (e) => {
   const m = JSON.parse(e.data);
-  if (m.id) { pending.get(m.id)?.(m); pending.delete(m.id); } else if (m.method === "Animation.animationStarted") anims.add(m.params.animation.id);
+  if (m.id) { pending.get(m.id)?.(m); pending.delete(m.id); }
+  else if (m.method === "Animation.animationStarted") anims.add(m.params.animation.id);
+  else if (m.method === "Page.loadEventFired") loaded = true;
 });
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 await send("Emulation.setDeviceMetricsOverride", { width: vw, height: vh, deviceScaleFactor: 1, mobile: false });
+await send("Page.enable");
 await send("Animation.enable"); // before the load, so every started animation (including <use> instances) is reported
 await send("Page.navigate", { url: pathToFileURL(file).href });
-for (let n = -1, k = 0; k < 40 && (anims.size === 0 || anims.size !== n); k++) { n = anims.size; await sleep(250); }
+// Seek only once the page has loaded and no animation has started for 3 checks in a row: under load Chrome reports
+// them in batches, and an unreported one would play at wall-clock time in the frames.
+for (let n = -1, still = 0, k = 0; k < 200 && still < 3; k++) { await sleep(300); still = loaded && anims.size && anims.size === n ? still + 1 : 0; n = anims.size; }
 fs.mkdirSync(outDir, { recursive: true });
 const shoot = async (label, ms) => {
   if (ms != null) {
