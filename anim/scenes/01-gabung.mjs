@@ -13,7 +13,7 @@ import {
   CHROME_TOP, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSeg, nkHead, nkDialogHead, nkAcc, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
   svMenuAt, favScalev, favChrome
 } from "../ui/kit.mjs";
-import { securityPanel } from "./02-scalev.mjs";
+import { securityPanel } from "../ui/scalev.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;

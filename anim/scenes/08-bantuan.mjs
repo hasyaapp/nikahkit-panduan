@@ -6,7 +6,7 @@
 // 02-scalev.mjs). WhatsApp Web: tata letak umum, belum diukur.
 import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, esc, PHONE } from "../lib.mjs";
 import { nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3, chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
-import { securityPanel, SECURITY } from "./02-scalev.mjs";
+import { securityPanel, SECURITY } from "../ui/scalev.mjs";
 
 const wrap = (s, w, size = 12, weight = 400) => {
   const out = []; let cur = "";
