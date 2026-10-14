@@ -7,20 +7,24 @@
 // skeleton of itself (text = bars of its width, colours = light greys), so every block keeps its real place and size.
 // The element to act on gets a precise ring (`mark`) with the step number, and a straight arrow from a 2x lens or a
 // note to the ring's nearest edge. Measurements come from the real UIs (captured 14 Okt 2026).
+// This file is the compiler and its primitives; drawings of the real screens live in ui/ (kit.mjs: shared widgets and
+// shells, then one module per screen), and scenes/ compose them without importing each other.
 //
 // Scene shape:
-//   { title, desc?, bg?, base: [svg], els: { id: svg | { svg, enter, origin, delay } }, cursorStart?: [x, y],
+//   { title, desc?, bg?, base: [svg], els: { id: svg | { svg, enter, origin, delay, skel } }, cursorStart?: [x, y],
 //     steps: [{ caption, dur?, focus, mark?, lens?, note?, at?, click?, press?, show?, hide?, type?, scroll?, hover? }] }
-//   base:  the whole 1440x900 screen in detail; its skeleton is derived (skeleton()). els are drawn as given, above the
-//          base: wrap an element in skeleton() when it should look greyed (e.g. a panel state outside the focus).
+//   base:  the whole 1440x900 screen in detail; its skeleton is derived (skeleton()). els are drawn above the base,
+//          as given; `skel: true` makes one part of the screen like the base (a panel state): skeleton outside the
+//          focus, detail inside it.
 //   focus: [x, y, w, h] | [[x, y, w, h], ...] | "all" | "none": base parts drawn in detail. Later steps inherit it; the
 //          first step must set it.
 //   mark:  [x, y, w, h] | { box: [x, y, w, h], r } | [...]: exact world bounds and corner radius (default 4) of the
 //          element to act on. Stage ring: 2.5 px, 4 px outside, radius r*2/3 + 4, step number on its top-left corner.
 //   lens:  { src: [x, y, w, h], at?: [sx, sy], zoom? }: magnifier of world rect src at `zoom` (default 2) x the stage,
 //          placed at stage point `at` or beside the mark (clear of it, the focus and the pointer), with an arrow to
-//          the ring. Use it when focused text is under ~20 px in the world (it would be under ~11 px in the docs).
-//   note:  "text" | { text, at }: a pill placed like a lens, with an arrow to the ring (steps without a lens).
+//          what it magnifies (the ring over src, else src). Use it when focused text is under ~20 px in the world (it
+//          would be under ~11 px in the docs). On a click step a lens away from the click shows the result, from it.
+//   note:  "text" | { text, at }: a pill placed like a lens, with an arrow to the first ring (steps without a lens).
 //   at/click/press/show/hide/type/scroll/hover: pointer target (world px), ripple, press dip, visibility, typing,
 //          scroll, hover; on a click step show/hide/type happen at the click.
 // Reduced motion: the final state of every element, no pointer.
