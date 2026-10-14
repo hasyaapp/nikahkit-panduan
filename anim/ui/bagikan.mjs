@@ -30,10 +30,11 @@ export const shareBtns = (d) => ["lihat", "salin", "umum"].map((k) => shareBtn(k
 export const accessHead = (y, on) => nkH3(16, y + 12, "Undangan khusus") + text(16, y + 49, "Undangan khusus", { size: 14, fill: C.text }) + nkSwitch(346, y + 34, on) +
   para(16, y + 78, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 });
 export const switchBox = (y) => [346, y + 34, 36, 20];
-// Untuk pengantin + PIN dashboard (y = top of the "Untuk pengantin" H3 box).
-export const forCouple = (y) => nkH3(16, y + 12, "Untuk pengantin") +
-  nkBtn(16, y + 24, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" }) +
-  nkBtn(16, y + 68, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" }) +
+// Untuk pengantin + PIN dashboard (y = top of the "Untuk pengantin" H3 box). The buttons are exported on their own
+// for scenes that press them.
+export const kirimBtn = (y) => nkBtn(16, y + 24, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" });
+export const dashboardBtn = (y) => nkBtn(16, y + 68, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" });
+export const forCouple = (y) => nkH3(16, y + 12, "Untuk pengantin") + kirimBtn(y) + dashboardBtn(y) +
   nkHint(16, y + 120, "Masuk dengan PIN dashboard.") + nkH3(16, y + 160, "PIN dashboard");
 export const kirimBox = (y) => [16, y + 24, 366, 36], dashboardBox = (y) => [16, y + 68, 366, 36], pinBox = (y) => [16, y + 172, 366, 36];
 export const pinBtn = (y) => nkBtn(16, y + 172, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" });
