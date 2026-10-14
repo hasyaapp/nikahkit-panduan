@@ -10,8 +10,8 @@ import { C, ED, PHONE, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialog
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 const shell = (o = {}) => [scalevEditor(0, 0, o)];
-// Over a scrolled list (x 72..399): the Scalev bars as the skeleton the panel steps show there, and the panel head.
-const cover = (o, title, h = {}) => skeleton(clipped(72, 0, 328, 92, scalevEditor(0, 0, o))) + clipped(72, 92, 327, 61, nkHead(0, 0, title, h));
+// Over a scrolled list (x 72..399): the Scalev bars and the panel head, redrawn above it.
+const cover = (o, title, h = {}) => clipped(72, 0, 328, 153, scalevEditor(0, 0, o), nkHead(0, 0, title, h));
 // Simpan & Terbitkan in the toolbar.
 const PUB_BOX = [1283, 50, 151, 34], PUB = [1358, 67];
 const bodyClip = (...s) => clipped(72, 153, 327, 747, ...s);
@@ -656,9 +656,9 @@ export const scenes = {
   "jualan-profil-merek": {
     title: "Mengisi Profil merek di Template > Marketing",
     base: kontenEd("Undangan Rani & Dimas", SAMPLE),
-    els: {
-      railOn: { svg: nkRail(0, 0, "Template"), enter: "fade" },
-      railSk: { svg: skeleton(nkRail(0, 0, "Template")), enter: "fade" },
+    // Every element is a state of the screen (skel): skeleton outside the step's focus, in the order they stack.
+    els: Object.fromEntries(Object.entries({
+      rail: { svg: nkRail(0, 0, "Template"), enter: "fade" },
       tpl: { svg: tplPanel(), enter: "fade" },
       mk: { svg: bodyBg + bodyClip(kindSeg("marketing"), brandOpen()), enter: "fade" },
       nameFocus: { svg: nkInput(101, 300, 253, "", { focus: true }), enter: "fade" },
@@ -678,11 +678,11 @@ export const scenes = {
       selV: { svg: nkInput(101, GAYA_Y - SCROLL, 253, "Kartu besar", { select: true, focus: true }), enter: "fade" },
       done: { svg: bodyBg + bodyClip(kindSeg("marketing"), brandClosed(BOX), mkCards(MKY)), enter: "fade", delay: 0.15 },
       cover: { svg: cover({ page: "Undangan Rani & Dimas", rail: "Template" }, "Template"), enter: "fade" }
-    },
+    }).map(([id, e]) => [id, { ...(typeof e === "string" ? { svg: e } : e), skel: true }])),
     steps: [
       tabStep("Di editor halaman, buka tab NikahKit.", 2.6),
-      { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["railOn", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 230, 120] }, dur: 3 },
-      { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", at: SEG.marketing, click: true, hide: ["railOn"], show: ["railSk", "mk"], focus: F.panel, mark: MARKETING,
+      { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["rail", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 230, 120] }, dur: 3 },
+      { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING,
         lens: { src: [84, 160, 290, 150] }, dur: 3.4 },
       { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: [228, 318], click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [111, 303, 70, 30] }],
         mark: M(101, 300, 253, 36), lens: { src: [92, 276, 272, 68] }, dur: 3.2 },
