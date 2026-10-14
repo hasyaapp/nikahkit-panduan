@@ -5,35 +5,17 @@
 // values from nikahkit/src/fields.js, model.js (SAMPLE, SAMPLE_CHECKS), ui/panel-content.jsx, ui/panels-style.jsx,
 // ui/fields.jsx, ui/App.jsx (MediaDialog, Toast). Template card thumbnails are drawn (the real ones are screenshots).
 import { C, rect, text, line, circle, para, clipped, icon, iconX, tw } from "../lib.mjs";
-import { nkHead, nkRail, nkLabel, nkBtn, nkSwitch, nkDialogHead, scalevEditor } from "./kit.mjs";
+import { nkHead, nkRail, nkLabel, nkBtn, nkInput, nkBadge, nkAcc, nkSwitch, nkDialogHead, scalevEditor } from "./kit.mjs";
 import { SERIF, photo } from "./invitation.mjs";
 
 export const ACCOUNT = "Tahunan"; // the account chip shows the member's plan
 export const P = 88, PW = 279, I = 101, IW = 253; // panel content box; inside an open accordion
 
-// ---- Panel widgets at measured sizes ------------------------------------------------------------------------------
+// ---- Panel widgets at measured sizes (inputs, accordions, badges: kit nkInput / nkAcc / nkBadge) --------------------
 export const lbl = (x, y, s) => nkLabel(x, y + 12, s);
 export const hintL = (x, y, lines, fill = C.faint) => para(x, y + 12, lines, { size: 12, fill, lh: 16 });
-// Input / select / datetime / textarea (o.lines). focus: blue border + 3px soft ring; err: red border; sel: selected text.
-export function inp(x, y, w, val, o = {}) {
-  const h = o.h ?? 36, tail = o.select || o.icon ? 34 : 6;
-  let s = (o.focus ? rect(x - 3, y - 3, w + 6, h + 6, { r: 6, fill: C.primarySoft }) : "") +
-    rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 4, fill: C.white, stroke: o.err ? C.danger : o.focus ? C.primary : C.field, sw: o.focus || o.err ? 1.5 : 1 });
-  if (o.sel && val) s += rect(x + 10, y + 8, tw(val, 14) + 2, 20, { fill: "#b4d7fe" });
-  if (o.lines) s += clipped(x + 2, y + 2, w - 4, h - 4, para(x + 11, y + 22, o.lines, { size: 14, fill: C.strong, lh: 17 }));
-  else if (val) s += clipped(x + 2, y + 2, w - tail, h - 4, text(x + 11, y + h / 2 + 5, val, { size: 14, fill: o.ph ? C.faint : C.strong }));
-  if (o.select) s += icon("chevron-down", x + w - 16, y + h / 2, 16, C.text);
-  if (o.icon) s += icon(o.icon, x + w - 20, y + h / 2, 16, C.strong);
-  return s;
-}
 // Typing into a cleared, focused input: [box, typed text, type spec for a step's `type`].
-export const typeIn = (x, y, w, val) => [inp(x, y, w, "", { focus: true }), text(x + 11, y + 23, val, { size: 14, fill: C.strong }), { n: val.length, box: [x + 10, y + 7, tw(val, 14) + 2, 22] }];
-const badge = (xr, y, label, ok = true) => { const w = Math.round(label.length * 4.6 + 9); return rect(xr - w, y, w, 18, { r: 9, fill: ok ? C.okSoft : C.warnSoft }) + text(xr - w / 2, y + 12.5, label, { size: 10, weight: 500, fill: ok ? C.ok : C.warnStrong, anchor: "middle" }); };
-// Konten accordion (nk-acc) at the panel's left: 50px bar, chevron, title, status badge; open = body height h below a hairline.
-export function acc(y, title, b, h) {
-  return rect(P + 0.5, y + 0.5, PW - 1, (h ?? 50) - 1, { r: 4, fill: C.white, stroke: C.line }) + (h ? line(P + 1, y + 50.5, P + PW - 1, y + 50.5) : "") +
-    icon(h ? "chevron-down" : "chevron-right", P + 22, y + 25, 18, C.strong) + text(P + 43, y + 30, title, { size: 14, weight: 500 }) + (b ? badge(P + 266, y + 16, b, b === "Terisi") : "");
-}
+export const typeIn = (x, y, w, val) => [nkInput(x, y, w, "", { focus: true }), text(x + 11, y + 23, val, { size: 14, fill: C.strong }), { n: val.length, box: [x + 10, y + 7, tw(val, 14) + 2, 22] }];
 export const quietBlock = (x, y, w, label, ic) => nkBtn(x, y, label, { variant: "quiet", w, icon: ic });
 // Vertical stack of fields (nk-field: label 16 + gap 4 + control, hint +8, margin 12). c.at: label -> top y of its field.
 export function col(x, y, w) {
@@ -45,7 +27,7 @@ export function col(x, y, w) {
     field(l, v, o = {}) {
       const h = o.h ?? 36;
       c.at[l] = y;
-      s += lbl(x, y, l) + inp(x, y + 20, w, v, o);
+      s += lbl(x, y, l) + nkInput(x, y + 20, w, v, o);
       let used = 20 + h;
       if (o.err) { s += text(x, y + used + 15, o.err, { size: 12, fill: C.danger }); used += 20; }
       else if (o.hint) { s += hintL(x, y + used + 8, o.hint); used += 8 + o.hint.length * 16; }
@@ -112,10 +94,10 @@ export function kList({ from = 0, top = 169, left = 6, link = "Ganti nama mempel
     if (y - dy > 3000) break;
     at[t] = y - dy;
     const b = todo.includes(t) ? "Belum diisi" : "Terisi";
-    if (t !== open) { s += acc(y, t, b); y += 58; continue; }
+    if (t !== open) { s += nkAcc(P, y, PW, t, { badge: b }); y += 58; continue; }
     const c = col(I, y + 54, IW); fill(c);
     for (const [k, v] of Object.entries(c.at)) f[k] = v - dy;
-    const h = c.y - y; s += acc(y, t, b, h) + c.svg; y += h + 8;
+    const h = c.y - y; s += nkAcc(P, y, PW, t, { badge: b, h: h }) + c.svg; y += h + 8;
   }
   const g = dy ? `<g transform="translate(0 ${-dy})">${s}</g>` : s;
   return { svg: raw ? rect(72, -2000, 327, 5000, { fill: C.white }) + g : panelBody(panelBg(), g), at, f };
@@ -124,7 +106,7 @@ export function kList({ from = 0, top = 169, left = 6, link = "Ganti nama mempel
 export const kListAt = (t, y, o = {}) => { const i = GRP.indexOf(t), from = Math.max(1, i - Math.ceil((y - 153) / 58)); return kList({ ...o, from, top: y - 58 * (i - from) }); };
 
 // Group fields (fields from nikahkit/src/fields.js, sample values from model.js SAMPLE); each fillX adds to a col.
-export const fillMempelai = (nick = "Rani") => (c) => c.field("Judul", "Mempelai", { ph: true }).field("Urutan nama", "Wanita dulu", { select: true }).h3("Mempelai Wanita")
+export const fillMempelai = (nick = "Rani") => (c) => c.field("Judul", "Mempelai", { placeholder: true }).field("Urutan nama", "Wanita dulu", { select: true }).h3("Mempelai Wanita")
   .field("Nama panggilan", nick, { hint: ["Tampil di sampul."] }).field("Nama lengkap dan gelar", "Rani Ayu, S.Psi.").field("Profesi atau bio singkat (opsional)", "Psikolog")
   .field("Anak ke- (opsional)", "Putri kedua", { hint: ["Kosong: \"Putri dari\" / \"Putra dari\"."] }).field("Nama ayah", "Ahmad").toggle("Ayah sudah wafat (Alm.)", false)
   .field("Nama ibu", "Siti").toggle("Ibu sudah wafat (Almh.)", true);
@@ -135,7 +117,7 @@ export const EVS = [["Akad Nikah", "14/02/2027, 08.00", "", "Masjid Al-Ikhlas", 
 export const fillAcara = (list) => (c) => {
   c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Acuan tanggal sampul, Simpan Tanggal,", "Hitung Mundur, dan kalender. Tanpa", "tanggal: acara pertama yang bertanggal."] });
   list.forEach((e, i) => item(c, e[0], (f) => f.field("Nama acara", e[0]).field("Mulai", e[1], { icon: "calendar" })
-    .field("Selesai (opsional)", e[2] || "hh/bb/tttt, --.--", { icon: "calendar", ph: !e[2] }).field("Nama tempat atau gedung", e[3])
+    .field("Selesai (opsional)", e[2] || "hh/bb/tttt, --.--", { icon: "calendar", placeholder: !e[2] }).field("Nama tempat atau gedung", e[3])
     .area("Alamat lengkap", [e[4]]).field("Tautan peta", e[5]).area("Catatan (opsional)", [e[6]]), i === 0, i === list.length - 1));
   c.at["Tambah acara"] = c.y;
   c.add(quietBlock(I, c.y, IW, "Tambah acara", "plus"), 48).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]);
@@ -147,7 +129,7 @@ export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true,
 // RSVP & Ucapan (sample: allowMaybe off, maxGuests 2, the four "Tanyakan juga" switches on), down to the QR switch.
 // c.at["Tersambung"] is the connection note's top; the switch rows are in c.at under their first line.
 export const fillRsvp = (c) => {
-  c.field("Judul", "Ucapan & Kehadiran", { ph: true });
+  c.field("Judul", "Ucapan & Kehadiran", { placeholder: true });
   c.at["Tersambung"] = c.y;
   c.add(rect(I, c.y, IW, 38, { r: 4, fill: C.primarySoft }) + text(I + 12, c.y + 24, ["Tersambung. ID: ", { t: "365671", w: 700 }], { size: 12 }), 50)
     .field("Isi form", "Ucapan + konfirmasi hadir", { select: true })
@@ -157,30 +139,30 @@ export const fillRsvp = (c) => {
     .toggle("Pilihan \"Masih ragu\"", false, ["Mati: tamu hanya memilih Hadir atau Tidak", "hadir."]).h3("Tanyakan juga")
     .toggle("Tamu dari pihak mana", true).toggle("Acara yang dihadiri", true, ["Butuh minimal 2 acara."]).toggle("Perkiraan jam datang", true)
     .toggle("Minta nomor WhatsApp tamu", true, ["Tamu mengisi nomornya sendiri di form (boleh", "kosong). Nomor tampil di Dashboard."]).lead("Jawaban tampil di Dashboard.")
-    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Hanya berlaku bila Undangan khusus menyala", "(di Bagikan). Tamu yang menjawab Hadir", "melihat QR ini di kartu terima kasih RSVP;", "penerima tamu memindainya di halaman Check-in."]);
+    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Hanya berlaku bila Undangan khusus", "menyala (di Bagikan). Tamu yang", "menjawab Hadir melihat QR ini di kartu", "terima kasih RSVP; penerima tamu", "memindainya di halaman Check-in."]);
 };
 const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
-export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { ph: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
+export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { placeholder: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
   item(c, "Menjalin Hubungan", story("Agustus 2022", "Jakarta", "Menjalin Hubungan", ["Setelah sekian lama berteman,", "kami memutuskan untuk", "melangkah bersama."], 3), false, false); };
-export const fillVideo = (c) => { c.field("Judul", "Video", { ph: true }).area("Keterangan", ["Saksikan perjalanan kami dalam", "video berikut."]);
+export const fillVideo = (c) => { c.field("Judul", "Video", { placeholder: true }).area("Keterangan", ["Saksikan perjalanan kami dalam", "video berikut."]);
   item(c, "Prewedding", (f) => f.field("Tautan YouTube", "https://www.youtube.com/watch?v=boRd_GXsYWA").field("Judul video (opsional)", "Prewedding"), true, true);
   c.add(quietBlock(I, c.y, IW, "Tambah video", "plus"), 48); };
 const swatch = (f, hex) => f.add(rect(I + IW - 52, f.y - 40, 20, 20, { r: 3, fill: hex, stroke: C.field }));
-export const fillDress = (c) => { c.field("Judul", "Dress Code", { ph: true });
+export const fillDress = (c) => { c.field("Judul", "Dress Code", { placeholder: true });
   [["Olive", "#3F4232"], ["Terakota", "#A0522D"], ["Sage", "#5B7553"]].forEach(([n, hex], i) => item(c, n, (f) => swatch(f.field("Warna", hex), hex).field("Nama warna", n), i === 0, false)); };
 export const fillGifts = (c) => {
-  c.field("Judul", "Tanda Kasih", { ph: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
+  c.field("Judul", "Tanda Kasih", { placeholder: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
     .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat terbuka setelah tamu", "menekan tombol."]);
   [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Logo tampil otomatis untuk bank dan", "e-wallet yang dikenal (BCA, BNI, BRI,", "BSI, Mandiri, DANA, OVO, ...). Nama", "lain tampil sebagai teks."] })
     .field("Nomor rekening", n).field("Nama pemilik rekening", h).photo("Gambar QRIS (opsional)", null, "Pilih foto"), i === 0, i === 1));
   c.add(quietBlock(I, c.y, IW, "Tambah rekening", "plus"), 48).h3("Kirim kado (opsional)").field("Nama penerima", "Rani Ayu").area("Alamat", ["Jl. Melati 10, Jakarta 12110"], 3)
     .field("Tautan peta alamat (opsional)", "https://maps.google.com/?q=Kebayoran+Baru").toggle("Tampilkan peta alamat", true, ["Butuh tautan Google Maps dan alamat."]).field("WhatsApp konfirmasi", "081234567890");
 };
-export const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { ph: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
+export const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { placeholder: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
   .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3);
 export const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda. Undangan baru mengambil", "nama dan WhatsApp dari Profil merek,", "atau dari bisnis Scalev bila profil kosong.", "Kosongkan kolom untuk menyembunyikan", "barisnya."]), 92)
   .toggle(["Hak cipta (© tahun dan nama", "mempelai)"], true).photo("Logo (opsional)", null, "Pilih foto")
-  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit. Tanpa {{Brand}}", "di Kredit: tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { ph: true });
+  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit. Tanpa {{Brand}}", "di Kredit: tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true });
 // Rail on Konten + the whole Konten panel (head and body) with Mempelai open, nickname `nick`; o goes to kList.
 export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ ...o, open: "Mempelai", fill: fillMempelai(nick) }).svg;
 
@@ -226,7 +208,7 @@ function thumb(x, y, id) {
 export function card(x, y, id, o = {}) {
   const [name, desc] = TPL[id];
   return rect(x + 1, y + 1, 132, 165, { r: 8, fill: C.page, stroke: o.on ? C.primary : C.line, sw: 2 }) + clipped(x + 2, y + 2, 130, 163, thumb(x, y, id)) +
-    text(x, y + 188, name, { size: 14, weight: 500 }) + (o.on ? badge(x + 133, y + 174, "Dipakai") : "") + para(x, y + 209, desc, { size: 12, fill: C.faint, lh: 16 });
+    text(x, y + 188, name, { size: 14, weight: 500 }) + (o.on ? nkBadge(x + 133, y + 174, "Dipakai", { end: true }) : "") + para(x, y + 209, desc, { size: 12, fill: C.faint, lh: 16 });
 }
 // Top-left of card i (two columns, 241 apart) when the cards start at y top; its box is [x, y, 134, 167].
 export const cardAt = (i, top) => [i % 2 ? 234 : 88, top + Math.floor(i / 2) * 241];
@@ -257,7 +239,7 @@ export function chips(y, n = ALL_N, on = "Semua") {
   });
   return s;
 }
-const searchBox = (y, q = "", focus = false) => inp(P, y, PW, q || SEARCH_PH, { ph: !q, focus });
+const searchBox = (y, q = "", focus = false) => nkInput(P, y, PW, q || SEARCH_PH, { placeholder: !q, focus });
 // The whole library under the switch: search at top, chips 44 below, cards 118 below (cards at 337 when top = 219).
 // used: id of the card marked Dipakai; o.q: search text, o.n: chip counts, o.cat: active chip, o.ids: the cards shown.
 export const library = (top, used, o = {}) => searchBox(top, o.q) + chips(top + 44, o.n, o.cat) + cards(top + 118, used, o.ids);
@@ -270,20 +252,20 @@ export const templatePanel = (used, o = {}) => seg() + library(219, used, o);
 // "Foto galeri (n)"; rest(y): Tambah foto button and the next bars; dlg: the dialog covering rail and panel (Unggah foto,
 // paste link, 3-column grid, Pakai foto footer); pick(i): photo i selected; foot(n): Pakai n foto; after(): two photos added.
 export const GAL = (() => {
-  const top = (n) => acc(191, "Kisah Cinta", "Terisi") + acc(249, "Galeri Foto", n ? "Terisi" : "Belum diisi", 1400) +
-    col(I, 303, IW).field("Judul", "Galeri", { ph: true }).area("Teks pengantar (opsional)", ["Sebagian momen yang ingin kami", "bagi bersama Anda."]).svg +
+  const top = (n) => nkAcc(P, 191, PW, "Kisah Cinta", { badge: "Terisi" }) + nkAcc(P, 249, PW, "Galeri Foto", { badge: n ? "Terisi" : "Belum diisi", h: 1400 }) +
+    col(I, 303, IW).field("Judul", "Galeri", { placeholder: true }).area("Teks pengantar (opsional)", ["Sebagian momen yang ingin kami", "bagi bersama Anda."]).svg +
     lbl(I, 451, `Foto galeri (${n})`);
   const rest = (y) => quietBlock(I, y, IW, "Tambah foto", "image") + text(I, y + 60, "Foto pertama tampil paling besar.", { size: 12, fill: C.faint }) +
-    ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera"].map((t, i) => acc(y + 85 + i * 58, t, "Terisi")).join("");
+    ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera"].map((t, i) => nkAcc(P, y + 85 + i * 58, PW, t, { badge: "Terisi" })).join("");
   const cell = (i) => [16 + (i % 3) * 124, 291 + Math.floor(i / 3) * 124];
   const dlg = nkDialogHead(0, 0, "Pilih foto") + nkBtn(16, 169, "Unggah foto", { variant: "ghost", w: 366, icon: "upload" }) + lbl(16, 217, "Atau tempel tautan https") +
-    inp(16, 237, 300, "https://...", { ph: true }) + `<g opacity=".5">${nkBtn(322, 237, "Pakai", { variant: "ghost", w: 60 })}</g>` +
+    nkInput(16, 237, 300, "https://...", { placeholder: true }) + `<g opacity=".5">${nkBtn(322, 237, "Pakai", { variant: "ghost", w: 60 })}</g>` +
     clipped(0, 285, 399, 554, ...Array.from({ length: 12 }, (_, i) => photo(...cell(i), 118, 118, i % 6, 4))) +
     rect(0, 839, 399, 61, { fill: C.white }) + line(0, 839.5, 399, 839.5) + `<g opacity=".5">${nkBtn(16, 851, "Pakai foto", { w: 366 })}</g>`;
   const pick = (i) => { const [x, y] = cell(i); return rect(x + 1, y + 1, 116, 116, { r: 4, stroke: C.primary, sw: 2 }) + circle(x + 104, y + 14, 8, { fill: C.action }) + iconX("check", x + 104, y + 14, 10, C.white, 3.5); };
   const foot = (n) => rect(0, 840, 399, 60, { fill: C.white }) + nkBtn(16, 851, `Pakai ${n} foto`, { w: 366 });
   const row = (k) => { const y = 471 + k * 104; return rect(I + 0.5, y + 0.5, IW - 1, 95, { r: 4, fill: C.page, stroke: C.line }) + photo(I + 9, y + 9, 64, 64, k * 4, 4) +
-    inp(I + 81, y + 9, 127, "Deskripsi foto", { ph: true }) + inp(I + 81, y + 51, 127, "Fokus tengah", { select: true }) +
+    nkInput(I + 81, y + 9, 127, "Deskripsi foto", { placeholder: true }) + nkInput(I + 81, y + 51, 127, "Fokus tengah", { select: true }) +
     icon("chevron-up", I + 230, y + 27, 16, k ? C.text : "rgba(91,102,117,.35)") + icon("trash", I + 230, y + 63, 16, C.text); };
   const after = () => panelBody(panelBg(), top(2), rest(679), row(0), row(1));
   return { top, rest, dlg, pick, foot, after };

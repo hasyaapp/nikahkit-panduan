@@ -1,7 +1,7 @@
 // Drawings of the product UIs the scenes compose: NikahKit panel widgets, the Chrome window, the Scalev editor and
 // dashboard shell, and the guide's stage pieces (dim, phone page). lib.mjs is the compiler and its primitives;
 // every drawing of a real screen lives under ui/, so scenes never import from each other.
-import { C, PHONE, WORLD, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX } from "../lib.mjs";
+import { C, PHONE, WORLD, rect, text, line, circle, para, tw, textWidth, clipped, shadow, icon, iconX } from "../lib.mjs";
 
 // ---- NikahKit panel widgets (nikahkit/src/ui/base.css) --------------------------------------------------------------
 // Button: variant "primary" (action blue), "ghost" (white, blue text+border), "quiet" (white, grey line), "danger".
@@ -17,17 +17,32 @@ export function nkBtn(x, y, label, o = {}) {
   return rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 4, fill, stroke }) + (ic ? iconX(ic, cx - tw(label, size, 500) / 2 - 2, y + h / 2, 16, fg) : "") +
     text(tx, y + h / 2 + size * 0.36, label, { size, weight: 500, fill: fg, anchor: "middle" });
 }
-export const nkInput = (x, y, w, value, o = {}) => rect(x + 0.5, y + 0.5, w - 1, (o.h ?? 36) - 1, { r: 4, fill: C.white, stroke: o.focus ? C.primary : C.field, sw: o.focus ? 2 : 1 }) +
-  (value ? text(x + 10, y + (o.h ?? 36) / 2 + 5, value, { size: 14, fill: o.placeholder ? C.faint : C.strong }) : "") +
-  (o.select ? icon("chevron-down", x + w - 16, y + (o.h ?? 36) / 2, 16, C.text) : "");
+// Input (nk-input, 36 high, 4 px radius; measured in the Konten panel). o.placeholder: faint value; o.select: chevron;
+// o.icon: icon at the right (calendar); o.lines: textarea lines (17 px apart); o.focus: blue 1.5 border + 3 px soft ring;
+// o.err: red border; o.sel: the value selected. The value is clipped to the box.
+export function nkInput(x, y, w, value, o = {}) {
+  const h = o.h ?? 36, tail = o.select || o.icon ? 34 : 6;
+  let s = (o.focus ? rect(x - 3, y - 3, w + 6, h + 6, { r: 6, fill: C.primarySoft }) : "") +
+    rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 4, fill: C.white, stroke: o.err ? C.danger : o.focus ? C.primary : C.field, sw: o.focus || o.err ? 1.5 : 1 });
+  if (o.sel && value) s += rect(x + 10, y + 8, tw(value, 14) + 2, 20, { fill: "#b4d7fe" });
+  if (o.lines) s += clipped(x + 2, y + 2, w - 4, h - 4, para(x + 11, y + 22, o.lines, { size: 14, fill: C.strong, lh: 17 }));
+  else if (value) s += clipped(x + 2, y + 2, w - tail, h - 4, text(x + 11, y + h / 2 + 5, value, { size: 14, fill: o.placeholder ? C.faint : C.strong }));
+  if (o.select) s += icon("chevron-down", x + w - 16, y + h / 2, 16, C.text);
+  if (o.icon) s += icon(o.icon, x + w - 20, y + h / 2, 16, C.strong);
+  return s;
+}
 export const nkLabel = (x, y, s) => text(x, y, s, { size: 12, weight: 500, fill: C.strong });
 export const nkHint = (x, y, s, o = {}) => text(x, y, s, { size: 12, fill: o.fill ?? C.faint });
 export const nkSwitch = (x, y, on) => rect(x, y, 36, 20, { r: 10, fill: on ? C.primary : C.off }) + circle(on ? x + 26 : x + 10, y + 10, 8, { fill: C.white });
-export const nkBadge = (x, y, label, o = {}) => { const w = tw(label, 10, 500) + 12; return rect(x, y, w, 18, { r: 9, fill: o.fill ?? C.okSoft }) + text(x + w / 2, y + 12.5, label, { size: 10, weight: 500, fill: o.fg ?? C.ok, anchor: "middle" }); };
+// Status pill (CSS padding 2px 6px): left edge x, or right edge x with o.end; tones via o.fill / o.fg (default ok green).
+export const nkBadge = (x, y, label, o = {}) => { const w = textWidth(label, 10, 500) + 12, bx = o.end ? x - w : x; return rect(bx, y, w, 18, { r: 9, fill: o.fill ?? C.okSoft }) + text(bx + w / 2, y + 12.5, label, { size: 10, weight: 500, fill: o.fg ?? C.ok, anchor: "middle" }); };
 export const nkNote = (x, y, w, lines, o = {}) => { const h = o.h ?? 20 + lines.length * 18; const tone = o.tone ?? "info"; const bg = tone === "warn" ? C.warnSoft : tone === "err" ? C.dangerSoft : tone === "ok" ? C.okSoft : C.primarySoft; const fg = tone === "warn" ? C.warnStrong : tone === "err" ? C.danger : tone === "ok" ? C.ok : C.strong; return rect(x, y, w, h, { r: 4, fill: bg }) + para(x + 12, y + 23, lines, { size: 12, fill: fg, lh: 18 }); };
-// Accordion row (Konten groups): title, optional badge (Terisi / Belum diisi), chevron.
-export const nkAcc = (x, y, w, title, o = {}) => rect(x + 0.5, y + 0.5, w - 1, 49, { r: 4, fill: C.white, stroke: C.line }) + icon(o.open ? "chevron-down" : "chevron-right", x + 18, y + 25, 16, C.text) +
-  text(x + 34, y + 30, title, { size: 14, weight: 500 }) + (o.badge ? nkBadge(x + w - tw(o.badge, 10, 500) - 24, y + 16, o.badge, o.badge === "Terisi" ? {} : { fill: C.warnSoft, fg: C.warnStrong }) : "");
+// Accordion (nk-acc, measured in Konten): 50 px bar, 18 px chevron at x + 22, title at x + 43, badge (Terisi green,
+// anything else warn) with its right edge at x + w - 13. o.open: chevron down; o.h: open with a body, the box h high and a
+// hairline under the bar.
+export const nkAcc = (x, y, w, title, o = {}) => rect(x + 0.5, y + 0.5, w - 1, (o.h ?? 50) - 1, { r: 4, fill: C.white, stroke: C.line }) + (o.h ? line(x + 1, y + 50.5, x + w - 1, y + 50.5) : "") +
+  icon(o.open || o.h ? "chevron-down" : "chevron-right", x + 22, y + 25, 18, C.strong) + text(x + 43, y + 30, title, { size: 14, weight: 500 }) +
+  (o.badge ? nkBadge(x + w - 13, y + 16, o.badge, o.badge === "Terisi" ? { end: true } : { end: true, fill: C.warnSoft, fg: C.warnStrong }) : "");
 // Segmented control (Gaya: Warna/Huruf/Bentuk; Template: Template/Marketing).
 export function nkSeg(x, y, w, items, active) {
   const iw = w / items.length;
