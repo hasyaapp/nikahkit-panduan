@@ -22,6 +22,7 @@ import { helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { shareTop, shareBtns, accessHead, coupleAll, shareAll, shareBox as shareBtnBox, ACC_Y, COUPLE_Y, NO_NOTE } from "../ui/bagikan.mjs";
 import { ACCOUNT, kontenPanel, panelBody, seg, library } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvCover, MAROON, CREAM, SERIF } from "../ui/invitation.mjs";
+import { WA_X, WA_HEAD, waWeb, waFoot, waFootBox, waBubble } from "../ui/whatsapp.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
 
@@ -115,27 +116,12 @@ const cfForm = rect(312.5, 316.5, 1055, 219, { r: 6, fill: "#f8f9fb", stroke: "#
 const CF_FORM = [312, 316, 1056, 220];
 
 
-// ---- 6. WhatsApp Web (not captured): generic chat list and one chat ------------------------------------------------
-const favWa = (cx, cy) => circle(cx, cy, 8, { fill: "#25d366" });
-const WA = { x: 461, head: [461, CT, 979, 60], foot: 838 };
-function waWeb(name) {
-  let s = chrome(0, 0, 1440, 900, { tabs: [{ title: "WhatsApp", active: true, fav: favWa }], url: "web.whatsapp.com" }) +
-    rect(0, CT, 460, 815, { fill: C.white }) + rect(0, CT, 460, 60, { fill: "#f0f2f5" }) + circle(36, CT + 30, 20, { fill: "#dfe5e7" }) +
-    rect(16, CT + 72, 428, 36, { r: 8, fill: "#f0f2f5" }) + bar(48, CT + 85, 140, 10, "#d1d7db");
-  for (let k = 0; k < 9; k++) {
-    const y = CT + 120 + k * 72;
-    if (!k) s += rect(0, y, 460, 72, { fill: "#f0f2f5" });
-    s += circle(40, y + 36, 24, { fill: "#dfe5e7" }) + bar(80, y + 22, [180, 140, 200, 160, 120, 190, 150, 170, 130][k], 10, "#d1d7db") + bar(80, y + 44, [260, 220, 240, 200, 250, 210, 230, 190, 220][k], 8, "#e9edef") + line(80, y + 71.5, 460, y + 71.5, { stroke: "#e9edef" });
-  }
-  return s + line(460.5, CT, 460.5, 900, { stroke: "#d1d7db" }) + rect(461, CT, 979, 60, { fill: "#f0f2f5" }) + circle(500, CT + 30, 20, { fill: "#dfe5e7" }) + icon("users", 500, CT + 30, 18, "#8696a0") +
-    text(532, CT + 36, name, { size: 16, weight: 500, fill: "#111b21" }) + rect(461, CT + 60, 979, 693, { fill: "#efeae2" }) + rect(461, WA.foot, 979, 62, { fill: "#f0f2f5" }) + rect(477, WA.foot + 10, 887, 42, { r: 8, fill: C.white });
-}
-const WA_SEND = [1383, 848, 42, 42];
-const waDraft = bar(497, WA.foot + 26, 260, 10, "#c9d1d6") + bar(767, WA.foot + 26, 110, 10, "#9aa6ad");
-const waSend = circle(1404, 869, 21, { fill: "#008069" }) + icon("send", 1403, 869, 18, C.white);
-const ticks = (x, y) => `<path d="M${x} ${y} l3 3 l6 -7 M${x + 6} ${y} l3 3 l6 -7" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round"/>`;
-const waBubble = rect(477, WA.foot + 10, 887, 42, { r: 8, fill: C.white }) + rect(1088, 740, 336, 64, { r: 8, fill: "#d9fdd3" }) + bar(1104, 758, 230, 10, "#a8c9a2") + bar(1104, 778, 100, 10, "#7fa978") + ticks(1394, 788);
-const WA_CHAT = [461, CT, 979, 815];
+// ---- 6. WhatsApp Web (../ui/whatsapp.mjs): the OTP draft (grey bars: the code is not shown), then the sent bubble ----
+const WA_FOOT = waFootBox(), WA_CHAT = [WA_X + 1, CT, 1440 - WA_X - 1, 815];
+const waDraft = bar(WA_FOOT.box[0] + 14, WA_FOOT.box[1] + 16, 260, 10, "#c9d1d6") + bar(WA_FOOT.box[0] + 284, WA_FOOT.box[1] + 16, 110, 10, "#9aa6ad");
+const otpScreen = waWeb("+6282125784683", { draft: true }) + waDraft;
+// After Send: the input empties and the message sits bottom right as a sent bubble.
+const otpSent = waFoot() + waBubble(1088, 740, 336, 64, "10.12") + bar(1104, 758, 230, 10, "#a8c9a2") + bar(1104, 778, 100, 10, "#7fa978");
 // After Save in Edit Account (not observed, generic): a confirmation that shows the number with Verifikasi, later Cek Verifikasi.
 const CD = { x: 520, y: 300 };
 const confirmDlg = (btn, w) => shadow(CD.x, CD.y, 400, 220, 4, 2) + rect(CD.x, CD.y, 400, 220, { r: 4, fill: C.white }) + bar(CD.x + 24, CD.y + 32, 200, 12, "#dfe4ea") +
@@ -188,9 +174,9 @@ const imgHover = rect(IMG.x, IMG.y, IMG.s, IMG.s, { r: 4, fill: "rgba(65,64,66,.
 // WhatsApp outgoing bubble with the link card (square thumbnail, title, description, domain).
 function waLink(x, y, w) {
   const p = 96, tx = x + p + 18;
-  return rect(x, y, w, p + 72, { r: 8, fill: "#d9fdd3" }) + rect(x + 4, y + 4, w - 8, p, { r: 6, fill: "#c9eec3" }) + clipped(x + 4, y + 4, p, p, thumb(x + 4, y + 4, p)) +
+  return waBubble(x, y, w, p + 72, "10.12") + rect(x + 4, y + 4, w - 8, p, { r: 6, fill: "#c9eec3" }) + clipped(x + 4, y + 4, p, p, thumb(x + 4, y + 4, p)) +
     text(tx, y + 28, JUDUL, { size: 14, weight: 600, fill: "#111b21" }) + para(tx, y + 48, DESC, { size: 12, fill: "#4a5a63", lh: 16 }) + text(tx, y + 88, "tokomu.myscalev.com", { size: 12, fill: "#4a5a63" }) +
-    text(x + 10, y + p + 30, PUB_URL, { size: 14, fill: "#027eb5" }) + text(x + w - 54, y + p + 60, "10.12", { size: 11, fill: "#667781" }) + ticks(x + w - 20, y + p + 54);
+    text(x + 10, y + p + 30, PUB_URL, { size: 14, fill: "#027eb5" });
 }
 
 // ---- 8. Canva: public gallery measured at 1440x900 (14 Okt 2026); logged-in header, menus and editor generic --------------
@@ -658,7 +644,7 @@ export const scenes = {
       num: eaPhone,
       saveOn: { svg: eaSaveOn, enter: "fade", delay: 1.2 },
       konf: { svg: confirmDlg("Verifikasi", 120), enter: "pop", origin: [903, 674] },
-      wa: { svg: waWeb("+6282125784683") + waDraft + waSend, skel: true, enter: "rise", delay: 0.15 }
+      wa: { svg: otpScreen, skel: true, enter: "rise", delay: 0.15 }
     },
     steps: [
       { caption: "Di Settings bagian Profil, klik Edit. Jendela Edit Account terbuka.", focus: EA, at: [566, 129], click: true, show: ["shade", "edit"], mark: { box: PROFIL_EDIT, r: 4 }, lens: { src: [489, 197, 300, 58] } },
@@ -666,8 +652,8 @@ export const scenes = {
         mark: EA_PHONE, lens: { src: [661, 535, 274, 88] } },
       { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", focus: [CD.x, CD.y, 400, 220], at: [903, 674], click: true, show: ["konf"], hide: ["edit", "num", "saveOn"], dur: 3.4,
         mark: EA_SAVE, lens: { src: [CD.x + 16, CD.y + 70, 330, 50] } },
-      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [WA.head, [461, WA.foot, 979, 62]], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf"], dur: 3.8,
-        mark: VERIF, lens: { src: [470, CT, 320, 60] } }
+      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", focus: [WA_HEAD, WA_FOOT.area], at: [VERIF[0] + 60, VERIF[1] + 20], click: true, show: ["wa"], hide: ["shade", "konf"], dur: 3.8,
+        mark: VERIF, lens: { src: [WA_X + 8, CT, 320, 60] } }
     ]
   },
 
@@ -675,16 +661,15 @@ export const scenes = {
     title: "Mengirim OTP lewat WhatsApp, Cek Verifikasi, lalu MFA",
     base: [profilPage(), dim(0, 0, 1440, 900), confirmDlg("Cek Verifikasi", 140)],
     els: {
-      wa: { svg: waWeb("+6282125784683") + waDraft, skel: true },
-      send: waSend,
-      bubble: { svg: waBubble, enter: "slide" },
+      wa: { svg: otpScreen, skel: true },
+      bubble: { svg: otpSent, enter: "slide" },
       back: { svg: profilPage() + dim(0, 0, 1440, 900) + confirmDlg("Cek Verifikasi", 140), skel: true, enter: "fade" },
       ok: { svg: icon("circle-check", CD.x + 274, CD.y + 92, 20, "#15c15d"), enter: "pop" },
       mfa: { svg: profilPage({ phone: "+62 81234567890" }), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 728, 352, 84], at: [300, 150] } },
-      { caption: "Kembali ke tab Scalev.", focus: [CD.x, CD.y, 400, 220], at: [720, 640], show: ["back"], hide: ["wa", "send", "bubble"], dur: 2.4 },
+      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA_HEAD, WA_FOOT.area, [1060, 720, 380, 100]], at: WA_FOOT.send, click: true, show: ["bubble"], dur: 3.4, mark: { box: WA_FOOT.sendBox, r: 21 }, lens: { src: [1080, 728, 352, 84], at: [300, 150] } },
+      { caption: "Kembali ke tab Scalev.", focus: [CD.x, CD.y, 400, 220], at: [720, 640], show: ["back"], hide: ["wa", "bubble"], dur: 2.4 },
       { caption: "Klik Cek Verifikasi. Nomor jadi terverifikasi.", at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["ok"], dur: 3.4,
         mark: CEK, lens: { src: [CD.x + 16, CD.y + 70, 370, 50] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", focus: SECURITY_BOX, at: [580, 890], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [504, 845, 240, 55], at: [470, 400] } }
