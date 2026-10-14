@@ -1,6 +1,6 @@
 // node panduan/anim/lib.test.mjs â€” the scene compiler's rules (canvas, skeleton, focus, marks, lens, timing, reduced motion).
 import assert from "node:assert/strict";
-import { compile, skeleton, text, rect, textWidth } from "./lib.mjs";
+import { compile, skeleton, text, rect, textWidth, tw, wrap, clipShape } from "./lib.mjs";
 
 const scene = (over = {}) => ({
   title: "uji",
@@ -44,6 +44,16 @@ assert.ok(run.includes(`width="${+(textWidth("Hadir 8", 10, 700) + textWidth(" Â
 assert.ok(sk.includes('fill="#eceff3"') && sk.includes('fill="#ffffff"') && sk.includes("rgba(214,219,226,0.42)"), "dark fill greyed, white kept, alpha kept");
 // A tinted near-white (green badge, cream page) keeps its lightness and loses its hue: one grey family.
 assert.equal(skeleton('<rect fill="#e8f9ef"/><rect fill="#f6f9fc"/><rect fill="rgba(255,250,240,.5)"/>'), '<rect fill="#f5f5f5"/><rect fill="#f6f9fc"/><rect fill="rgba(250,250,250,0.5)"/>', "tints neutralised, neutral greys kept");
+// text() runs: a run sets only what it names (an underlined run keeps the line's weight), the skeleton is one bar.
+const rs = skeleton(text(0, 20, ["Urutan di ", { t: "Lapisan", u: true }, " ", { t: "365671", w: 700 }], { size: 12, weight: 500 }));
+assert.ok(rs.includes(`width="${+(textWidth("Urutan di ", 12, 500) + textWidth("Lapisan", 12, 500) + textWidth(" ", 12, 500) + textWidth("365671", 12, 700)).toFixed(1)}"`), "runs: one bar, each run at its own weight " + rs);
+// wrap: a word longer than the width (a URL) is split so every line fits; nothing is lost.
+const url = "Kelola: https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas";
+const wl = wrap(url, 200, 14);
+assert.ok(wl.length > 2 && wl.every((l) => tw(l, 14) <= 200) && wl.join("") === url.replace(/ /g, ""), "long word split to fit: " + wl);
+// Clip ids come from the shape: the same shape shares an id, another shape gets its own (no renumbering).
+const cid = (s) => /clipPath id="(\w+)"/.exec(s)[1];
+assert.ok(cid(clipShape('<path d="M0 0h9v9z"/>', "<a/>")) === cid(clipShape('<path d="M0 0h9v9z"/>', "<b/>")) && cid(clipShape('<path d="M0 0h8v9z"/>')) !== cid(clipShape('<path d="M0 0h9v9z"/>')), "clip id from the shape");
 
 // Focus: the skeleton base under one detailed layer per run of steps with the same focus.
 assert.ok(svg.includes('<clipPath id="fz0"><rect x="72" y="92" width="327" height="808"/></clipPath>'), "step 1-2 focus clip");

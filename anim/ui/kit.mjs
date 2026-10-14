@@ -1,5 +1,5 @@
 // Drawings of the product UIs the scenes compose: NikahKit panel widgets, the Chrome window, the Scalev editor and
-// dashboard shell, and the guide's stage pieces (toast, dim, phone page). lib.mjs is the compiler and its primitives;
+// dashboard shell, and the guide's stage pieces (dim, phone page). lib.mjs is the compiler and its primitives;
 // every drawing of a real screen lives under ui/, so scenes never import from each other.
 import { C, PHONE, WORLD, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX } from "../lib.mjs";
 
@@ -35,6 +35,18 @@ export function nkSeg(x, y, w, items, active) {
     text(x + i * iw + iw / 2, y + 24, it, { size: 12, weight: i === active ? 600 : 500, fill: i === active ? C.action : C.text, anchor: "middle" })).join("");
 }
 export const nkH3 = (x, y, s) => text(x, y, s, { size: 12, weight: 700, fill: C.strong });
+// Toast (styles.js .nk-toast): left 84 / right 12 / bottom 12 of the 399-wide panel area, padding 10 12, 14 px lines
+// (it grows upward), the Urungkan button on the right (Chrome's 6 px button padding inside the toast's 12). Boxes for
+// marks: the toast and the Urungkan button.
+export const nkToastBoxes = (lines) => {
+  const h = Math.max(52, [].concat(lines).length * 18 + 20), y = 888 - h, w = tw("Urungkan", 14, 700) + 12;
+  return { toast: [84, y, 303, h], undo: [375 - w, y + h / 2 - 16, w, 32] };
+};
+export function nkToast(lines, o = {}) {
+  const ls = [].concat(lines), [x, y, w, h] = nkToastBoxes(ls).toast;
+  return shadow(x, y, w, h, 4, 2) + rect(x, y, w, h, { r: 4, fill: C.strong }) + para(x + 12, y + h / 2 - (ls.length - 1) * 9 + 5, ls, { size: 14, fill: C.white, lh: 18 }) +
+    (o.undo === false ? "" : text(369, y + h / 2 + 5, "Urungkan", { size: 14, weight: 700, fill: C.toastLink, anchor: "end" }));
+}
 
 // ---- Chrome window --------------------------------------------------------------------------------------------------
 // Chrome (light, 2024 UI) at real size: tab strip 41px, toolbar 44px, content from y + 85.
@@ -80,6 +92,9 @@ export const ED = {
   panel: { x: 88, y: 169, w: 279 }, // panel body content box (inside 16px padding)
   screen: { x: 727, y: 106, w: 390, h: 784 } // preview: plain screen, no device frame
 };
+// The two toolbar buttons, alone: scenes draw them as elements that dip when pressed (at ED.simpanBox / terbitkanBox).
+export const svSimpan = (x = 0, y = 0) => rect(x + 1193, y + 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(x + 1201, y + 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", x + 1258, y + 67, 15, C.strong);
+export const svTerbitkan = (x = 0, y = 0) => rect(x + 1283, y + 50, 151, 34, { r: 4, fill: C.primary }) + text(x + 1403, y + 72, "Simpan & Terbitkan", { size: 13, weight: 500, fill: C.white, anchor: "end" }) + iconX("rocket", x + 1418, y + 67, 15, C.white);
 const RAIL = [["Template", "layout-grid"], ["Gaya", "palette"], ["Audio", "music"], ["Media", "image"], ["Lapisan", "rows-3"], ["Konten", "pencil"]];
 export function scalevEditor(x, y, o = {}) {
   const tab = o.tab ?? "NikahKit", page = o.page ?? "Undangan Rani & Dimas";
@@ -100,8 +115,7 @@ export function scalevEditor(x, y, o = {}) {
     rect(x + 858.5, y + 50.5, 123, 33, { r: 4, fill: "#f6f9fc", stroke: C.svDivider }) +
     ["monitor", "monitor", "tablet", "smartphone"].map((ic, i) => (i === 3 ? rect(x + 952, y + 54, 26, 26, { r: 3, fill: C.white }) : "") + icon(ic, x + 874 + i * 30, y + 67, 14, C.text)).join("") +
     rect(x + 990.5, y + 53.5, 35, 27, { r: 4, fill: C.white, stroke: C.svDivider, sw: 2 }) + iconX("search", x + 1008, y + 67, 16, C.text) +
-    rect(x + 1193, y + 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(x + 1201, y + 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", x + 1258, y + 67, 15, C.strong) +
-    rect(x + 1283, y + 50, 151, 34, { r: 4, fill: C.primary }) + text(x + 1403, y + 72, "Simpan & Terbitkan", { size: 13, weight: 500, fill: C.white, anchor: "end" }) + iconX("rocket", x + 1418, y + 67, 15, C.white);
+    svSimpan(x, y) + svTerbitkan(x, y);
   // left area
   if (tab === "NikahKit") s += nkRail(x, y, o.rail ?? "Template", o) + rect(x + 72, y + 92, 327, 808, { fill: C.white });
   else s += rect(x, y + 92, 399, 808, { fill: C.white }) + [0, 1, 2, 3, 4, 5, 6, 7].map((k) => rect(x + 20, y + 120 + k * 26, [220, 300, 260, 340, 180, 280, 240, 320][k], 10, { r: 5, fill: C.mutedBg })).join("");
@@ -166,10 +180,8 @@ export function scalevApp(x, y, o = {}) {
 }
 
 // ---- Guide stage pieces ---------------------------------------------------------------------------------------------
-// Dark toast (NikahKit/Scalev snackbar).
-export const toast = (x, y, label, o = {}) => { const w = o.w ?? tw(label, 14) + 40 + (o.action ? tw(o.action, 14, 600) + 24 : 0); return rect(x, y, w, 44, { r: 6, fill: "#323232" }) + text(x + 18, y + 27, label, { size: 14, fill: C.white }) + (o.action ? text(x + w - 18, y + 27, o.action, { size: 14, weight: 600, fill: "#7fd3f5", anchor: "end" }) : ""); };
-// Dimmed backdrop over a world rect (for dialogs).
-export const dim = (x, y, w, h) => rect(x, y, w, h, { fill: "rgba(15,22,30,.42)" });
+// Dimmed backdrop over a world rect, for dialogs: Scalev's modal veil, as NikahKit's pin frame copies it (src/pin-frame.js).
+export const dim = (x, y, w, h) => rect(x, y, w, h, { fill: "rgba(15,23,42,.45)" });
 // A phone page in the desktop canvas: the plain screen (no device frame) at PHONE, a generic desktop around it (top bar,
 // side cards) that steps leave as skeleton. content: markup drawn at PHONE coordinates, clipped to the screen.
 export const phoneDesk = (content, o = {}) => rect(0, 0, WORLD.w, WORLD.h, { fill: o.bg ?? "#eef1f5" }) +

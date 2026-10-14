@@ -38,7 +38,7 @@ export const C = {
   primary: "#0899cf", action: "#0779a6", primarySoft: "#e8f6fb", surface: "#ffffff", page: "#f6f9fc", mutedBg: "#f2f5fa",
   text: "#5b6675", strong: "#223548", faint: "#6b7480", line: "#eaeaeb", field: "#d5dae1", off: "#cbd2da",
   danger: "#b42318", dangerSoft: "#fef3f2", warn: "#b45309", warnStrong: "#9a3412", warnSoft: "#fff7ed", changed: "#f59e0b",
-  ok: "#166534", okSoft: "#e8f9ef",
+  ok: "#166534", okSoft: "#e8f9ef", toastLink: "#7fd3f5",
   // Scalev chrome
   svTop: "#4497ca", svDivider: "#dcdfe4", svPreview: "#f3f5f9", svTab: "#5b6675", svTabOn: "#0f161e", svBtnLine: "#e8ebef", svEditOk: "#15c15d",
   // Chrome browser (light)
@@ -53,11 +53,17 @@ export const C = {
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const attrs = (o) => Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== false).map(([k, v]) => ` ${k}="${esc(v)}"`).join("");
 export const rect = (x, y, w, h, o = {}) => `<rect${attrs({ x, y, width: w, height: h, rx: o.r ?? 0, fill: o.fill ?? "none", stroke: o.stroke, "stroke-width": o.stroke ? o.sw ?? 1 : undefined, "stroke-dasharray": o.dash, opacity: o.opacity })}/>`;
-export const text = (x, y, s, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, "font-weight": o.weight, fill: o.fill ?? C.strong, "text-anchor": o.anchor, "font-family": o.mono ? "'Roboto Mono',ui-monospace,Menlo,monospace" : o.font, "font-style": o.italic ? "italic" : undefined, "text-decoration": o.underline ? "underline" : undefined })}>${esc(s)}</text>`;
+// s: a string, or the runs of one line in mixed styles: each a string (styled like the line) or { t, w?, fill?, u? }
+// (a bold run, an underlined link); a run sets only what it names. Runs keep their spaces (xml:space).
+const run = (p) => (typeof p === "string" ? esc(p) : `<tspan${attrs({ "font-weight": p.w, fill: p.fill, "text-decoration": p.u ? "underline" : undefined })}>${esc(p.t)}</tspan>`);
+export const text = (x, y, s, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, "font-weight": o.weight, fill: o.fill ?? C.strong, "text-anchor": o.anchor, "font-family": o.mono ? "'Roboto Mono',ui-monospace,Menlo,monospace" : o.font, "font-style": o.italic ? "italic" : undefined, "text-decoration": o.underline ? "underline" : undefined, "xml:space": Array.isArray(s) ? "preserve" : undefined })}>${Array.isArray(s) ? s.map(run).join("") : esc(s)}</text>`;
 export const line = (x1, y1, x2, y2, o = {}) => `<line${attrs({ x1, y1, x2, y2, stroke: o.stroke ?? C.line, "stroke-width": o.sw ?? 1, "stroke-linecap": o.cap })}/>`;
 export const circle = (cx, cy, r, o = {}) => `<circle${attrs({ cx, cy, r, fill: o.fill ?? "none", stroke: o.stroke, "stroke-width": o.stroke ? o.sw ?? 1 : undefined })}/>`;
 export const group = (o, ...kids) => `<g${attrs({ transform: o.transform, opacity: o.opacity, "clip-path": o.clip })}>${kids.join("")}</g>`;
 export const para = (x, y, lines, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, fill: o.fill ?? C.strong, "font-weight": o.weight, "text-anchor": o.anchor })}>${lines.map((l, i) => `<tspan x="${x}" dy="${i ? (o.lh ?? Math.round((o.size ?? 14) * 1.43)) : 0}">${esc(l)}</tspan>`).join("")}</text>`;
+// Box helpers for [x, y, w, h]: its centre, and the box grown by d on every side.
+export const mid = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
+export const grow = (b, d) => [b[0] - d, b[1] - d, b[2] + 2 * d, b[3] + 2 * d];
 // Approximate text width (a flat average per character) for laying out boxes and pills around a label; every scene's
 // layout is built on these numbers. Skeleton bars use textWidth() instead, which follows the glyphs.
 export const tw = (s, size = 14, weight = 400) => Math.round(String(s).length * size * (weight >= 600 ? 0.57 : weight >= 500 ? 0.55 : 0.53));
@@ -80,16 +86,29 @@ export const textWidth = (s, size = 14, weight = 400, { mono = false, spacing = 
   const em = glyphs.reduce((t, c) => t + (mono ? 60 : adv[GLYPH.get(c)] ?? 60), 0) / 100;
   return +(em * size + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
 };
-// Greedy word wrap to a width, using tw().
-export const wrap = (s, width, size = 14, weight = 400) => String(s).split(" ").reduce((ls, w) => {
-  const last = ls.at(-1);
-  if (last && tw(last + " " + w, size, weight) <= width) ls[ls.length - 1] = last + " " + w; else ls.push(w);
-  return ls;
-}, []);
-// Clip children to a rect (scrolling panels, truncated text). The id comes from the rect itself, so a build never
-// renumbers clips in unrelated scenes; equal rects share one identical clipPath, which is harmless.
+// Greedy word wrap to a width, using tw(); a word longer than the width (a URL) is split where the line is full.
+export function wrap(s, width, size = 14, weight = 400) {
+  const lines = [], fits = (t) => tw(t, size, weight) <= width;
+  for (let w of String(s).split(" ")) {
+    const last = lines.at(-1);
+    if (last && fits(last + " " + w)) { lines[lines.length - 1] = last + " " + w; continue; }
+    for (let cs = [...w]; cs.length > 1 && !fits(w); cs = [...w]) {
+      let k = cs.length - 1;
+      while (k > 1 && !fits(cs.slice(0, k).join(""))) k--;
+      lines.push(cs.slice(0, k).join(""));
+      w = cs.slice(k).join("");
+    }
+    lines.push(w);
+  }
+  return lines;
+}
+// Clip children to a rect (scrolling panels, truncated text) or to any shape markup (clipShape: an arch path, a rounded
+// rect). The id comes from the shape itself, so a build never renumbers clips in unrelated scenes; equal shapes share
+// one identical clipPath, which is harmless.
 const clipId = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return "k" + (h >>> 0).toString(36); };
-export const clipped = (x, y, w, h, ...kids) => { const id = clipId(`${x},${y},${w},${h}`); return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+const clipBy = (key, shape, kids) => { const id = clipId(key); return `<defs><clipPath id="${id}">${shape}</clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+export const clipped = (x, y, w, h, ...kids) => clipBy(`${x},${y},${w},${h}`, `<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`, kids);
+export const clipShape = (shape, ...kids) => clipBy(shape, shape, kids);
 export const shadow = (x, y, w, h, r = 8, d = 1) => rect(x, y + 2 * d, w, h, { r, fill: "rgba(16,24,40,.08)" }) + rect(x - d, y + d * 4, w + 2 * d, h, { r: r + 2, fill: "rgba(16,24,40,.04)" });
 
 // Lucide icon from nikahkit/src/icons.js (the exact icons the NikahKit panel shows). size in px, centred at (cx, cy).
