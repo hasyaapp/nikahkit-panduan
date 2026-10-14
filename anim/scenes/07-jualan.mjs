@@ -152,10 +152,11 @@ const LPY = { cta: 350.3, art: 442.3, katalog: 778.3, chips: 966.6, grid: 1040.6
 // scrolls sideways, so a phone shows the first few. [label, count, x, width]; `on` is the pressed one. Label and count
 // are one centred text: the guide's SVG may fall back to another font, and two separately placed texts would collide.
 const CHIPS = [["Semua", "62", 20, 103.3], ["Adat", "32", 131.3, 89.7], ["Floral", "15", 228.9, 96.8], ["Elegan", "6", 333.7, 95.7], ["Minimalis", "5", 437.4, 114.6], ["Ceria", "4", 559.9, 83.5]];
-const chipRow = (x0, y, on = "Semua") => CHIPS.map(([l, n, x, w]) => {
-  const p = l === on, fg = p ? LP.paper : LP.cocoa;
-  return rect(x0 + x + 0.75, y + 0.75, w - 1.5, 42.5, { r: 21.25, fill: p ? LP.cocoa : LP.paper, stroke: LP.cocoa, sw: 1.5 }) +
-    `<text x="${x0 + x + w / 2}" y="${y + 26.7}" font-size="15" font-weight="700" fill="${fg}" text-anchor="middle">${l}<tspan dx="6" font-size="13" font-weight="600" opacity=".75">${n}</tspan></text>`;
+// list and col: another chip row with its own positions and colours (Etalase); base = baseline below the chip top.
+const chipRow = (x0, y, on = "Semua", list = CHIPS, col = LP, base = 26.7) => list.map(([l, n, x, w]) => {
+  const p = l === on, fg = p ? col.paper : col.cocoa;
+  return rect(x0 + x + 0.75, y + 0.75, w - 1.5, 42.5, { r: 21.25, fill: p ? col.cocoa : col.paper, stroke: col.cocoa, sw: 1.5 }) +
+    `<text x="${x0 + x + w / 2}" y="${y + base}" font-size="15" font-weight="700" fill="${fg}" text-anchor="middle">${l}<tspan dx="6" font-size="13" font-weight="600" opacity=".75">${n}</tspan></text>`;
 }).join("");
 const chipX = (label) => { const [, , x, w] = CHIPS.find((c) => c[0] === label); return x + w / 2; };
 // Design notes (the description) as each Gaya katalog clamps them at 390 px, read off the screen.
@@ -316,7 +317,7 @@ const mkPanel = (on, extra = "") => nkHead(0, 0, "Template", { inbox: false }) +
 const BOX = 219;
 function brandOpen(v = {}) {
   const fx = 101, fw = 253;
-  let s = rect(85.5, BOX - 2.5, 284, 1004, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, 998, { r: 4, fill: C.white, stroke: C.primary }) +
+  let s = rect(85.5, BOX - 2.5, 284, 1036, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, 1030, { r: 4, fill: C.white, stroke: C.primary }) +
     text(101, BOX + 30, "Profil merek", { size: 14, weight: 500 }) + badgeAt(354, BOX + 16, v.ready ? "Terisi" : "Belum diisi", v.ready ? "ok" : "plain") + line(89, BOX + 49, 366, BOX + 49);
   s += nkLabel(fx, 292, "Nama bisnis") + nkInput(fx, 300, fw, v.name ?? "") +
     nkLabel(fx, 360, "Nomor WhatsApp") + nkInput(fx, 368, fw, v.wa ?? "0812 3456 7890", { placeholder: !v.wa }) +
@@ -333,15 +334,15 @@ function brandOpen(v = {}) {
     para(111, 954, ["Satu baris satu isi, maksimal 6 baris, 80", "huruf per baris."], { size: 12, fill: C.faint, lh: 16 }) +
     nkBtn(fx, 1005, "Tambah paket", { variant: "quiet", w: fw, icon: "plus" }) +
     nkLabel(fx, 1061, "Gaya katalog") + nkInput(fx, GAYA_Y, fw, v.style ?? "Grid", { select: true }) +
-    para(fx, 1121, ["Cara daftar desain tampil di Landing", "page. Berlaku setelah profil disimpan", "dan halaman dipasang atau diperbarui."], { size: 12, fill: C.faint, lh: 16 }) +
+    para(fx, 1121, ["Cara daftar desain tampil di Landing", "page; Etalase juga mengganti warna dan", "huruf seluruh halaman. Berlaku setelah", "profil disimpan dan halaman dipasang", "atau diperbarui."], { size: 12, fill: C.faint, lh: 16 }) +
     nkBtn(fx, SIMPAN_Y, "Simpan profil", { w: 110 });
   return s;
 }
-const GAYA_Y = 1069, SIMPAN_Y = 1169, SCROLL = 420;
+const GAYA_Y = 1069, SIMPAN_Y = 1201, SCROLL = 420;
 // Gaya katalog's native select list (CATALOG_STYLES labels), under the select; the current value has a check.
-const STYLE_LABELS = ["Grid", "Daftar", "Kartu besar", "Geser", "Mozaik"];
-const MENU_Y = GAYA_Y - SCROLL + 40, menuItemY = (i) => MENU_Y + 4 + i * 32;
-const styleMenu = shadow(101, MENU_Y, 253, 168, 6, 2) + rect(101.5, MENU_Y + 0.5, 252, 167, { r: 6, fill: C.white, stroke: C.line }) +
+const STYLE_LABELS = ["Grid", "Daftar", "Kartu besar", "Geser", "Mozaik", "Etalase"];
+const MENU_Y = GAYA_Y - SCROLL + 40, menuItemY = (i) => MENU_Y + 4 + i * 32, MENU_H = 8 + STYLE_LABELS.length * 32;
+const styleMenu = shadow(101, MENU_Y, 253, MENU_H, 6, 2) + rect(101.5, MENU_Y + 0.5, 252, MENU_H - 1, { r: 6, fill: C.white, stroke: C.line }) +
   rect(105, menuItemY(0), 245, 32, { r: 4, fill: C.primarySoft }) + iconX("check", 120, menuItemY(0) + 16, 14, C.strong, 2.4) +
   STYLE_LABELS.map((l, i) => text(134, menuItemY(i) + 21, l, { size: 14 })).join("");
 
@@ -471,8 +472,35 @@ const CAT_STYLE = {
     [[TPL[0], 20, CT, 450], [TPL[1], 200, CT, 220], [TPL[2], 200, CT + 230, 220], [TPL[3], 200, CT + 460, 450], [GEMOY, 20, CT + 460, 220]].map(([[n, , pal], x, y, hh]) => { const b = y + hh;
       return rclip(x, y, 170, hh, 14, pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
         rect(x + 10, y + 11, 84, 24, { r: 12, fill: "rgba(20,12,8,.3)" }) + rect(x + 10, y + 10, 84, 24, { r: 12, fill: LP.paper }) + text(x + 52, y + 27, "Lihat demo", { size: 12, weight: 800, fill: LP.cocoa, anchor: "middle" }) +
-        h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join("")
+        h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join(""),
+  etalase: etalaseView()
 };
+// Etalase (#lp[data-style="etalase"]): the whole page takes its own colours and type, so this view redraws the head too:
+// pink band without the dashed line, centred raspberry heading and intro, navy theme buttons; each design a framed full
+// catalogue image (4:5) with its category hanging from the top edge and Lihat demo at the bottom, then a name board with
+// Pilih. Measured in Chrome at 390 px, y from the section top; the second design peeks in from the right.
+function etalaseView() {
+  const ET = { paper: "#fffcf2", tint: "#fbe3e8", cocoa: "#10324a", muted: "#4f6272", accent: "#d1124f", line: "rgba(16,50,74,.22)", chip: "#dfe9fb" };
+  const DSP = "'DM Serif Display',Georgia,serif", BOD = "'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+  const chips = [["Semua", "62", 20, 106.9], ["Adat", "32", 134.9, 91.9], ["Floral", "15", 234.8, 94.5], ["Elegan", "6", 337.4, 98.1]];
+  const t = 292.6, board = 716.9;
+  const item = (x, [n, , pal], cat, lw) => {
+    const cx = x + 140, l = cx - lw / 2, r = cx + lw / 2, lb = t + 29.1;
+    return rect(x + 0.75, t + 0.75, 278.5, 412.8, { r: 16, fill: ET.paper, stroke: ET.cocoa, sw: 1.5 }) +
+      rclip(x + 11.5, t + 35.5, 257, 321.3, 8, pageSketch(x + 11.5, t + 35.5, 257, 321.3, pal)) + rect(x + 11.5, t + 35.5, 257, 321.3, { r: 8, stroke: ET.line }) +
+      `<path d="M${l} ${t + 1.5}V${lb - 14}a14 14 0 0 0 14 14H${r - 14}a14 14 0 0 0 14 -14V${t + 1.5}" fill="${ET.chip}" stroke="${ET.line}"/>` +
+      text(cx, t + 18.5, cat, { size: 12, weight: 800, fill: ET.cocoa, anchor: "middle" }) +
+      rect(cx - 51.9, t + 366.4, 103.8, 33.9, { r: 16.95, fill: ET.paper, stroke: "rgba(209,18,79,.35)" }) + text(cx, t + 387.9, "Lihat demo", { size: 13, weight: 800, fill: ET.accent, anchor: "middle" }) +
+      rect(x + 0.75, board + 0.75, 278.5, 106.5, { r: 16, fill: ET.paper, stroke: ET.cocoa, sw: 1.5 }) + text(cx, board + 34.5, n, { size: 20, font: DSP, fill: ET.cocoa, anchor: "middle" }) +
+      rect(x + 13.5, board + 52.5, 253, 44, { r: 22, fill: ET.cocoa }) + rect(x + 14.25, board + 51.25, 251.5, 42.5, { r: 21.25, fill: ET.accent, stroke: ET.cocoa, sw: 1.5 }) +
+      text(cx, board + 79.3, "Pilih", { size: 17, weight: 700, fill: "#ffffff", anchor: "middle" });
+  };
+  return `<g font-family="${BOD}">` + rect(0, 0, 390, 844, { fill: ET.tint }) + text(195, 88, "Pilih desain undangan", { size: 32, font: DSP, fill: ET.accent, anchor: "middle" }) +
+    para(195, 125.6, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian", "suka."], { size: 17, fill: ET.muted, lh: 26.35, anchor: "middle" }) +
+    chipRow(0, 214.6, "Semua", chips, ET, 28.5) + item(20, TPL[0], "Minimalis", 82.9) + item(314, TPL[1], "Minimalis", 82.9) + "</g>";
+}
+// Etalase in the scene: the first design's Lihat demo, name board and Pilih.
+const ET_LENS = [14, 652, 292, 178];
 // Pilihan tema Adat (page y): the first four adat designs; Tradisional Elegan's name takes two lines, so its row is taller.
 const ADAT = [[["Tradisional", "Elegan"], ["Hitam & emas, bingkai", "lengkung, judul huruf…"], ["#1f1c1a", "#ecbb6c"]], [["Kencana"], ["Krem & merah bata,", "wayang golek berwarna…"], ["#fff7e9", "#8e2818"]],
   [["Kembang Joyo"], ["Kertas cokelat muda,", "bingkai lengkung dan…"], ["#d8c9ae", "#18150f"]], [["Lado Mudo"], ["Krem merah muda &", "marun, pita ulos dan…"], ["#fffaf0", "#520000"]]];
@@ -695,10 +723,10 @@ export const scenes = {
       { caption: "Isi Harga (Rp) dan Isi paket. Tambah paket untuk paket kedua dan ketiga.", at: [228, 754 - SCROLL], click: true, show: ["pkBlur", "prFocus", "pkPrice"],
         type: [{ id: "pkPrice", n: 7, box: [121, 739 - SCROLL, 50, 30] }], mark: [M(111, 736 - SCROLL, 233, 36), M(101, 1005 - SCROLL, 253, 36)],
         lens: { src: [96, 286, 268, 74] }, dur: 3.6 },
-      { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, atau Mozaik.", at: [228, GAYA_Y - SCROLL + 18], click: true, hide: ["prFocus"], show: ["prBlur", "selFocus", "menu"],
-        mark: M(101, GAYA_Y - SCROLL, 253, 36), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 236] }, dur: 3.4 },
+      { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, Mozaik, atau Etalase.", at: [228, GAYA_Y - SCROLL + 18], click: true, hide: ["prFocus"], show: ["prBlur", "selFocus", "menu"],
+        mark: M(101, GAYA_Y - SCROLL, 253, 36), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3.4 },
       { caption: "Pilih gayanya, misalnya Kartu besar. Bawaannya Grid.", at: [180, menuItemY(2) + 16], click: true, hide: ["menu", "selFocus"], show: ["selV"],
-        mark: M(105, menuItemY(2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 236] }, dur: 3 },
+        mark: M(105, menuItemY(2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3 },
       { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: [156, SIMPAN_Y + 18 - SCROLL], click: true, show: ["done"],
         mark: M(...nkBtnBox(101, SIMPAN_Y - SCROLL, "Simpan profil", { w: 110 })), lens: { src: [84, 210, 290, 68] }, dur: 3.4 }
     ]
@@ -806,7 +834,7 @@ export const scenes = {
   },
 
   "jualan-gaya-katalog": {
-    title: "Lima Gaya katalog di Landing page",
+    title: "Enam Gaya katalog di Landing page",
     base: phBase(body(catHead)),
     els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: ph(body(rect(0, CHIP_Y + 52, 390, 844 - CHIP_Y - 52, { fill: LP.paper }), svg)), enter: "fade" }])),
     steps: [
@@ -814,7 +842,8 @@ export const scenes = {
       { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], lens: lensBy(QR(14, CT + 10, 372, 140), "r", 1.2), dur: 3.2 },
       { caption: "Kartu besar: satu kartu selebar layar, tombol Pilih berwarna.", hide: ["daftar"], show: ["kartu"], lens: lensBy(QR(30, CT + 274, 340, 154), "l", 1.4), dur: 3.2 },
       { caption: "Geser: satu baris desain yang digeser ke samping.", hide: ["kartu"], show: ["geser"], lens: lensBy(QR(16, CT + 321, 260, 127), "l", 1.8), dur: 3.2 },
-      { caption: "Mozaik: kolase gambar. Ketuk gambar untuk membuka demo.", hide: ["geser"], show: ["mozaik"], lens: lensBy(QR(196, CT - 4, 178, 228), "r"), dur: 3.4 }
+      { caption: "Mozaik: kolase gambar. Ketuk gambar untuk membuka demo.", hide: ["geser"], show: ["mozaik"], lens: lensBy(QR(196, CT - 4, 178, 228), "r"), dur: 3.4 },
+      { caption: "Etalase: gambar utuh berbingkai, warna dan huruf seluruh halaman berganti.", hide: ["mozaik"], show: ["etalase"], lens: lensBy(QR(...ET_LENS), "l", 1.4), dur: 3.6 }
     ]
   },
 
