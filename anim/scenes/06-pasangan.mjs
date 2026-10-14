@@ -244,19 +244,26 @@ const SENT_ROWS = (sent) => [
 ].map((g, i) => row(158 + i * 72, { ...g, ini: iniS(g.name) })).join("");
 
 // Percakapan pratinjau (#chat): gelembung draf berisi kartu tautan + pesan muslim untuk Dewi Lestari, lalu penyusun pesan.
+// Kartu tautan di HP (share/index.html .lp, @media max-width 760px): selebar gelembung, gambar persegi 1:1, judul maks 2 baris,
+// deskripsi, domain. Isinya contoh SEO & Page Identity Scalev. unpub: penanda .lpn "Belum diterbitkan" di bawah kartu.
 const GUEST_LINK = SITE + "?to=Dewi+Lestari&u=K7Q2MX";
-function chatContent() {
+function chatContent(unpub = false) {
   const msg = MUSLIM.replace(/\*\[nama\]\*/g, "*Dewi Lestari*").replace(/\[nama\]/g, "Dewi Lestari").replace(/\[link-undangan\]/g, GUEST_LINK);
   const bw = 305, bx = 374 - bw, inner = bw - 16;
   const lines = msg.split("\n").flatMap((l) => { const bold = /^\*[^*]+\*$/.test(l.trim()); return wrap(bold ? l.trim().slice(1, -1) : l, inner, 14.2, bold ? 600 : 400).map((t) => ({ t, bold, link: /^https?:/.test(l) })); });
   let y = 116;
   let s = rect(0, 0, 390, 2600, { fill: T.wall }) + dayChip(195, 80, "Belum dikirim");
-  const bh = 6 + 66 + lines.length * 19 + 8 + 17;
+  const cw = bw - 6, card = cw + 8 + 16 + 18 + 16 + 12, note = unpub ? 2 * 16 + 20 : 0, top = 3 + card + note;
+  const bh = top + lines.length * 19 + 8 + 17;
   s += rect(bx, y, bw, bh, { r: 7.5, fill: T.soft }) + rect(bx + bw - 10, y, 10, 10, { fill: T.soft }) + tail(bx + bw, y, "out", T.soft) +
-    rect(bx + 3, y + 3, bw - 6, 60, { r: 6, fill: "rgba(0,0,0,.05)" }) + rect(bx + 9, y + 9, 48, 48, { r: 4, fill: T.strong }) +
-    text(bx + 33, y + 38, "R&D", { size: 14, fill: "#fff", anchor: "middle", italic: true, font: "Georgia,serif" }) +
-    text(bx + 67, y + 29, "Undangan pernikahan", { size: 14.2, weight: 500, fill: T.text }) + text(bx + 67, y + 46, "tokomu.myscalev.com", { size: 12, fill: T.sub });
-  lines.forEach((l, i) => (s += text(bx + 9, y + 66 + 15 + i * 19, l.t, { size: 14.2, fill: l.link ? T.link : T.text, weight: l.bold ? 600 : undefined })));
+    rect(bx + 3, y + 3, cw, card, { r: 6, fill: "rgba(0,0,0,.05)" }) + rect(bx + 3, y + 3, cw, cw, { r: 6, fill: T.strong }) +
+    text(bx + 3 + cw / 2, y + 3 + cw / 2 - 6, "RANI & DIMAS", { size: 26, fill: "#fff", anchor: "middle", font: "Georgia,serif" }) +
+    text(bx + 3 + cw / 2, y + 3 + cw / 2 + 22, "14 . 02 . 2027", { size: 14, fill: "#fff", anchor: "middle", font: "Georgia,serif" }) +
+    text(bx + 13, y + 3 + cw + 22, "Undangan Rani & Dimas", { size: 13.6, weight: 600, fill: T.text }) +
+    text(bx + 13, y + 3 + cw + 40, "Minggu, 14 Februari 2027. Mohon doa restu.", { size: 12, fill: T.sub }) +
+    text(bx + 13, y + 3 + cw + 58, "tokomu.myscalev.com", { size: 12, fill: T.sub }) +
+    (unpub ? para(bx + 9, y + 3 + card + 22, ["Belum diterbitkan: tamu masih melihat versi lama.", "Terbitkan halaman di Scalev."], { size: 12, fill: "#b45309", lh: 16 }) : "");
+  lines.forEach((l, i) => (s += text(bx + 9, y + top + 15 + i * 19, l.t, { size: 14.2, fill: l.link ? T.link : T.text, weight: l.bold ? 600 : undefined })));
   s += text(bx + bw - 7, y + bh - 8, "Draf · belum dikirim", { size: 11, fill: T.sub, anchor: "end" });
   y += bh + 20;
   // Penyusun: pilihan teks + kotak pesan (tumbuh setinggi isi) + tombol kirim.
@@ -271,8 +278,8 @@ function chatContent() {
   s += circle(send[0], send[1], 20, { fill: T.accent }) + wa("send", send[0], send[1], 24, "#fff");
   return { svg: s, bottom: cy + ch + 8, send };
 }
-const CHAT = chatContent();
-const CHAT_DY = CHAT.bottom - 844;
+const CHAT = chatContent(), CHAT_U = chatContent(true);
+const CHAT_DY = CHAT_U.bottom - 844;
 
 // ---- Hari-H (HP) -----------------------------------------------------------------------------------------------------
 const scanBar = () => rect(0, 64, 390, 3, { fill: "rgba(10,10,10,.05)" }) + rect(0, 0, 390, 64, { fill: "#fff" }) + text(16, 29, "Scan tamu", { size: 16, fill: T.text }) + text(16, 47, "/rani-dimas", { size: 13, fill: T.sub });
@@ -511,6 +518,8 @@ const SCENES = {
         list: { svg: ph(kirimTop([3, 3, 0]), SENT_ROWS(false), fab(), tabbar("kirim")), enter: "fade" },
         ready: { svg: ph(waToast(195, 684, "3 tamu siap.")), enter: "slide" },
         chat: { svg: ph(CHAT.svg), enter: "fade" },
+        chatU: { svg: ph(CHAT_U.svg), enter: "fade" },
+        nUnpub: ring(PX + 72, PY + 490, 296, 40),
         chatTop: { svg: ph(chatBar("Dewi Lestari", "", "+6282198765432", { av: false })), enter: "fade" },
         opened: { svg: ph(waToast(195, 684, "WhatsApp dibuka untuk Dewi Lestari.")), enter: "slide" },
         sent: { svg: ph(kirimTop([3, 2, 1]), SENT_ROWS(true), fab(), tabbar("kirim")), enter: "fade" },
@@ -521,7 +530,9 @@ const SCENES = {
         { caption: "Tempel daftar tamu, satu per baris. Hanya nama yang wajib.", at: P(195, 190), click: true, hide: ["ph1"], show: ["paste"], dur: 3.4 },
         { caption: "Tekan Simpan daftar. Muncul 3 tamu siap, masing-masing dengan tautan.", at: P(88, 410), click: true, show: ["list", "ready"], dur: 3.6 },
         { caption: "Ketuk nama tamu. Pratinjau pesan dengan tautan pribadinya muncul.", at: dewi, click: true, hide: ["ready"], show: ["chat", "chatTop"], dur: 3.6 },
-        { caption: "Gulir ke bawah, tekan tombol kirim hijau. WhatsApp terbuka.", scroll: { id: "chat", dy: CHAT_DY }, at: P(CHAT.send[0], CHAT.send[1] - CHAT_DY), click: true, show: ["opened"], dur: 4 },
+        { caption: "Kartu berisi gambar, judul, dan deskripsi dari SEO & Page Identity Scalev.", dur: 3.6 },
+        { caption: "Versi terbaru belum terbit? Muncul Belum diterbitkan: terbitkan dulu di Scalev.", show: ["chatU", "nUnpub"], dur: 4.2 },
+        { caption: "Gulir ke bawah, tekan tombol kirim hijau. WhatsApp terbuka.", scroll: { id: "chatU", dy: CHAT_DY }, at: P(CHAT_U.send[0], CHAT_U.send[1] - CHAT_DY), click: true, hide: ["nUnpub"], show: ["opened"], dur: 4 },
         { caption: "Kembali ke daftar: tamu itu bercentang dan masuk hitungan Terkirim.", at: P(24, 32), click: true, hide: ["opened"], show: ["sent"], dur: 3.8 }
       ]
     };
