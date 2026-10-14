@@ -1,19 +1,15 @@
 // Dashboard pasangan: serah terima dari NikahKit, masuk, Beranda, Kirim, Tamu dan Ucapan, Hari-H, Pelacakan, Pengaturan.
-// Satu layar desktop 1440x900 per adegan (lib v4). Halaman HP = layar polos 390x844 di tengah desktop (phoneDesk);
-// Pelacakan = dashboard laptop selebar layar, posisi diukur dari server/pages/panel/scalev_panel.html di Chromium
-// 1440x900 (14 Okt, worker asli dengan data contoh); Bagikan dan jendela PIN di editor Scalev utuh. Label, ukuran, warna,
-// dan ikon diambil dari server/pages/src/{panel,dashboard,share,checkin} dan nikahkit/ext/pin.html; ikon WhatsApp dan
-// template pesan dibaca langsung dari sumbernya supaya tidak bergeser dari aslinya.
+// Satu layar desktop 1440x900 per adegan (lib v4). Halaman HP = layar polos 390x844 di tengah desktop (phoneDesk),
+// diukur dari tangkapan dashboard 390x844 (14 Okt); desktop di sekitarnya generik. Pelacakan dan Buka kunci = dashboard
+// laptop selebar layar, diukur dari server/pages/panel/scalev_panel.html di Chromium 1440x900 (14 Okt, worker asli dengan
+// data contoh); baris hitung mundur Beranda laptop ditambahkan dari tangkapan 1280. Bagikan dan jendela PIN (pin.html)
+// di editor Scalev utuh, ukuran dari QA panel. Label, warna, dan ikon dari server/pages/src/{panel,dashboard,share,
+// checkin} dan nikahkit/ext/pin.html; ikon WhatsApp dan template pesan dibaca langsung dari sumbernya.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { C, WORLD, PHONE, rect, text, line, circle, para, tw as libTw, icon, iconX, skeleton, clipped } from "../lib.mjs";
-import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkH3, nkNote, nkLogo, nkHead, nkDialogHead, nkAcc, scalevEditor, dim, phoneDesk } from "../ui/kit.mjs";
-
-// Lebar teks Roboto per huruf (em), lebih tepat dari tw() untuk menata baris daftar dan pil di layar dashboard.
-const CW = { " ": 0.248, a: 0.544, b: 0.561, c: 0.523, d: 0.563, e: 0.53, f: 0.347, g: 0.561, h: 0.551, i: 0.243, j: 0.239, k: 0.507, l: 0.243, m: 0.876, n: 0.552, o: 0.57, p: 0.561, q: 0.568, r: 0.338, s: 0.516, t: 0.327, u: 0.551,
-  v: 0.484, w: 0.751, x: 0.496, y: 0.473, z: 0.496, ".": 0.263, ",": 0.196, ":": 0.242, "·": 0.26, "-": 0.276, "&": 0.621, "/": 0.411, "?": 0.473, "(": 0.342, ")": 0.348, "@": 0.897, "+": 0.567, "=": 0.549,
-  "…": 0.73, "!": 0.258, "%": 0.733, "*": 0.431, "_": 0.451, "[": 0.266, "]": 0.266, "'": 0.17, '"': 0.32, "•": 0.35, I: 0.272, J: 0.552, M: 0.873, W: 0.887, L: 0.538, E: 0.568, F: 0.553 };
-const tw = (s, size = 14, weight = 400) => Math.round([...String(s)].reduce((a, ch) => a + (CW[ch] ?? (/[A-Z]/.test(ch) ? 0.65 : /[0-9]/.test(ch) ? 0.561 : 0.6)), 0) * size * (weight >= 600 ? 1.06 : weight >= 500 ? 1.03 : 1));
+import { C, WORLD, PHONE, rect, text, line, circle, para, tw, textWidth, wrap, icon, iconX, skeleton, clipped } from "../lib.mjs";
+import { BAGIKAN_TOOL, NO_NOTE, ACC_Y, COUPLE_Y, shareTop, shareBtns, accessHead, forCouple, pinBtn, pinHint, pinBox } from "../ui/bagikan.mjs";
+import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk } from "../ui/kit.mjs";
 
 // ---- Sumber asli ------------------------------------------------------------------------------------------------------
 const SRC = (p) => fs.readFileSync(fileURLToPath(new URL(`../../../server/pages/src/${p}`, import.meta.url)), "utf8");
@@ -51,22 +47,6 @@ const iniS = (n) => { const w = n.replace(/^(bapak|ibu|bpk\.?|kel\.?|keluarga)\s
 
 // ---- Teks ------------------------------------------------------------------------------------------------------------
 const fit = (s, maxW, size = 14, weight = 400) => { if (tw(s, size, weight) <= maxW) return s; let t = s; while (t.length > 1 && tw(t + "…", size, weight) > maxW) t = t.slice(0, -1); return t.trimEnd() + "…"; };
-function wrap(s, maxW, size = 14, weight = 400) {
-  const out = [];
-  for (const para of String(s).split("\n")) {
-    if (!para.trim()) { out.push(""); continue; }
-    let cur = "";
-    for (const word of para.split(" ")) {
-      const next = cur ? cur + " " + word : word;
-      if (tw(next, size, weight) <= maxW) { cur = next; continue; }
-      if (cur) out.push(cur);
-      cur = word;
-      while (tw(cur, size, weight) > maxW) { let k = cur.length; while (k > 1 && tw(cur.slice(0, k), size, weight) > maxW) k--; out.push(cur.slice(0, k)); cur = cur.slice(k); }
-    }
-    out.push(cur);
-  }
-  return out;
-}
 
 // ---- Layar HP (390x844, tanpa bingkai perangkat) ----------------------------------------------------------------------
 const PX = PHONE.x, PY = PHONE.y;
@@ -99,9 +79,9 @@ function chips(y, items, active, x0 = 20) {
   let x = x0, svg = "";
   const at = [], boxes = [];
   items.forEach(([l, n], i) => {
-    const lw = tw(l, 14, 500), nw = n == null ? 0 : tw(String(n), 12) + 6, w = lw + nw + 24, on = i === active;
-    svg += rect(x + 0.5, y + 0.5, w - 1, 31, { r: 16, fill: on ? T.soft : "#fff", stroke: on ? "#bfe6b8" : T.outline }) + text(x + 12, y + 21, l, { size: 14, weight: 500, fill: on ? T.strong : T.sub }) +
-      (n == null ? "" : text(x + 12 + lw + 6, y + 21, String(n), { size: 12, fill: on ? T.strong : T.sub }));
+    const w = textWidth(l, 14, 500) + (n == null ? 0 : textWidth("  " + n, 12)) + 24, on = i === active, fg = on ? T.strong : T.sub;
+    svg += rect(x + 0.5, y + 0.5, w - 1, 31, { r: 16, fill: on ? T.soft : "#fff", stroke: on ? "#bfe6b8" : T.outline }) +
+      text(x + w / 2, y + 21, n == null ? [l] : [l, { t: "  " + n, size: 12, w: 400 }], { size: 14, weight: 500, fill: fg, anchor: "middle" });
     at.push([x + w / 2, y + 16]);
     boxes.push([x, y, w, 32]);
     x += w + 8;
@@ -115,27 +95,22 @@ function row(y, o) {
     text(nx, y + 31, fit(o.name, right - nx - (o.time ? 50 : 0), 16), { size: 16, fill: T.text }) + (o.time ? text(right, y + 31, o.time, { size: 12, weight: 500, fill: T.sub, anchor: "end" }) : "") +
     l2(o.parts, right - nx)(nx, y + 54);
 }
-// Baris kedua: potongan { t, fill, w, icon }.
+// Baris kedua: potongan { t, fill, w, icon } dalam satu baris teks (browser yang menyusun), dipangkas dengan … ke maxW.
 const l2 = (parts, maxW) => (x, y) => {
-  let s = "", cx = x;
-  for (const p of parts) {
-    if (p.icon) { s += wa(p.icon, cx + 8, y - 5, 16, p.iconFill ?? p.fill ?? T.sub); cx += 19; }
-    const str = fit(p.t, x + maxW - cx, 14, p.w ?? 400);
-    s += text(cx, y, str, { size: 14, fill: p.fill ?? T.sub, weight: p.w });
-    cx += tw(str, 14, p.w ?? 400) + 5;
-    if (cx >= x + maxW) break;
-  }
-  return s;
+  const ic = parts[0].icon ? wa(parts[0].icon, x + 8, y - 5, 16, parts[0].iconFill ?? parts[0].fill ?? T.sub) : "", tx = x + (ic ? 19 : 0);
+  let left = fit(parts.map((p) => p.t).join(" "), x + maxW - tx, 14);
+  const runs = parts.map((p, i) => { const t = left.slice(0, p.t.length + (i ? 1 : 0)); left = left.slice(t.length); return { t, fill: p.fill ?? T.sub, w: p.w }; }).filter((r) => r.t);
+  return ic + text(tx, y, runs, { size: 14, fill: T.sub });
 };
 const groupLabel = (y, s, x = 23) => text(x, y, s, { size: 13, weight: 500, fill: T.sub });
 // Snackbar dashboard (#242626, 14px) berpusat di cx, sisi bawah di bottom.
-const waToast = (cx, bottom, label) => { const w = tw(label, 14) + 44; return rect(cx - w / 2, bottom - 48, w, 48, { r: 4, fill: T.toast }) + text(cx, bottom - 19, label, { size: 14, fill: "#fff", anchor: "middle" }); };
+const waToast = (cx, bottom, label) => { const w = textWidth(label, 14) + 44; return rect(cx - w / 2, bottom - 48, w, 48, { r: 4, fill: T.toast }) + text(cx, bottom - 19, label, { size: 14, fill: "#fff", anchor: "middle" }); };
 const menuBox = (x, y, w, h) => rect(x, y + 6, w, h, { r: 16, fill: "rgba(0,0,0,.08)" }) + rect(x - 1, y + 2, w + 2, h + 1, { r: 17, fill: "rgba(0,0,0,.06)" }) + rect(x, y, w, h, { r: 16, fill: "#fff" });
 const menuItem = (x, y, ic, label, danger) => wa(ic, x + 21, y + 20, 18, danger ? T.danger : T.sub) + text(x + 46, y + 25, label, { size: 15, fill: danger ? T.danger : T.text });
 // Ekor gelembung chat (masuk = kiri, putih; keluar = kanan, hijau).
 const tail = (x, y, side, fill) => side === "in" ? `<path d="M${x} ${y} h-6.5 q-2.6 0 -1.1 2.1 l7.6 9.9 z" fill="${fill}"/>` : `<path d="M${x} ${y} h6.5 q2.6 0 1.1 2.1 l-7.6 9.9 z" fill="${fill}"/>`;
-const dayChip = (cx, y, s) => { const w = tw(s, 12, 500) + 26; return rect(cx - w / 2, y, w, 24, { r: 6, fill: "#fff" }) + text(cx, y + 16, s, { size: 12, weight: 500, fill: T.sub, anchor: "middle" }); };
-const sysNote = (cx, y, s) => { const w = tw(s, 12.5) + 26; return rect(cx - w / 2, y, w, 29, { r: 7.5, fill: T.system }) + text(cx, y + 19, s, { size: 12.5, fill: T.sub, anchor: "middle" }); };
+const dayChip = (cx, y, s) => { const w = textWidth(s, 12, 500) + 26; return rect(cx - w / 2, y, w, 24, { r: 6, fill: "#fff" }) + text(cx, y + 16, s, { size: 12, weight: 500, fill: T.sub, anchor: "middle" }); };
+const sysNote = (cx, y, s) => { const w = textWidth(s, 12.5) + 26; return rect(cx - w / 2, y, w, 29, { r: 7.5, fill: T.system }) + text(cx, y + 19, s, { size: 12.5, fill: T.sub, anchor: "middle" }); };
 // Kepala percakapan (chat-bar): kembali, avatar 40, nama + keterangan, menu ⋮.
 const chatBar = (name, ini, sub, o = {}) => rect(0, 64, 390, 3, { fill: "rgba(10,10,10,.05)" }) + rect(0, 0, 390, 64, { fill: "#fff" }) + wa("back", 24, 32) +
   (o.av === false ? "" : circle(72, 32, 20, { fill: avc(name)[0] }) + text(72, 37.5, ini, { size: 15, fill: avc(name)[1], anchor: "middle" })) +
@@ -155,7 +130,7 @@ function homeContent() {
   s += rect(16, 180, 358, 230, { r: 16, fill: "#fff" }) + text(40, 217, "Estimasi tamu hadir", { size: 14, fill: T.sub }) + text(38, 262, "128", { size: 40, fill: T.text }) +
     text(40, 281, "52 konfirmasi hadir", { size: 12, fill: T.sub }) +
     rect(40, 298, 310, 8, { r: 4, fill: "#e5e5e5" }) + rect(40, 298, 264, 8, { r: 4, fill: T.accent }) + rect(300, 298, 21, 8, { fill: T.amber }) + rect(321, 298, 29, 8, { r: 4, fill: T.grey }) + rect(318, 298, 6, 8, { fill: T.grey }) +
-    [["Hadir", "52", T.accent, 40], ["Ragu", "4", T.amber, 120], ["Tidak hadir", "5", T.grey, 190]].map(([l, n, c, x]) => circle(x + 4, 326, 4, { fill: c }) + text(x + 14, 330, l, { size: 12, fill: T.sub }) + text(x + 18 + tw(l, 12) + 3, 330, n, { size: 12, weight: 600, fill: T.text })).join("") +
+    [["Hadir", "52", T.accent, 40], ["Ragu", "4", T.amber, 120], ["Tidak hadir", "5", T.grey, 190]].map(([l, n, c, x]) => circle(x + 4, 326, 4, { fill: c }) + text(x + 14, 330, [l + " ", { t: n, w: 600, fill: T.text }], { size: 12, fill: T.sub })).join("") +
     rect(40.5, 350.5, 143, 35, { r: 18, fill: "#fff", stroke: T.outline }) + text(112, 373, "Lihat daftar tamu", { size: 14, weight: 500, fill: T.strong, anchor: "middle" });
   // Empat angka
   s += rect(16, 434, 358, 207, { r: 16, fill: "#fff" }) + STATS.map(([l, v, n], i) => {
@@ -273,9 +248,6 @@ const CHECKS = (mode) => [["free", "Kalimat, urutan, emoji, *tebal*", "boleh diu
   ["ok", "[nama]", "jadi nama tamu"], ["ok", "[pasangan]", "jadi Rani & Dimas"],
   ["rule", "Jangan isi nama/tautan manual", "tulis penanda persis dengan [ ], diganti otomatis saat dikirim"]];
 const NO_LINK = MUSLIM.replace("\n[link-undangan]", "");
-const xe = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-// Satu baris teks: awalan tebal gelap lalu sisanya, mengalir seperti <b> di HTML.
-const boldLead = (x, y, size, bold, rest, fill) => `<text x="${x}" y="${y}" font-size="${size}"><tspan font-weight="600" fill="#111b21">${xe(bold)}</tspan><tspan fill="${fill}" xml:space="preserve">${xe(rest)}</tspan></text>`;
 function chatContent(unpub = false, mode = "ok") {
   const tpl = mode === "no" ? NO_LINK : MUSLIM;
   const msg = tpl.replace(/\*\[nama\]\*/g, "*Dewi Lestari*").replace(/\[nama\]/g, "Dewi Lestari").replace(/\[pasangan\]/g, "Rani & Dimas").replace(/\[link-undangan\]/g, GUEST_LINK);
@@ -299,7 +271,7 @@ function chatContent(unpub = false, mode = "ok") {
   // Penyusun (.chead: pilihan teks, tombol penanda, status layak kirim) + kotak pesan (tumbuh setinggi isi) + daftar periksa.
   // Mode "no"/"fixed": baris tombol digeser (di HP bergulir ke samping) sampai + [link-undangan] terlihat.
   let cx = 12, chip = null; const s0 = s.length;
-  const chipBtn = (k, on) => { const w = tw(k, 13, 500) + 26; s += rect(cx + 0.5, y + 0.5, w - 1, 29, { r: 15, fill: on ? T.soft : "#fff", stroke: T.outline }) + text(cx + w / 2, y + 20, k, { size: 13, weight: 500, fill: on ? T.strong : T.sub, anchor: "middle" }); const c = [cx + w / 2, y + 15, cx, w]; cx += w + 6; return c; };
+  const chipBtn = (k, on) => { const w = textWidth(k, 13, 500) + 26; s += rect(cx + 0.5, y + 0.5, w - 1, 29, { r: 15, fill: on ? T.soft : "#fff", stroke: T.outline }) + text(cx + w / 2, y + 20, k, { size: 13, weight: 500, fill: on ? T.strong : T.sub, anchor: "middle" }); const c = [cx + w / 2, y + 15, cx, w]; cx += w + 6; return c; };
   (mode === "ok" ? ["formal", "muslim", "nasrani", "hindu", "custom"] : ["custom"]).forEach((k) => chipBtn(k, k === "muslim"));
   s += rect(cx, y + 4, 1, 22, { fill: T.outline }); cx += 7;
   ["+ [nama]", "+ [link-undangan]", "+ [pasangan]"].forEach((k) => { const c = chipBtn(k, false); if (k === "+ [link-undangan]") chip = c; });
@@ -307,10 +279,10 @@ function chatContent(unpub = false, mode = "ok") {
   const [st, title, detail] = READY[mode === "no" ? "no" : "ok"], rl = wrap(title + (detail ? " · " + detail : ""), 296, 13);
   const ry = y + 38, rh = 14 + rl.length * 18;
   s += rect(12, ry, 366, rh, { r: 8, fill: st === "no" ? "#ffe0de" : "#d9fdd3" }) + emo(st, 22, ry + 9);
-  rl.forEach((t, i) => (s += i ? text(42, ry + 20 + i * 18, t, { size: 13, fill: "#111b21" }) : boldLead(42, ry + 20, 13, title, t.slice(title.length), "#111b21")));
+  rl.forEach((t, i) => (s += text(42, ry + 20 + i * 18, i ? t : [{ t: title, w: 600 }, t.slice(title.length)], { size: 13, fill: "#111b21" })));
   // .chead menempel di bawah kepala percakapan (top 64px, padding-top 8px) saat pesan digulir.
   const sticky = `<g transform="translate(0 ${72 - y})">` + rect(0, y - 8, 390, 38 + rh + 16, { fill: T.wall }) + s.slice(s0) + "</g>";
-  const raw = wrap(tpl, 286, 15);
+  const raw = tpl.split("\n").flatMap((l) => wrap(l, 286, 15));
   const ch = Math.max(52, 20 + raw.length * 22 + 10), cy = ry + rh + 8;
   s += rect(8, cy + 2, 374, ch, { r: 26, fill: "rgba(0,0,0,.08)" }) + rect(8, cy, 374, ch, { r: 26, fill: "#fff" }) +
     raw.map((t, i) => text(29, cy + 26 + i * 22, t, { size: 15, fill: T.text })).join("");
@@ -321,7 +293,7 @@ function chatContent(unpub = false, mode = "ok") {
   CHECKS(mode).forEach(([k, label, desc]) => {
     const hl = wrap(label + " " + desc, 306, 12.5);
     s += emo(k, 16, hy + 2);
-    hl.forEach((t, i) => (s += i ? text(40, hy + 13 + i * 17.5, t, { size: 12.5, fill: "#54656f" }) : boldLead(40, hy + 13, 12.5, label, t.slice(label.length), "#54656f")));
+    hl.forEach((t, i) => (s += text(40, hy + 13 + i * 17.5, i ? t : [{ t: label, w: 600, fill: "#111b21" }, t.slice(label.length)], { size: 12.5, fill: "#54656f" })));
     hy += hl.length * 17.5 + 4;
   });
   // Kotak untuk mark (koordinat layar HP; chip dan ready di baris yang menempel, checks/send di isi yang belum digulir).
@@ -386,8 +358,7 @@ function rowD(x0, y, w, o) {
   let cx = nx;
   if (o.dot) { s += circle(cx + 4, y + 48, 2.5, { fill: o.fill }); cx += 12; } // .chip.warn::before
   if (o.icon) { s += wa(o.icon, cx + 8, y + 48, 16, o.fill ?? T.sub); cx += 18; }
-  s += text(cx, y + 53, o.chip, { size: 14, fill: o.fill ?? T.sub });
-  return s + text(cx + tw(o.chip, 14) + 6, y + 53, o.cap, { size: 14, fill: T.sub });
+  return s + text(cx, y + 53, [{ t: o.chip, fill: o.fill ?? T.sub }, " " + o.cap], { size: 14, fill: T.sub });
 }
 // Beranda laptop. Ukuran tanpa tanggal acara, ditambah 28px untuk baris hitung mundur (data contoh punya tanggal acara).
 const TREND = [0, 1, 0, 2, 3, 1, 4, 2, 0, 5, 3, 8, 12, 2]; // RSVP per hari, contoh
@@ -397,12 +368,9 @@ function berandaDesk() {
   s += rect(352, 164, 388, 232, { r: 16, fill: "#fff" }) + text(376, 203, "Estimasi tamu hadir", { size: 14, fill: T.sub }) + text(374, 251, "128", { size: 40, weight: 500, fill: T.text }) +
     text(376, 268, "52 konfirmasi hadir", { size: 12, fill: T.sub }) +
     rect(376, 286, 340, 8, { r: 4, fill: "#707070" }) + rect(376, 286, 290, 8, { r: 4, fill: T.accent }) + rect(660, 286, 6, 8, { fill: T.accent }) + rect(666, 286, 22, 8, { fill: T.amber });
-  let lx = 376;
-  for (const [l, n, c] of [["Hadir", "52", T.accent], ["Ragu", "4", T.amber], ["Tidak hadir", "5", "#707070"]]) {
-    const bx = lx + 14 + tw(l, 12) + 4;
-    s += circle(lx + 4, 312, 4, { fill: c }) + text(lx + 14, 316, l, { size: 12, fill: T.sub }) + text(bx, 316, n, { size: 12, weight: 500, fill: T.text });
-    lx = bx + tw(n, 12, 500) + 14;
-  }
+  // Legenda .att-legend: diukur Hadir 376, Ragu 443, Tidak hadir 509 dengan angka 1 digit; +7 untuk "52".
+  [["Hadir", "52", T.accent, 376], ["Ragu", "4", T.amber, 450], ["Tidak hadir", "5", "#707070", 516]].forEach(([l, n, c, lx]) =>
+    (s += circle(lx + 4, 312, 4, { fill: c }) + text(lx + 14, 316, [l + " ", { t: n, w: 500, fill: T.text }], { size: 12, fill: T.sub })));
   s += rect(376.5, 336.5, 143, 35, { r: 18, fill: "#fff", stroke: T.outline }) + text(448, 359, "Lihat daftar tamu", { size: 14, weight: 500, fill: T.strong, anchor: "middle" });
   s += rect(764, 164, 388, 232, { r: 16, fill: "#fff" }) + STATS.map(([l, v, n], i) => { const x = i % 2 ? 966 : 784, y = i > 1 ? 108 : 0;
     return text(x, 196 + y, l, { size: 12, fill: T.sub }) + text(x, 224 + y, v, { size: 24, weight: 500, fill: T.text }) + text(x, 244 + y, n.join(" "), { size: 12, fill: T.sub }); }).join("");
@@ -479,24 +447,12 @@ const PEL_ALL = railD("pelacakan") + listD(0, ROWS_ALL, "dewi") + dewiD();
 const PEL_PENUH = railD("pelacakan") + listD(3, [["Dibuka Oktober 2026", ["hendra"]]], "hendra") + hendraD();
 
 // ---- Editor Scalev 1440x900 + jendela PIN NikahKit ---------------------------------------------------------------------
-const EY = 0; // editor mengisi layar
-const SY = EY - 50; // isi dialog Bagikan (tanpa catatan "Perubahan belum disimpan", jadi naik 50px dari ukuran QA)
-const bagikan = () => nkDialogHead(0, EY, "Bagikan") +
-  nkLabel(16, SY + 231, "Nama tamu") + nkInput(16, SY + 239, 366, "Nama Tamu") + nkHint(16, SY + 295, "Ditambahkan sebagai ?to=Nama.") +
-  rect(16, SY + 311, 366, 52, { r: 4, fill: C.mutedBg }) + para(26, SY + 332, ["https://tokomu.myscalev.com/rani-dimas?", "to=Nama+Tamu"], { size: 12, fill: C.strong, lh: 18 }).replace("<text", `<text font-family="'Roboto Mono',ui-monospace,Menlo,monospace"`) +
-  nkBtn(16, SY + 375, "Lihat sebagai tamu", { w: 366, size: 14, icon: "eye" }) + nkBtn(16, SY + 419, "Salin tautan tamu", { w: 366, size: 14, icon: "copy", variant: "ghost" }) +
-  nkBtn(16, SY + 463, "Salin tautan umum", { w: 366, size: 14, icon: "link", variant: "quiet" }) +
-  nkH3(16, SY + 535, "Undangan khusus") + text(16, SY + 572, "Undangan khusus", { size: 14, fill: C.text }) + nkSwitch(346, SY + 557, false) +
-  para(16, SY + 601, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 }) +
-  nkH3(16, SY + 653, "Untuk pengantin") + nkBtn(16, SY + 665, "Kirim undangan", { w: 366, size: 14, icon: "link", variant: "ghost" }) +
-  nkBtn(16, SY + 709, "Buka Dashboard", { w: 366, size: 14, icon: "layout-grid", variant: "quiet" }) + nkHint(16, SY + 761, "Masuk dengan PIN dashboard.") +
-  nkH3(16, SY + 801, "PIN dashboard") + nkHint(16, SY + 865, "PIN hanya tampil di jendela NikahKit.");
-const KELOLA_O = { w: 366, size: 14, icon: "lock" }, KELOLA = nkBtnBox(16, SY + 813, "Kelola PIN dashboard", KELOLA_O);
-const kelolaBtn = () => nkBtn(KELOLA[0], KELOLA[1], "Kelola PIN dashboard", KELOLA_O);
-const BAGIKAN_TOOL = [6, 566, 60, 44]; // ikon share-2 + label Bagikan di lajur NikahKit
+// Dialog Bagikan tanpa catatan belum disimpan (ui/bagikan.mjs); Kelola PIN dashboard terpisah supaya bisa ditekan.
+const bagikan = () => shareTop(NO_NOTE) + shareBtns(NO_NOTE) + accessHead(ACC_Y, false) + forCouple(COUPLE_Y) + pinHint(COUPLE_Y);
+const KELOLA = pinBox(COUPLE_Y);
 // pin.html dalam dialog Scalev (src/pin-frame.js): kartu 440px, sudut 8px, di tengah editor. revealed = setelah Lihat PIN.
 const DLG_X = 500;
-const dlgTop = (revealed) => EY + 450 - (revealed ? 282 : 233);
+const dlgTop = (revealed) => 450 - (revealed ? 282 : 233);
 function pinDialog(revealed) {
   const x = DLG_X, y = dlgTop(revealed), h = revealed ? 564 : 466, card = (cy, ch) => rect(x + 16.5, cy + 0.5, 407, ch - 1, { r: 8, fill: "#fff", stroke: C.line });
   let s = rect(x - 2, y + 4, 444, h + 2, { r: 10, fill: "rgba(16,24,40,.10)" }) + rect(x, y, 440, h, { r: 8, fill: C.page }) +
@@ -517,11 +473,11 @@ function pinDialog(revealed) {
 const DLG_A = pinDialog(false), DLG_B = pinDialog(true);
 const pinNote = (s) => nkNote(DLG_X + 16, DLG_B.noteY, 408, [s], { h: 38 });
 // Editor Scalev (tab Konten NikahKit) dengan pratinjau undangan, sebelum panel Bagikan dibuka.
-const EDITOR_BASE = [scalevEditor(0, EY, { rail: "Konten", page: "Undangan Rani & Dimas", user: "Rina" }),
-  nkHead(0, EY, "Konten") + nkLabel(88, EY + 192, "Bahasa undangan") + nkInput(88, EY + 200, 279, "Indonesia", { select: true }) +
-    para(88, EY + 256, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkAcc(88, EY + 300, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, EY + 358, 279, "Mempelai", { badge: "Terisi" }),
-  text(922, EY + 300, "Rani & Dimas", { size: 34, fill: "#8a3b2b", anchor: "middle", italic: true, font: "Georgia,serif" }) + text(922, EY + 340, "Sabtu, 28 November 2026", { size: 15, fill: "#5a4636", anchor: "middle", font: "Georgia,serif" })];
+const EDITOR_BASE = [scalevEditor(0, 0, { rail: "Konten", page: "Undangan Rani & Dimas", user: "Rina" }),
+  nkHead(0, 0, "Konten") + nkLabel(88, 192, "Bahasa undangan") + nkInput(88, 200, 279, "Indonesia", { select: true }) +
+    para(88, 256, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
+    nkAcc(88, 300, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, 358, 279, "Mempelai", { badge: "Terisi" }),
+  text(922, 300, "Rani & Dimas", { size: 34, fill: "#8a3b2b", anchor: "middle", italic: true, font: "Georgia,serif" }) + text(922, 340, "Sabtu, 28 November 2026", { size: 15, fill: "#5a4636", anchor: "middle", font: "Georgia,serif" })];
 
 const circ = (cx, cy, r) => ({ box: [cx - r, cy - r, 2 * r, 2 * r], r }); // tombol bulat
 const SCENES = {
@@ -531,7 +487,7 @@ const SCENES = {
     base: EDITOR_BASE,
     els: {
       share: { svg: bagikan(), enter: "fade", skel: true },
-      kelola: { svg: kelolaBtn(), enter: "fade" },
+      kelola: { svg: pinBtn(COUPLE_Y), enter: "fade" },
       backdrop: { svg: dim(0, 0, WORLD.w, WORLD.h), enter: "fade" },
       dlg: { svg: DLG_A.svg, enter: "pop" }
     },
@@ -554,7 +510,7 @@ const SCENES = {
     return {
       title: "Menyalin pesan serah terima untuk pengantin",
       // Jendela NikahKit di atas editor yang diredupkan; kedua keadaannya bagian layar (skel), jadi ikut focus.
-      base: [...EDITOR_BASE, bagikan(), kelolaBtn(), dim(0, 0, WORLD.w, WORLD.h)],
+      base: [...EDITOR_BASE, bagikan(), pinBtn(COUPLE_Y), dim(0, 0, WORLD.w, WORLD.h)],
       els: {
         dlgA: { svg: DLG_A.svg, skel: true },
         dlgB: { svg: DLG_B.svg + pinNote("PIN aktif saat ini. Tetap berlaku sampai Anda membuat PIN baru."), enter: "fade", skel: true },
@@ -567,7 +523,7 @@ const SCENES = {
         { caption: "Di jendela NikahKit, bagian PIN dashboard, klik Lihat PIN. PIN 6 angka tampil.", focus: pinCard, mark: DLG_A.lihat,
           lens: { src: [524, 474, 240, 52], at: [16, 230] }, at: [DLG_A.lihat[0] + DLG_A.lihat[2] / 2, DLG_A.lihat[1] + 18], click: true, show: ["dlgB"], dur: 3.4 },
         { caption: "Klik ikon balon chat: Salin pesan untuk pengantin. Muncul Pesan tersalin.", focus: [pinCard, [516, DLG_B.noteY - 2, 408, 42]], mark: [hx - 12, hy - 12, 24, 24],
-          lens: { src: [524, 425, 412, 84], zoom: 1.5, at: [530, 500] },
+          lens: { src: [524, 425, 412, 100], zoom: 1.5, at: [530, 476] },
           at: DLG_B.handover, click: true, hover: "tip", show: ["copied"], dur: 3.6 },
         { caption: "Pesan berisi link undangan, link kelola undangan, dan PIN. Tempel di WA.", focus: [bx, by, 404, bh + 2], mark: { box: [bx, by, 404, bh], r: 8 },
           lens: { src: [bx - 8, by - 8, 420, bh + 18], zoom: 1.5 }, show: ["bubble"], dur: 4.4 }
@@ -637,7 +593,6 @@ const SCENES = {
     const sticky = (c) => PB(0, 64, 390, c.ready[1] + c.ready[3] + 8 - 64);
     const sendNo = P(CHAT_NO.send[0], CHAT_NO.send[1] - NO_DY), sendFix = P(CHAT_FIX.send[0], CHAT_FIX.send[1] - CHAT_DY);
     const checks = PB(CHAT_U.checks[0], CHAT_U.checks[1] - CHAT_DY, CHAT_U.checks[2], CHAT_U.checks[3]);
-    const fy = Math.min(sendFix[1] - PY - 30, 630);
     return {
       title: "Mengirim undangan per tamu lewat WhatsApp",
       base: [phoneDesk(ph(kirimTop([0, 0, 0]), text(195, 452, "Belum ada tamu", { size: 16, fill: T.text, anchor: "middle" }),
@@ -682,9 +637,9 @@ const SCENES = {
           mark: [{ box: PB(...CHAT_NO.ready), r: 8 }, circ(sendNo[0], sendNo[1], 20)], lens: { src: PB(4, CHAT_NO.ready[1] - 8, 382, CHAT_NO.ready[3] + 16), zoom: 1.25 },
           at: sendNo, show: ["broken"], dur: 4.4 },
         { caption: "Tekan + [link-undangan]. Tanda kembali hijau, tombol kirim menyala.", focus: [sticky(CHAT_NO), [sendNo[0] - 30, sendNo[1] - 30, 60, 60]], mark: { box: PB(...CHAT_NO.chipBox), r: 15 },
-          lens: { src: PB(0, 64, 390, 62 + CHAT_NO.ready[3]), zoom: 1.25, at: [616, 24] }, at: P(CHAT_NO.chip[0], 87), click: true, hide: ["broken"], show: ["fixed"], dur: 4 },
-        { caption: "Tekan tombol kirim hijau. WhatsApp terbuka.", focus: PB(0, fy, 390, 700 - fy), mark: circ(sendFix[0], sendFix[1], 20),
-          lens: { src: PB(0, fy, 390, 700 - fy), zoom: 1.25, at: [12, 420] }, at: sendFix, click: true, show: ["opened"], dur: 3.6 },
+          lens: { src: PB(0, 66, CHAT_NO.chipBox[0] + CHAT_NO.chipBox[2] + 4, 42), zoom: 1.5, at: [600, 24] }, at: P(CHAT_NO.chip[0], 87), click: true, hide: ["broken"], show: ["fixed"], dur: 4 },
+        { caption: "Tekan tombol kirim hijau. WhatsApp terbuka.", focus: [sendFix[0] - 28, sendFix[1] - 28, 56, 56], mark: circ(sendFix[0], sendFix[1], 20),
+          note: "Kirim", at: sendFix, click: true, show: ["opened"], dur: 3.6 },
         { caption: "Kembali ke daftar: tamu itu bercentang dan masuk hitungan Terkirim.", focus: [PB(0, 0, 390, 150), rowsF], mark: BACK,
           lens: { src: PB(10, 302, 370, 72), zoom: 1.25 }, at: P(24, 32), click: true, hide: ["opened"], show: ["sent"], dur: 3.8 }
       ]
@@ -802,8 +757,8 @@ const SCENES = {
       penuh: { svg: PEL_PENUH, enter: "fade", skel: true }
     },
     steps: [
-      { caption: "Di laptop, klik ikon Pelacakan di lajur kiri (di HP lewat menu akun).", focus: [[0, 0, 64, 900], [64, 0, 550, 180]], mark: circ(32, 291, 20),
-        lens: { src: [72, 4, 532, 176], zoom: 1.5, at: [410, 40] }, at: [32, 291], click: true, show: ["pel"], dur: 3.4 },
+      { caption: "Di laptop, klik ikon Pelacakan di lajur kiri (di HP lewat menu akun).", focus: [[0, 0, 64, 900], [64, 0, 550, 174]], mark: circ(32, 291, 20),
+        lens: { src: [72, 4, 532, 170], zoom: 1.5, at: [410, 40] }, at: [32, 291], click: true, show: ["pel"], dur: 3.4 },
       { caption: "Tiap baris: berapa kali dibuka, kapan pertama, dan jumlah perangkat.", focus: [64, 262, 550, 440], mark: { box: [74, 268, 530, 424], r: 12 },
         lens: { src: [80, 296, 520, 152], zoom: 1.5 }, dur: 3.8 },
       { caption: "Saring dengan Perangkat penuh: tamu yang jatah perangkatnya habis.", focus: [64, 100, 550, 380], mark: { box: PENUH_CHIP, r: 16 },
