@@ -1,28 +1,30 @@
 // Animated SVG walkthroughs for the panduan (v2).
 //
 // A scene is drawn in WORLD coordinates = real screen pixels (e.g. a 1440x985 Chrome window with the Scalev editor,
-// or a 390x844 phone screen), so every button keeps its real size and nothing is squashed. A CAMERA per step decides
-// which part of the world fills the stage (960x536 above the caption bar): it pans/zooms between steps.
+// or a 390x844 phone screen), so every button keeps its real size and nothing is squashed. The whole world is scaled
+// once to fit the stage (960x536 above the caption bar); there is no camera movement.
 // Measurements come from the real UIs (Scalev editor, NikahKit panel, chrome://extensions, couple dashboard),
 // captured 14 Okt 2026; see the constants below. Scenes import parts from here and compose them.
 //
 // Scene shape:
-//   { title, desc?, world: { w, h }, bg?, base: [svg], els: { id: svg | { svg, enter, origin } },
-//     steps: [{ caption, dur?, cam?, at?, click?, press?, show?, hide?, type?, scroll?, hover? }] }
-//   cam:    { x, y, w } world rect to show (height follows the stage ratio) or "all". Defaults to the previous step.
-//   at:     [x, y] world point the pointer moves to (35% of the step), click: true = ripple + pointer press.
+//   { title, desc?, world: { x?, y?, w, h }, bg?, base: [svg], els: { id: svg | { svg, enter, origin } },
+//     steps: [{ caption, dur?, at?, click?, press?, show?, hide?, type?, scroll?, hover? }] }
+//   world: the fixed part of the drawing that fills the stage (crop to the panel or phone you explain; text should
+//          stay >= 9 px on stage, i.e. world text size x scale, where scale = min(960 / w, 536 / h)).
+//   at:     [x, y] world point the pointer moves to (arrives at 35% of the step, at least 0.6 s).
+//   click:  true = ripple at `at`; the step's show/hide/type then happen at the click instead of the step start.
 //   press:  element id that dips to 97% when clicked (buttons). hover: element id shown while the pointer is there.
 //   show/hide: element ids. enter: "fade" | "rise" (8px up) | "pop" (scale .96 from origin) | "slide" (from below);
-//          delay: seconds after the step start (stagger list rows 0.04-0.08 apart).
+//          delay: seconds after the step's moment (its start, or its click); stagger list rows 0.04-0.08 apart.
 //   type:   [{ id, n }] reveals that element left-to-right in n character steps (typing), with a caret.
 //   scroll: { id, dy } moves element id (a scrolling list/panel) by dy world px during the step (ease-in-out).
 // Reduced motion: the final state of every element, no pointer.
 
 import { ICONS } from "../../nikahkit/src/icons.js";
 
-export const W = 960, H = 600, CAP = 64, VH = H - CAP; // stage; caption bar height; visible stage height
+const MAX_W = 960, MAX_VH = 836; // largest stage (the caption bar goes below it)
 const EASE_OUT = "cubic-bezier(0.23,1,0.32,1)", EASE_IN_OUT = "cubic-bezier(0.77,0,0.175,1)";
-export const FONT = `Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif`;
+const FONT = `Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif`;
 
 // ---- Tokens (NikahKit: nikahkit/src/ui/base.css; Scalev/Chrome: measured) ---------------------------------------
 export const C = {
@@ -52,6 +54,12 @@ export const group = (o, ...kids) => `<g${attrs({ transform: o.transform, opacit
 export const para = (x, y, lines, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, fill: o.fill ?? C.strong, "font-weight": o.weight, "text-anchor": o.anchor })}>${lines.map((l, i) => `<tspan x="${x}" dy="${i ? (o.lh ?? Math.round((o.size ?? 14) * 1.43)) : 0}">${esc(l)}</tspan>`).join("")}</text>`;
 // Approximate text width in Roboto (for sizing buttons and pills around a label).
 export const tw = (s, size = 14, weight = 400) => Math.round(String(s).length * size * (weight >= 600 ? 0.57 : weight >= 500 ? 0.55 : 0.53));
+// Greedy word wrap to a width, using tw().
+export const wrap = (s, width, size = 14, weight = 400) => String(s).split(" ").reduce((ls, w) => {
+  const last = ls.at(-1);
+  if (last && tw(last + " " + w, size, weight) <= width) ls[ls.length - 1] = last + " " + w; else ls.push(w);
+  return ls;
+}, []);
 let clipN = 0;
 // Clip children to a rect (scrolling panels, truncated text).
 export const clipped = (x, y, w, h, ...kids) => { const id = `k${clipN++}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
@@ -165,7 +173,7 @@ export const ED = {
   panel: { x: 88, y: 169, w: 279 }, // panel body content box (inside 16px padding)
   screen: { x: 727, y: 106, w: 390, h: 784 } // preview: plain screen, no device frame
 };
-export const RAIL = [["Template", "layout-grid"], ["Gaya", "palette"], ["Audio", "music"], ["Media", "image"], ["Lapisan", "rows-3"], ["Konten", "pencil"]];
+const RAIL = [["Template", "layout-grid"], ["Gaya", "palette"], ["Audio", "music"], ["Media", "image"], ["Lapisan", "rows-3"], ["Konten", "pencil"]];
 export function scalevEditor(x, y, o = {}) {
   const tab = o.tab ?? "NikahKit", page = o.page ?? "Undangan Rani & Dimas";
   let s = rect(x, y, 1440, 900, { fill: C.svPreview });
@@ -225,10 +233,10 @@ export const nkDialogHead = (x, y, title) => rect(x, y + 92, 399, 808, { fill: C
 
 // ---- Scalev dashboard shell (app.scalev.com), measured from /tmp/ref/scalev-pages.png ------------------------------
 // Sidebar 0..255; menu rows 32px apart from y 138; chevron = has a submenu; bottom group Tutorials/Billing/Settings.
-export const SV_MENU = [["Home", "home", 1], ["E-Payment", "credit-card"], ["Products", "package", 1], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"],
+const SV_MENU = [["Home", "home", 1], ["E-Payment", "credit-card"], ["Products", "package", 1], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"],
   ["Checkout Flows", "shopping-cart", 0, "New"], ["Orders", "list", 1], ["Subscriptions", "refresh-ccw"], ["Ads & WhatsApp", "send", 1], ["Stores", "home"], ["Customers", "users"],
   ["Marketers", "link"], ["Collaborations", "heart"], ["Developers", "code-xml"], ["Mailev", "mail", 0, "ext"], ["Waylev", "message-circle", 0, "ext"]];
-export const SV_BOTTOM = [["Tutorials", "video", 803], ["Billing", "landmark", 833], ["Settings", "settings", 862]];
+const SV_BOTTOM = [["Tutorials", "video", 803], ["Billing", "landmark", 833], ["Settings", "settings", 862]];
 // Row centre of a sidebar item (pointer target): svMenuAt("Landing Pages").
 export const svMenuAt = (name) => { const i = SV_MENU.findIndex((m) => m[0] === name); if (i >= 0) return [110, 138 + i * 32]; const b = SV_BOTTOM.find((m) => m[0] === name); if (b) return [100, b[2]]; throw new Error(`svMenuAt: "${name}"`); };
 export function scalevApp(x, y, o = {}) {
@@ -265,44 +273,43 @@ const POINTER = `<path d="M0 0 L0 20 L5.5 15 L9.5 24 L13 22.5 L9 13.8 L16.5 13.8
 export function compile(scene) {
   const steps = scene.steps;
   if (!steps?.length) throw new Error(`${scene.title}: tanpa langkah`);
-  const world = scene.world ?? { w: W, h: VH };
+  const world = scene.world ?? { w: MAX_W, h: MAX_VH };
   const els = Object.fromEntries(Object.entries(scene.els ?? {}).map(([id, v]) => [id, typeof v === "string" ? { svg: v } : v]));
   for (const id of Object.keys(els)) if (!/^[A-Za-z][\w-]*$/.test(id)) throw new Error(`${scene.title}: id "${id}" harus diawali huruf`);
   const durs = steps.map((s) => s.dur ?? 3.2), total = +(durs.reduce((a, b) => a + b, 0) + 1.6).toFixed(2);
   const start = durs.map((_, i) => +durs.slice(0, i).reduce((a, b) => a + b, 0).toFixed(3));
   const pct = (t) => +Math.max(0, Math.min(100, (100 * t) / total)).toFixed(3);
   const css = [];
-  // Cameras: each step's view rect → stage transform (scale, tx, ty).
-  const camOf = (c) => {
-    const r = c === "all" || !c ? { x: 0, y: 0, w: world.w, h: world.h } : { x: c.x, y: c.y, w: c.w ?? world.w, h: c.h };
-    const s = r.h ? Math.min(W / r.w, VH / r.h) : W / r.w;
-    const vw = W / s, vh = VH / s;
-    const cx = r.x + r.w / 2, cy = r.y + (r.h ?? vh) / 2;
-    return { s, tx: -(cx - vw / 2) * s, ty: -(cy - vh / 2) * s };
-  };
-  // Static view: every step shows the whole world; per-step `cam` is ignored.
-  const cams = steps.map(() => camOf("all"));
-  steps.forEach((st) => delete st.cam);
-  const camT = (c) => `translate(${+c.tx.toFixed(2)}px,${+c.ty.toFixed(2)}px) scale(${+c.s.toFixed(4)})`;
+  // Static view: the stage takes the world rect's own shape (x, y default 0), scaled to fit MAX_W x MAX_VH, so a phone
+  // crop becomes a tall narrow image and an editor crop a wide one; nothing is letterboxed and nothing moves.
+  const wx = world.x ?? 0, wy = world.y ?? 0;
+  const fit = Math.min(MAX_W / world.w, MAX_VH / world.h), W = Math.round(world.w * fit), VH = Math.round(world.h * fit);
+  const fx = -wx * fit, fy = -wy * fit;
+  const toStage = (p) => [+(fx + p[0] * fit).toFixed(1), +(fy + p[1] * fit).toFixed(1)];
+  // Caption bar: captions wrap to the stage width.
+  const capLines = steps.map((s) => wrap(s.caption ?? "", W - 80, 16, 500));
+  const CAP = 24 + 22 * Math.max(...capLines.map((l) => l.length)), H = VH + CAP;
+  // Timing: the pointer reaches `at` at hit[i]; on a click step everything the step changes (show, hide, type, press)
+  // happens at the click, otherwise at the step start.
   const MOVE = 0.6;
-  const camKf = [];
-  steps.forEach((_, i) => { const c = cams[i], p = cams[i - 1] ?? c; camKf.push(`${pct(start[i])}%{transform:${camT(p)};animation-timing-function:${EASE_IN_OUT}}`, `${pct(start[i] + MOVE)}%{transform:${camT(c)}}`); });
-  camKf.push(`${pct(total - 0.45)}%{transform:${camT(cams.at(-1))};animation-timing-function:${EASE_IN_OUT}}`, `100%{transform:${camT(cams[0])}}`);
-  css.push(`#world{transform:${camT(cams.at(-1))};animation:cam ${total}s infinite}@keyframes cam{${dedupe(camKf)}}`);
-  // Visibility windows.
+  const hit = durs.map((d, i) => start[i] + Math.max(MOVE, d * 0.35));
+  const act = steps.map((s, i) => (s.click && s.at ? hit[i] + 0.1 : start[i]));
+  // Visibility windows in seconds: [from, to]; from null = visible from the start, to null = stays visible.
   const win = {};
+  const need = (i, kind, id) => { if (!els[id]) throw new Error(`${scene.title}: langkah ${i + 1} ${kind} "${id}" tidak ada`); };
+  const KEYS = new Set(["caption", "dur", "at", "click", "press", "show", "hide", "type", "scroll", "hover"]);
   steps.forEach((s, i) => {
-    for (const id of s.show ?? []) { if (!els[id]) throw new Error(`${scene.title}: langkah ${i + 1} show "${id}" tidak ada`); (win[id] ??= []).push([i, null]); }
+    for (const k of Object.keys(s)) if (!KEYS.has(k)) throw new Error(`${scene.title}: langkah ${i + 1} kunci "${k}" tidak dikenal`);
+    for (const id of s.show ?? []) { need(i, "show", id); (win[id] ??= []).push([act[i] + (els[id].delay ?? 0), null]); }
     for (const id of s.hide ?? []) {
-      if (!els[id]) throw new Error(`${scene.title}: langkah ${i + 1} hide "${id}" tidak ada`);
-      const w = win[id]; if (w && w.at(-1)[1] === null) w.at(-1)[1] = i; else (win[id] ??= []).push([-1, i]);
+      need(i, "hide", id);
+      const w = win[id]; if (w && w.at(-1)[1] === null) w.at(-1)[1] = act[i]; else (win[id] ??= []).push([null, act[i]]);
     }
-    for (const t of s.type ?? []) if (!els[t.id ?? t]) throw new Error(`${scene.title}: langkah ${i + 1} type "${t.id ?? t}" tidak ada`);
-    if (s.press && !els[s.press]) throw new Error(`${scene.title}: langkah ${i + 1} press "${s.press}" tidak ada`);
-    if (s.hover && !els[s.hover]) throw new Error(`${scene.title}: langkah ${i + 1} hover "${s.hover}" tidak ada`);
-    if (s.scroll && !els[s.scroll.id]) throw new Error(`${scene.title}: langkah ${i + 1} scroll "${s.scroll.id}" tidak ada`);
+    for (const t of s.type ?? []) need(i, "type", t.id ?? t);
+    if (s.press) need(i, "press", s.press);
+    if (s.hover) { need(i, "hover", s.hover); (win[s.hover] ??= []).push([start[i] + durs[i] * 0.3, start[i] + durs[i]]); }
+    if (s.scroll) need(i, "scroll", s.scroll.id);
   });
-  steps.forEach((s, i) => { if (s.hover) { const t = start[i] + durs[i] * 0.3; (win[s.hover] ??= []).push([`t${t}`, `t${start[i] + durs[i]}`]); } });
   const ENTER = 0.26, EXIT = 0.16;
   const off = (el) => {
     const e = el.enter ?? "rise";
@@ -312,32 +319,27 @@ export function compile(scene) {
     return "opacity:0;transform:translateY(8px)";
   };
   const onState = (el) => ((el.enter ?? "rise") === "fade" ? "opacity:1" : "opacity:1;transform:none");
-  const tOf = (v, kind) => (typeof v === "string" ? +v.slice(1) : start[v]);
   Object.entries(els).forEach(([id, el], k) => {
     const w = win[id];
     if (!w) return;
-    const kf = [], startsOn = w[0][0] === -1, endsOn = w.at(-1)[1] === null;
+    const kf = [], startsOn = w[0][0] === null, endsOn = w.at(-1)[1] === null;
     kf.push(`0%{${startsOn ? onState(el) : off(el)}}`);
     for (const [a, b] of w) {
-      if (a !== -1) { const t = tOf(a) + (typeof a === "number" ? el.delay ?? 0 : 0); kf.push(`${pct(t)}%{${off(el)};animation-timing-function:${EASE_OUT}}`, `${pct(t + ENTER)}%{${onState(el)}}`); }
-      if (b !== null) { const t = tOf(b); kf.push(`${pct(t)}%{${onState(el)};animation-timing-function:${EASE_OUT}}`, `${pct(t + EXIT)}%{${off(el)}}`); }
+      if (a !== null) kf.push(`${pct(a)}%{${off(el)};animation-timing-function:${EASE_OUT}}`, `${pct(a + ENTER)}%{${onState(el)}}`);
+      if (b !== null) kf.push(`${pct(b)}%{${onState(el)};animation-timing-function:${EASE_OUT}}`, `${pct(b + EXIT)}%{${off(el)}}`);
     }
     kf.push(`${pct(total - 0.45)}%{${endsOn ? onState(el) : off(el)}}`, `100%{${startsOn ? onState(el) : off(el)}}`);
     const origin = el.origin ? `transform-origin:${el.origin[0]}px ${el.origin[1]}px;` : "transform-box:fill-box;transform-origin:center;";
     css.push(`#e-${id}{${origin}${endsOn ? onState(el) : off(el)};animation:v${k} ${total}s infinite}@keyframes v${k}{${dedupe(kf)}}`);
   });
-  // Typing: clip reveal in character steps + caret.
+  // Typing: clip reveal in character steps + caret, starting at the click (or 0.35 s into the step).
   const defs = [];
   steps.forEach((s, i) => (s.type ?? []).forEach((t, j) => {
-    const id = t.id ?? t, n = t.n ?? 16, cid = `ty${i}_${j}`, t0 = start[i] + (s.click && s.at ? Math.max(MOVE, durs[i] * 0.35) + 0.1 : 0.35), t1 = Math.min(start[i] + durs[i] * 0.85, t0 + n * 0.07);
-    defs.push(`<clipPath id="${cid}"><rect class="${cid}" x="-2000" y="-2000" width="8000" height="8000"/></clipPath>`);
+    const id = t.id ?? t, n = t.n ?? 16, cid = `ty${i}_${j}`, t0 = s.click && s.at ? act[i] : start[i] + 0.35, t1 = Math.min(start[i] + durs[i] * 0.85, t0 + n * 0.07);
+    const [bx, by, bw, bh] = t.box ?? [-2000, -2000, 8000, 8000]; // box: [x, y, w, h] of the typed text (adds a caret)
+    defs.push(`<clipPath id="${cid}"><rect class="${cid}" x="${bx}" y="${by}" width="${bw}" height="${bh}"/></clipPath>`);
     css.push(`.${cid}{transform-box:fill-box;transform-origin:left center;animation:${cid} ${total}s infinite}@keyframes ${cid}{0%,${pct(t0)}%{transform:scaleX(0);animation-timing-function:steps(${n},end)}${pct(t1)}%,${pct(total - 0.45)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
-    const bb = t.box; // optional [x, y, w, h] of the text to clip precisely
-    if (bb) {
-      defs.pop();
-      defs.push(`<clipPath id="${cid}"><rect class="${cid}" x="${bb[0]}" y="${bb[1]}" width="${bb[2]}" height="${bb[3]}"/></clipPath>`);
-      els[id].caret = { box: bb, t0, t1 };
-    }
+    if (t.box) els[id].caret = { box: t.box, t0, t1 };
     els[id].svg = `<g clip-path="url(#${cid})">${els[id].svg}</g>`;
   }));
   // Scroll: translate inner content.
@@ -350,42 +352,36 @@ export function compile(scene) {
     css.push(`.sc-${id}{transform:translateY(${y}px);animation:sc${k} ${total}s infinite}@keyframes sc${k}{${dedupe(kf)}}`);
     els[id].svg = `<g class="sc-${id}">${els[id].svg}</g>`;
   });
-  // Press: buttons dip to .97 on click.
+  // Press: buttons dip to .97 when the pointer clicks.
   steps.forEach((s, i) => {
     if (!s.press) return;
-    const t = start[i] + durs[i] * 0.35, id = s.press;
+    const t = hit[i], id = s.press;
     els[id].svg = `<g class="pr${i}">${els[id].svg}</g>`;
     css.push(`.pr${i}{transform-box:fill-box;transform-origin:center;animation:pr${i} ${total}s infinite}@keyframes pr${i}{0%,${pct(t)}%{transform:none;animation-timing-function:${EASE_OUT}}${pct(t + 0.08)}%{transform:scale(.97)}${pct(t + 0.24)}%,100%{transform:none}}`);
   });
-  // Pointer in stage space (constant size): position = camera(world point) at arrival.
-  const toStage = (p, c) => [+(p[0] * c.s + c.tx).toFixed(1), +(p[1] * c.s + c.ty).toFixed(1)];
-  const rest = scene.cursorStart ? toStage(scene.cursorStart, cams[0]) : [W - 140, VH - 70];
-  const pts = []; let cur = rest, curWorld = null;
-  steps.forEach((s, i) => {
-    const t = start[i];
-    pts.push([pct(t), cur]);
-    if (curWorld && s.cam) { cur = toStage(curWorld, cams[i]); pts.push([pct(t + MOVE), cur]); }
-    if (s.at) { curWorld = s.at; cur = toStage(s.at, cams[i]); pts.push([pct(t + Math.max(MOVE, durs[i] * 0.35)), cur]); }
-  });
+  // Pointer in stage space (constant size).
+  const rest = scene.cursorStart ? toStage(scene.cursorStart) : [W - 60, VH - 50];
+  const pts = []; let cur = rest;
+  steps.forEach((s, i) => { pts.push([pct(start[i]), cur]); if (s.at) { cur = toStage(s.at); pts.push([pct(hit[i]), cur]); } });
   pts.push([pct(total - 0.45), cur], [100, rest]);
   const usesCursor = steps.some((s) => s.at);
   if (usesCursor) css.push(`#cur{animation:cur ${total}s infinite}@keyframes cur{${dedupe(pts.map(([p, [x, y]]) => `${p}%{transform:translate(${x}px,${y}px);animation-timing-function:${EASE_IN_OUT}}`))}}`);
-  // Clicks: ripple at the stage point + pointer press.
+  // Clicks: ripple at the stage point.
   const ripples = [];
   steps.forEach((s, i) => {
     if (!s.click || !s.at) return;
-    const t = start[i] + Math.max(MOVE, durs[i] * 0.35), [x, y] = toStage(s.at, cams[i]);
+    const t = hit[i], [x, y] = toStage(s.at);
     ripples.push(`<circle id="r${i}" cx="${x}" cy="${y}" r="16" fill="rgba(184,70,13,.18)" stroke="${C.accent}" stroke-width="2.5"/>`);
     css.push(`#r${i}{opacity:0;transform-origin:${x}px ${y}px;animation:r${i} ${total}s infinite}@keyframes r${i}{0%,${pct(t)}%{opacity:0;transform:scale(.4);animation-timing-function:${EASE_OUT}}${pct(t + 0.05)}%{opacity:1}${pct(t + 0.55)}%{opacity:0;transform:scale(1.5)}100%{opacity:0}}`);
   });
   // Captions, step numbers, progress.
-  const caps = steps.map((s, i) => `<g id="c${i}">${text(64, H - CAP / 2 + 6, s.caption, { size: 16, fill: C.white, weight: 500 })}</g>`).join("");
+  const caps = capLines.map((ls, i) => `<g id="c${i}">${para(64, VH + CAP / 2 + 6 - 11 * (ls.length - 1), ls, { size: 16, fill: C.white, weight: 500, lh: 22 })}</g>`).join("");
   steps.forEach((s, i) => {
     if (!s.caption || s.caption.length > 80) throw new Error(`${scene.title}: langkah ${i + 1} caption kosong atau lebih dari 80 huruf`);
     const a = start[i], b = a + durs[i], last = i === steps.length - 1, end = last ? total - 0.45 : b;
     css.push(`#c${i},#n${i}{opacity:${last ? 1 : 0};animation:c${i} ${total}s infinite}@keyframes c${i}{${dedupe([`0%{opacity:${i === 0 ? 1 : 0}}`, i ? `${pct(a)}%{opacity:0}` : "", i ? `${pct(a + 0.2)}%{opacity:1}` : "", `${pct(end)}%{opacity:1}`, `${pct(end + 0.2)}%{opacity:0}`, i === 0 ? `${pct(total - 0.05)}%{opacity:0}` : "", `100%{opacity:${i === 0 ? 1 : 0}}`].filter(Boolean))}}`);
   });
-  const nums = steps.map((_, i) => `<g id="n${i}">${circle(32, H - CAP / 2, 15, { fill: C.accent })}${text(32, H - CAP / 2 + 5, String(i + 1), { size: 14, fill: C.white, anchor: "middle", weight: 700 })}</g>`).join("");
+  const nums = steps.map((_, i) => `<g id="n${i}">${circle(32, VH + CAP / 2, 15, { fill: C.accent })}${text(32, VH + CAP / 2 + 5, String(i + 1), { size: 14, fill: C.white, anchor: "middle", weight: 700 })}</g>`).join("");
   const bar = `<rect x="0" y="${H - CAP}" width="${W}" height="3" fill="rgba(255,255,255,.18)"/><rect id="prog" x="0" y="${H - CAP}" width="${W}" height="3" fill="${C.accent}"/>`;
   css.push(`#prog{transform-origin:0 0;transform:scaleX(1);animation:prog ${total}s linear infinite}@keyframes prog{0%{transform:scaleX(0)}${pct(total - 0.45)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
   // Carets for typed fields.
@@ -402,7 +398,7 @@ export function compile(scene) {
 ${reduce}</style>
 <defs>${defs.join("")}<clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
 ${rect(0, 0, W, H, { r: 0, fill: scene.bg ?? "#eef1f5" })}
-<g clip-path="url(#stage)"><g id="world">
+<g clip-path="url(#stage)"><g id="world" transform="translate(${+fx.toFixed(2)} ${+fy.toFixed(2)}) scale(${+fit.toFixed(4)})">
 ${(scene.base ?? []).join("\n")}
 ${Object.entries(els).map(([id, e]) => `<g id="e-${id}">${e.svg}</g>`).join("\n")}
 ${carets.join("")}

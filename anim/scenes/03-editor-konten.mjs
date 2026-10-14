@@ -1,4 +1,4 @@
-// Editor dan Konten (v2): peta editor, pilih template, isi Mempelai, tambah acara, galeri, RSVP dan Amplop Digital.
+// Editor dan Konten: langkah editor, pilih/ganti template, Langkah tiap halaman Konten, tambah acara, galeri, RSVP dan Amplop Digital.
 // World = the real 1440x900 Scalev editor (lib scalevEditor). Panel boxes follow /tmp/ref/editor-metrics.json (Template,
 // Konten: cards 134x229, accordions 279x50, fields 253 wide); labels from nikahkit/src/fields.js, model.js (SAMPLE,
 // SAMPLE_CHECKS), ui/panel-content.jsx, ui/panels-style.jsx, ui/fields.jsx, ui/App.jsx (MediaDialog, Toast), store.js.
@@ -7,7 +7,9 @@ import { C, ED, esc, rect, text, line, circle, para, clipped, shadow, icon, icon
 // Text with inline bold / underlined runs (link buttons, <b> in notes); parts: string | { t, w?, fill?, u? }.
 const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.faint}">${parts.map((p) => (typeof p === "string" ? esc(p) : `<tspan font-weight="${p.w ?? 700}" fill="${p.fill ?? C.strong}"${p.u ? ' text-decoration="underline"' : ""}>${esc(p.t)}</tspan>`)).join("")}</text>`;
 
-const WORLD = { w: 1440, h: 900 };
+// Crops: WIDE = rail, panel and preview (scale .857); SIDE = rail and panel only (scale 1.03). TABS adds the Scalev tab row.
+// The Scalev Simpan button (x 1193) never fits with the rail; walk-throughs end on the Tersimpan status (SAVED).
+const WIDE = { x: 0, y: 92, w: 1120, h: 808 }, SIDE = { x: 0, y: 92, w: 400, h: 808 }, TABS = { x: 0, y: 44, w: 1120, h: 856 };
 const ACCOUNT = "Tahunan"; // the account chip shows the member's plan
 const P = 88, PW = 279, I = 101, IW = 253; // panel content box; inside an open accordion
 const SC = ED.screen, CX = SC.x + SC.w / 2; // plain preview screen 727,106 390x784
@@ -29,19 +31,21 @@ function inp(x, y, w, val, o = {}) {
 }
 const sw = (x, y, on) => rect(x, y, 36, 20, { r: 10, fill: on ? C.primary : C.off }) + circle(on ? x + 26 : x + 10, y + 10, 8, { fill: C.white });
 const badge = (xr, y, label, ok = true) => { const w = Math.round(label.length * 4.6 + 9); return rect(xr - w, y, w, 18, { r: 9, fill: ok ? C.okSoft : C.warnSoft }) + text(xr - w / 2, y + 12.5, label, { size: 10, weight: 500, fill: ok ? C.ok : C.warnStrong, anchor: "middle" }); };
-// Konten accordion (nk-acc): 50px bar, chevron, title, status badge; open = body below a hairline.
-function acc(y, title, b, open) {
-  return rect(P + 0.5, y + 0.5, PW - 1, (open ? 1400 : 50) - 1, { r: 4, fill: C.white, stroke: C.line }) + (open ? line(P + 1, y + 50.5, P + PW - 1, y + 50.5) : "") +
-    icon(open ? "chevron-down" : "chevron-right", P + 22, y + 25, 18, C.strong) + text(P + 43, y + 30, title, { size: 14, weight: 500 }) + (b ? badge(P + 266, y + 16, b, b === "Terisi") : "");
+// Konten accordion (nk-acc): 50px bar, chevron, title, status badge; open = body height h below a hairline.
+function acc(y, title, b, h) {
+  return rect(P + 0.5, y + 0.5, PW - 1, (h ?? 50) - 1, { r: 4, fill: C.white, stroke: C.line }) + (h ? line(P + 1, y + 50.5, P + PW - 1, y + 50.5) : "") +
+    icon(h ? "chevron-down" : "chevron-right", P + 22, y + 25, 18, C.strong) + text(P + 43, y + 30, title, { size: 14, weight: 500 }) + (b ? badge(P + 266, y + 16, b, b === "Terisi") : "");
 }
 // Vertical stack of fields (nk-field: label 16 + gap 4 + control, hint +8, margin 12).
 function col(x, y, w) {
   let s = "";
   const c = {
+    at: {}, // label -> top y of its field
     get y() { return y; }, get svg() { return s; },
     add(str, h = 0) { s += str; y += h; return c; },
     field(l, v, o = {}) {
       const h = o.h ?? 36;
+      c.at[l] = y;
       s += lbl(x, y, l) + inp(x, y + 20, w, v, o);
       let used = 20 + h;
       if (o.err) { s += text(x, y + used + 15, o.err, { size: 12, fill: C.danger }); used += 20; }
@@ -57,7 +61,9 @@ function col(x, y, w) {
       return c;
     },
     h3(t) { y += 12; s += text(x, y + 12, t, { size: 12, weight: 700 }); y += 24; return c; },
-    lead(t) { s += text(x, y + 12, t, { size: 12, fill: C.faint }); y += 28; return c; }
+    lead(t) { s += text(x, y + 12, t, { size: 12, fill: C.faint }); y += 28; return c; },
+    // Photo field (nk-photo): label, 96px thumb, button (Ganti foto; Pilih foto when empty).
+    photo(l, k, btn = "Ganti foto") { c.at[l] = y; s += lbl(x, y, l) + (k === null ? "" : photo(x, y + 20, 96, 96, k, 4)) + quietBlock(x, y + (k === null ? 20 : 124), w, btn, "image"); y += k === null ? 68 : 172; return c; }
   };
   return c;
 }
@@ -71,15 +77,34 @@ const sampleNote = (left, link) => rect(P, 169, PW, 64, { r: 4, fill: C.warnSoft
   text(P + 12, 218, link, { size: 12, weight: 500, fill: C.strong, underline: true });
 const panelBg = () => rect(72, 153, 327, 747, { fill: C.white });
 const body = (...kids) => clipped(72, 153, 327, 747, ...kids);
-
-// ---- Callouts --------------------------------------------------------------------------------------------------------
-// Pill pinned to a world point; k scales it so it stays readable in the overview camera.
-const tag = (x, y, label, tx, ty, k = 1) => {
-  const w = Math.round(tw(label, 14 * k, 600) + 28 * k), h = 32 * k;
-  return line(x + w / 2, y + h / 2, tx, ty, { stroke: C.accent, sw: 2 * k }) + circle(tx, ty, 4 * k, { fill: C.accent }) +
-    rect(x, y, w, h, { r: h / 2, fill: C.accent }) + text(x + w / 2, y + 21 * k, label, { size: 14 * k, weight: 600, fill: C.white, anchor: "middle" });
-};
-
+// Konten groups in panel order (nikahkit/src/fields.js GROUPS, labels from model.js META).
+const GRP = ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video", "Dress Code", "Susunan Acara",
+  "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
+// Konten panel body: the head (sample note, Bahasa undangan, Lapisan line) when from = 0, then the accordions from GRP[from];
+// open: title of the open group, fill(c) adds its fields to a col; dy: panel scrolled by dy; raw: no clip (a scroll element
+// under lid()). Returns the svg, each bar's y and the open group's field tops (f), all in scrolled coordinates.
+function kList({ from = 0, top = 169, left = 6, link = "Ganti nama mempelai wanita", open, fill, todo = [], dy = 0, raw = false } = {}) {
+  let s = "", y = top;
+  if (!from) {
+    const c = col(P, left ? 245 : 169, PW);
+    if (left) s += sampleNote(left, link);
+    c.field("Bahasa undangan", "Indonesia", { select: true, hint: ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."] });
+    s += c.svg + rich(P, c.y + 12, ["Urutan dan tampilan bagian di ", { t: "Lapisan", w: 500, u: true }, "."]);
+    y = c.y + 28;
+  }
+  const at = {}, f = {};
+  for (const t of GRP.slice(from)) {
+    if (y - dy > 3000) break;
+    at[t] = y - dy;
+    const b = todo.includes(t) ? "Belum diisi" : "Terisi";
+    if (t !== open) { s += acc(y, t, b); y += 58; continue; }
+    const c = col(I, y + 54, IW); fill(c);
+    for (const [k, v] of Object.entries(c.at)) f[k] = v - dy;
+    const h = c.y - y; s += acc(y, t, b, h) + c.svg; y += h + 8;
+  }
+  const g = dy ? `<g transform="translate(0 ${-dy})">${s}</g>` : s;
+  return { svg: raw ? rect(72, -2000, 327, 5000, { fill: C.white }) + g : body(panelBg(), g), at, f };
+}
 // ---- Preview screen (plain screen, no device frame); the maroon cream design of the reference ------------------------
 const SERIF = "Georgia,'Times New Roman',serif";
 const SCRIPT = "'Pinyon Script','Snell Roundhand','Apple Chancery','Brush Script MT',cursive";
@@ -97,7 +122,7 @@ const scr = (fill, ...kids) => rect(SC.x - 1, SC.y - 1, SC.w + 2, SC.h + 2, { fi
 const bumps = (y, dir) => rect(SC.x, dir > 0 ? SC.y : y, SC.w, dir > 0 ? y - SC.y : SC.y + SC.h - y, { fill: MAROON }) +
   Array.from({ length: 14 }, (_, i) => circle(SC.x + 14 + i * 29, y, 11 + (i % 3) * 3, { fill: MAROON })).join("");
 const cloud = (cx, cy, s = 1) => circle(cx, cy, 13 * s, { fill: MAROON }) + circle(cx - 17 * s, cy + 6 * s, 10 * s, { fill: MAROON }) + circle(cx + 17 * s, cy + 6 * s, 10 * s, { fill: MAROON }) + rect(cx - 27 * s, cy + 6 * s, 54 * s, 10 * s, { r: 5 * s, fill: MAROON });
-const disc = () => circle(1065, 765, 26, { fill: "#1b1b1b" }) + circle(1065, 765, 10, { fill: C.white }) + `<path d="M1062 760 L1069 765 L1062 770 Z" fill="#1b1b1b"/>`;
+const disc = () => circle(1065, 700, 26, { fill: "#1b1b1b" }) + circle(1065, 700, 10, { fill: C.white }) + `<path d="M1062 695 L1069 700 L1062 705 Z" fill="#1b1b1b"/>`;
 const DOCK = [["Mempelai", "heart"], ["Acara", "calendar"], ["Galeri", "image"], ["Ucapan", "message-circle"], ["Hadiah", "gift"]];
 const dock = (active) => shadow(764, 810, 316, 70, 18) + rect(764, 810, 316, 70, { r: 18, fill: MAROON }) + DOCK.map(([n, ic], i) => {
   const x = 802 + i * 60;
@@ -124,9 +149,7 @@ const evCard = (e) => rect(751, e.y, 342, e.h, { r: 14, fill: C.white, stroke: "
   sTxt(e.y + 66, "Minggu, 14 Februari 2027") + sTxt(e.y + 90, e.time) + (e.place ? sTxt(e.y + 120, e.place, { weight: 700, fill: INK }) + sTxt(e.y + 141, e.addr, { size: 12 }) : "");
 const pvEvents = (list) => scr(CREAM, secTitle("Waktu & Tempat"), ...list.map((k) => evCard(EV[k])), dock("Acara"), disc());
 const pvGallery = () => scr(CREAM, secTitle("Galeri"), sTxt(262, "Sebagian momen yang ingin kami bagi"), sTxt(283, "bersama Anda."),
-  photo(751, 305, 342, 236, 0, 10), photo(751, 553, 165, 120, 2, 10), dock("Galeri"), disc());
-const pvGifts = () => scr(CREAM, secTitle("Tanda Kasih"), sTxt(262, "Doa restu Anda sudah lebih dari cukup."), sTxt(284, "Bila ingin memberi tanda kasih,"), sTxt(306, "dapat melalui:"),
-  rect(842, 334, 160, 46, { r: 23, fill: MAROON }) + icon("gift", 874, 357, 16, C.white) + text(932, 362, "Kirim Hadiah", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }), dock("Hadiah"), disc());
+  photo(751, 305, 342, 236, 0, 10), photo(751, 553, 165, 120, 4, 10), dock("Galeri"), disc());
 // Another landing page's HTML (before a template is picked): neutral blocks, no text.
 const pvForeign = () => scr(C.white, rect(SC.x, SC.y, SC.w, 56, { fill: "#1f2937" }), rect(SC.x + 20, SC.y + 20, 90, 16, { r: 3, fill: "#4b5563" }),
   rect(SC.x, SC.y + 56, SC.w, 250, { fill: "#e5e7eb" }), rect(SC.x + 40, SC.y + 130, 310, 22, { r: 4, fill: "#9ca3af" }), rect(SC.x + 70, SC.y + 166, 250, 14, { r: 4, fill: "#c4c8ce" }),
@@ -181,113 +204,238 @@ const seg = () => rect(P + 0.5, 169.5, PW - 1, 37, { r: 4, fill: C.white, stroke
 const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Memilih template", "akan menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
 const templatePanel = (used) => body(seg(), cards(219, used));
 
-// ---- Konten panel (Mempelai open, as the reference) -------------------------------------------------------------------
-const NICK_Y = 685; // Nama panggilan input (Mempelai Wanita)
-function kontenBody(left = 6, link = "Ganti nama mempelai wanita") {
-  const c = col(P, 245, PW).add(sampleNote(left, link));
-  c.field("Bahasa undangan", "Indonesia", { select: true, hint: ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."] });
-  c.add(rich(P, c.y + 12, ["Urutan dan tampilan bagian di ", { t: "Lapisan", w: 500, u: true }, "."]), 28);
-  c.add(acc(c.y, "Sampul", "Terisi"), 58).add(acc(c.y, "Mempelai", "Terisi", true));
-  const m = col(I, c.y + 54, IW);
-  m.field("Judul", "Mempelai", { ph: true }).field("Urutan nama", "Wanita dulu", { select: true }).h3("Mempelai Wanita")
-    .field("Nama panggilan", "Rani", { hint: ["Tampil di sampul."] }).field("Nama lengkap dan gelar", "Rani Ayu, S.Psi.").field("Profesi atau bio singkat (opsional)", "Psikolog");
-  return body(c.svg, m.svg);
+// ---- Konten groups (fields from nikahkit/src/fields.js, sample values from model.js SAMPLE) ---------------------------
+// List item (nk-item) built by build(col); its field tops join c.at (first occurrence wins).
+function item(c, title, build, first, last) {
+  const y0 = c.y, f = col(I + 10, y0 + 48, IW - 20); build(f);
+  const h = f.y - y0 - 2;
+  c.at[title] = y0; for (const [k, v] of Object.entries(f.at)) if (!(k in c.at)) c.at[k] = v;
+  return c.add(itemBox(y0, h) + itemBar(y0, title, first, last) + f.svg, h + 8);
 }
-const kontenPanel = (o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kontenBody(o.left, o.link);
+const fillMempelai = (nick = "Rani") => (c) => c.field("Judul", "Mempelai", { ph: true }).field("Urutan nama", "Wanita dulu", { select: true }).h3("Mempelai Wanita")
+  .field("Nama panggilan", nick, { hint: ["Tampil di sampul."] }).field("Nama lengkap dan gelar", "Rani Ayu, S.Psi.").field("Profesi atau bio singkat (opsional)", "Psikolog")
+  .field("Anak ke- (opsional)", "Putri kedua", { hint: ["Kosong: \"Putri dari\" / \"Putra dari\"."] }).field("Nama ayah", "Ahmad").toggle("Ayah sudah wafat (Alm.)", false)
+  .field("Nama ibu", "Siti").toggle("Ibu sudah wafat (Almh.)", true);
+const EVS = [["Akad Nikah", "14/02/2027, 08.00", "", "Masjid Al-Ikhlas", "Jl. Melati 1, Jakarta", "https://maps.google.com/?q=Kebayoran+Baru", "Khusus keluarga inti"],
+  ["Resepsi", "14/02/2027, 11.00", "14/02/2027, 14.00", "Gedung Sejahtera", "Jl. Melati 10, Jakarta", "https://maps.google.com/?q=Kebayoran+Baru", "Parkir di basement"],
+  ["Ngunduh Mantu", "21/02/2027, 10.00", "21/02/2027, 13.00", "Rumah Bpk. Budi", "Jl. Mawar 5, Depok", "https://maps.google.com/?q=Depok", "Acara keluarga"]];
+const fillAcara = (list) => (c) => {
+  c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Acuan tanggal sampul, Simpan Tanggal,", "Hitung Mundur, dan kalender. Tanpa", "tanggal: acara pertama yang bertanggal."] });
+  list.forEach((e, i) => item(c, e[0], (f) => f.field("Nama acara", e[0]).field("Mulai", e[1], { icon: "calendar" })
+    .field("Selesai (opsional)", e[2] || "hh/bb/tttt, --.--", { icon: "calendar", ph: !e[2] }).field("Nama tempat atau gedung", e[3])
+    .area("Alamat lengkap", [e[4]]).field("Tautan peta", e[5]).area("Catatan (opsional)", [e[6]]), i === 0, i === list.length - 1));
+  c.at["Tambah acara"] = c.y;
+  c.add(quietBlock(I, c.y, IW, "Tambah acara", "plus"), 48).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]);
+};
+const fillSampul = (c) => c.add(hintL(I, c.y, ["Nama dan tanggal diambil dari", "Mempelai dan Acara."]), 44).photo("Foto sampul", 6).photo("Foto slideshow (opsional, maks. 4)", 2, "Tambah foto");
+const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi kalimat pembuka, salam,", "kata pengantar, dan salam penutup.", "Tetap bisa diubah."] })
+  .field("Kalimat pembuka (opsional)", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", { hint: ["Mis. basmalah. Kosongkan bila tidak", "dipakai."] })
+  .field("Salam", "Assalamu'alaikum Warahmatullahi Wabarakatuh").area("Kata pengantar", ["Dengan memohon rahmat dan rida", "Allah SWT, kami bermaksud", "menyelenggarakan pernikahan", "putra-putri kami. Merupakan", "kebahagiaan bagi kami apabila"], 5);
+const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
+const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { ph: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
+  item(c, "Menjalin Hubungan", story("Agustus 2022", "Jakarta", "Menjalin Hubungan", ["Setelah sekian lama berteman,", "kami memutuskan untuk", "melangkah bersama."], 3), false, false); };
+const fillVideo = (c) => { c.field("Judul", "Video", { ph: true }).area("Keterangan", ["Saksikan perjalanan kami dalam", "video berikut."]);
+  item(c, "Prewedding", (f) => f.field("Tautan YouTube", "https://www.youtube.com/watch?v=boRd_GXsYWA").field("Judul video (opsional)", "Prewedding"), true, true);
+  c.add(quietBlock(I, c.y, IW, "Tambah video", "plus"), 48); };
+const swatch = (f, hex) => f.add(rect(I + IW - 52, f.y - 40, 20, 20, { r: 3, fill: hex, stroke: C.field }));
+const fillDress = (c) => { c.field("Judul", "Dress Code", { ph: true });
+  [["Olive", "#3F4232"], ["Terakota", "#A0522D"], ["Sage", "#5B7553"]].forEach(([n, hex], i) => item(c, n, (f) => swatch(f.field("Warna", hex), hex).field("Nama warna", n), i === 0, false)); };
+const fillGifts = (c) => {
+  c.field("Judul", "Tanda Kasih", { ph: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
+    .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat terbuka setelah tamu", "menekan tombol."]);
+  [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Logo tampil otomatis untuk bank dan", "e-wallet yang dikenal (BCA, BNI, BRI,", "BSI, Mandiri, DANA, OVO, ...). Nama", "lain tampil sebagai teks."] })
+    .field("Nomor rekening", n).field("Nama pemilik rekening", h).photo("Gambar QRIS (opsional)", null, "Pilih foto"), i === 0, i === 1));
+  c.add(quietBlock(I, c.y, IW, "Tambah rekening", "plus"), 48).h3("Kirim kado (opsional)").field("Nama penerima", "Rani Ayu").area("Alamat", ["Jl. Melati 10, Jakarta 12110"], 3)
+    .field("Tautan peta alamat (opsional)", "https://maps.google.com/?q=Kebayoran+Baru").toggle("Tampilkan peta alamat", true, ["Butuh tautan Google Maps dan alamat."]).field("WhatsApp konfirmasi", "081234567890");
+};
+const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { ph: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
+  .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3);
+const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda. Undangan baru mengambil", "nama dan WhatsApp dari Profil merek,", "atau dari bisnis Scalev bila profil kosong.", "Kosongkan kolom untuk menyembunyikan", "barisnya."]), 92)
+  .toggle(["Hak cipta (© tahun dan nama", "mempelai)"], true).photo("Logo (opsional)", null, "Pilih foto")
+  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit. Tanpa {{Brand}}", "di Kredit: tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { ph: true });
+// A Konten list placed so that group t's bar sits at y (the panel scrolled to it), with enough groups above to reach the head.
+const keep = (t, y, o = {}) => { const i = GRP.indexOf(t), from = Math.max(1, i - Math.ceil((y - 153) / 58)); return kList({ ...o, from, top: y - 58 * (i - from) }); };
+
+const kontenPanel = (o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ ...o, open: "Mempelai", fill: fillMempelai() }).svg;
 const editor = (rail) => [DEFS, scalevEditor(0, 0, { rail })];
 // The panel head and Scalev bars above a scrolling panel body (content slides under them).
-const lid = (rail) => clipped(72, 0, 327, 153, scalevEditor(0, 0, { rail }), nkHead(0, 0, "Konten", { account: ACCOUNT }));
+const lid = (rail, o = {}) => clipped(72, 0, 327, 153, scalevEditor(0, 0, { rail }), nkHead(0, 0, rail, { account: ACCOUNT, ...o }));
+// Save status at the foot of the rail.
+const SAVED = { svg: ring(0, 851, 71, 49, { r: 4 }), enter: "fade" }, SAVED_AT = [36, 878];
+// Rail before a template is picked: only Template and Media open; Bagikan and Kosongkan disabled.
+const LOCKED = [160, 216, 328, 384].map((y) => rect(0, y, 71, 52, { fill: C.page, opacity: 0.62 })).join("") + rect(0, 560, 71, 50, { fill: C.page, opacity: 0.62 }) + rect(0, 750, 71, 46, { fill: C.page, opacity: 0.62 });
+// Typing into a cleared, focused input: [box, typed text, type spec].
+const typeIn = (x, y, w, val) => [inp(x, y, w, "", { focus: true }), text(x + 11, y + 23, val, { size: 14, fill: C.strong }), { n: val.length, box: [x + 10, y + 7, tw(val, 14) + 2, 22] }];
+// Name on the cover preview changed to Sinta: maroon cover and Folio cover.
+const pvSinta = () => rect(760, 462, 324, 64, { fill: CREAM }) + text(CX, 508, "Sinta & Dimas", { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" });
+const pvSintaFolio = () => rect(752, 420, 340, 44, { fill: "#232220" }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: C.white });
+const FOLIO_C = [301, 302], DASAR_C = [155, 302]; // card centres with the cards at y 219
+// Galeri Foto: panel scrolled so Kisah Cinta's bar is at y 191 and Galeri Foto (opened) at 249; the Media dialog (Pilih foto)
+// covers rail and panel: Unggah foto, paste link, 3-column grid, Pakai foto footer.
+const GAL = (() => {
+  const top = (n) => acc(191, "Kisah Cinta", "Terisi") + acc(249, "Galeri Foto", n ? "Terisi" : "Belum diisi", 1400) +
+    col(I, 303, IW).field("Judul", "Galeri", { ph: true }).area("Teks pengantar (opsional)", ["Sebagian momen yang ingin kami", "bagi bersama Anda."]).svg +
+    lbl(I, 451, `Foto galeri (${n})`);
+  const rest = (y) => quietBlock(I, y, IW, "Tambah foto", "image") + text(I, y + 60, "Foto pertama tampil paling besar.", { size: 12, fill: C.faint }) +
+    ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera"].map((t, i) => acc(y + 85 + i * 58, t, "Terisi")).join("");
+  const cell = (i) => [16 + (i % 3) * 124, 291 + Math.floor(i / 3) * 124];
+  const dlg = nkDialogHead(0, 0, "Pilih foto") + nkBtn(16, 169, "Unggah foto", { variant: "ghost", w: 366, icon: "upload" }) + lbl(16, 217, "Atau tempel tautan https") +
+    inp(16, 237, 300, "https://...", { ph: true }) + `<g opacity=".5">${nkBtn(322, 237, "Pakai", { variant: "ghost", w: 60 })}</g>` +
+    clipped(0, 285, 399, 554, ...Array.from({ length: 12 }, (_, i) => photo(...cell(i), 118, 118, i % 6, 4))) +
+    rect(0, 839, 399, 61, { fill: C.white }) + line(0, 839.5, 399, 839.5) + `<g opacity=".5">${nkBtn(16, 851, "Pakai foto", { w: 366 })}</g>`;
+  const pick = (i) => { const [x, y] = cell(i); return rect(x + 1, y + 1, 116, 116, { r: 4, stroke: C.primary, sw: 2 }) + circle(x + 104, y + 14, 8, { fill: C.action }) + iconX("check", x + 104, y + 14, 10, C.white, 3.5); };
+  const foot = (n) => rect(0, 840, 399, 60, { fill: C.white }) + nkBtn(16, 851, `Pakai ${n} foto`, { w: 366 });
+  const row = (k) => { const y = 471 + k * 104; return rect(I + 0.5, y + 0.5, IW - 1, 95, { r: 4, fill: C.page, stroke: C.line }) + photo(I + 9, y + 9, 64, 64, k * 4, 4) +
+    inp(I + 81, y + 9, 127, "Deskripsi foto", { ph: true }) + inp(I + 81, y + 51, 127, "Fokus tengah", { select: true }) +
+    icon("chevron-up", I + 230, y + 27, 16, k ? C.text : "rgba(91,102,117,.35)") + icon("trash", I + 230, y + 63, 16, C.text); };
+  const after = () => body(panelBg(), top(2), rest(679), row(0), row(1));
+  return { top, rest, dlg, pick, foot, after };
+})();
 
 export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
-  "editor-peta": {
-    title: "Peta editor NikahKit di Scalev",
-    world: WORLD,
-    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton"), pvCover("Rani & Dimas")],
-    els: {
-      konten: { svg: kontenPanel(), enter: "fade", delay: 1.15 },
-      o1: { svg: tag(420, 120, "Tab Scalev & NikahKit", 150, 80, 2), enter: "pop", origin: [150, 80], delay: 0.2 },
-      o2: { svg: tag(420, 250, "Menu dan alat", 50, 330, 2), enter: "pop", origin: [50, 330], delay: 0.45 },
-      o3: { svg: tag(420, 380, "Panel", 300, 560, 2), enter: "pop", origin: [300, 560], delay: 0.7 },
-      o4: { svg: tag(1140, 300, "Pratinjau", 1080, 420, 2), enter: "pop", origin: [1080, 420], delay: 0.95 },
-      o5: { svg: tag(1150, 140, "Simpan", 1300, 86, 2), enter: "pop", origin: [1300, 86], delay: 1.2 },
-      n2: { svg: ring(10, 52, 210, 30, { r: 6 }) + ring(226, 50, 82, 34, { r: 6 }) + tag(40, 190, "Tab Scalev", 110, 86) + tag(250, 240, "Tab NikahKit", 266, 88), enter: "fade" },
-      n3: { svg: ring(1193, 50, 241, 34, { r: 6 }) + tag(1150, 170, "Tombol Scalev", 1300, 88), enter: "fade" },
-      n4: { svg: ring(2, 104, 68, 332, { r: 6 }), enter: "fade" },
-      n5: { svg: ring(226, 112, 20, 20, { r: 4 }) + ring(262, 108, 79, 27, { r: 16 }) + ring(358, 112, 20, 20, { r: 4 }) + tag(430, 100, "Tutup", 382, 122) + tag(430, 160, "Tombol akun", 345, 130) + tag(430, 220, "Pesanan masuk", 240, 136), enter: "fade" },
-      n6: { svg: ring(2, 562, 68, 286, { r: 6 }) + ring(2, 855, 68, 42, { r: 6 }) + tag(430, 640, "Alat", 72, 690) + tag(430, 800, "Status simpan", 72, 876), enter: "fade" },
-      n7: { svg: ring(SC.x, SC.y, SC.w, 410, { r: 2 }) + tag(560, 200, "Pratinjau", 723, 260), enter: "fade" }
-    },
-    steps: [
-      { caption: "Editor NikahKit menumpang di editor halaman Scalev. Ini petanya.", cam: "all", show: ["o1", "o2", "o3", "o4", "o5"], dur: 3.8 },
-      { caption: "Code, Media, Security, Settings milik Scalev. Klik tab NikahKit.", cam: { x: 0, y: 24, w: 600 }, hide: ["o1", "o2", "o3", "o4", "o5"], show: ["n2"], at: ED.tab.NikahKit, click: true },
-      { caption: "Simpan dan Simpan & Terbitkan di kanan atas tetap tombol Scalev.", cam: { x: 840, y: 24, w: 600 }, hide: ["n2"], show: ["n3"], at: ED.simpan },
-      { caption: "Kolom kiri berisi enam menu. Klik Konten, panelnya terbuka di tengah.", cam: { x: 0, y: 90, w: 660 }, hide: ["n3"], show: ["n4", "konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
-      { caption: "Kepala panel: judul menu, Pesanan masuk, tombol akun, dan Tutup.", cam: { x: 40, y: 60, w: 560 }, hide: ["n4"], show: ["n5"], at: ED.account },
-      { caption: "Di bawah menu ada alat. Paling bawah status simpan: Tersimpan.", cam: { x: 0, y: 540, w: 640 }, hide: ["n5"], show: ["n6"], at: [36, 878] },
-      { caption: "Di kanan, pratinjau undangan berubah setiap kamu mengisi.", cam: { x: 520, y: 96, w: 760 }, hide: ["n6"], show: ["n7"], at: [922, 470], dur: 3.6 }
-    ]
-  },
+  "editor-peta": (() => {
+    const nickY = kList({ open: "Mempelai", fill: fillMempelai() }).f["Nama panggilan"] + 20;
+    const [clear, typed, ty] = typeIn(I, nickY, IW, "Sinta");
+    return {
+      title: "Langkah pertama di editor NikahKit",
+      world: TABS,
+      base: [DEFS, scalevEditor(0, 0, { tab: "Code", screenFill: C.white })],
+      els: {
+        rTabs: { svg: ring(10, 52, 210, 30, { r: 6 }), enter: "fade", delay: 0.3 },
+        gate: { svg: scalevEditor(0, 0, { rail: "Template", screenFill: C.white }) + rect(0, 93, 399, 807, { fill: C.white }) + text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade" },
+        tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + body(seg(), cards(219)), enter: "fade", delay: 0.5 },
+        locked: { svg: LOCKED, enter: "fade", delay: 0.5 },
+        picked: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
+        pvF: { svg: pvFolio(), enter: "fade", delay: 0.2 },
+        konten: { svg: kontenPanel(), enter: "fade" },
+        clear: { svg: clear, enter: "fade" },
+        typed: { svg: typed, enter: "fade" },
+        pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.5 },
+        saved: SAVED
+      },
+      steps: [
+        { caption: "Buka halaman undangan di Scalev. Editornya terbuka dalam HTML Mode.", show: ["rTabs"], at: [120, 66] },
+        { caption: "Klik tab NikahKit. Sebentar tertulis Memeriksa akses...", hide: ["rTabs"], show: ["gate"], at: ED.tab.NikahKit, click: true },
+        { caption: "Tunggu pemeriksaan akses selesai. Menu dan panel muncul.", show: ["tpl", "locked"], at: [230, 330] },
+        { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", hide: ["locked"], show: ["picked", "pvF"], at: FOLIO_C, click: true, dur: 3.4 },
+        { caption: "Klik Konten untuk mengisi data. Daftar bagian undangan muncul.", show: ["konten"], at: ED.rail.Konten, click: true },
+        { caption: "Ketik di kotak, misalnya Nama panggilan Sinta. Pratinjau ikut berubah.", show: ["clear", "typed", "pvName"], at: [230, nickY + 18], click: true, type: [{ id: "typed", ...ty }], dur: 3.8 },
+        { caption: "Tunggu status Tersimpan di bawah kolom kiri, lalu klik Simpan di Scalev.", show: ["saved"], at: SAVED_AT, dur: 3.4 }
+      ]
+    };
+  })(),
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-pilih-template": {
-    title: "Memilih template NikahKit",
-    world: WORLD,
-    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), body(seg()), pvForeign()],
+    title: "Memilih template NikahKit pertama kali",
+    world: WIDE,
+    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), pvForeign()],
     els: {
-      // Before a template is picked: only Template and Media open, Bagikan and Kosongkan disabled (opacity .4).
-      locked: [160, 216, 328, 384].map((y) => rect(0, y, 71, 52, { fill: C.page, opacity: 0.62 })).join("") + rect(0, 560, 71, 50, { fill: C.page, opacity: 0.62 }) + rect(0, 750, 71, 46, { fill: C.page, opacity: 0.62 }),
-      cardsA: { svg: body(htmlNote(), cards(287)), enter: "fade" },
+      locked: LOCKED,
+      cardsA: { svg: seg() + htmlNote() + cards(287), enter: "fade" },
+      lidT: lid("Template", { inbox: false }),
       rSeg: { svg: ring(P, 169, PW, 38, { r: 6 }), enter: "fade" },
-      rNote: { svg: ring(P, 219, PW, 56, { r: 6 }), enter: "fade" },
-      veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade", delay: 1.2 },
+      veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade" },
       dlg: { svg: shadow(540, 383, 360, 134, 8, 3) + rect(540, 383, 360, 134, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Folio?", { size: 14, weight: 600 }) +
-        text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 }), enter: "pop", origin: [720, 450], delay: 1.2 },
-      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "pop", origin: [720, 450], delay: 1.2 },
-      inboxIc: { svg: icon("inbox", 236, 122, 18, C.text), enter: "fade" },
-      cardsB: { svg: body(panelBg(), seg(), cards(219, "folio")), enter: "fade" },
+        text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 }), enter: "pop", origin: [301, 370] },
+      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "pop", origin: [301, 370] },
+      cardsB: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
       pvF: { svg: pvFolio(), enter: "fade", delay: 0.2 },
-      cardsC: { svg: body(panelBg(), seg(), cards(219, "dasar")), enter: "fade", delay: 1.15 },
-      pvD: { svg: pvDasar(), enter: "fade", delay: 1.3 },
-      toast: { svg: shadow(84, 836, 302, 52, 4, 2) + rect(84, 836, 302, 52, { r: 4, fill: C.strong }) + text(96, 867, "Template diganti ke Dasar.", { size: 14, fill: C.white }) +
-        text(374, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }), enter: "slide", delay: 1.4 }
+      rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade" },
+      konten: { svg: kontenPanel(), enter: "fade" },
+      rNote: { svg: ring(P, 169, PW, 64, { r: 6 }), enter: "fade", delay: 0.4 },
+      saved: SAVED
     },
     steps: [
-      { caption: "Klik Template di menu kiri. Pastikan pilihan Template yang aktif.", cam: { x: 0, y: 92, w: 760 }, at: ED.rail.Template, click: true, show: ["rSeg"] },
-      { caption: "Halaman berisi HTML lain? Peringatan kuning muncul di atas kartu.", hide: ["rSeg"], show: ["rNote"], at: [260, 247] },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", cam: { x: 0, y: 96, w: 960 }, hide: ["rNote"], at: [301, 370], click: true, show: ["veil", "dlg", "gnt"] },
-      { caption: "Dialog bertanya: Ganti isi halaman dengan Folio? Klik Ganti.", cam: { x: 420, y: 260, w: 600 }, at: [851, 479], click: true, press: "gnt", dur: 2.8 },
-      { caption: "Template terpasang. Kartu Folio bertanda Dipakai, menu lain terbuka.", cam: { x: 70, y: 96, w: 1060 }, hide: ["veil", "dlg", "gnt", "cardsA", "locked"], show: ["cardsB", "pvF", "inboxIc"], at: [301, 400], dur: 3.6 },
-      { caption: "Mau ganti nanti? Klik kartu lain, misalnya Dasar. Isian tetap terbawa.", at: [155, 300], click: true, show: ["cardsC", "pvD", "toast"], dur: 3.6 },
-      { caption: "Pesan Template diganti ke Dasar. muncul. Urungkan membatalkannya.", cam: { x: 40, y: 520, w: 680 }, at: [345, 864], dur: 3.6 }
+      { caption: "Klik Template di menu kiri. Panel Template terbuka.", at: ED.rail.Template, click: true, show: ["cardsA"] },
+      { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", show: ["rSeg"], at: [160, 188] },
+      { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", hide: ["rSeg"], scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
+      { caption: "Klik kartu yang kamu suka, misalnya Folio.", scroll: { id: "cardsA", dy: -241 }, at: [301, 370], click: true, show: ["veil", "dlg", "gnt"], dur: 3.6 },
+      { caption: "Halaman berisi HTML lain, jadi muncul dialog. Klik Ganti.", at: [851, 479], click: true, press: "gnt", hide: ["veil", "dlg", "gnt", "cardsA", "locked"], show: ["cardsB", "pvF"], dur: 3.4 },
+      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", show: ["rDip"], at: [346, 402] },
+      { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", hide: ["rDip"], at: ED.rail.Konten, click: true, show: ["konten", "rNote"], dur: 3.6 },
+      { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", hide: ["rNote"], show: ["saved"], at: SAVED_AT }
     ]
   },
 
   // ---------------------------------------------------------------------------------------------------------------------
-  "editor-isi-mempelai": {
-    title: "Mengisi nama mempelai di Konten",
-    world: WORLD,
-    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton"), pvCover("Rani & Dimas")],
+  "editor-ganti-template": {
+    title: "Mengganti template nanti",
+    world: WIDE,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), kontenPanel(), pvFolio()],
     els: {
-      konten: { svg: kontenPanel(), enter: "fade", delay: 1.15 },
-      rMemp: { svg: ring(P, 439, PW, 50, { r: 6 }), enter: "fade" },
-      focus: { svg: inp(I, NICK_Y, IW, "Rani", { focus: true, sel: true }), enter: "fade", delay: 1.15 },
-      clear: { svg: inp(I, NICK_Y, IW, "", { focus: true }), enter: "fade" },
-      typed: { svg: text(I + 11, NICK_Y + 23, "Sinta", { size: 14, fill: C.strong }), enter: "fade" },
-      pvS: { svg: rect(760, 462, 324, 64, { fill: CREAM }) + text(CX, 508, "Sinta & Dimas", { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" }) + ring(770, 466, 304, 58, { r: 10 }), enter: "fade", delay: 0.5 },
-      note5: { svg: rect(P, 169, PW, 64, { r: 4, fill: C.warnSoft }) + text(P + 12, 192, "5 isian masih contoh. Ganti sebelum terbit.", { size: 12, fill: C.warnStrong }) +
-        text(P + 12, 218, "Ganti foto sampul", { size: 12, weight: 500, fill: C.strong, underline: true }) + ring(P, 169, PW, 64, { r: 6 }), enter: "fade", delay: 0.4 }
+      tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + body(seg(), cards(219, "folio")), enter: "fade" },
+      rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade", delay: 0.4 },
+      cardsC: { svg: body(panelBg(), seg(), cards(219, "dasar")), enter: "fade" },
+      pvD: { svg: pvDasar(), enter: "fade", delay: 0.2 },
+      rPv: { svg: ring(780, 322, 284, 52, { r: 10 }), enter: "fade" },
+      toast: { svg: shadow(84, 836, 302, 52, 4, 2) + rect(84, 836, 302, 52, { r: 4, fill: C.strong }) + text(96, 867, "Template diganti ke Dasar.", { size: 14, fill: C.white }) +
+        text(374, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }), enter: "slide", delay: 0.4 }
     },
     steps: [
-      { caption: "Klik Konten di menu kiri. Daftar bagian undangan muncul.", cam: { x: 0, y: 92, w: 760 }, at: ED.rail.Konten, click: true, show: ["konten"] },
-      { caption: "Mempelai biasanya sudah terbuka. Bila tertutup, klik namanya.", show: ["rMemp"], at: [190, 464] },
-      { caption: "Klik kotak Nama panggilan di bawah Mempelai Wanita. Isinya contoh: Rani.", cam: { x: 40, y: 420, w: 640 }, hide: ["rMemp"], at: [230, NICK_Y + 18], click: true, show: ["focus"], dur: 3.4 },
-      { caption: "Ketik nama panggilan klien, misalnya Sinta.", show: ["clear", "typed"], type: [{ id: "typed", n: 5, box: [I + 10, NICK_Y + 7, tw("Sinta", 14) + 2, 22] }] },
-      { caption: "Nama di sampul pratinjau langsung berubah.", cam: { x: 60, y: 308, w: 1060 }, show: ["pvS"], dur: 3.4 },
-      { caption: "Catatan kuning ikut berkurang: tinggal 5 isian yang masih contoh.", cam: { x: 0, y: 92, w: 760 }, show: ["note5"], at: [190, 218], dur: 3.6 }
+      { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", at: ED.rail.Template, click: true, show: ["tplB", "rDip"] },
+      { caption: "Klik kartu template lain, misalnya Dasar. Template langsung berganti.", hide: ["rDip"], at: DASAR_C, click: true, show: ["cardsC", "pvD", "toast"], dur: 3.6 },
+      { caption: "Periksa pratinjau. Desainnya baru, isian Konten tetap ada.", show: ["rPv"], at: [922, 380] },
+      { caption: "Tidak suka? Klik Urungkan di pesan itu. Folio kembali.", hide: ["cardsC", "pvD", "toast", "rPv"], show: ["rDip"], at: [343, 862], click: true, dur: 3.6 }
     ]
   },
 
+  // ---------------------------------------------------------------------------------------------------------------------
+  "editor-isi-mempelai": (() => {
+    const hold = { left: 5, link: "Ganti foto sampul", raw: true };
+    const v1 = kList({ open: "Mempelai", fill: fillMempelai(), raw: true });
+    const v1b = kList({ ...hold, open: "Mempelai", fill: fillMempelai("Sinta") });
+    const nickY = v1.f["Nama panggilan"] + 20, [clear, typed, ty] = typeIn(I, nickY, IW, "Sinta");
+    const D4 = v1b.f["Nama ayah"] - 400, ayahY = 420;
+    const D5 = Math.max(0, v1b.at["Acara & Tanggal"] - D4 - 260), barA = v1b.at["Acara & Tanggal"] - D4 - D5;
+    const a0 = kList({ ...hold, open: "Acara & Tanggal", fill: fillAcara(EVS) });
+    const dyA = Math.max(0, a0.at["Acara & Tanggal"] - barA);
+    const v2 = kList({ ...hold, open: "Acara & Tanggal", fill: fillAcara(EVS), dy: dyA });
+    const D6 = v2.f["Ngunduh Mantu"] - 320;
+    const v2d = kList({ ...hold, open: "Acara & Tanggal", fill: fillAcara(EVS.slice(0, 2)), dy: dyA + D6 });
+    const v3 = kList({ ...hold, open: "Sampul", fill: fillSampul });
+    const D8 = v3.at["Salam Pembuka"] - 420;
+    const s0 = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam });
+    const v4 = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam, dy: s0.at["Salam Pembuka"] - 420 });
+    const v5 = kList({ left: 5, link: "Ganti foto sampul" });
+    const sub = (D) => (D ? { scroll: { id: "v1b", dy: D } } : {});
+    return {
+      title: "Mengisi Mempelai, Acara, Sampul, dan Salam di Konten",
+      world: WIDE,
+      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton"), pvCover("Rani & Dimas")],
+      els: {
+        railK: { svg: nkRail(0, 0, "Konten"), enter: "fade" },
+        v1: { svg: v1.svg, enter: "fade" },
+        rMemp: { svg: ring(P, v1.at.Mempelai, PW, 50, { r: 6 }), enter: "fade" },
+        clear: { svg: clear, enter: "fade" },
+        typed: { svg: typed, enter: "fade" },
+        v1b: { svg: v1b.svg, enter: "fade", delay: -1.2 },
+        ayahF: { svg: inp(I, ayahY, IW, "Ahmad", { focus: true }), enter: "fade" },
+        v2: { svg: v2.svg, enter: "fade" },
+        v2d: { svg: v2d.svg, enter: "fade" },
+        v3: { svg: v3.svg, enter: "fade" },
+        v4: { svg: v4.svg, enter: "fade" },
+        v5: { svg: v5.svg, enter: "fade" },
+        rBad: { svg: ring(310, 397, 46, 18 + 58 * 5, { r: 10 }), enter: "fade", delay: 0.3 },
+        lidK: { svg: lid("Konten"), enter: "fade" },
+        pvS: { svg: pvSinta(), enter: "fade", delay: 0.5 },
+        pvEv: { svg: pvEvents(["akad", "resepsi"]), enter: "fade", delay: 0.3 },
+        saved: SAVED
+      },
+      steps: [
+        { caption: "Klik Konten di menu kiri. Daftar bagian muncul, di atasnya Bahasa undangan.", at: ED.rail.Konten, click: true, show: ["railK", "v1", "lidK"] },
+        { caption: "Buka Mempelai. Biasanya sudah terbuka; bila tertutup, klik namanya.", show: ["rMemp"], at: [190, v1.at.Mempelai + 25] },
+        { caption: "Klik Nama panggilan di bawah Mempelai Wanita, lalu ketik nama klien.", hide: ["rMemp"], show: ["clear", "typed", "pvS"], at: [230, nickY + 18], click: true, type: [{ id: "typed", ...ty }], dur: 3.6 },
+        { caption: "Isi kolom mempelai lain: Nama lengkap, Nama ayah, Nama ibu. Ulangi untuk pria.", hide: ["clear", "typed"], show: ["v1b", "ayahF"], ...sub(D4), at: [230, ayahY + 18], click: true, dur: 3.8 },
+        { caption: "Klik Acara & Tanggal. Pilih Zona waktu, lalu ganti isi acara contoh.", hide: ["ayahF"], show: ["v2", "pvEv"], ...sub(D5), at: [190, barA + 25], click: true, dur: 3.6 },
+        { caption: "Hapus acara yang tidak dipakai dengan ikon tempat sampah.", show: ["v2d"], scroll: { id: "v2", dy: D6 }, at: [I + IW - 24, 344], click: true, dur: 3.6 },
+        { caption: "Klik Sampul. Pilih Foto sampul; teks sampul boleh dibiarkan kosong.", hide: ["pvEv"], show: ["v3"], scroll: { id: "v2d", dy: -(dyA + D6) }, at: [190, v3.at.Sampul + 25], click: true, dur: 3.6 },
+        { caption: "Klik Salam Pembuka dan pilih Preset salam. Lalu buka Ayat / Kutipan.", show: ["v4"], scroll: { id: "v3", dy: D8 }, at: [190, 445], click: true, dur: 3.6 },
+        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", show: ["v5", "rBad", "saved"], at: SAVED_AT, dur: 3.8 }
+      ]
+    };
+  })(),
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-tambah-acara": (() => {
     const DY = 560;
@@ -300,7 +448,7 @@ export const scenes = {
       .area("Alamat lengkap", ["Jl. Melati 1, Jakarta"]).field("Tautan peta", "https://maps.google.com/?q=Kebayoran+Baru").area("Catatan (opsional)", ["Khusus keluarga inti"]);
     const end1 = f1.y - 2, btnY = end1 + 8;
     const after = col(I, btnY + 48, IW).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]).lead("Hitung mundur memakai Acara utama.");
-    const scrolled = rect(72, 153, 327, 747 + DY, { fill: C.white }) + acc(111, "Mempelai", "Terisi") + acc(169, "Acara & Tanggal", "Terisi", true) + c.svg +
+    const scrolled = rect(72, 153, 327, 747 + DY, { fill: C.white }) + acc(111, "Mempelai", "Terisi") + acc(169, "Acara & Tanggal", "Terisi", 1400) + c.svg +
       itemBox(it1, end1 - it1) + itemBar(it1, "Akad Nikah", true, true) + f1.svg + quietBlock(I, btnY, IW, "Tambah acara", "plus") + after.svg;
     // Second event, after scrolling (world y = scrolled y - DY).
     const y2 = btnY - DY, nameY = y2 + 48, startY = nameY + 68, endY = startY + 68;
@@ -316,75 +464,88 @@ export const scenes = {
       ["WIB", "WITA", "WIT"].map((v, i) => text(I + 14, 302 + i * 24, v, { size: 14, fill: C.strong })).join("") + iconX("check", I + IW - 18, 297, 14, C.action);
     return {
       title: "Menambah acara di Acara & Tanggal",
-      world: WORLD,
+      world: WIDE,
       base: [...editor("Konten"), pvEvents(["akad"])],
       els: {
         list: scrolled,
-        dd: { svg: dd, enter: "pop", origin: [I + IW / 2, 279], delay: 1.15 },
-        item2: { svg: item2, enter: "rise", delay: 1.3 },
-        nFocus: { svg: inp(I + 10, nameY + 20, IW - 20, "", { focus: true }), enter: "fade", delay: 1.15 },
+        dd: { svg: dd, enter: "pop", origin: [I + IW / 2, 279] },
+        item2: { svg: item2, enter: "rise" },
+        nFocus: { svg: inp(I + 10, nameY + 20, IW - 20, "", { focus: true }), enter: "fade" },
         nBlur: { svg: inp(I + 10, nameY + 20, IW - 20, ""), enter: "fade" },
         nTyped: { svg: text(I + 21, nameY + 43, "Resepsi", { size: 14, fill: C.strong }), enter: "fade" },
-        title2: { svg: rect(I + 8, y2 + 12, 80, 22, { fill: C.page }) + text(I + 10, y2 + 28, "Resepsi", { size: 12, weight: 700 }), enter: "fade", delay: 1.1 },
-        times: { svg: times, enter: "fade", delay: 1.2 },
-        fixed: { svg: fixed, enter: "fade", delay: 1.15 },
+        title2: { svg: rect(I + 8, y2 + 12, 80, 22, { fill: C.page }) + text(I + 10, y2 + 28, "Resepsi", { size: 12, weight: 700 }), enter: "fade", delay: 0.9 },
+        times: { svg: times, enter: "fade" },
+        fixed: { svg: fixed, enter: "fade" },
         lidE: lid("Konten"),
-        pv2: { svg: pvEvents(["akad", "resepsi"]) + ring(751, EV.resepsi.y, 342, EV.resepsi.h, { r: 16 }), enter: "fade", delay: 0.3 }
+        pv2: { svg: pvEvents(["akad", "resepsi"]) + ring(751, EV.resepsi.y, 342, EV.resepsi.h, { r: 16 }), enter: "fade", delay: 0.3 },
       },
       steps: [
-        { caption: "Di Acara & Tanggal, pilih Zona waktu: WIB, WITA, atau WIT.", cam: { x: 40, y: 150, w: 680 }, at: [I + 120, 261], click: true, show: ["dd"] },
-        { caption: "Gulir ke bawah daftar acara, lalu klik Tambah acara.", cam: { x: 40, y: 300, w: 680 }, hide: ["dd"], scroll: { id: "list", dy: DY }, at: [I + IW / 2, y2 + 18], click: true, show: ["item2"], dur: 3.6 },
+        { caption: "Di Acara & Tanggal, pilih Zona waktu: WIB, WITA, atau WIT.", at: [I + 120, 261], click: true, show: ["dd"] },
+        { caption: "Gulir ke bawah daftar acara, lalu klik Tambah acara.", hide: ["dd"], scroll: { id: "list", dy: DY }, at: [I + IW / 2, y2 + 18], click: true, show: ["item2"], dur: 3.6 },
         { caption: "Kotak Acara 2 muncul. Klik kotak Nama acara.", at: [I + 120, nameY + 38], click: true, show: ["nFocus"] },
         { caption: "Ketik nama acara, misalnya Resepsi. Judul kotaknya ikut berganti.", show: ["nTyped", "title2"], type: [{ id: "nTyped", n: 7, box: [I + 20, nameY + 27, tw("Resepsi", 14) + 2, 22] }], dur: 3.4 },
         { caption: "Isi Mulai dan Selesai. Selesai lebih awal? Muncul pesan merah.", hide: ["nFocus"], show: ["nBlur", "times"], at: [I + 120, endY + 38], click: true, dur: 3.6 },
         { caption: "Perbaiki jam Selesai, misalnya 14.00. Pesan merah hilang.", at: [I + 60, endY + 38], click: true, show: ["fixed"] },
-        { caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", cam: { x: 560, y: 120, w: 720 }, show: ["pv2"], at: [922, 470], dur: 3.6 }
+        { caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", show: ["pv2"], at: [922, 470], dur: 3.6 }
       ]
     };
   })(),
 
   // ---------------------------------------------------------------------------------------------------------------------
+  "editor-galeri-pilih-foto": {
+    title: "Memilih foto galeri dari Media Scalev",
+    world: WIDE,
+    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), body(GAL.top(0), GAL.rest(471)), pvCover("Rani & Dimas")],
+    els: {
+      dlg: { svg: GAL.dlg, enter: "rise" },
+      s1: { svg: GAL.pick(0), enter: "pop", origin: [75, 350] },
+      b1: { svg: GAL.foot(1), enter: "fade" },
+      s2: { svg: GAL.pick(4), enter: "pop", origin: [199, 474] },
+      b2: { svg: GAL.foot(2), enter: "fade" },
+      after: { svg: GAL.after(), enter: "fade" },
+      pvG: { svg: pvGallery(), enter: "fade", delay: 0.2 }
+    },
+    steps: [
+      { caption: "Klik Tambah foto. Jendela Pilih foto berisi foto Media Scalev.", at: [I + IW / 2, 489], click: true, show: ["dlg"] },
+      { caption: "Klik foto yang ingin dipakai. Foto terpilih diberi tanda centang.", at: [75, 350], click: true, show: ["s1", "b1"] },
+      { caption: "Klik foto lain bila perlu. Tombolnya kini Pakai 2 foto.", at: [199, 474], click: true, show: ["s2", "b2"] },
+      { caption: "Klik Pakai 2 foto. Foto masuk daftar dan tampil di pratinjau.", at: [199, 869], click: true, press: "b2", hide: ["dlg", "s1", "b1", "s2", "b2"], show: ["after", "pvG"], dur: 3.6 }
+    ]
+  },
+
+  // ---------------------------------------------------------------------------------------------------------------------
   "editor-isi-galeri": (() => {
-    // Panel scrolled to Galeri Foto (opened), sample photos already removed.
-    const top = (n) => acc(111, "Kisah Cinta", "Terisi") + acc(169, "Galeri Foto", n ? "Terisi" : "Belum diisi", true) +
-      col(I, 223, IW).field("Judul", "Galeri", { ph: true }).area("Teks pengantar (opsional)", ["Sebagian momen yang ingin kami", "bagi bersama Anda."]).svg +
-      lbl(I, 371, `Foto galeri (${n})`);
-    const rest = (y) => quietBlock(I, y, IW, "Tambah foto", "image") + text(I, y + 60, "Foto pertama tampil paling besar.", { size: 12, fill: C.faint }) +
-      ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera", "Amplop Digital"].map((t, i) => acc(y + 85 + i * 58, t, "Terisi")).join("");
-    // Media dialog (covers rail and panel): Unggah foto, paste link, 3-column grid, Pakai foto footer.
-    const cell = (i) => [16 + (i % 3) * 124, 291 + Math.floor(i / 3) * 124];
-    const dlg = nkDialogHead(0, 0, "Pilih foto") + nkBtn(16, 169, "Unggah foto", { variant: "ghost", w: 366, icon: "upload" }) + lbl(16, 217, "Atau tempel tautan https") +
-      inp(16, 237, 300, "https://...", { ph: true }) + `<g opacity=".5">${nkBtn(322, 237, "Pakai", { variant: "ghost", w: 60 })}</g>` +
-      clipped(0, 285, 399, 554, ...Array.from({ length: 12 }, (_, i) => photo(...cell(i), 118, 118, i % 6, 4))) +
-      rect(0, 839, 399, 61, { fill: C.white }) + line(0, 839.5, 399, 839.5) + `<g opacity=".5">${nkBtn(16, 851, "Pakai foto", { w: 366 })}</g>`;
-    const pick = (i) => { const [x, y] = cell(i); return rect(x + 1, y + 1, 116, 116, { r: 4, stroke: C.primary, sw: 2 }) + circle(x + 104, y + 14, 8, { fill: C.action }) + iconX("check", x + 104, y + 14, 10, C.white, 3.5); };
-    const foot = (n) => rect(0, 840, 399, 60, { fill: C.white }) + nkBtn(16, 851, `Pakai ${n} foto`, { w: 366 });
-    const row = (k) => { const y = 391 + k * 104; return rect(I + 0.5, y + 0.5, IW - 1, 95, { r: 4, fill: C.page, stroke: C.line }) + photo(I + 9, y + 9, 64, 64, k * 2, 4) +
-      inp(I + 81, y + 9, 127, "Deskripsi foto", { ph: true }) + inp(I + 81, y + 51, 127, "Fokus tengah", { select: true }) +
-      icon("chevron-up", I + 230, y + 27, 16, k ? C.text : "rgba(91,102,117,.35)") + icon("trash", I + 230, y + 63, 16, C.text); };
+    const [dClear, dTyped, dTy] = typeIn(I + 81, 480, 127, "Lamaran kami");
+    const g = { from: 5, raw: true };
+    const vK = kList({ ...g, top: 191, open: "Kisah Cinta", fill: fillKisah });
+    const DK = vK.at.Video - 330;
+    const vV = keep("Video", 330, { ...g, open: "Video", fill: fillVideo });
+    const DV = vV.at["Dress Code"] - 330;
+    const vD = keep("Dress Code", 330, { ...g, open: "Dress Code", fill: fillDress });
     return {
-      title: "Mengisi Galeri Foto",
-      world: WORLD,
-      base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), body(top(0), rest(391)), pvCover("Rani & Dimas")],
+      title: "Mengisi Galeri Foto, Kisah Cinta, Video, dan Dress Code",
+      world: SIDE,
+      base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), kList({ from: 5, top: 191, todo: ["Galeri Foto"] }).svg],
       els: {
-        dlg: { svg: dlg, enter: "rise", delay: 1.15 },
-        s1: { svg: pick(0), enter: "pop", origin: [75, 350], delay: 1.1 },
-        b1: { svg: foot(1), enter: "fade", delay: 1.1 },
-        s2: { svg: pick(4), enter: "pop", origin: [199, 474], delay: 1.1 },
-        b2: { svg: foot(2), enter: "fade", delay: 1.1 },
-        after: { svg: body(panelBg(), top(2), rest(599)), enter: "fade" },
-        r1: { svg: row(0), enter: "rise", delay: 0.15 },
-        r2: { svg: row(1), enter: "rise", delay: 0.22 },
-        rBadge: { svg: ring(306, 183, 50, 22, { r: 12 }), enter: "fade", delay: 0.5 },
-        pvG: { svg: pvGallery(), enter: "fade", delay: 0.2 }
+        after: { svg: GAL.after(), enter: "fade" },
+        rBadge: { svg: ring(306, 263, 50, 22, { r: 12 }), enter: "fade", delay: 0.4 },
+        dClear: { svg: dClear, enter: "fade" },
+        dTyped: { svg: dTyped, enter: "fade" },
+        vK: { svg: vK.svg, enter: "fade" },
+        vV: { svg: vV.svg, enter: "fade" },
+        vD: { svg: vD.svg, enter: "fade" },
+        vAll: { svg: kList({ from: 5, top: 191 }).svg, enter: "fade" },
+        rBad: { svg: ring(310, 207, 46, 18 + 58 * 8, { r: 10 }), enter: "fade", delay: 0.3 },
+        lidK: lid("Konten"),
+        saved: SAVED
       },
       steps: [
-        { caption: "Di Konten, buka Galeri Foto. Foto contoh sudah dihapus. Klik Tambah foto.", cam: { x: 0, y: 92, w: 760 }, at: [I + IW / 2, 409], click: true, show: ["dlg"], dur: 3.6 },
-        { caption: "Jendela Pilih foto berisi foto Media Scalev. Klik satu foto.", cam: { x: 0, y: 140, w: 700 }, at: [75, 350], click: true, show: ["s1", "b1"] },
-        { caption: "Klik foto lain. Setiap foto terpilih diberi tanda centang.", at: [199, 474], click: true, show: ["s2", "b2"] },
-        { caption: "Klik Pakai 2 foto. Angkanya sesuai jumlah foto yang dipilih.", cam: { x: 0, y: 509, w: 700 }, at: [199, 869], click: true, press: "b2", dur: 2.6 },
-        { caption: "Foto masuk ke daftar dengan kotak Deskripsi foto. Galeri kini Terisi.", cam: { x: 0, y: 92, w: 760 }, hide: ["dlg", "s1", "s2", "b1", "b2"], show: ["after", "r1", "r2", "rBadge"], at: [230, 420], dur: 3.6 },
-        { caption: "Di pratinjau, foto pertama tampil paling besar.", cam: { x: 520, y: 160, w: 800 }, hide: ["rBadge"], show: ["pvG"], at: [922, 420], dur: 3.4 }
+        { caption: "Klik Konten, lalu Galeri Foto. Foto dari Tambah foto ada di daftar.", at: [190, 274], click: true, show: ["after", "rBadge"] },
+        { caption: "Isi Deskripsi foto. Foto pertama tampil paling besar.", hide: ["rBadge"], at: [245, 498], click: true, show: ["dClear", "dTyped"], type: [{ id: "dTyped", ...dTy }], dur: 3.6 },
+        { caption: "Klik Kisah Cinta. Ganti Waktu, Judul, dan Cerita tiap momen.", hide: ["dClear", "dTyped"], at: [190, 216], click: true, show: ["vK"], dur: 3.4 },
+        { caption: "Klik Video. Ganti Tautan YouTube dengan video klien.", scroll: { id: "vK", dy: DK }, at: [190, 355], click: true, show: ["vV"], dur: 3.6 },
+        { caption: "Isi Dress Code dan Susunan Acara bila dipakai.", scroll: { id: "vV", dy: DV }, at: [190, 355], click: true, show: ["vD"], dur: 3.6 },
+        { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", show: ["vAll", "rBad", "saved"], at: SAVED_AT, dur: 3.8 }
       ]
     };
   })(),
@@ -395,6 +556,7 @@ export const scenes = {
     const rs = col(I, 223, IW).field("Judul", "Ucapan & Kehadiran", { ph: true });
     const noteY = rs.y;
     rs.add(rect(I, noteY, IW, 38, { r: 4, fill: C.primarySoft }) + rich(I + 12, noteY + 24, ["Tersambung. ID: ", { t: "365671" }], { fill: C.strong }), 50);
+    const formY = rs.y + 20;
     rs.field("Isi form", "Ucapan + konfirmasi hadir", { select: true });
     const guestsY = rs.y + 20;
     rs.field("Jumlah tamu paling banyak per undangan", "2 orang", { select: true })
@@ -408,48 +570,48 @@ export const scenes = {
     const accY = rs.y + 8;
     const DY = accY + 2 * 58 - 420; // scroll so Amplop Digital's bar lands at y 420
     const accs = ["Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang"].map((t, i) => acc(accY + i * 58, t, "Terisi")).join("");
-    const amplopY = accY + 2 * 58 - DY;
-    const rsvp = (o = {}) => rect(72, 153, 327, 747 + DY, { fill: C.white }) + acc(111, "Susunan Acara", "Terisi") + acc(169, "RSVP & Ucapan", "Terisi", true) + rect(P + 1, accY - 9, PW - 2, 1400, { fill: C.white }) + line(P, accY - 8.5, P + PW, accY - 8.5) +
-      rs.svg + accs + (o.v3 ? inp(I, guestsY, IW, "3 orang", { select: true }) : "") + (o.on ? sw(I + IW - 36, maybeY, true) : "");
-    const dd = shadow(I, guestsY + 38, IW, 152, 6, 2) + rect(I, guestsY + 38, IW, 152, { r: 6, fill: C.white, stroke: C.field }) + rect(I + 4, guestsY + 66, IW - 8, 24, { r: 4, fill: C.primarySoft }) +
-      [1, 2, 3, 4, 5, 6].map((n, i) => text(I + 14, guestsY + 59 + i * 24, `${n} orang`, { size: 14, fill: C.strong })).join("") + iconX("check", I + IW - 18, guestsY + 78, 14, C.action);
-    // Amplop Digital open (sample: reveal on, BCA 1234567890 a.n. Rani Ayu).
-    const gc = col(I, 223, IW).field("Judul", "Tanda Kasih", { ph: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
-      .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat terbuka setelah tamu", "menekan tombol."]);
-    const it = gc.y, fx = I + 10, fw = IW - 20;
-    const fields = col(fx, it + 48, fw).field("Bank atau e-wallet", "BCA", { hint: ["Logo tampil otomatis untuk bank dan", "e-wallet yang dikenal (BCA, BNI, BRI,", "BSI, Mandiri, DANA, OVO, ...). Nama", "lain tampil sebagai teks."] });
-    const numY = fields.y + 20;
-    fields.field("Nomor rekening", "1234567890");
-    const holderY = fields.y + 20;
-    fields.field("Nama pemilik rekening", "Rani Ayu").add(lbl(fx, fields.y, "Gambar QRIS (opsional)") + quietBlock(fx, fields.y + 20, fw, "Pilih foto", "image"));
-    const gifts = body(panelBg(), acc(111, "Filter Kamera", "Terisi"), acc(169, "Amplop Digital", "Terisi", true), gc.svg, itemBox(it, 900 - it + 20), itemBar(it, "BCA", true, false), fields.svg);
+    const rsvp = (on) => rect(72, 153, 327, 747 + DY, { fill: C.white }) + acc(111, "Susunan Acara", "Terisi") + acc(169, "RSVP & Ucapan", "Terisi", 1400) + rect(P + 1, accY - 9, PW - 2, 1400, { fill: C.white }) + line(P, accY - 8.5, P + PW, accY - 8.5) +
+      rs.svg + accs + (on ? sw(I + IW - 36, maybeY, true) : "");
+    const ddMode = shadow(I, formY + 38, IW, 80, 6, 2) + rect(I, formY + 38, IW, 80, { r: 6, fill: C.white, stroke: C.field }) + rect(I + 4, formY + 42, IW - 8, 24, { r: 4, fill: C.primarySoft }) +
+      ["Ucapan + konfirmasi hadir", "Ucapan saja", "Konfirmasi hadir saja"].map((v, i) => text(I + 14, formY + 59 + i * 24, v, { size: 14, fill: C.strong })).join("") + iconX("check", I + IW - 18, formY + 54, 14, C.action);
+    const gifts = keep("Amplop Digital", 169, { open: "Amplop Digital", fill: fillGifts, raw: true });
+    const numY = gifts.f["Nomor rekening"] + 20, D6 = gifts.f["WhatsApp konfirmasi"] - 450, waY = 470;
+    const [waClear, waTyped, waTy] = typeIn(I, waY, IW, "081298765432");
+    const turutY = gifts.at["Turut Mengundang"] - D6;
+    const vF = keep("Turut Mengundang", turutY, { open: "Turut Mengundang", fill: fillFamilies, raw: true });
+    const D8 = vF.at["Kaki Halaman"] - 330;
+    const vKaki = keep("Kaki Halaman", 330, { open: "Kaki Halaman", fill: fillFooter });
     return {
-      title: "Mengatur RSVP dan Amplop Digital",
-      world: WORLD,
-      base: [...editor("Konten"), pvCover("Rani & Dimas")],
+      title: "Mengatur RSVP, Amplop Digital, dan bagian penutup",
+      world: SIDE,
+      base: [...editor("Konten"), keep("RSVP & Ucapan", 169).svg],
       els: {
-        list1: rsvp(),
+        list1: { svg: rsvp(false), enter: "fade" },
         rNote: { svg: ring(I, noteY, IW, 38, { r: 6 }), enter: "fade" },
-        dd: { svg: dd, enter: "pop", origin: [I + IW / 2, guestsY + 36] },
-        v3: { svg: inp(I, guestsY, IW, "3 orang", { select: true }), enter: "fade" },
-        on: { svg: sw(I + IW - 36, maybeY, true), enter: "fade", delay: 1.15 },
-        list2: { svg: rsvp({ v3: true, on: true }), enter: "fade" },
-        gifts: { svg: gifts, enter: "fade", delay: 1.45 },
-        nFocus: { svg: inp(fx, numY, fw, "1234567890", { focus: true, sel: true }), enter: "fade", delay: 1.1 },
-        nClear: { svg: inp(fx, numY, fw, "", { focus: true }), enter: "fade" },
-        nTyped: { svg: text(fx + 11, numY + 23, "7712003456", { size: 14, fill: C.strong }), enter: "fade" },
-        holder: { svg: rect(fx + 2, holderY + 2, fw - 4, 32, { fill: C.white }) + text(fx + 11, holderY + 23, "Sinta Maharani", { size: 14, fill: C.strong }), enter: "fade", delay: 2.2 },
+        ddMode: { svg: ddMode, enter: "pop", origin: [I + IW / 2, formY + 36] },
+        ddG: { svg: shadow(I, guestsY + 38, IW, 152, 6, 2) + rect(I, guestsY + 38, IW, 152, { r: 6, fill: C.white, stroke: C.field }) + rect(I + 4, guestsY + 66, IW - 8, 24, { r: 4, fill: C.primarySoft }) +
+          [1, 2, 3, 4, 5, 6].map((n, i) => text(I + 14, guestsY + 59 + i * 24, `${n} orang`, { size: 14, fill: C.strong })).join("") + iconX("check", I + IW - 18, guestsY + 78, 14, C.action), enter: "pop", origin: [I + IW / 2, guestsY + 36] },
+        list2: { svg: rsvp(false), enter: "fade", delay: -1.3 },
+        gifts: { svg: gifts.svg, enter: "fade" },
+        rNum: { svg: ring(I + 10, numY, IW - 20, 36, { r: 6 }), enter: "fade", delay: 0.5 },
+        waClear: { svg: waClear, enter: "fade" },
+        waTyped: { svg: waTyped, enter: "fade" },
+        vF: { svg: vF.svg, enter: "fade" },
+        vKaki: { svg: vKaki.svg, enter: "fade" },
+        rBrand: { svg: ring(I, vKaki.f["Nama brand"] + 20, IW, 36, { r: 6 }), enter: "fade", delay: 0.4 },
         lidE: lid("Konten"),
-        pvH: { svg: pvGifts() + tag(560, 420, "Rekening ada di balik tombol ini", 842, 357), enter: "fade", delay: 0.2 }
+        saved: SAVED
       },
       steps: [
-        { caption: "Buka RSVP & Ucapan. Catatan Tersambung. ID: (angka) berarti siap.", cam: { x: 40, y: 150, w: 680 }, show: ["rNote"], at: [I + 150, noteY + 19] },
-        { caption: "Pilih Isi form, lalu Jumlah tamu paling banyak per undangan.", cam: { x: 40, y: 250, w: 680 }, hide: ["rNote"], show: ["dd"], at: [I + 80, guestsY + 102], click: true },
-        { caption: "Nyalakan sakelar yang perlu, misalnya Pilihan \"Masih ragu\".", cam: { x: 40, y: 420, w: 680 }, hide: ["dd"], show: ["v3", "on"], at: [I + IW - 18, maybeY + 10], click: true },
-        { caption: "Gulir ke Amplop Digital, lalu klik namanya. Rekening contoh sudah ada.", cam: { x: 40, y: 150, w: 680 }, hide: ["v3", "on"], show: ["list2", "gifts"], scroll: { id: "list2", dy: DY }, at: [P + 80, amplopY + 25], click: true, dur: 3.8 },
-        { caption: "Klik Nomor rekening. Nomor contoh 1234567890 harus diganti.", cam: { x: 40, y: 470, w: 680 }, at: [fx + 150, numY + 18], click: true, show: ["nFocus"] },
-        { caption: "Ketik nomor rekening klien. Ganti juga Nama pemilik rekening.", show: ["nClear", "nTyped", "holder"], type: [{ id: "nTyped", n: 10, box: [fx + 10, numY + 7, tw("7712003456", 14) + 2, 22] }], dur: 3.6 },
-        { caption: "Di undangan, rekening tampil setelah tamu menekan Kirim Hadiah.", cam: { x: 520, y: 120, w: 760 }, show: ["pvH"], at: [922, 357], dur: 3.6 }
+        { caption: "Klik Konten, lalu klik RSVP & Ucapan. Bagian terbuka.", at: [190, 194], click: true, show: ["list1"] },
+        { caption: "Pastikan tertulis Tersambung. ID: diikuti angka ID halaman.", show: ["rNote"], at: [I + 150, noteY + 19] },
+        { caption: "Pilih Isi form, misalnya Ucapan + konfirmasi hadir.", hide: ["rNote"], show: ["ddMode"], at: [I + 120, formY + 18], click: true },
+        { caption: "Pilih Jumlah tamu paling banyak per undangan, lalu atur sakelar Tanyakan juga.", hide: ["ddMode"], show: ["ddG"], at: [I + 120, guestsY + 18], click: true },
+        { caption: "Klik Amplop Digital, lalu ganti rekening contoh 1234567890.", hide: ["ddG"], show: ["list2", "gifts", "rNum"], scroll: { id: "list2", dy: DY }, at: [190, 445], click: true, dur: 3.8 },
+        { caption: "Masih di Amplop Digital, isi WhatsApp konfirmasi dengan nomor klien.", hide: ["rNum"], scroll: { id: "gifts", dy: D6 }, at: [230, waY + 18], click: true, show: ["waClear", "waTyped"], type: [{ id: "waTyped", ...waTy }], dur: 3.8 },
+        { caption: "Isi Turut Mengundang dan Salam Penutup.", at: [190, turutY + 25], click: true, show: ["vF"], dur: 3.4 },
+        { caption: "Periksa Kaki Halaman: nama brand dan WhatsApp pemesanan milik usahamu.", scroll: { id: "vF", dy: D8 }, at: [190, 355], click: true, show: ["vKaki", "rBrand"], dur: 3.8 },
+        { caption: "Simpan: tunggu status Tersimpan, lalu klik Simpan di Scalev.", hide: ["rBrand"], show: ["saved"], at: SAVED_AT }
       ]
     };
   })()
