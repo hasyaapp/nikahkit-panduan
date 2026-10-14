@@ -1,48 +1,29 @@
 // Jualan ke klien: alur, Profil merek, Dashboard pasangan, Bagikan > Untuk pengantin, Landing page, form klien,
 // Pesanan masuk, checklist serah. Every scene is one 1440x900 screen (lib v4): the Scalev editor at 0,0, or the
 // member Landing page and its form as a phone page (phoneDesk; the page is mobile-first).
-// Panel: nikahkit/src/ui/panels-style.jsx (TemplatePanel, BrandForm), orders.jsx, App.jsx (AccessSection), styles.js;
-// measured from /tmp/ref/editor-marketing.png, editor-pesanan.png, editor-bagikan.png, editor-konten.png.
-// Landing page and form: server/pages/src/landing/index.html + server/pages/shared/order-form.js at 390 px (mobile CSS).
-// Dashboard pasangan: /tmp/ref/dash-gate-hp.png.
-import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw } from "../lib.mjs";
-import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialogHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkAcc, nkH3, phoneDesk } from "../ui/kit.mjs";
+// Product screens come from ui/: Template > Marketing (marketing.mjs), Pesanan masuk (pesanan.mjs), Bagikan
+// (bagikan.mjs), Template library and Konten panel (editor-panels.mjs), invitation preview (invitation.mjs).
+// Drawn here: the Marketing install dialog and update note (panels-style.jsx), the Dashboard pasangan gate
+// (/tmp/ref/dash-gate-hp.png), the WhatsApp message bubble (generic), and the member Landing page and its form
+// (server/pages/src/landing/index.html + server/pages/shared/order-form.js, measured in Chrome at 390 px). The flow
+// diagram and the checklist are guide graphics, not product screens.
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, clipShape, shadow, skeleton, tw } from "../lib.mjs";
+import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkHint, nkToast, nkToastBoxes, phoneDesk } from "../ui/kit.mjs";
 import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_W, HAPUS_W, HAPUS_X, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
+import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
+import { SEG, MARKETING_BOX, BOX, brandClosed, MK, MKY, CARD_X, mkCards, dipakaiBox, GAYA_Y, SIMPAN_Y, brandOpen, MENU_H, menuItemY, styleMenu } from "../ui/marketing.mjs";
+import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel } from "../ui/editor-panels.mjs";
+import { PHOTO_DEFS, pvMempelai } from "../ui/invitation.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
-const shell = (o = {}) => [scalevEditor(0, 0, o)];
-// Over a scrolled list (x 72..399): the Scalev bars and the panel head, redrawn above it.
-const cover = (o, title, h = {}) => clipped(72, 0, 328, 153, scalevEditor(0, 0, o), nkHead(0, 0, title, h));
-const bodyClip = (...s) => clipped(72, 153, 327, 747, ...s);
-const bodyBg = rect(72, 153, 327, 747, { fill: C.white });
-const svgIcon = (body, cx, cy, size, color) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
+// PHOTO_DEFS: the gradients the invitation preview's photos use.
+const shell = (o = {}) => [PHOTO_DEFS, scalevEditor(0, 0, o)];
+// The panel head with the member's plan on the account chip.
+const head = (title, o = {}) => nkHead(0, 0, title, { account: ACCOUNT, ...o });
 // Step helpers: a mark ({ box, r }) and the screen regions steps focus on.
 const M = (x, y, w, hh, r = 4) => ({ box: [x, y, w, hh], r });
 const F = { left: [0, 92, 399, 808], panel: [72, 92, 327, 808], rail: [0, 92, 72, 808], tabs: [0, 44, 399, 48], top: [1180, 44, 260, 48], preview: [727, 106, 390, 784] };
 const INBOX = M(218, 104, 36, 36, 8);
-
-// Kategori: Template | Marketing (Seg with KIND_ICON; the chosen one also shows its label).
-const KIND = {
-  template: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
-  marketing: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>'
-};
-const SEG_Y = 169, SEG = { template: [158, 188], marketing: [297, 188] };
-function kindSeg(active) {
-  const x = 88, y = SEG_Y, w = 279, h = 38, half = w / 2;
-  let s = rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 4, fill: C.white, stroke: C.field });
-  [["template", "Template"], ["marketing", "Marketing"]].forEach(([k, l], i) => {
-    const cx = x + i * half + half / 2;
-    if (k === active) {
-      const total = 26 + tw(l, 12, 600);
-      s += rect(x + 1 + i * (half - 1), y + 1, half - 1, h - 2, { fill: C.primarySoft }) + svgIcon(KIND[k], cx - total / 2 + 10, y + h / 2, 20, C.action) +
-        text(cx - total / 2 + 26, y + h / 2 + 4, l, { size: 12, weight: 600, fill: C.action });
-    } else s += svgIcon(KIND[k], cx, y + h / 2, 20, C.text);
-  });
-  return s + line(x + half, y + 1, x + half, y + h - 1, { stroke: C.field });
-}
-// Profil merek box (details.nk-box), closed: 50 px.
-const brandClosed = (y, ready = true) => rect(88.5, y + 0.5, 278, 49, { r: 4, fill: C.white, stroke: C.line }) + text(101, y + 30, "Profil merek", { size: 14, weight: 500 }) +
-  badgeAt(354, y + 16, ready ? "Terisi" : "Belum diisi", ready ? "ok" : "plain");
 
 // Template cards (Template category). Thumbnails are the worker's images: drawn here as neutral page sketches; the
 // description as the card clamps it (two lines, same text as 03-editor-konten.mjs).
@@ -57,52 +38,8 @@ function pageSketch(x, y, w, h, [bg, ac]) {
     rect(cx - w * 0.3, y + h * 0.76, w * 0.6, Math.max(3, h * 0.02), { r: 1.5, fill: ac, opacity: 0.35 }) +
     rect(cx - w * 0.16, y + h * 0.84, w * 0.32, Math.max(6, h * 0.06), { r: h * 0.03, fill: ac, opacity: 0.55 });
 }
-function tplCard(x, y, [name, desc, pal]) {
-  return clipped(x + 2, y + 2, 130, 163, pageSketch(x + 2, y + 2, 130, 163, pal)) + rect(x + 1, y + 1, 132, 165, { r: 8, stroke: C.line, sw: 2 }) +
-    text(x, y + 188, name, { size: 14, weight: 500 }) + para(x, y + 209, desc, { size: 12, fill: C.faint, lh: 16 });
-}
-const tplCards = (y) => TPL.map((t, i) => tplCard(88 + (i % 2) * 146, y + Math.floor(i / 2) * 241, t)).join("");
 
-// Marketing cards: SKETCH from panels-style.jsx (viewBox 150x100, centred in the 4:5 phone).
-const SKETCH = {
-  dashboard: rect(0, 0, 150, 18, { fill: C.primarySoft }) + [0, 1, 2, 3].map((i) => rect(8 + i * 35, 24, 28, 6, { r: 3, fill: i ? C.line : C.primary })).join("") +
-    [0, 1, 2, 3].map((i) => circle(16, 46 + i * 14, 5, { fill: C.line }) + rect(26, 42 + i * 14, 70 - i * 8, 4, { r: 2, fill: C.line }) + rect(26, 48 + i * 14, 40, 3, { r: 1.5, fill: C.line })).join(""),
-  landing: circle(12, 9, 5, { fill: C.primary }) + rect(8, 22, 80, 7, { r: 3.5, fill: C.line }) + rect(8, 33, 34, 8, { r: 4, fill: C.primary }) +
-    [0, 1, 2, 3].map((i) => rect(8 + i * 35, 50, 30, 26, { r: 3, fill: C.line })).join("") + rect(8, 84, 134, 12, { r: 3, fill: C.primarySoft })
-};
-const MK = { dashboard: ["Dashboard pasangan", ["Kirim undangan, RSVP,", "ucapan, dan check-in…"]], landing: ["Landing page", ["Halaman jualan: desain,", "paket dan harga, lalu for…"]] };
-// The name and its Dipakai badge share the 134 px row (justify-content: space-between): with the badge the name wraps.
-function mkCard(x, y, id, on) {
-  const [name, desc] = MK[id], nameLines = on ? name.split(" ") : [name], dy = (nameLines.length - 1) * 20;
-  return rect(x + 1, y + 1, 132, 165, { r: 8, fill: C.page, stroke: on ? C.primary : C.line, sw: 2 }) +
-    group({ transform: `translate(${x + 2} ${y + 2 + 38.2}) scale(${130 / 150})` }, SKETCH[id]) +
-    para(x, y + 188, nameLines, { size: 14, weight: 500, lh: 20 }) + (on ? badgeAt(x + 134, y + 175 + dy / 2, "Dipakai", "ok") : "") + para(x, y + 209 + dy, desc, { size: 12, fill: C.faint, lh: 16 });
-}
-const mkCards = (y, on) => mkCard(88, y, "dashboard", on === "dashboard") + mkCard(234, y, "landing", on === "landing");
-const MKY = 281; // cards under a closed Profil merek box
-
-// NikahKit toast (.nk-toast: left 84, right 12, bottom 12 of the panel; Urungkan link).
-function nkToast(lines, undo = true) {
-  const h = Math.max(52, lines.length * 18 + 20), y = 888 - h;
-  return shadow(84, y, 302, h, 4, 2) + rect(84, y, 302, h, { r: 4, fill: C.strong }) + para(96, y + h / 2 - (lines.length - 1) * 9 + 5, lines, { size: 14, fill: C.white, lh: 18 }) +
-    (undo ? text(374, y + h / 2 + 5, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }) : "");
-}
-
-// Invitation preview (sample template data, like editor-konten.png) on the 390 screen at (727, 106).
-const INV_RED = "#8f2f1d", SCRIPT = "'Great Vibes','Segoe Script',cursive", SERIF = "Georgia,'Times New Roman',serif";
-function invite(p) {
-  const cx = 922;
-  return rect(727, 106, 390, 784, { fill: "#fdf6ee" }) + rect(727, 106, 390, 18, { fill: INV_RED }) + [0, 1, 2, 3, 4, 5, 6].map((i) => circle(745 + i * 58, 124, 20, { fill: INV_RED })).join("") +
-    text(cx, 262, "Mempelai", { size: 46, font: SCRIPT, italic: true, fill: INV_RED, anchor: "middle" }) +
-    `<path d="M833 548 V398 a89 89 0 0 1 178 0 V548 Z" fill="#ead3c3" stroke="${INV_RED}" stroke-width="1.5"/>` +
-    circle(cx, 420, 36, { fill: "#c9a58f" }) + `<path d="M852 548 q4 -78 70 -84 q66 6 70 84 Z" fill="#9c2b2b"/>` +
-    text(cx, 606, p.nick, { size: 36, font: SCRIPT, italic: true, fill: INV_RED, anchor: "middle" }) +
-    text(cx, 643, p.full, { size: 16, weight: 700, font: SERIF, fill: "#1a1a1a", anchor: "middle" }) + text(cx, 668, p.job, { size: 14, font: SERIF, fill: "#333", anchor: "middle" }) +
-    text(cx, 694, p.parents, { size: 15, font: SERIF, fill: "#1a1a1a", anchor: "middle" }) +
-    rect(765, 810, 315, 70, { r: 16, fill: INV_RED }) + rect(773, 818, 58, 52, { r: 10, fill: "rgba(255,255,255,.18)" }) +
-    [["heart", "Mempelai"], ["calendar", "Acara"], ["image", "Galeri"], ["message-circle", "Ucapan"], ["gift", "Hadiah"]].map(([ic, l], i) =>
-      icon(ic, 802 + i * 60, 836, 18, C.white) + text(802 + i * 60, 860, l, { size: 10, font: SERIF, fill: C.white, anchor: "middle" })).join("");
-}
+// Invitation preview: the Mempelai section (ui/invitation.mjs) with the sample couple or Rani.
 const SAMPLE = { nick: "Ayu", full: "Ayu Lestari, S.Ked.", job: "Dokter", parents: "Putri pertama dari Bapak Hadi & Ibu Ratna" };
 const RANI = { nick: "Rani", full: "Rani Ayu, S.Psi.", job: "Psikolog", parents: "Putri kedua dari Bapak Ahmad & Almh. Ibu Siti" };
 
@@ -117,11 +54,6 @@ function gate(x, top) {
 }
 const dashPreview = rect(727, 106, 390, 784, { fill: "#f5f4f2" }) + gate(727, 326);
 
-// Konten panel (editor-konten.png without the update/sample notes).
-const kontenBody = nkLabel(88, 181, "Bahasa undangan") + nkInput(88, 189, 279, "Indonesia", { select: true }) +
-  para(88, 245, ["Hanya halaman tamu. Teks bawaan ikut", "berganti; teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
-  `<text x="88" y="289" font-size="12" fill="${C.faint}">Urutan dan tampilan bagian di <tspan font-weight="500" fill="${C.strong}" text-decoration="underline">Lapisan</tspan>.</text>` +
-  nkAcc(88, 305, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, 363, 279, "Mempelai", { badge: "Terisi" }) + nkAcc(88, 421, 279, "Acara & Tanggal", { badge: "Terisi" });
 
 // ---- Landing page (server/pages/src/landing/index.html), 390 wide, mobile styles ----------------------------------
 // Measured in Chrome at 390x844: Rina WO, Basic + Premium, every design in the extension's order, Gaya Grid. Only the
@@ -306,53 +238,12 @@ const PEMESAN = { kind: "pemesan", step: 1, title: "Pemesan", intro: ["Kontak un
 const CATATAN = { kind: "catatan", step: 9, title: "Catatan", intro: ["Hal lain yang ingin dimasukkan, lalu", "kirim."] };
 
 // ---- Shared panel pieces -----------------------------------------------------------------------------------------
-const tplPanel = (o = {}) => nkHead(0, 0, "Template", o.head) + bodyBg + bodyClip(kindSeg("template"), tplCards(219));
-const mkPanel = (on, extra = "") => nkHead(0, 0, "Template", { inbox: false }) + bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), extra, mkCards(MKY, on));
+const tplPanel = (o = {}) => head("Template", o.head) + panelBody(panelBg(), templatePanel(null));
+// Template > Marketing: switch, Profil merek closed, extra (a note under it) and the two cards at cardY; on = the Dipakai card.
+const mkBody = (on, extra = "", cardY = MKY) => panelBody(panelBg(), seg("marketing"), brandClosed(BOX), extra, mkCards(cardY, on));
+const mkPanel = (on, extra, cardY) => head("Template", { inbox: false }) + mkBody(on, extra, cardY);
 
-// Profil merek open form (BrandForm), from the box top y; positions documented in scene notes below.
-const BOX = 219;
-function brandOpen(v = {}) {
-  const fx = 101, fw = 253;
-  let s = rect(85.5, BOX - 2.5, 284, 1036, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, 1030, { r: 4, fill: C.white, stroke: C.primary }) +
-    text(101, BOX + 30, "Profil merek", { size: 14, weight: 500 }) + badgeAt(354, BOX + 16, v.ready ? "Terisi" : "Belum diisi", v.ready ? "ok" : "plain") + line(89, BOX + 49, 366, BOX + 49);
-  s += nkLabel(fx, 292, "Nama bisnis") + nkInput(fx, 300, fw, v.name ?? "") +
-    nkLabel(fx, 360, "Nomor WhatsApp") + nkInput(fx, 368, fw, v.wa ?? "0812 3456 7890", { placeholder: !v.wa }) +
-    para(fx, 420, ["Tombol Tanya lewat WhatsApp di Landing page", "menuju nomor ini."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkLabel(fx, 464, "Logo (opsional)") + nkInput(fx, 472, fw, "https://", { placeholder: true }) +
-    para(fx, 524, ["Alamat gambar https, misalnya dari Media", "Scalev Anda."], { size: 12, fill: C.faint, lh: 16 }) +
-    para(fx, 572, ["Paket dan harga di Landing page, 1 sampai 3", "paket."], { size: 12, fill: C.faint, lh: 16 });
-  // one package item (.nk-item)
-  s += rect(fx + 0.5, 600.5, fw - 1, 396, { r: 4, fill: C.page, stroke: C.line }) + text(111, 629, v.pkg ?? "Paket 1", { size: 12, weight: 700 }) +
-    icon("chevron-up", 282, 624, 16, C.off) + icon("chevron-down", 308, 624, 16, C.off) + icon("trash", 334, 624, 16, C.off) +
-    nkLabel(111, 660, "Nama paket") + nkInput(111, 668, 233, v.pkgName ?? "Nama paket", { placeholder: !v.pkgName }) +
-    nkLabel(111, 728, "Harga (Rp)") + nkInput(111, 736, 233, v.price ?? "150.000", { placeholder: !v.price }) +
-    nkLabel(111, 796, "Isi paket (opsional)") + rect(111.5, 804.5, 232, 133, { r: 4, fill: C.white, stroke: C.field }) +
-    para(111, 954, ["Satu baris satu isi, maksimal 6 baris, 80", "huruf per baris."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkBtn(fx, 1005, "Tambah paket", { variant: "quiet", w: fw, icon: "plus" }) +
-    nkLabel(fx, 1061, "Gaya katalog") + nkInput(fx, GAYA_Y, fw, v.style ?? "Grid", { select: true }) +
-    para(fx, 1121, ["Cara daftar desain tampil di Landing", "page; Etalase juga mengganti warna dan", "huruf seluruh halaman. Berlaku setelah", "profil disimpan dan halaman dipasang", "atau diperbarui."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkBtn(fx, SIMPAN_Y, "Simpan profil", { w: 110 });
-  return s;
-}
-const GAYA_Y = 1069, SIMPAN_Y = 1201, SCROLL = 420;
-// Gaya katalog's native select list (CATALOG_STYLES labels), under the select; the current value has a check.
-const STYLE_LABELS = ["Grid", "Daftar", "Kartu besar", "Geser", "Mozaik", "Etalase"];
-const MENU_Y = GAYA_Y - SCROLL + 40, menuItemY = (i) => MENU_Y + 4 + i * 32, MENU_H = 8 + STYLE_LABELS.length * 32;
-const styleMenu = shadow(101, MENU_Y, 253, MENU_H, 6, 2) + rect(101.5, MENU_Y + 0.5, 252, MENU_H - 1, { r: 6, fill: C.white, stroke: C.line }) +
-  rect(105, menuItemY(0), 245, 32, { r: 4, fill: C.primarySoft }) + iconX("check", 120, menuItemY(0) + 16, 14, C.strong, 2.4) +
-  STYLE_LABELS.map((l, i) => text(134, menuItemY(i) + 21, l, { size: 14 })).join("");
-
-// Bagikan dialog (editor-bagikan.png, saved state: no unsaved note, so 50 px higher).
-const shareDlg = nkDialogHead(0, 0, "Bagikan") + nkLabel(16, 181, "Nama tamu") + nkInput(16, 189, 366, "Nama Tamu") + nkHint(16, 245, "Ditambahkan sebagai ?to=Nama.") +
-  rect(16, 261, 366, 52, { r: 4, fill: C.mutedBg }) + text(26, 283, "https://tokomu.myscalev.com/rani-dimas?", { size: 12, mono: true }) + text(26, 301, "to=Nama+Tamu", { size: 12, mono: true }) +
-  nkBtn(16, 325, "Lihat sebagai tamu", { w: 366, size: 14, icon: "eye" }) + nkBtn(16, 369, "Salin tautan tamu", { w: 366, size: 14, variant: "ghost", icon: "copy" }) +
-  nkBtn(16, 413, "Salin tautan umum", { w: 366, size: 14, variant: "quiet", icon: "link" }) +
-  nkH3(16, 485, "Undangan khusus") + text(16, 522, "Undangan khusus", { size: 14, fill: C.text }) + nkSwitch(346, 507, false) +
-  para(16, 551, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 }) +
-  nkH3(16, 603, "Untuk pengantin") + nkBtn(16, 615, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" }) +
-  nkHint(16, 711, "Masuk dengan PIN dashboard.") + nkH3(16, 751, "PIN dashboard") + nkBtn(16, 763, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" }) +
-  nkHint(16, 815, "PIN hanya tampil di jendela NikahKit.");
-const bukaDash = nkBtn(16, 659, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" });
+const SCROLL = 420; // the brand form scrolled so the first package shows
 
 // ---- Flow diagram and checklist ----------------------------------------------------------------------------------
 // The 11 steps of alur-dengan-klien.mdx, snaking over 4 rows of 3.
@@ -417,7 +308,7 @@ const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain 
 const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Dasar"], desain: "Dasar", paket: "Basic" });
 // Live demo (dialog.demo, full screen): bar 63 px (name, Pakai desain ini 147x46, close 44), the sample invitation below.
 const DEMO_PICK = [181 + 147 / 2, 31], DEMO_X = [360, 31];
-const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + clipped(0, 63, 390, 781, group({ transform: "translate(-727 -43)" }, invite(RANI))) +
+const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + PHOTO_DEFS + clipped(0, 63, 390, 781, group({ transform: "translate(-727 -43)" }, pvMempelai(RANI))) +
   rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Dasar", 19, { weight: 600 }) +
   iconX("x", DEMO_X[0], DEMO_X[1], 24, LP.cocoa, 2.2));
 const demoPick = body(lpBtn(181, 8, "Pakai desain ini", { small: true, solid: true, w: 147 }));
@@ -429,9 +320,7 @@ const inBrowser = (...s) => clipped(0, 56, 390, 844, group({ transform: "transla
 
 // Gaya katalog (renderCatalog + .cat-* CSS at 390 px, measured in Chrome): y from the katalog's dashed line; the designs
 // start under the theme buttons.
-let rcN = 0;
-const rclip = (x, y, w, hh, r, ...kids) => { const id = `rc${rcN++}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="${r}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
-const pic = (x, y, w, hh, pal, r = 14) => rclip(x, y, w, hh, r, pageSketch(x, y, w, hh, pal)) + rect(x, y, w, hh, { r, stroke: LP.cocoa, sw: 1.5 });
+const pic = (x, y, w, hh, pal, r = 14) => clipShape(rect(x, y, w, hh, { r }), pageSketch(x, y, w, hh, pal)) + rect(x, y, w, hh, { r, stroke: LP.cocoa, sw: 1.5 });
 const demoLink = (x, top) => text(x, top + 28, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true });
 const CT = LPY.grid - KAT, CHIP_Y = LPY.chips - KAT;
 const catHead = rect(0, 0, 390, 844, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 88, "Pilih desain undangan", 32) +
@@ -445,7 +334,7 @@ const CAT_STYLE = {
       lpBtn(220, t + 89.6, "Pilih", { small: true, w: 71 }) + dash(20, t + 151.6, 350); }).join(""),
   // Kartu besar: a third note line makes the card 21.8 taller and moves Lihat demo and Pilih down with it.
   kartu: [0, 1].map((i) => { const [n, , pal] = TPL[i], note = NOTES.kartu[i], more = (note.length - 2) * 21.8, t = CT + i * 470.6, hh = 450.6 + more;
-    return rect(20, t, 350, hh, { r: 16, fill: LP.paper }) + rclip(20, t, 350, hh, 16, pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
+    return rect(20, t, 350, hh, { r: 16, fill: LP.paper }) + clipShape(rect(20, t, 350, hh, { r: 16 }), pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
       rect(20.75, t + 0.75, 348.5, hh - 1.5, { r: 16, stroke: LP.cocoa, sw: 1.5 }) + h(41, t + 303, n, 26) + para(41, t + 331, note, { size: 15, fill: LP.muted, lh: 21.8 }) +
       demoLink(41, t + 379.8 + more) + lpBtn(137, t + 377.5 + more, "Pilih", { solid: true, w: 83.1 }); }).join(""),
   // Geser: on a phone (no arrows) the next section, Fitur undangan digital, starts 778.9 below the dashed line.
@@ -454,7 +343,7 @@ const CAT_STYLE = {
       lpBtn(x + 92, t + 392.6, "Pilih", { small: true, w: 71 }); }).join("") + dash(20, 778.9, 350),
   mozaik: `<defs><linearGradient id="mzfade" x1="0" y1="1" x2="0" y2="0"><stop offset="${(79 / 135).toFixed(3)}" stop-color="rgb(20,12,8)" stop-opacity=".88"/><stop offset="1" stop-color="rgb(20,12,8)" stop-opacity="0"/></linearGradient></defs>` +
     [[TPL[0], 20, CT, 450], [TPL[1], 200, CT, 220], [TPL[2], 200, CT + 230, 220], [TPL[3], 200, CT + 460, 450], [GEMOY, 20, CT + 460, 220]].map(([[n, , pal], x, y, hh]) => { const b = y + hh;
-      return rclip(x, y, 170, hh, 14, pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
+      return clipShape(rect(x, y, 170, hh, { r: 14 }), pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
         rect(x + 10, y + 11, 84, 24, { r: 12, fill: "rgba(20,12,8,.3)" }) + rect(x + 10, y + 10, 84, 24, { r: 12, fill: LP.paper }) + text(x + 52, y + 27, "Lihat demo", { size: 12, weight: 800, fill: LP.cocoa, anchor: "middle" }) +
         h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join(""),
   etalase: etalaseView()
@@ -471,7 +360,7 @@ function etalaseView() {
   const item = (x, [n, , pal], cat, lw) => {
     const cx = x + 140, l = cx - lw / 2, r = cx + lw / 2, lb = t + 29.1;
     return rect(x + 0.75, t + 0.75, 278.5, 412.8, { r: 16, fill: ET.paper, stroke: ET.cocoa, sw: 1.5 }) +
-      rclip(x + 11.5, t + 35.5, 257, 321.3, 8, pageSketch(x + 11.5, t + 35.5, 257, 321.3, pal)) + rect(x + 11.5, t + 35.5, 257, 321.3, { r: 8, stroke: ET.line }) +
+      clipShape(rect(x + 11.5, t + 35.5, 257, 321.3, { r: 8 }), pageSketch(x + 11.5, t + 35.5, 257, 321.3, pal)) + rect(x + 11.5, t + 35.5, 257, 321.3, { r: 8, stroke: ET.line }) +
       `<path d="M${l} ${t + 1.5}V${lb - 14}a14 14 0 0 0 14 14H${r - 14}a14 14 0 0 0 14 -14V${t + 1.5}" fill="${ET.chip}" stroke="${ET.line}"/>` +
       text(cx, t + 18.5, cat, { size: 12, weight: 800, fill: ET.cocoa, anchor: "middle" }) +
       rect(cx - 51.9, t + 366.4, 103.8, 33.9, { r: 16.95, fill: ET.paper, stroke: "rgba(209,18,79,.35)" }) + text(cx, t + 387.9, "Lihat demo", { size: 13, weight: 800, fill: ET.accent, anchor: "middle" }) +
@@ -516,7 +405,7 @@ const waBubble = rect(0, 92, 400, 808, { fill: "rgba(15,22,30,.42)" }) + shadow(
   para(40, 326, WA_MSG, { size: 14, fill: C.waText, lh: 24 }) + text(362, 488, "10.20", { size: 11, fill: C.waSub, anchor: "end" });
 
 // Marketing card install (Dashboard pasangan / Landing page): dialog + Pasang.
-const CARD_X = { dashboard: 88, landing: 234 }, CARD_AT = { dashboard: [155, 360], landing: [301, 360] };
+const CARD_AT = { dashboard: [155, 360], landing: [301, 360] };
 const veil = rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" });
 const DLG = [540, 383, 360, 134];
 const pasangDlg = (name) => shadow(...DLG, 8, 3) + rect(...DLG, { r: 8, fill: C.white }) +
@@ -525,25 +414,23 @@ const pasangBtn = nkBtn(816, 461, "Pasang", { w: 64 });
 const DLG_O = [720, 450];
 
 // Shared step parts: the NikahKit tab, Kategori > Marketing, the panel toast, Simpan & Terbitkan.
-const NK_TAB = M(224, 52, 92, 32), MARKETING = M(227.5, 169, 139.5, 38);
+const NK_TAB = M(224, 52, 92, 32), MARKETING = M(...MARKETING_BOX);
 const tabStep = (caption, dur = 2.8) => ({ caption, dur, focus: [F.tabs, F.left], mark: NK_TAB, lens: { src: [100, 46, 222, 46] } });
-const toastBox = (lines) => { const hh = Math.max(52, lines.length * 18 + 20); return [84, 888 - hh, 302, hh]; };
+// The toast's lens: its box with 8 px above and below, 4 px at the sides (the panel ends at 399).
+const toastLens = (lines) => { const [x, y, w, hh] = nkToastBoxes(lines).toast; return { src: [x - 4, y - 8, w + 8, hh + 16] }; };
 const pubStep = (caption) => ({ caption, at: ED.terbitkan, click: true, focus: F.top, mark: M(...ED.terbitkanBox), lens: { src: [1180, 44, 260, 50] }, dur: 3.4 });
 
 // ---- Scenes ------------------------------------------------------------------------------------------------------
-const kontenPanel = nkHead(0, 0, "Konten") + kontenBody;
-const kontenEd = (page, inv) => [...shell({ page, rail: "Konten" }), kontenPanel, invite(inv)];
+const kontenPanel = head("Konten") + kList({ left: 0 }).svg;
+const kontenEd = (page, p) => [...shell({ page, rail: "Konten" }), kontenPanel, pvMempelai(p)];
 const DATA_TOAST = ["Data pesanan dimasukkan.", "Foto tetap; ganti foto", "contoh bila masih ada."];
-const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + nkHead(0, 0, "Konten") + bodyBg + kontenBody + invite(RANI), enter: "fade" },
+const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + kontenPanel + pvMempelai(RANI), enter: "fade" },
   t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: o.toast ?? 0.3 } });
-// Urungkan in a toast (right-aligned bold link).
-const undoMark = (lines) => { const [, y, , hh] = toastBox(lines), w = tw("Urungkan", 14, 700); return M(374 - w - 4, y + hh / 2 - 11, w + 8, 22); };
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
 function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
   const name = MK[kind][0], slug = `jualan-pasang-${kind}`, cx = CARD_X[kind];
-  const donePanel = bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind));
-  const bw = tw("Dipakai", 10, 500) + 12, bx = cx + 134 - bw; // mkCard's wrapped-name badge
+  const donePanel = mkBody(kind);
   const blank = shell({ page, rail: "Template", screenFill: C.white });
   return {
     [slug]: {
@@ -570,11 +457,11 @@ function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
     },
     [`${slug}-hasil`]: {
       title: `${name} dipasang`,
-      base: [...blank, after, nkHead(0, 0, "Template", { inbox: false }), donePanel],
+      base: [...blank, after, head("Template", { inbox: false }), donePanel],
       els: { t1: { svg: nkToast(toast), enter: "slide", delay: 0.3 } },
       steps: [
-        { caption: `Muncul pesan: ${toast.join(" ")}`, show: ["t1"], focus: F.panel, mark: M(...toastBox(toast)), lens: { src: [84, 820, 302, 72] }, dur: 3.4 },
-        { caption: `Kartu ${name} kini berlabel Dipakai.`, mark: M(bx, MKY + 185, bw, 18, 9), lens: { src: [84, MKY + 170, 294, 80] }, dur: 3 }
+        { caption: `Muncul pesan: ${toast.join(" ")}`, show: ["t1"], focus: F.panel, mark: M(...nkToastBoxes(toast).toast), lens: toastLens(toast), dur: 3.4 },
+        { caption: `Kartu ${name} kini berlabel Dipakai.`, mark: M(...dipakaiBox(kind), 9), lens: { src: [84, MKY + 170, 294, 80] }, dur: 3 }
       ]
     }
   };
@@ -588,7 +475,6 @@ function pubScene(title, page, rail, panel, preview, cap, first, before) {
     steps: [{ caption: cap[0], show: before ? ["nw"] : [], focus: F.preview, ...first, dur: 3.2 }, pubStep(cap[1])]
   };
 }
-const tplDone = (kind) => nkHead(0, 0, "Template", { inbox: false }) + bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind));
 // The landing header in the preview (logo, business name, Pesan) and the gate card of the couple dashboard.
 const LAND_HEAD = { mark: M(727, 106, 390, 74, 0), lens: { src: [727, 106, 390, 74], zoom: 1.6 } };
 const landPreview = (n) => clipped(727, 106, 390, 784, landingTop(727, 106, n));
@@ -599,20 +485,19 @@ const RESET = M(88, 277, 279, 50), RESET_LENS = { src: [80, 272, 295, 62] };
 function perbaruiScene(kind, title, page, before, after, toast, steps) {
   return {
     title,
-    base: [...shell({ page, rail: "Template" }), before, nkHead(0, 0, "Template", { inbox: false }), bodyBg,
-      bodyClip(kindSeg("marketing"), brandClosed(219), rect(88.5, 277.5, 278, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }),
-        resetText(["Versi baru halaman", "tersedia."]), mkCards(339, kind))],
+    base: [...shell({ page, rail: "Template" }), before, mkPanel(null, rect(88.5, 277.5, 278, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }) +
+      resetText(["Versi baru halaman", "tersedia."]), 339)],
     els: {
       perbarui: nkBtn(216, 286, "Perbarui halaman ini", { variant: "quiet", h: 32, w: 140 }),
       ...(kind === "landing" ? { brandT: { svg: rect(89, 278, 124, 48, { fill: C.warnSoft }) + resetText(["Profil merek", "berubah."]), enter: "fade" } } : {}),
-      after: { svg: bodyBg + bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind)) + after, enter: "fade", delay: 0.1 },
+      after: { svg: mkBody(kind) + after, enter: "fade", delay: 0.1 },
       t1: { svg: nkToast(toast), enter: "slide", delay: 0.25 }
     },
     steps: [
       { ...steps[0], focus: F.panel, mark: MARKETING, lens: { src: [80, 161, 295, 113] } },
       ...steps.slice(1).map((s) => ({ ...s, mark: RESET, lens: RESET_LENS })),
       { caption: "Klik Perbarui halaman ini. Halaman langsung dipasang ulang.", at: [286, 302], click: true, press: "perbarui", hide: kind === "landing" ? ["brandT"] : [],
-        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: { src: [84, 820, 302, 72] }, dur: 3.8 }
+        show: ["after", "t1"], focus: [F.panel, F.preview], mark: M(216, 286, 140, 32), lens: toastLens(toast), dur: 3.8 }
     ]
   };
 }
@@ -653,13 +538,13 @@ export const scenes = {
     els: Object.fromEntries(Object.entries({
       rail: { svg: nkRail(0, 0, "Template"), enter: "fade" },
       tpl: { svg: tplPanel(), enter: "fade" },
-      mk: { svg: bodyBg + bodyClip(kindSeg("marketing"), brandOpen()), enter: "fade" },
+      mk: { svg: panelBody(panelBg(), seg("marketing"), brandOpen()), enter: "fade" },
       nameFocus: { svg: nkInput(101, 300, 253, "", { focus: true }), enter: "fade" },
       nameBlur: { svg: nkInput(101, 300, 253, ""), enter: "fade" },
       nameV: text(111, 323, "Rina WO", { size: 14 }),
       waFocus: { svg: nkInput(101, 368, 253, "", { focus: true }), enter: "fade" },
       waV: text(111, 391, "0812 3456 7890", { size: 14 }),
-      body2: { svg: rect(72, 153, 327, 1200, { fill: C.white }) + kindSeg("marketing") + brandOpen({ name: "Rina WO", wa: "0812 3456 7890" }), enter: "fade" },
+      body2: { svg: rect(72, 153, 327, 1200, { fill: C.white }) + seg("marketing") + brandOpen({ name: "Rina WO", wa: "0812 3456 7890" }), enter: "fade" },
       pkFocus: { svg: nkInput(111, 668 - SCROLL, 233, "", { focus: true }), enter: "fade" },
       pkBlur: { svg: nkInput(111, 668 - SCROLL, 233, ""), enter: "fade" },
       pkName: text(121, 691 - SCROLL, "Basic", { size: 14 }),
@@ -667,10 +552,10 @@ export const scenes = {
       pkPrice: text(121, 759 - SCROLL, "150.000", { size: 14 }),
       prBlur: { svg: nkInput(111, 736 - SCROLL, 233, "") + text(121, 759 - SCROLL, "150.000", { size: 14 }), enter: "fade" },
       selFocus: { svg: nkInput(101, GAYA_Y - SCROLL, 253, "Grid", { select: true, focus: true }), enter: "fade" },
-      menu: { svg: styleMenu, enter: "fade" },
+      menu: { svg: styleMenu(GAYA_Y - SCROLL), enter: "fade" },
       selV: { svg: nkInput(101, GAYA_Y - SCROLL, 253, "Kartu besar", { select: true, focus: true }), enter: "fade" },
-      done: { svg: bodyBg + bodyClip(kindSeg("marketing"), brandClosed(BOX), mkCards(MKY)), enter: "fade", delay: 0.15 },
-      cover: { svg: cover({ page: "Undangan Rani & Dimas", rail: "Template" }, "Template"), enter: "fade" }
+      done: { svg: mkBody(), enter: "fade", delay: 0.15 },
+      cover: { svg: lid("Template"), enter: "fade" }
     }).map(([id, e]) => [id, { ...(typeof e === "string" ? { svg: e } : e), skel: true }])),
     steps: [
       tabStep("Di editor halaman, buka tab NikahKit.", 2.6),
@@ -690,8 +575,8 @@ export const scenes = {
         lens: { src: [96, 286, 268, 74] }, dur: 3.6 },
       { caption: "Klik Gaya katalog: Grid, Daftar, Kartu besar, Geser, Mozaik, atau Etalase.", at: [228, GAYA_Y - SCROLL + 18], click: true, hide: ["prFocus"], show: ["prBlur", "selFocus", "menu"],
         mark: M(101, GAYA_Y - SCROLL, 253, 36), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3.4 },
-      { caption: "Pilih gayanya, misalnya Kartu besar. Bawaannya Grid.", at: [180, menuItemY(2) + 16], click: true, hide: ["menu", "selFocus"], show: ["selV"],
-        mark: M(105, menuItemY(2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3 },
+      { caption: "Pilih gayanya, misalnya Kartu besar. Bawaannya Grid.", at: [180, menuItemY(GAYA_Y - SCROLL, 2) + 16], click: true, hide: ["menu", "selFocus"], show: ["selV"],
+        mark: M(105, menuItemY(GAYA_Y - SCROLL, 2), 245, 32), lens: { src: [96, GAYA_Y - SCROLL - 20, 268, 68 + MENU_H] }, dur: 3 },
       { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: [156, SIMPAN_Y + 18 - SCROLL], click: true, show: ["done"],
         mark: M(...nkBtnBox(101, SIMPAN_Y - SCROLL, "Simpan profil", { w: 110 })), lens: { src: [84, 210, 290, 68] }, dur: 3.4 }
     ]
@@ -702,7 +587,7 @@ export const scenes = {
     "Pratinjau berubah menjadi Kelola undangan.",
     ["Dashboard pasangan dipasang.", "Tekan Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Di Kategori, klik Marketing."]),
-  "jualan-pasang-dashboard-terbit": pubScene("Menerbitkan halaman Dashboard pasangan", "Dashboard Rina WO", "Template", tplDone("dashboard"), dashPreview,
+  "jualan-pasang-dashboard-terbit": pubScene("Menerbitkan halaman Dashboard pasangan", "Dashboard Rina WO", "Template", mkPanel("dashboard"), dashPreview,
     ["Pratinjau sudah Kelola undangan. Tinggal diterbitkan.", "Klik Simpan & Terbitkan. Alamat halaman ini jadi alamat Dashboard."],
     { mark: M(743, 326, 358, 303, 24), lens: { src: [737, 320, 370, 204], zoom: 1.4 } }),
 
@@ -711,18 +596,18 @@ export const scenes = {
     title: "Tombol Untuk pengantin di Bagikan",
     base: kontenEd("Undangan Rani & Dimas", RANI),
     els: {
-      share: { svg: shareDlg, enter: "fade" },
-      buka: { svg: bukaDash, enter: "fade" },
+      share: { svg: shareAll(null), enter: "fade" },
+      buka: { svg: dashboardBtn(COUPLE_Y), enter: "fade" },
       // Kelola undangan in a new Chrome tab: the 390 column of the dashboard centred on a 1440 window.
       tab: { svg: chrome(0, 0, 1440, 900, { tabs: [{ title: "Landing Page Studio", fav: favScalev, w: 180 }, { title: "Kelola undangan", active: true, w: 160 }], url: "tokomu.myscalev.com/kelola?w=…" }) +
         rect(0, 85, 1440, 815, { fill: "#f5f4f2" }) + gate(525, 300), enter: "fade" }
     },
     steps: [
       tabStep("Buka undangan klien di editor, tab NikahKit."),
-      { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(6, 566, 60, 46), note: "Bagikan", dur: 3.2 },
-      { caption: "Untuk pengantin: Kirim undangan dan Buka Dashboard.", mark: M(16, 615, 366, 80), lens: { src: [12, 588, 374, 136] }, dur: 3.4 },
-      { caption: "Buka Check-in muncul bila Undangan khusus dan QR masuk menyala.", mark: M(16, 468, 366, 106), lens: { src: [12, 464, 374, 114] }, dur: 3.8 },
-      { caption: "Klik Buka Dashboard: Kelola undangan terbuka di tab baru.", at: [199, 677], click: true, press: "buka", show: ["tab"], mark: M(16, 659, 366, 36),
+      { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(...BAGIKAN_TOOL), note: "Bagikan", dur: 3.2 },
+      { caption: "Untuk pengantin: Kirim undangan dan Buka Dashboard.", mark: M(16, COUPLE_Y + 24, 366, 80), lens: { src: [12, COUPLE_Y - 3, 374, 136] }, dur: 3.4 },
+      { caption: "Buka Check-in muncul bila Undangan khusus dan QR masuk menyala.", mark: M(16, ACC_Y - 5, 366, 106), lens: { src: [12, ACC_Y - 9, 374, 114] }, dur: 3.8 },
+      { caption: "Klik Buka Dashboard: Kelola undangan terbuka di tab baru.", at: [199, COUPLE_Y + 86], click: true, press: "buka", show: ["tab"], mark: M(...dashboardBox(COUPLE_Y)),
         note: "Buka Dashboard", dur: 3.4 },
       { caption: "Pengantin masuk dengan PIN dashboard.", focus: "none", mark: M(561, 448, 318, 44, 8), lens: { src: [541, 300, 358, 250], zoom: 1.4, at: [12, 180] }, dur: 3 }
     ]
@@ -732,7 +617,7 @@ export const scenes = {
   ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", landPreview("Rina WO"), LAND_HEAD.lens,
     "Pratinjau berubah menjadi Landing page.", ["Landing page dipasang. Tekan", "Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Klik Marketing. Profil merek harus berlabel Terisi."]),
-  "jualan-pasang-landing-terbit": pubScene("Menerbitkan Landing page", "Landing Rina WO", "Template", tplDone("landing"), landPreview("Rina WO"),
+  "jualan-pasang-landing-terbit": pubScene("Menerbitkan Landing page", "Landing Rina WO", "Template", mkPanel("landing"), landPreview("Rina WO"),
     ["Pratinjau sudah Landing page dengan nama bisnismu.", "Klik Simpan & Terbitkan, lalu buka alamat publiknya dari HP."], LAND_HEAD),
 
   "jualan-landing-page": {
@@ -823,7 +708,7 @@ export const scenes = {
       { caption: "Buka halaman Dashboard pasangan: NikahKit > Template > Marketing.", dur: 3.2 },
       { caption: "Ada versi baru: tulisannya Versi baru halaman tersedia.", dur: 3.6 }
     ]),
-  "jualan-perbarui-terbit": pubScene("Menerbitkan Landing page yang diperbarui", "Landing Rina WO", "Template", tplDone("landing"), landPreview("Rina WO"),
+  "jualan-perbarui-terbit": pubScene("Menerbitkan Landing page yang diperbarui", "Landing Rina WO", "Template", mkPanel("landing"), landPreview("Rina WO"),
     ["Pratinjau ikut berganti ke profil terbaru, misalnya nama bisnis.", "Klik Simpan & Terbitkan supaya klien melihat versi baru."], LAND_HEAD,
     landPreview("Rina Undangan")),
 
@@ -903,11 +788,11 @@ export const scenes = {
         M(331 - tw("Sudah diisi", 10, 500) - 12, ROW2 + 19, tw("Sudah diisi", 10, 500) + 12, 18, 9)], lens: { src: [12, 186, 374, 120] }, dur: 3.2 },
       { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, 182, 374, 70] }, dur: 3 },
       { caption: "Semua kolom terisi sesuai paketnya. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
-        mark: undoMark(DATA_TOAST), lens: { src: [84, 806, 302, 90] }, dur: 4 }
+        mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
   },
-  "jualan-pesanan-terbit": pubScene("Ganti foto, lalu terbitkan undangan", "Undangan Rani & Dimas", "Konten", kontenPanel, invite(RANI),
-    ["Foto tidak ikut terisi: ganti foto contoh di pratinjau.", "Lalu klik Simpan & Terbitkan."], { mark: M(833, 309, 178, 239, 12), note: "Foto contoh" }),
+  "jualan-pesanan-terbit": pubScene("Ganti foto, lalu terbitkan undangan", "Undangan Rani & Dimas", "Konten", kontenPanel, pvMempelai(RANI),
+    ["Foto tidak ikut terisi: ganti foto contoh di pratinjau.", "Lalu klik Simpan & Terbitkan."], { mark: M(852, 248, 140, 202, 12), note: "Foto contoh" }),
 
   "jualan-tempel-pesanan": {
     title: "Tempel data pesanan dari pesan WhatsApp",
@@ -928,7 +813,7 @@ export const scenes = {
       { caption: "Klik di kotak, tekan Ctrl+V (Windows) atau Cmd+V (Mac).", at: [200, 428], click: true, show: ["pasted", "isi"], mark: M(28, 381, 341, 95),
         lens: { src: [20, 372, 358, 160] }, dur: 3.4 },
       { caption: "Klik Isi undangan: panel pindah ke Konten, ada tombol Urungkan.", at: [70, 506], click: true, press: "isi", hide: ["inbox", "paste", "pasted", "isi"],
-        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: { src: [84, 806, 302, 90] }, dur: 4 }
+        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
   },
 
