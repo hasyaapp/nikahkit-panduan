@@ -1,19 +1,26 @@
 // Mulai + Gabung dan pasang: peta perjalanan, checklist per bagian, istilah alamat, pasang ekstensi, masuk, bayar, kode
 // uji, Scalev, update. Every scene is one 1440x900 desktop screen (lib v4). Chrome pages sit in a maximized Chrome window
 // (page from y 85, viewport 1440 x 815); the Scalev editor and app are drawn at their measured 1440 layout from y 85.
-// Measured: pasang.html at 1440 x 815 in headless Chromium (14 Okt 2026), chrome://extensions at 1440 (labels in Bahasa
-// Indonesia), the Scalev Landing Pages list and Settings tab (as in 02-scalev.mjs), the NikahKit account dialog from
+// Real screens come from ui/: the Scalev Landing Pages list, editor Settings and Security tabs (ui/scalev), the Template
+// and Konten panels (ui/editor-panels), Template > Marketing (ui/marketing), the invitation cover (ui/invitation), the
+// Bagikan and Pesanan masuk dialogs (ui/bagikan, ui/pesanan). Drawn here, measured: pasang.html at 1440 x 815 in headless
+// Chromium (14 Okt 2026), chrome://extensions at 1440 (labels in Bahasa Indonesia), the NikahKit account dialog from
 // pin.html + pin.js (440 or 760 wide, centred, max-height 100vh - 32px) and src/pin-frame.js (36 px close button 12 px
-// from the corner, backdrop rgba(15,23,42,.45)), the panel gate from nikahkit/src/ui/App.jsx, the update banner from
-// nikahkit/src/ui/help.jsx. No extension version numbers: the banner and the ZIP names keep their place, the number is
-// left out. Not measured (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows,
-// Windows Explorer, the Chrome download bubble, folder picker, extension menu and prompt box.
-import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, esc } from "../lib.mjs";
+// from the corner), the panel gate from nikahkit/src/ui/App.jsx, the update banner from nikahkit/src/ui/help.jsx. No
+// extension version numbers: the banner and the ZIP names keep their place, the number is left out. Not measured
+// (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows, Windows Explorer, the
+// Chrome download bubble, folder picker, extension menu and prompt box.
+import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, mid, grow } from "../lib.mjs";
 import {
-  CHROME_TOP, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSeg, nkHead, nkDialogHead, nkAcc, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
-  svMenuAt, favScalev, favChrome
+  CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
+  svMenuAt, favScalev, favChrome, ED, dim
 } from "../ui/kit.mjs";
-import { securityPanel } from "../ui/scalev.mjs";
+import { securityPanel, settingsPanel, slugText, SLUG as SLUG_BOX, SLUG_LENS, lpScreen, LP_ROWS, head, genericBody } from "../ui/scalev.mjs";
+import { templatePanel, cardAt, kList, panelBody, panelBg, seg, ACCOUNT } from "../ui/editor-panels.mjs";
+import { brandClosed, brandOpen, mkCards, BOX, MKY, CARD_X } from "../ui/marketing.mjs";
+import { pvCover, PHOTO_DEFS } from "../ui/invitation.mjs";
+import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
+import { ordersDlg, linkOpen, salinBtn, SALIN_W, pasteOpen } from "../ui/pesanan.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;
@@ -22,17 +29,13 @@ const BIZ = "Rina Wedding Organizer (@rinawo)";
 const LIC_NONE = ["Belum berlangganan. Pilih paket untuk mulai", "membuat undangan."];
 const LIC_YEAR = ["Paket Tahunan, aktif sampai 14 Oktober 2027."];
 const LIC_ON = { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true };
-const MAROON = "#8a2d1f", SERIF = "Georgia,'Times New Roman',serif";
+const PASANG_SERIF = "Gelica, Georgia, serif"; // pasang.html title font (measured)
 const BAR = "#e3e5e8";
 
 // ---- Small shared pieces --------------------------------------------------------------------------------------------
-// Mixed-weight text on one line: segs = [[text, weight?, fill?], ...].
-const rich = (x, y, segs, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.strong}">${segs.map(([s, w, f]) => `<tspan font-weight="${w ?? 400}"${f ? ` fill="${f}"` : ""}>${esc(s)}</tspan>`).join("")}</text>`;
-const mid = (r) => [r[0] + r[2] / 2, r[1] + r[3] / 2];
-const grow = (r, d) => [r[0] - d, r[1] - d, r[2] + 2 * d, r[3] + 2 * d];
 const bars = (x, y, ws, gap = 26, fill = BAR) => ws.map((w, k) => rect(x, y + k * gap, w, 10, { r: 5, fill })).join("");
 // Chrome: maximized window, its top strip alone (tab or address changes), the page viewport.
-const win = (o) => chrome(0, 0, W, 900, o);
+const win = (o) => PHOTO_DEFS + chrome(0, 0, W, 900, o);
 const crTop = (o) => clipped(0, 0, W, CT, chrome(0, 0, W, CT + 10, o));
 const vp = (svg) => clipped(0, CT, W, VIEW, svg);
 const urlBox = (url) => [164, 54, tw(url, 14) + 4, 18]; // the address text in the omnibox
@@ -42,16 +45,18 @@ const TAB1 = [84, 6, 240, 35], TAB2 = [332, 6, 240, 35]; // Chrome tab shapes (f
 // Editor (measured 1440 layout) in the Chrome page area.
 const LEFT = [0, CT + 44, 400, VIEW - 44]; // Scalev tab row + left area
 const TOP = [0, 0, W, CT + 92]; // Chrome top + Scalev top bar and tab row
-const TAB_NK_BOX = [228, CT + 56, 82, 20], TAB_NK = [264, CT + 66];
+const TAB_NK_BOX = [228, CT + 56, 82, 20], TAB_NK = [ED.tab.NikahKit[0], CT + ED.tab.NikahKit[1]];
+// Simpan + Simpan & Terbitkan together (editor at y 0).
+const SAVE_PAIR = [ED.simpanBox[0], ED.simpanBox[1], ED.terbitkanBox[0] + ED.terbitkanBox[2] - ED.simpanBox[0], ED.simpanBox[3]];
 const tabBox = (name, x, on, T = CT) => [x - 2, T + 57, tw(name, 12, on ? 700 : 500) + 4, 18];
-const editor = (tab = "Code", rail, name = "Tamu Undangan") => scalevEditor(0, CT, { tab, rail }) + coverAt(727, CT + 106, 922, name);
+const editor = (tab = "Code", rail) => scalevEditor(0, CT, { tab, rail }) + atY(CT, pvCover("Rani & Dimas"));
 // Google's four-colour G (App.jsx GOOGLE_G), size px square at (x, y).
 const gLogo = (x, y, size = 20) => `<g transform="translate(${x} ${y}) scale(${size / 48})"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></g>`;
 // "Masuk dengan Google" (.nk-gbtn: 40 high, #747775 border, 14px 500).
 const GBTN_W = 12 + 20 + 10 + tw("Masuk dengan Google", 14, 500) + 12;
 const gBtn = (x, y, o = {}) => group({ opacity: o.disabled ? 0.38 : 1 }, rect(x + 0.5, y + 0.5, GBTN_W - 1, 39, { r: 4, fill: C.white, stroke: "#747775" }) + gLogo(x + 12, y + 10) +
   text(x + 42, y + 25, "Masuk dengan Google", { size: 14, weight: 500, fill: "#1f1f1f" }));
-const DIM = rect(0, CT, W, VIEW, { fill: "rgba(15,23,42,.45)" }); // pin-frame backdrop over the page viewport
+const DIM = dim(0, CT, W, VIEW); // the NikahKit dialog backdrop over the page viewport
 const yesIc = (cx, cy) => circle(cx, cy, 7.5, { stroke: C.ok, sw: 1.7 }) + `<path d="M${cx - 3} ${cy} l2.2 2.2 l4 -4" fill="none" stroke="${C.ok}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>`;
 const noIc = (cx, cy) => circle(cx, cy, 7.5, { stroke: C.off, sw: 1.7 }) + `<path d="M${cx - 2.6} ${cy - 2.6} l5.2 5.2 M${cx + 2.6} ${cy - 2.6} l-5.2 5.2" fill="none" stroke="${C.off}" stroke-width="1.7" stroke-linecap="round"/>`;
 const PIN_ICON = '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>';
@@ -110,7 +115,7 @@ const PLAN_ROWS = [
   [["Masa aktif"], ["30 hari"], ["1 tahun"], ["Selama layanan", "Nikahin berjalan"]],
   [["Jumlah undangan"], ["Tanpa batas"], ["Tanpa batas"], ["Tanpa batas"]],
   [["Editor NikahKit di Scalev"], 1, 1, 1],
-  [[[["Buku Tamu Digital", 700, C.strong], [": RSVP, ucapan,"]], "check-in QR. Tanpa kuota tamu", "dan event"], 1, 1, 1],
+  [[[{ t: "Buku Tamu Digital", w: 700, fill: C.strong }, ": RSVP, ucapan,"], "check-in QR. Tanpa kuota tamu", "dan event"], 1, 1, 1],
   [["Akun staff penerima tamu (kode", "check-in, tanpa membagi PIN)"], 0, 1, 1],
   [["Impor daftar tamu CSV (kategori,", "jumlah orang, WhatsApp)"], 0, 1, 1],
   [["PIN dashboard dan tautan tamu"], 1, 1, 1],
@@ -139,7 +144,7 @@ function planDlg(X, Y, H) {
   PLAN_ROWS.forEach((r, i) => {
     rowY.push(y);
     body += line(tx + 1, y, tx + tw0 - 1, y);
-    r[0].forEach((l, k) => (body += Array.isArray(l) ? rich(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text }) : text(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text })));
+    r[0].forEach((l, k) => (body += Array.isArray(l) ? text(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text }) : text(tx + 12, y + 27 + 20 * k, l, { size: 14, fill: C.text })));
     r.slice(1).forEach((v, j) => (body += v === 1 ? yesIc(col(j) + 21, y + 22) : v === 0 ? noIc(col(j) + 21, y + 22) : para(col(j) + 12, y + 27, v, { size: 14, weight: 500, fill: C.strong, lh: 20 })));
     y += rowsH[i];
   });
@@ -157,7 +162,7 @@ function gate(ex, ey, o) {
     line(ex, ey + 158.5, ex + 399, ey + 158.5, { stroke: C.line }) + iconX("x", ex + 369, ey + 125, 18, C.text);
   if (o.chip) { const w = 6 + 16 + 4 + tw(o.chip, 12, 500) + 8, x = ex + 343 - w; s += rect(x + 0.5, ey + 111.5, w - 1, 27, { r: 14, fill: C.white, stroke: C.field }) + icon("circle-user-round", x + 14, ey + 125, 14, C.primary) + text(x + 26, ey + 129, o.chip, { size: 12, weight: 500 }); }
   const nh = 20 + o.lines.length * 18, ny = ey + 175;
-  s += rect(ex + 16, ny, 367, nh, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + o.lines.map((l, i) => rich(ex + 28, ny + 23 + i * 18, l, { size: 12, fill: o.warn ? C.warnStrong : C.strong })).join("");
+  s += rect(ex + 16, ny, 367, nh, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + o.lines.map((l, i) => text(ex + 28, ny + 23 + i * 18, l, { size: 12, fill: o.warn ? C.warnStrong : C.strong })).join("");
   const by = ny + nh + 12, at = {};
   let bx = ex + 16;
   for (const [label, v, key] of o.btns ?? []) {
@@ -166,61 +171,30 @@ function gate(ex, ey, o) {
   }
   return { svg: s, at };
 }
-const GATE_OUT = (ex, ey) => gate(ex, ey, { lines: [[["Masuk ke NikahKit.", 700]]], btns: [["Masuk dengan Google", "google", "google"]] });
-const GATE_NONE = (ex, ey) => gate(ex, ey, { chip: "Akun", lines: [[["Akun belum berlangganan.", 700]]], btns: [["Pilih paket", "primary", "choose"], ["Periksa lagi", "quiet", "recheck"]] });
-const GATE_BIZ = (ex, ey) => gate(ex, ey, { chip: "Tahunan", warn: true, lines: [[["Hubungkan bisnis Scalev dulu.", 700], [" Hubungkan di akun"]], [["NikahKit, lalu tekan Periksa lagi."]]], btns: [["Hubungkan bisnis Scalev", "primary", "connect"], ["Periksa lagi", "quiet", "recheck"]] });
+const GATE_OUT = (ex, ey) => gate(ex, ey, { lines: [[{ t: "Masuk ke NikahKit.", w: 700 }]], btns: [["Masuk dengan Google", "google", "google"]] });
+const GATE_NONE = (ex, ey) => gate(ex, ey, { chip: "Akun", lines: [[{ t: "Akun belum berlangganan.", w: 700 }]], btns: [["Pilih paket", "primary", "choose"], ["Periksa lagi", "quiet", "recheck"]] });
+const GATE_BIZ = (ex, ey) => gate(ex, ey, { chip: "Tahunan", warn: true, lines: [[{ t: "Hubungkan bisnis Scalev dulu.", w: 700 }, " Hubungkan di akun"], ["NikahKit, lalu tekan Periksa lagi."]], btns: [["Hubungkan bisnis Scalev", "primary", "connect"], ["Periksa lagi", "quiet", "recheck"]] });
 // The editor's NikahKit tab with a gate, over a Code-tab editor (tab row + left area).
 const gateEl = (g) => clipped(...LEFT, scalevEditor(0, CT, { tab: "NikahKit", rail: "" }) + g.svg);
 
-// Template panel (editor-template.png): rail, header with chip, optional update banner, Template/Marketing, cards. The
-// description as the card clamps it (two lines, same text as 03-editor-konten.mjs).
-const TPL = [["Dasar", "#3d3a38", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], ["Folio", "#2a2d33", ["Hitam & krem gaya", "majalah, foto penuh…"]],
-  ["Galeri Putih", "#f4f1ec", ["Putih bersih gaya", "majalah, huruf serif…"]], ["Modern Estetik", "#efe9e2", ["Putih & krem, bingkai", "lengkung, bayangan…"]]];
-function thumb(x, y, dark) {
-  const fg = dark === "#f4f1ec" || dark === "#efe9e2" ? "#7a6a5c" : "#e8e2da";
-  return rect(x + 0.5, y + 0.5, 133, 166, { r: 4, fill: C.page, stroke: C.line, sw: 2 }) + rect(x + 5, y + 5, 72, 157, { r: 2, fill: dark }) +
-    text(x + 41, y + 70, "Rani & Dimas", { size: 7, fill: fg, anchor: "middle", font: SERIF }) + rect(x + 26, y + 104, 30, 6, { r: 3, fill: fg }) +
-    [0, 1, 2, 3, 4, 5, 6, 7].map((k) => rect(x + 83 + (k % 2) * 23, y + 6 + Math.floor(k / 2) * 39, 20, 35, { r: 1, fill: k % 3 ? "#ffffff" : "#ded6cc" })).join("");
-}
-const panelHead = (ex, ey, title) => rect(ex + 72, ey + 92, 327, 808, { fill: C.white }) + nkHead(ex, ey, title, { account: "Tahunan" }) + line(ex + 72, ey + 153.5, ex + 399, ey + 153.5, { stroke: C.line });
-function templatePanel(ex, ey, o = {}) {
-  let s = panelHead(ex, ey, "Template");
-  let y = ey + 169;
-  if (o.banner) y += 112 + (o.hint ? 36 : 0);
-  s += nkSeg(ex + 88, y, 279, ["Template", "Marketing"], 0);
-  TPL.forEach(([n, bg, desc], i) => {
-    const x = ex + 88 + (i % 2) * 146, cy = y + 50 + Math.floor(i / 2) * 241;
-    s += thumb(x, cy, bg) + text(x, cy + 188, n, { size: 14, weight: 500 }) + para(x, cy + 209, desc, { size: 12, fill: C.faint, lh: 16 });
-  });
-  return clipped(ex, ey + 92, 399, 808, s);
-}
-const TPL_CARD = [88, 219, 134, 167]; // first template card (Dasar), editor at 0,0
-// Template > Marketing (panels-style.jsx, marketing.js): Profil merek box, then the two page cards.
-const MKT = [[["Dashboard", "pasangan"], ["Kirim undangan, RSVP,", "ucapan, dan check-in", "tamu dalam satu", "halaman."]],
-  [["Landing page"], ["Halaman jualan:", "desain, paket dan", "harga, lalu form", "pesanan yang masuk", "ke Pesanan masuk", "Anda."]]];
-function marketing(ex, ey, o = {}) {
-  let s = panelHead(ex, ey, "Template") + nkSeg(ex + 88, ey + 169, 279, ["Template", "Marketing"], 1), y = ey + 217;
-  if (o.open) {
-    const f = (yy, label, value, hint, ph) => nkLabel(ex + 104, yy, label) + nkInput(ex + 104, yy + 8, 247, value, { placeholder: ph }) + (hint ? para(ex + 104, yy + 62, hint, { size: 12, fill: C.faint, lh: 16 }) : "");
-    s += rect(ex + 88.5, y + 0.5, 278, 380, { r: 4, fill: C.white, stroke: C.line }) + nkAcc(ex + 88, y, 279, "Profil merek", { open: true, badge: "Terisi" }) +
-      f(y + 76, "Nama bisnis", "Rina WO") + f(y + 140, "Nomor WhatsApp", "0812 3456 7890", ["Tombol Tanya lewat WhatsApp di Landing", "page menuju nomor ini."]) +
-      f(y + 240, "Logo (opsional)", "https://", ["Alamat gambar https, misalnya dari", "Media Scalev Anda."], true);
-    y += 392;
-  } else { s += nkAcc(ex + 88, y, 279, "Profil merek", { badge: "Terisi" }); y += 62; }
-  MKT.forEach(([name, desc], i) => {
-    const x = ex + 88 + i * 146;
-    s += rect(x + 0.5, y + 0.5, 133, 166, { r: 4, fill: C.page, stroke: C.line, sw: 2 }) + rect(x + 40, y + 12, 54, 143, { r: 6, fill: C.white, stroke: C.field }) + bars(x + 48, y + 30, [38, 26, 34, 20], 22, C.mutedBg) +
-      para(x, y + 188, name, { size: 14, weight: 500, fill: C.strong, lh: 18 }) + para(x, y + 191 + 18 * name.length, desc, { size: 12, fill: C.faint, lh: 16 });
-  });
-  return clipped(ex, ey + 92, 399, 808, s);
-}
-// Konten panel: accordion groups (fields.js GROUPS labels).
-const konten = (ex, ey) => clipped(ex, ey + 92, 399, 808, panelHead(ex, ey, "Konten") + nkAcc(ex + 88, ey + 169, 279, "Sampul", { badge: "Terisi" }) +
-  nkAcc(ex + 88, ey + 227, 279, "Mempelai", { badge: "Terisi" }) + nkAcc(ex + 88, ey + 285, 279, "Acara & Tanggal", { badge: "Belum diisi" }));
+// NikahKit panels with the editor at 0,0 (atY moves them into the Chrome page): the Template panel (ui/editor-panels,
+// with the update banner above the switch when o.banner), the Marketing side of Template, the Konten list.
+const atY = (y, svg) => group({ transform: `translate(0 ${y})` }, svg);
+const panelShell = (title) => rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, title, { account: ACCOUNT });
+const tplPanel = (o = {}) => nkRail(0, 0, "Template") + panelShell("Template") +
+  panelBody(o.banner ? atY(BANNER_H + (o.hint ? 36 : 0), templatePanel()) : templatePanel()) + (o.banner ? updateBanner(o) : "");
+const TPL_CARD = [...cardAt(0, 337), 134, 167]; // first template card (Dasar)
+// Template > Marketing (ui/marketing): Profil merek closed + the two page cards, or Profil merek open and filled.
+const marketing = (o = {}) => panelShell("Template") + panelBody(panelBg(), seg("marketing"),
+  o.open ? brandOpen({ name: "Rina WO", wa: "0812 3456 7890", ready: true }) : brandClosed(BOX) + mkCards(MKY));
+// Konten panel: the group list (Acara & Tanggal not filled yet); KONTEN.at = each group bar's y.
+const KONTEN = kList({ todo: ["Acara & Tanggal"] });
+const kontenP = () => panelShell("Konten") + KONTEN.svg;
+const KONTEN_TOP3 = [88, KONTEN.at.Sampul, 279, KONTEN.at["Acara & Tanggal"] + 50 - KONTEN.at.Sampul];
 // Update banner (help.jsx UpdateBox, nk-note--warn at 88,169 279 wide). Version numbers are left out on purpose.
-const BANNER = (ey) => [88, ey + 169, 279, 100];
-function updateBanner(ex, ey, o = {}) {
-  const x = ex + 88, y = ey + 169, h = 100 + (o.hint ? 36 : 0);
+const BANNER_H = 112, BANNER = (ey) => [88, ey + 169, 279, 100];
+function updateBanner(o = {}) {
+  const x = 88, y = 169, h = 100 + (o.hint ? 36 : 0);
   const bar = (bx, by, w) => rect(bx, by - 9, w, 11, { r: 3, fill: "rgba(154,52,18,.22)" });
   const w1 = tw("NikahKit ", 12, 700);
   let s = rect(x, y, 279, h, { r: 4, fill: C.warnSoft }) + text(x + 12, y + 23, "NikahKit", { size: 12, weight: 700, fill: C.warnStrong }) + bar(x + 12 + w1, y + 23, 34) +
@@ -230,45 +204,10 @@ function updateBanner(ex, ey, o = {}) {
   if (o.hint) s += para(x + 12, y + 110, ["Ekstrak ZIP, timpa isi folder NikahKit, lalu", "klik ↻ di chrome://extensions."], { size: 12, fill: C.faint, lh: 16 });
   return s;
 }
-// The panel after access is granted: rail + Template panel (+ banner).
-const nkOpen = (ey, o = {}) => rect(0, ey + 92, 400, 808, { fill: C.white }) + nkRail(0, ey, "Template") + templatePanel(0, ey, o) + (o.banner ? updateBanner(0, ey, o) : "");
-// Bagikan dialog (editor-bagikan.png, as in 02-scalev.mjs), guest "Andi".
-const SHARE_VIEW = (y) => [16, y + 325, 366, 36];
-const shareDlg = (y) => nkDialogHead(0, y, "Bagikan") + nkLabel(16, y + 181, "Nama tamu") + nkInput(16, y + 189, 366, "Andi") + nkHint(16, y + 245, "Ditambahkan sebagai ?to=Nama.") +
-  rect(16, y + 261, 366, 52, { r: 4, fill: C.mutedBg }) + para(26, y + 282, [`https://tokomu.myscalev.com/${SLUG}?`, "to=Andi"], { size: 12, fill: C.strong, lh: 18 }) +
-  nkBtn(16, y + 325, "Lihat sebagai tamu", { w: 366, size: 14, icon: "eye" }) + nkBtn(16, y + 369, "Salin tautan tamu", { w: 366, size: 14, variant: "ghost", icon: "copy" }) +
-  nkBtn(16, y + 413, "Salin tautan umum", { w: 366, size: 14, variant: "quiet", icon: "link" });
-// Pesanan masuk dialog (orders.jsx): empty list, "Tempel data pesanan" and "Link form klien (opsional)" boxes.
-function ordersDlg(x, y, o = {}) {
-  let s = nkDialogHead(x, y, "Pesanan masuk") + text(x + 16, y + 180, "Belum ada pesanan masuk.", { size: 12, fill: C.faint }), yy = y + 196;
-  if (o.paste) {
-    s += rect(x + 16.5, yy + 0.5, 366, 210, { r: 4, fill: C.white, stroke: C.line }) + nkAcc(x + 16, yy, 367, "Tempel data pesanan", { open: true }) +
-      rect(x + 32.5, yy + 62.5, 334, 95, { r: 4, fill: C.white, stroke: C.field }) +
-      para(x + 44, yy + 86, ["Halo Rina WO, ini data undangan kami.", "Rani & Dimas, 14 Februari 2027.", "#data-undangan {\"v\":1,…}"], { size: 13, fill: C.strong, lh: 20 }) + nkBtn(x + 32, yy + 166, "Isi undangan");
-    yy += 222;
-  } else { s += nkAcc(x + 16, yy, 367, "Tempel data pesanan"); yy += 58; }
-  if (o.link) s += rect(x + 16.5, yy + 0.5, 366, 156, { r: 4, fill: C.white, stroke: C.line }) + nkAcc(x + 16, yy, 367, "Link form klien (opsional)", { open: true }) +
-    para(x + 32, yy + 78, ["Kirim ke klien bila ingin mereka mengisi sendiri.", "Isian mereka muncul di daftar ini."], { size: 12, fill: C.faint, lh: 16 }) +
-    nkBtn(x + 32, yy + 106, "Salin link form", { variant: "quiet", icon: "copy", w: tw("Salin link form", 12, 500) + 44 });
-  else s += nkAcc(x + 16, yy, 367, "Link form klien (opsional)");
-  return s;
-}
-
-// Invitation cover in the plain preview screen (template look from editor-template.png).
-function coverAt(X, Y, cx, name) {
-  const wave = (yy) => `<path d="M${X} ${yy} h390 v24 ${Array.from({ length: 8 }, () => "q-24.4 16 -48.75 0").join(" ")} z" fill="${MAROON}"/>`;
-  return rect(X, Y, 390, 784, { fill: "#fdf6ee" }) + rect(X, Y, 390, 22, { fill: MAROON }) + wave(Y + 22) +
-    `<path d="M${cx - 70} ${Y + 294} v-120 a70 70 0 0 1 140 0 v120 z" fill="#c9b8a6" stroke="${MAROON}" stroke-width="2"/>` +
-    `<path d="M${cx - 68} ${Y + 292} l40 -60 l25 30 l30 -45 l41 75 z" fill="#a8927e"/>` + circle(cx + 30, Y + 160, 12, { fill: "#e9dccd" }) +
-    text(cx, Y + 326, "The Wedding Of", { size: 17, fill: "#2b1a07", anchor: "middle", font: SERIF }) +
-    text(cx, Y + 398, "Rani & Dimas", { size: 44, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
-    text(cx, Y + 450, "Minggu, 14 Februari 2027", { size: 15, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
-    text(cx, Y + 471, "#RaniDimas", { size: 13, fill: "#3a3a3a", anchor: "middle", font: SERIF }) +
-    text(cx, Y + 506, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, weight: 700, fill: "#1f1f1f", anchor: "middle", font: SERIF }) +
-    rect(cx - 120, Y + 512, 240, 30, { fill: "#fdf6ee" }) + text(cx, Y + 535, name, { size: 18, fill: MAROON, anchor: "middle", font: SERIF }) +
-    rect(cx - 86, Y + 567, 172, 48, { r: 24, fill: MAROON }) + icon("mail", cx - 58, Y + 591, 16, C.white) + text(cx + 12, Y + 596, "Buka Undangan", { size: 15, fill: C.white, anchor: "middle", font: SERIF }) +
-    `<path d="M${X} ${Y + 784} v-24 ${Array.from({ length: 8 }, () => "q24.4 -16 48.75 0").join(" ")} v24 z" fill="${MAROON}"/>`;
-}
+// The panel after access is granted (rail + Template panel, optional banner), editor at y ey.
+const nkOpen = (ey, o = {}) => atY(ey, rect(0, 92, 400, 808, { fill: C.white }) + tplPanel(o));
+// Bagikan dialog (ui/bagikan) for guest "Andi"; Pesanan masuk dialog (ui/pesanan).
+const shareDlg = shareTop(NO_NOTE, { name: "Andi", page: SLUG }) + shareBtns(NO_NOTE);
 
 // ---- chrome://extensions (measured from chrome-extensions.png at 1440 wide) -------------------------------------------
 const DEV_BTNS = ["Muat yang belum dibuka", "Kemas ekstensi", "Perbarui"];
@@ -319,60 +258,11 @@ const NK_FILES = ["manifest.json", "nk-bg.js", "pin.html", "nk-bridge.js"];
 const DOC_FOLDERS = ["Faktur", "NikahKit", "Foto klien"];
 
 // ---- Scalev pages ---------------------------------------------------------------------------------------------------
-// Landing Pages (scalev-pages.png, 1440 layout as in 02-scalev.mjs), page top y; rows of HTML Mode pages.
-const SV = { blue: "#3b8fd0", link: "#2f86d1", ink: "#1f2d3d", sub: "#6b7480", line: "#e5e8ec", bg: "#f8f9fb", soft: "#e6f2fb" };
-const LP_ROWS = [[PAGE, "/" + SLUG], ["Promo Rina WO", "/promo"], ["Contoh Undangan", "/contoh"]];
-const svCheck = (x, y) => rect(x + 0.5, y + 0.5, 17, 17, { r: 3, fill: C.white, stroke: "#b8c0ca" });
-function lpPage(y) {
-  let s = rect(256, y, 1184, 900, { fill: SV.bg }) + rect(256, y, 1184, 137, { fill: C.white }) + line(256, y + 137.5, 1440, y + 137.5, { stroke: SV.line }) +
-    text(280, y + 36, "Landing Pages", { size: 18, weight: 600, fill: SV.ink }) + line(280, y + 58.5, 1400, y + 58.5, { stroke: SV.line }) +
-    rect(280, y + 78, 173, 40, { r: 4, fill: SV.blue }) + text(366.5, y + 103, "+ Create Landing Page", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
-    iconX("search", 1203, y + 97, 15, SV.sub) + text(1223, y + 103, "Cari landing page...", { size: 13, fill: "#a6adb7" }) +
-    rect(280.5, y + 244.5, 1119, 655, { r: 6, fill: C.white, stroke: SV.line }) + line(520.5, y + 244, 520.5, y + 900, { stroke: SV.line }) +
-    text(297, y + 275, "Folders", { size: 14, weight: 600, fill: SV.ink }) + para(297, y + 294, ["Kelompokkan landing page per", "campaign, produk, atau klien."], { size: 11, fill: SV.sub, lh: 16 }) +
-    rect(297, y + 328, 207, 36, { r: 4, fill: "#eef6fc" }) + icon("layout-grid", 316, y + 346, 15, SV.blue) + text(335, y + 351, "All Landing Pages", { size: 14, weight: 500, fill: SV.link }) + text(498, y + 351, String(LP_ROWS.length), { size: 12, fill: SV.link, anchor: "end" }) +
-    text(537, y + 273, "All Landing Pages", { size: 14, weight: 600, fill: SV.ink }) + text(667, y + 273, String(LP_ROWS.length), { size: 12, fill: SV.sub }) +
-    rect(521, y + 293, 879, 38, { fill: "#f6f8fa" }) + svCheck(537, y + 303) +
-    [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].map(([l, x]) => text(x, y + 316, l, { size: 12, fill: SV.sub })).join("");
-  LP_ROWS.forEach(([name, slug], i) => {
-    const ry = y + 331 + i * 71;
-    s += line(521, ry + 70.5, 1400, ry + 70.5, { stroke: SV.line }) + svCheck(537, ry + 27) +
-      text(585, ry + 41, name, { size: 14, weight: 500, fill: SV.link }) + rect(787, ry + 24, 92, 24, { r: 4, fill: "#f3f4f6" }) + iconX("file-text", 800, ry + 36, 12, SV.sub) + text(812, ry + 40, "Ungrouped", { size: 12, fill: "#3b4350" }) +
-      text(925, ry + 41, slug, { size: 14, fill: SV.link }) + rect(1125, ry + 22, 83, 28, { r: 3, fill: SV.soft }) + text(1166.5, ry + 40, "HTML Mode", { size: 12, weight: 700, fill: SV.blue, anchor: "middle" }) +
-      text(1245, ry + 41, "-", { size: 14, fill: SV.sub }) + [0, 1, 2].map((k) => circle(1364 + k * 7, ry + 36, 2.2, { fill: "#3b4350" })).join("");
-  });
-  return s;
-}
-const LP_NAME = (y) => [585, y + 358, tw(PAGE, 14, 500), 18]; // first row's page name
+// Landing Pages list and the editor Settings tab come from ui/scalev (editor or dashboard at 0,0).
+const LP_NAME = (y) => [585, y + 358, tw(LP_ROWS[0][0], 14, 500), 18]; // first row's page name
 const LP_ALL = (y) => [297, y + 328, 207, 36];
-// Scalev editor Settings tab (measured 14 Okt 2026, as in 02-scalev.mjs): header row, Domain / URL open with the slug.
-const lu = (paths, cx, cy, size, color) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</g>`;
-const ACC = [["DOMAIN / URL", '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>'],
-  ["SEO & PAGE IDENTITY", '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'], ["ANALYTICS SETTINGS", '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>'],
-  ["PAGE MANAGEMENT", '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
-  ["ADVANCED SETTINGS", '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>']];
-const acc = (y, i, h = 0) => rect(17, y + 1, 364, (h || 60) - 2, { r: 8, fill: C.white, stroke: "#e8ebef", sw: 2 }) + rect(18, y + 2, 362, h ? 58 : 56, { r: 6, fill: h ? "#eef2f6" : "#f3f5f7" }) +
-  rect(30, y + 14, 32, 32, { r: 8, fill: "#0b9bd3" }) + lu(ACC[i][1], 46, y + 30, 16, C.white) +
-  text(72, y + 35, ACC[i][0], { size: 12, weight: 700, fill: "#344157" }).replace("<text", '<text letter-spacing="0.96"') + icon(h ? "chevron-up" : "chevron-down", 359, y + 30, 14, "#7c899b");
-const svField = (x, y, w, h = 42) => rect(x + 1, y + 1, w - 2, h - 2, { r: 4, fill: "#f6f9fc", stroke: "#dbdfe5", sw: 2 });
-const svLabel = (x, y, s) => text(x, y, s, { size: 12, weight: 500, fill: "#5b6675" });
-function settingsPanel(T) {
-  let s = rect(0, T + 93, 399, 807, { fill: C.white }) + rect(16, T + 112, 49, 20, { r: 4, fill: "#f3f5f7" }) + text(40.5, T + 126, "ver. 37", { size: 12, weight: 500, fill: "#5b6675", anchor: "middle" }) +
-    text(73, T + 127, "Diterbitkan", { size: 14, weight: 500, fill: "#15c15d" }) + text(149, T + 127, "14/10/2026", { size: 14, fill: C.strong }) +
-    rect(240, T + 105, 126, 34, { r: 4, fill: C.white, stroke: "#e8ebef", sw: 2 }) + text(303, T + 126, "Batalkan Penerbitan", { size: 12, weight: 500, fill: "#df0e03", anchor: "middle" }) +
-    line(0, T + 153.5, 399, T + 153.5, { stroke: "#dbdfe5" });
-  let y = T + 170;
-  ACC.forEach((_, i) => {
-    if (i === 0) {
-      s += acc(y, 0, 351) + svLabel(34, T + 259, "Slug URL") + text(88, T + 259, "*", { size: 12, weight: 500, fill: "#f14756" }) + svField(34, T + 274, 330) + text(48, T + 300, SLUG, { size: 14, fill: "#0f161e" }) +
-        svLabel(34, T + 368, "Set as Homepage to Domains") + svField(34, T + 383, 330, 43) + text(48, T + 409, "Select Domain", { size: 14, fill: "#8d97a3" }) +
-        svLabel(34, T + 455, "Limit to Domains") + svField(34, T + 470, 330, 43) + text(48, T + 496, "Select Custom Domain", { size: 14, fill: "#8d97a3" });
-      y += 367;
-    } else { s += acc(y, i); y += 76; }
-  });
-  return s;
-}
-const SLUG_FIELD = (T) => [34, T + 274, 330, 42];
+const SLUG_FIELD = (T) => [SLUG_BOX[0], T + SLUG_BOX[1], SLUG_BOX[2], SLUG_BOX[3]];
+const settingsP = () => settingsPanel({}) + slugText(SLUG);
 // Scalev PayLink invoice page (nikahin.myscalev.com/pay/…, labels as seen live), Tahunan Rp299.000, in the viewport.
 const PAY = { x: W / 2 - 250, w: 500 }, PAY_BTN = [PAY.x + 24, CT + 500, PAY.w - 48, 48], PAY_CARD = [PAY.x, CT + 30, PAY.w, 560];
 const payPage = () => {
@@ -448,9 +338,9 @@ function scanScreen(x, y) {
 // pv(svg, sx, sy, mark, o): svg in its own coordinates, its point (sx, sy) lands on the pane's inner top-left.
 const PANE = { x: 600, y: 40, w: 800, h: 820, pad: 16 };
 const pv = (svg, sx, sy, mark, o = {}) => ({ svg, sx, sy, mark, r: o.r ?? 4, more: o.more ?? [], lens: o.lens ?? grow(mark, 24), lensAt: o.lensAt });
-function checklist(title, head, sub, rows) {
+function checklist(title, heading, sub, rows) {
   const x = 40, w = 520, y0 = 150, n = rows.length, RH = Math.min(96, Math.floor((860 - y0) / n)), bh = RH - 12;
-  const base = [rect(0, 0, W, 900, { fill: "#f7f3ef" }), text(x, 78, head, { size: 34, weight: 700, fill: C.cocoa }), text(x, 114, sub, { size: 18, fill: "#6f675f" }),
+  const base = [PHOTO_DEFS, rect(0, 0, W, 900, { fill: "#f7f3ef" }), text(x, 78, heading, { size: 34, weight: 700, fill: C.cocoa }), text(x, 114, sub, { size: 18, fill: "#6f675f" }),
     rect(PANE.x + 3, PANE.y + 6, PANE.w, PANE.h, { r: 12, fill: "rgba(43,26,7,.08)" }), rect(PANE.x, PANE.y, PANE.w, PANE.h, { r: 12, fill: C.svPreview, stroke: "#e6dcd3" })];
   const els = {}, steps = [];
   const ox = PANE.x + PANE.pad, oy = PANE.y + PANE.pad;
@@ -488,7 +378,7 @@ const PV = {
     -74, -60, SEL(214, 150), { lens: [184, 130, 400, 128] }),
   plans: () => { const t = planDlg(0, 0, 788); return pv(t.svg, 4, 0, [t.col(1), t.t0, t.pc, 170], { r: 4, lens: [t.col(0), t.t0, 3 * t.pc, 168] }); },
   gate: (g, key) => pv(edLeft(g.svg, { tab: "NikahKit", rail: "", top: 44 }), -184, 44, g.at[key], { lens: [0, 44, 400, 240] }),
-  template: () => pv(edLeft(templatePanel(0, 0)), -184, 92, TPL_CARD, { lens: [80, 208, 300, 248] })
+  template: () => pv(edLeft(tplPanel()), -184, 92, TPL_CARD, { lens: [80, 329, 150, 241] })
 };
 
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
@@ -500,9 +390,9 @@ export const scenes = {
     ["3. Scalev: hubungkan bisnis", "Scalev: hubungkan bisnismu, buat halaman dengan HTML Mode.", pv(lpRowCard(0, 0), -180, -200, [0, 10, 408, 121], { r: 8, lens: [-8, 2, 424, 137] })],
     ["4. Buat undangan: template, Konten", "Buat undangan: pilih template, isi Konten, lalu Simpan.", PV.template()],
     ["5. Serahkan: tautan, Dashboard, PIN", "Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { more: [[PIN_MSG_IC]], lens: [0, 8, 408, 104] })],
-    ["6. Tamu: tautan pribadi, RSVP", "Tamu membuka undangan lewat tautan pribadi berisi namanya.", pv(coverAt(0, 0, 195, "Andi"), -189, 0, [75, 512, 240, 30], { lens: [30, 486, 330, 66] })],
+    ["6. Tamu: tautan pribadi, RSVP", "Tamu membuka undangan lewat tautan pribadi berisi namanya.", pv(pvCover("Rani & Dimas", { guest: "Andi" }), 538, 106, [802, 619, 240, 26], { lens: [762, 596, 320, 54] })],
     ["7. Hari-H: check-in tamu", "Hari-H: tamu dicatat lewat check-in di Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })],
-    ["8. Jualan: landing page, pesanan", "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", pv(clipped(0, 92, 399, 808, ordersDlg(0, 0)), -184, 92, [16, 196, 367, 50], { lens: [0, 100, 399, 210] })]
+    ["8. Jualan: landing page, pesanan", "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", pv(clipped(0, 92, 399, 808, ordersDlg), -184, 92, [16, 189, 366, 114], { lens: [8, 162, 382, 149] })]
   ]),
 
   // /mulai/alur-lengkap, one checklist per Bagian; rows = the page's step titles.
@@ -517,62 +407,62 @@ export const scenes = {
   ]),
   "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 7 sampai 10.", [
     ["7. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
-      pv(scalevApp(0, 0, { active: "Landing Pages" }) + lpPage(0), 276, 220, LP_ALL(0), { lens: [281, 256, 500, 148] })],
+      pv(lpScreen(), 276, 220, LP_ALL(0), { lens: [281, 256, 500, 148] })],
     ["8. Buat halaman undangan dengan HTML Mode", "Buat Landing Page HTML Mode, isi slug di Settings, lalu Simpan.",
-      pv(edLeft(settingsPanel(0), { tab: "Settings", top: 44 }), -184, 44, SLUG_FIELD(0), { lens: [16, 240, 368, 90] })],
+      pv(edLeft(settingsP(), { tab: "Settings", top: 44 }), -184, 44, SLUG_FIELD(0), { lens: SLUG_LENS.src })],
     ["9. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
-      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1193, 50, 241, 34], { lens: [1183, 45, 257, 44] })],
+      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + pvCover("Rani & Dimas"), 672, 0, SAVE_PAIR, { lens: grow(SAVE_PAIR, 5) })],
     ["10. Atur alamat dan izin domain", "Atur alamat di Settings dan izin domain di tab Security.",
       pv(edLeft(securityPanel(0, { at: "connect" }), { tab: "Security", rail: "", top: 44 }), -184, 44, [107, 57, 169 + tw("Settings", 12, 500) + 2 - 107, 18], { lens: [0, 44, 340, 48] })]
   ]),
   "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 11 sampai 15.", [
-    ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
+    ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(tplPanel()), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
     ["12. Pilih template", "Pilih template di panel Template.", PV.template()],
-    ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(konten(0, 0), { rail: "Konten" }), -184, 92, [88, 169, 279, 166], { lens: [80, 160, 296, 182] })],
-    ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
+    ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(kontenP(), { rail: "Konten" }), -184, 92, KONTEN_TOP3, { lens: grow(KONTEN_TOP3, 8) })],
+    ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(tplPanel()), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
     ["15. Simpan & Terbitkan", "Tekan Simpan & Terbitkan supaya tamu melihat versi terbaru.",
-      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1283, 50, 151, 34], { lens: [1183, 45, 257, 44] })]
+      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + pvCover("Rani & Dimas"), 672, 0, ED.terbitkanBox, { lens: grow(SAVE_PAIR, 5) })]
   ]),
   "mulai-alur-serahkan": checklist("Bagian 4: bagikan dan serahkan", "Bagian 4: Bagikan dan serahkan", "Langkah 16 sampai 20.", [
-    ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg(0)), -184, 92, SHARE_VIEW(0), { lens: [8, 166, 384, 204] })],
+    ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg), -184, 92, shareBox("lihat", NO_NOTE), { lens: [8, 166, 384, 204] })],
     ["17. Pasang Dashboard pasangan milikmu (sekali saja)", "Template > Marketing: pasang Dashboard pasangan, sekali saja.",
-      pv(edLeft(marketing(0, 0)), -184, 92, [88, 279, 134, 167], { lens: [80, 271, 150, 291] })],
+      pv(edLeft(marketing()), -184, 92, [CARD_X.dashboard, MKY, 134, 167], { lens: [CARD_X.dashboard - 8, MKY - 8, 150, 245] })],
     ["18. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 8, 408, 104] })],
     ["19. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 58, 408, 148] })],
     ["20. Siapkan hari-H (opsional)", "Hari-H: tamu di-check-in dari Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })]
   ]),
   "mulai-alur-jualan": checklist("Bagian 5: jualan", "Bagian 5: Jualan", "Langkah 21 sampai 24.", [
-    ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing(0, 0, { open: true })), -184, 92, [88, 217, 279, 380], { lens: [96, 274, 263, 135] })],
-    ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing(0, 0)), -184, 92, [234, 279, 134, 167], { lens: [226, 270, 150, 312] })],
+    ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
+    ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing()), -184, 92, [CARD_X.landing, MKY, 134, 167], { lens: [CARD_X.landing - 8, MKY - 8, 150, 245] })],
     ["23. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
-      pv(clipped(0, 92, 399, 808, ordersDlg(0, 0, { link: true })), -184, 92, [32, 360, tw("Salin link form", 12, 500) + 44, 36], { lens: [16, 254, 367, 160] })],
+      pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, [28, 534, SALIN_W, 36], { lens: [8, 369, 382, 217] })],
     ["24. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
-      pv(clipped(0, 92, 399, 808, ordersDlg(0, 0, { paste: true })), -184, 92, nkBtnBox(32, 362, "Isi undangan"), { lens: [16, 196, 367, 214] })]
+      pv(clipped(0, 92, 399, 808, ordersDlg + pasteOpen(true)), -184, 92, nkBtnBox(28, 488, "Isi undangan"), { lens: [20, 373, 358, 160] })]
   ]),
 
   // Istilah: ID undangan (address bar), slug (Settings), tab NikahKit, then the terms (guide card over the preview).
   "mulai-istilah-alamat": (() => {
     const urlX = 166 + tw("app.scalev.com/pages/", 14), idBox = [urlX - 2, 54, tw(ID, 14) + 4, 18];
-    const nk = clipped(...LEFT, scalevEditor(0, CT, { tab: "NikahKit", rail: "Template" }) + templatePanel(0, CT));
+    const nk = clipped(...LEFT, scalevEditor(0, CT, { tab: "NikahKit", rail: "Template" }) + atY(CT, tplPanel()));
     const CARD = [452, CT + 120, 960, 360], cx = CARD[0] + 28, cy = CARD[1];
     const terms = guideCard(...CARD, "Alamat umum: domain atau subdomain, lalu slug") + text(cx, cy + 86, "https://tokomu.myscalev.com/" + SLUG, { size: 26, fill: C.cocoa }) +
       text(cx, cy + 138, "Tautan pribadi: alamat umum ditambah ?to=Nama", { size: 22, weight: 700, fill: C.accent }) +
-      rich(cx, cy + 178, [["https://tokomu.myscalev.com/" + SLUG], ["?to=Andi", 700, C.accent]], { size: 26, fill: C.cocoa });
+      text(cx, cy + 178, ["https://tokomu.myscalev.com/" + SLUG, { t: "?to=Andi", w: 700, fill: C.accent }], { size: 26, fill: C.cocoa });
     const keys = text(cx, cy + 236, "Untuk masuk Dashboard pasangan", { size: 22, weight: 700, fill: C.accent }) +
-      rich(cx, cy + 276, [["PIN dashboard", 700], [": pasangan, pemilik undangan"]], { size: 22, fill: C.cocoa }) +
-      rich(cx, cy + 312, [["Kode staff", 700], [": penerima tamu, khusus Tahunan dan Sekali Bayar"]], { size: 22, fill: C.cocoa });
+      text(cx, cy + 276, [{ t: "PIN dashboard", w: 700 }, ": pasangan, pemilik undangan"], { size: 22, fill: C.cocoa }) +
+      text(cx, cy + 312, [{ t: "Kode staff", w: 700 }, ": penerima tamu, khusus Tahunan dan Sekali Bayar"], { size: 22, fill: C.cocoa });
     return {
       title: "ID undangan, slug, alamat, dan tautan pribadi",
       base: [win({ tabs: [TAB_ED], url: URL }), editor("Code")],
       els: {
-        settings: { svg: clipped(...LEFT, scalevEditor(0, CT, { tab: "Settings" }) + settingsPanel(CT)), enter: "fade" },
+        settings: { svg: clipped(...LEFT, scalevEditor(0, CT, { tab: "Settings" }) + atY(CT, settingsP())), enter: "fade" },
         nk: { svg: nk, enter: "fade", skel: true },
         terms: { svg: terms, enter: "pop", origin: mid(CARD) }, keys
       },
       steps: [
         { caption: "Buka halaman di editor Scalev. Angka di alamat adalah ID undangan.", focus: [TOOLBAR], at: mid(idBox), mark: { box: idBox, r: 3 }, lens: { src: [130, 46, 330, 36] }, dur: 3.6 },
-        { caption: "Klik tab Settings di editor Scalev.", focus: [LEFT], at: [191, CT + 66], click: true, show: ["settings"], mark: tabBox("Settings", 169, false), lens: { src: [0, CT + 44, 330, 48] } },
-        { caption: "Kolom Slug URL berisi slug, bagian akhir alamat: rani-dimas.", mark: SLUG_FIELD(CT), lens: { src: [16, CT + 240, 368, 90] }, dur: 3.6 },
+        { caption: "Klik tab Settings di editor Scalev.", focus: [LEFT], at: [ED.tab.Settings[0], CT + ED.tab.Settings[1]], click: true, show: ["settings"], mark: tabBox("Settings", 169, false), lens: { src: [0, CT + 44, 330, 48] } },
+        { caption: "Kolom Slug URL berisi slug, bagian akhir alamat: rani-dimas.", mark: SLUG_FIELD(CT), lens: { src: [SLUG_LENS.src[0], CT + SLUG_LENS.src[1], SLUG_LENS.src[2], SLUG_LENS.src[3]] }, dur: 3.6 },
         { caption: "Klik tab NikahKit.", at: TAB_NK, click: true, hide: ["settings"], show: ["nk"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 330, 48] }, dur: 3 },
         { caption: "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", mark: [0, CT + 104, 72, 332], lens: { src: [0, CT + 98, 72, 342] }, dur: 3.6 },
         { caption: "Cocokkan istilah: alamat umum, lalu tautan pribadi berisi nama tamu.", focus: [CARD], show: ["terms"], dur: 4 },
@@ -590,7 +480,7 @@ export const scenes = {
     const ST = [["Unduh dan ekstrak", "Windows: klik kanan ZIP, Extract All.", "Mac: klik dua kali."], ["Buka chrome://extensions", "Ketik di kolom alamat Chrome, lalu", "Enter."],
       ["Nyalakan Developer mode", "Tombol geser di kanan atas."], ["Klik Load unpacked", "Pilih folder NikahKit yang berisi", "manifest.json, lalu Select."],
       ["NikahKit terpasang", "Jangan hapus atau pindahkan", "foldernya."], ["Masuk di editor Scalev", "Halaman HTML Mode, tab NikahKit,", "Masuk dengan Google."]];
-    let page = rect(0, y, W, VIEW, { fill: C.white }) + text(160, y + 104, "Cara pasang NikahKit", { size: 60, fill: C.cocoa, font: SERIF }) +
+    let page = rect(0, y, W, VIEW, { fill: C.white }) + text(160, y + 104, "Cara pasang NikahKit", { size: 60, fill: C.cocoa, font: PASANG_SERIF }) +
       text(160, y + 148, "Untuk Google Chrome di komputer Windows atau Mac.", { size: 18, fill: "#6f675f" }) +
       text(1014, y + 148, "Rilis", { size: 18, fill: "#6f675f" }) + rect(1062, y + 136, 92, 12, { r: 6, fill: "#e6e1dc" }) + text(1280, y + 148, "· ZIP ±120 KB", { size: 18, fill: "#6f675f", anchor: "end" }) +
       rect(...DL, { r: 16, fill: C.cocoa }) + text(1038, y + 97, "Unduh NikahKit", { size: 16, weight: 800, fill: C.white }) + rect(1169, y + 87, 52, 9, { r: 4.5, fill: "rgba(255,255,255,.35)" });
@@ -695,21 +585,19 @@ export const scenes = {
   // Pasang bagian 3: app.scalev.com, Landing Pages, halaman HTML Mode, tab NikahKit, panel Masuk ke NikahKit.
   "gabung-tab-nikahkit-muncul": (() => {
     const g = GATE_OUT(0, CT), lp = svMenuAt("Landing Pages"), LPROW = [24, CT + lp[1] - 14, 216, 28];
-    const home = scalevApp(0, CT, { active: "Home" }) + rect(256, CT, 1184, 900, { fill: SV.bg }) + rect(256, CT, 1184, 70, { fill: C.white }) + line(256, CT + 70.5, W, CT + 70.5, { stroke: SV.line }) +
-      text(280, CT + 43, "Home", { size: 18, weight: 600, fill: SV.ink }) + [0, 1, 2].map((i) => rect(280.5 + i * 380, CT + 94.5, 363, 119, { r: 6, fill: C.white, stroke: SV.line }) + bars(300 + i * 380, CT + 118, [120, 220, 160], 34)).join("") +
-      rect(280.5, CT + 238.5, 1123, 379, { r: 6, fill: C.white, stroke: SV.line }) + bars(304, CT + 274, [520, 380, 600, 300, 460, 340], 52);
+    const home = atY(CT, scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody());
     const ROW0 = [521, CT + 331, 879, 71];
     return {
       title: "Tab NikahKit muncul di editor Scalev",
       base: [win({ tabs: [TAB_ED], url: URL }), scalevEditor(0, CT, { tab: "Code" })],
       els: {
         dash: { svg: crTop({ tabs: [{ title: "Scalev", active: true, fav: favScalev }], url: "app.scalev.com" }) + vp(home), skel: true },
-        list: { svg: vp(scalevApp(0, CT, { active: "Landing Pages" }) + lpPage(CT)), enter: "fade", skel: true },
+        list: { svg: vp(atY(CT, lpScreen())), enter: "fade", skel: true },
         gate: { svg: gateEl(g), enter: "fade" }
       },
       steps: [
         { caption: "Buka app.scalev.com. Editor sudah terbuka? Muat ulang dengan F5.", focus: [TOOLBAR], at: [330, 63], mark: { box: urlBox("app.scalev.com"), r: 3 }, lens: { src: [124, 44, 300, 40] }, dur: 3 },
-        { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [LPROW, [256, CT, 1184, 420]], at: [lp[0], CT + lp[1]], click: true, show: ["list"], mark: LPROW, lens: { src: [0, CT + 190, 260, 90] } },
+        { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [LPROW, [256, CT, 1184, 404]], at: [lp[0], CT + lp[1]], click: true, show: ["list"], mark: LPROW, lens: { src: [0, CT + 190, 260, 90] } },
         { caption: "Klik halaman undangan yang memakai HTML Mode. Editor terbuka.", focus: [TOP], at: mid(LP_NAME(CT)), click: true, hide: ["dash", "list"], mark: LP_NAME(CT), note: PAGE, dur: 3.4 },
         { caption: "Klik tab NikahKit di samping Settings.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 229] } },
         { caption: "Panel menampilkan Masuk ke NikahKit. dan tombol Masuk dengan Google.", mark: g.at.google, lens: { src: [8, CT + 167, 384, 108] }, dur: 3.6 }
@@ -915,7 +803,7 @@ export const scenes = {
         { caption: "Buka chrome://extensions di tab Ekstensi.", focus: [[0, 0, 600, 41], CARD], at: mid(TAB2), click: true, hide: ["old", "pasted"], show: ["ext"], mark: { box: TAB2, r: 9 }, lens: { src: [76, 2, 502, 39] } },
         { caption: "Klik ↻ di kartu NikahKit, di samping sakelar.", focus: [CARD], at: RELOAD, click: true, mark: { box: [RELOAD[0] - 14, RELOAD[1] - 14, 28, 28], r: 14 }, lens: { src: [384, CT + 350, 400, 64] } },
         { caption: "Kembali ke tab editor, lalu tekan F5 (Cmd+R di Mac) untuk memuat ulang.", focus: [[0, 0, 600, 41], [0, CT + 44, 400, 48]], at: mid(TAB1), click: true, hide: ["ext"], show: ["code"], mark: { box: TAB1, r: 9 }, lens: { src: [76, 2, 502, 39] } },
-        { caption: "Klik tab NikahKit. Banner update hilang: NikahKit sudah versi terbaru.", focus: [LEFT], at: TAB_NK, click: true, show: ["after"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 170] }, dur: 3.8 }
+        { caption: "Klik tab NikahKit. Banner update hilang: NikahKit sudah versi terbaru.", focus: [LEFT], at: TAB_NK, click: true, show: ["after"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 166] }, dur: 3.8 }
       ]
     };
   })()
