@@ -530,11 +530,11 @@ const SCENES = {
       done: { svg: mediaBody("Atau seret ke sini.", [3, 8, 1, 4, ...OLD]), enter: "fade" }
     },
     steps: [
-      { caption: "Buka menu Media: klik Media di rel kiri.", focus: LEFT, at: ED.rail.Media, click: true, show: ["tabs", "media"], mark: railBox("Media"), lens: { src: [0, 96, 390, 240], at: [300, 40] } },
+      { caption: "Buka menu Media: klik Media di rel kiri.", focus: LEFT, at: ED.rail.Media, click: true, show: ["tabs", "media"], mark: railBox("Media"), lens: { src: [0, 96, 384, 116], at: [300, 40] } },
       { caption: "Klik Unggah foto, lalu pilih beberapa foto (tahan Ctrl atau Cmd).", focus: [[72, 154, 327, 84], [FW.x, FW.y, FW.w, FW.h]], at: [PX + PW / 2, BY + 18], click: true, show: ["win", "winSel"],
-        mark: [PX, BY, PW, 36], lens: { src: [80, 160, 300, 80] }, dur: 3.8 },
+        mark: [PX, BY, PW, 36], lens: { src: [80, 161, 295, 70] }, dur: 3.8 },
       { caption: "Klik Buka, lalu tunggu. Foto diunggah satu per satu: Mengunggah 1 dari 4...", focus: [[72, 154, 327, 200], [FW.x, FW.y, FW.w, FW.h]], at: BUKA, click: true,
-        hide: ["win", "winSel"], show: ["busy1", "up1", "busy2", "up2"], mark: [{ box: [PX, 211, 150, 16], r: 2 }, { box: BUKA_BOX, r: 6 }], lens: { src: [80, 160, 300, 120], at: [12, 420] }, dur: 4 },
+        hide: ["win", "winSel"], show: ["busy1", "up1", "busy2", "up2"], mark: [{ box: [PX, 211, 150, 16], r: 2 }, { box: BUKA_BOX, r: 6 }], lens: { src: [80, 161, 295, 70], at: [12, 420] }, dur: 4 },
       { caption: "Selesai: semua foto baru tampil paling depan di grid Media.", focus: [72, 154, 327, 330], at: [PX + 140, MEDIA_Y + 45], hide: ["busy1", "up1", "busy2", "up2"], show: ["done"],
         mark: { box: [PX, MEDIA_Y, PW, 2 * MS + 6], r: 0 }, note: "4 foto baru paling depan", dur: 3.4 }
     ]
@@ -579,15 +579,15 @@ const SCENES = {
         top: { svg: rect(ACC_X + 10.5, p2.alt + 0.5, ACC_W - 21, 35, { r: 4, stroke: C.white, sw: 3 }) + rect(ACC_X + 10.5, p2.alt + 0.5, ACC_W - 21, 35, { r: 4, stroke: C.field }) + rect(ACC_X + 10, p2.focus, ACC_W - 20, 38, { fill: C.page }) + focusSeg(ACC_X + 10, p2.focus, ACC_W - 20, 0), enter: "fade" }
       },
       steps: [
-        { caption: "Di Konten, klik kelompok yang punya foto, misalnya Mempelai.", focus: PANELF, at: [200, accY + 25], click: true, show: ["open", "hdr"], mark: [PX, accY, PW, 50], lens: { src: [80, GROUPS_Y - 10, 310, 180] } },
+        { caption: "Di Konten, klik kelompok yang punya foto, misalnya Mempelai.", focus: PANELF, at: [200, accY + 25], click: true, show: ["open", "hdr"], mark: [PX, accY, PW, 50], lens: { src: [80, GROUPS_Y - 10, 302, 121] } },
         { caption: "Gulir ke Foto, lalu klik Pilih foto. Jendela Pilih foto terbuka.", focus: LEFT, at: [150, FOTO_AT + 38], scroll: { id: "open", dy }, click: true, show: ["dlg"],
-          mark: nkBtnBox(ACC_X, FOTO_AT + 20, "Pilih foto", { icon: "image" }), lens: { src: [8, 100, 390, 190] }, dur: 3.6 },
+          mark: nkBtnBox(ACC_X, FOTO_AT + 20, "Pilih foto", { icon: "image" }), lens: { src: [8, 213, 370, 76] }, dur: 3.6 },
         { caption: "Klik satu foto di grid. Foto itu diberi tanda terpilih.", show: ["sel"], at: [selX + gs / 2, selY + gs / 2], click: true, mark: [selX, selY, gs, gs], note: "Foto terpilih", dur: 3.4 },
         { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 144] }, dur: 3.6 },
         { caption: "Klik Deskripsi foto, lalu tulis kalimat pendek tentang isi foto.", focus: PANELF, at: [230, p2.alt + 18], click: true, show: ["alt", "altFocus"], type: [typed("alt", ACC_X + 20, p2.alt + 8, ALT)],
-          mark: [ACC_X + 10, p2.alt, ACC_W - 20, 36], lens: { src: [ACC_X, p2.alt - 34, ACC_W, 78] }, dur: 3.8 },
+          mark: [ACC_X + 10, p2.alt, ACC_W - 20, 36], lens: { src: [ACC_X - 8, p2.alt - 34, ACC_W + 16, 78] }, dur: 3.8 },
         { caption: "Wajah terpotong di undangan? Di Titik fokus, klik Atas.", at: [ACC_X + 10 + atasW / 2, p2.focus + 19], click: true, show: ["top"], mark: [ACC_X + 10, p2.focus, atasW, 38],
-          lens: { src: [ACC_X, p2.focus - 32, ACC_W, 78] }, dur: 3.6 }
+          lens: { src: [ACC_X - 8, p2.focus - 24, ACC_W + 16, 70] }, dur: 3.6 }
       ]
     };
   })(),
@@ -617,16 +617,16 @@ const SCENES = {
         { caption: "Di YouTube, klik Bagikan, lalu Salin. Centang Mulai pada bila perlu.", focus: [YT_DLG, YT_TOAST], at: [906, 496], click: true, show: ["copied", "ed"],
           mark: { box: SALIN_BOX, r: 18 }, lens: { src: [476, 462, 500, 136], at: [150, 16] }, dur: 3.8 },
         { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", focus: LEFT, at: ED.rail.Audio, click: true, hide: ["yt", "copied"], show: ["tabs", "musik"],
-          mark: railBox("Audio"), lens: { src: [0, 96, 390, 240], at: [300, 40] }, dur: 3.4 },
+          mark: railBox("Audio"), lens: { src: [0, 96, 384, 232], at: [300, 40] }, dur: 3.4 },
         { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, hide: ["ed"], show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.6 },
         { caption: "Isi Mulai dari, contoh 1:05 atau 65 (detik).", at: [200, BY + 130], click: true, show: ["c", "start"], type: [typed("start", PX + 10, BY + 119, "1:05")],
-          mark: [PX, BY + 112, AW, 36], lens: { src: [80, BY + 86, 310, 90] }, dur: 3.4 },
+          mark: [PX, BY + 112, AW, 36], lens: { src: [80, BY + 86, 310, 70] }, dur: 3.4 },
         { caption: "Klik Coba putar dari 1:05 untuk mendengar. Klik Hentikan untuk berhenti.", at: [180, BY + 351], click: true, show: ["d"],
           mark: nkBtnBox(PX + 11, BY + 333, "Coba putar dari 1:05", { icon: "play" }), lens: { src: [PX - 4, BY + 156, AW + 8, 226] }, dur: 3.8 },
         { caption: "Putar saat undangan dibuka dan Ulang terus sudah menyala. Biarkan.", at: [PX + AW - 18, t1 + 20],
-          mark: [{ box: [PX + AW - 36, t1 + 10, 36, 20], r: 10 }, { box: [PX + AW - 36, t1 + 58, 36, 20], r: 10 }], lens: { src: [PX - 4, t1, AW + 8, 100] }, dur: 3.6 },
+          mark: [{ box: [PX + AW - 36, t1 + 10, 36, 20], r: 10 }, { box: [PX + AW - 36, t1 + 58, 36, 20], r: 10 }], lens: { src: [PX - 4, t1, AW + 8, 92] }, dur: 3.6 },
         { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", focus: [1180, 44, 260, 48], at: [1234, 67], click: true,
-          mark: [SIMPAN[0], SIMPAN[1], TERBIT[0] + TERBIT[2] - SIMPAN[0], SIMPAN[3]], lens: { src: [1150, 40, 290, 56] }, dur: 3.8 }
+          mark: [SIMPAN[0], SIMPAN[1], TERBIT[0] + TERBIT[2] - SIMPAN[0], SIMPAN[3]], lens: { src: [1180, 46, 260, 42] }, dur: 3.8 }
       ]
     };
   })(),
@@ -646,11 +646,11 @@ const SCENES = {
         pv: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade" }
       },
       steps: [
-        { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", focus: LEFT, at: ED.rail.Gaya, click: true, show: ["tabs", "pane", "top", "bar"], mark: railBox("Gaya"), lens: { src: [0, 96, 390, 240], at: [300, 40] } },
+        { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", focus: LEFT, at: ED.rail.Gaya, click: true, show: ["tabs", "pane", "top", "bar"], mark: railBox("Gaya"), lens: { src: [0, 96, 384, 118], at: [300, 40] } },
         { caption: "Gulir ke daftar palet. Paling atas palet bawaan, berlabel Bawaan Kencana.", focus: PANELF, at: [250, 470], scroll: { id: "pane", dy: DY },
-          mark: [PX, PAL_Y + 24 - DY, PW, 54], lens: { src: [80, PAL_Y - DY - 6, 310, 230] }, dur: 3.6 },
+          mark: [PX, PAL_Y + 24 - DY, PW, 54], lens: { src: [80, PAL_Y - DY - 6, 302, 230] }, dur: 3.6 },
         { caption: "Klik satu palet, misalnya Terakota. Pratinjau langsung berganti warna.", focus: [[72, tRow - 60, 327, 170], PREVF], at: [230, tRow + 22], click: true, show: ["terra", "pv"],
-          mark: [PX, tRow, PW, 44], lens: { src: [80, tRow - 48, 310, 150] }, dur: 3.8 }
+          mark: [PX, tRow, PW, 44], lens: { src: [80, tRow - 40, 302, 138] }, dur: 3.8 }
       ]
     };
   })(),
@@ -665,13 +665,13 @@ const SCENES = {
       gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }
     },
     steps: [
-      { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", focus: PANELF, at: [300, 440], mark: [PX, 291, PW, 294], lens: { src: [80, 218, 310, 372] }, dur: 3.6 },
-      { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, show: ["pick"], mark: [97, 544, 36, 28], lens: { src: [92, 316, 300, 290], at: [290, 150] }, dur: 3.4 },
+      { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", focus: PANELF, at: [300, 440], mark: [PX, 291, PW, 294], lens: { src: [80, 218, 302, 372] }, dur: 3.6 },
+      { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, show: ["pick"], mark: [97, 544, 36, 28], lens: { src: [80, 284, 302, 308], at: [290, 150] }, dur: 3.4 },
       { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", focus: [[72, 154, 327, 460], PREVF], at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b", "gold"],
-        mark: [PICK.x + 12, PICK.y + 12, PICK.w - 24, 104], lens: { src: [80, 543, 310, 66], at: [12, 420] }, dur: 3.8 },
-      { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", focus: PANELF, at: [300, 637], mark: [PX, 609, PW, 56], lens: { src: [80, 600, 310, 110] }, dur: 3.6 },
+        mark: [PICK.x + 12, PICK.y + 12, PICK.w - 24, 104], lens: { src: [80, 545, 302, 60], at: [12, 420] }, dur: 3.8 },
+      { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", focus: PANELF, at: [300, 637], mark: [PX, 609, PW, 56], lens: { src: [80, 605, 302, 116] }, dur: 3.6 },
       { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", focus: [[72, 220, 327, 110], [72, 600, 327, 130], PREVF], at: [160, 695], click: true, hide: ["b", "gold"],
-        mark: nkBtnBox(PX, 677, "Kembali ke palet bawaan"), lens: { src: [80, 222, 310, 106], at: [12, 250] }, dur: 3.6 }
+        mark: nkBtnBox(PX, 677, "Kembali ke palet bawaan"), lens: { src: [80, 214, 302, 70], at: [12, 250] }, dur: 3.6 }
     ]
   },
 
@@ -696,13 +696,13 @@ const SCENES = {
         pair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" }
       },
       steps: [
-        { caption: "Di menu Gaya, klik tab Huruf.", focus: PANELF, at: [227, 188], click: true, show: ["h0"], mark: [PX + PW / 3, BY, PW / 3, 38], lens: { src: [80, 160, 310, 160] } },
+        { caption: "Di menu Gaya, klik tab Huruf.", focus: PANELF, at: [227, 188], click: true, show: ["h0"], mark: [PX + PW / 3, BY, PW / 3, 38], lens: { src: [80, 160, 302, 128] } },
         { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", focus: [[72, 154, 327, 210], PREVF], at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs", "bar", "big"],
-          mark: [PX + (2 * PW) / 3, P0.scale, PW / 3, 38], lens: { src: [80, 211, 310, 140], at: [12, 262] }, dur: 3.6 },
+          mark: [PX + (2 * PW) / 3, P0.scale, PW / 3, 38], lens: { src: [80, 281, 302, 69], at: [12, 262] }, dur: 3.6 },
         { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", focus: [[72, 290, 327, 260], PREVF], at: [230, 470], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "pair"],
-          mark: [PX, 416, PW, 108], lens: { src: [80, 410, 310, 120], at: [12, 24] }, dur: 4.2 },
+          mark: [PX, 416, PW, 108], lens: { src: [80, 412, 302, 116], at: [12, 24] }, dur: 4.2 },
         { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", focus: PANELF, at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"],
-          mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 310, 170] }, dur: 4.2 }
+          mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 302, 160] }, dur: 4.2 }
       ]
     };
   })(),
@@ -722,21 +722,21 @@ const SCENES = {
         // Back to Scalev (2.2 s after the copy, before step 3's click moves the focus): drawn as step 3 shows it.
         ed: { svg: skeleton(base.join("\n")) + clipped(...PANELF, base.join("\n")), skel: false, enter: "fade", delay: 2.2 },
         chk: { svg: HC, enter: "fade" },
-        done: { svg: HD, enter: "fade", delay: 1.0 },
+        done: { svg: HD, enter: "fade" },
         tabs1: { svg: hurufTabs([1]), enter: "fade" },
         bar: { svg: barMask(), enter: "fade" }
       },
       steps: [
         { caption: "Klik Buka Google Fonts di tab Huruf. Google Fonts terbuka di tab baru.", focus: PANELF, at: [PX + PW / 2, P0.gf + 18], click: true, show: ["gf"],
-          mark: nkBtnBox(PX, P0.gf, "Buka Google Fonts", { w: PW, icon: "external-link" }), lens: { src: [80, P0.gf - 72, 310, 120] }, dur: 3.6 },
+          mark: nkBtnBox(PX, P0.gf, "Buka Google Fonts", { w: PW, icon: "external-link" }), lens: { src: [80, P0.gf - 72, 302, 120] }, dur: 3.6 },
         { caption: "Klik font, misalnya Playfair Display. Salin alamatnya dari kolom alamat.", focus: [[0, 41, 1440, 44], [24, 236, 1392, 260]], at: [600, 290], click: true, show: ["spec", "sel", "ed"],
           mark: [{ box: OMNI, r: 17 }, { box: GF_ROW0, r: 12 }], lens: { src: [118, 44, 560, 40], at: [100, 92] }, dur: 4.2 },
         { caption: "Kembali ke Scalev. Tempel link di Font judul dan nama.", focus: PANELF, at: [230, P0.font + 38], click: true, hide: ["gf", "spec", "sel"], show: ["chk", "tabs1", "bar"],
-          mark: [PX, P0.font + 20, PW, 36], lens: { src: [80, PC.font - 30, 310, 120] }, dur: 3.4 },
+          mark: [PX, P0.font + 20, PW, 36], lens: { src: [80, PC.font - 8, 302, 96] }, dur: 3.4 },
         { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], hide: ["ed"], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
-          lens: { src: [80, PD.font - 10, 310, 120] }, dur: 3.8 },
+          lens: { src: [80, PD.font - 8, 302, 72] }, dur: 3.8 },
         { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["chk", "done", "tabs1", "bar"],
-          mark: nkBtnBox(PX, PD.back - SDY, "Kembali ke pasangan bawaan"), lens: { src: [80, PD.back - SDY - 100, 310, 150] }, dur: 3.8 }
+          mark: nkBtnBox(PX, PD.back - SDY, "Kembali ke pasangan bawaan"), note: "Kembali ke pasangan bawaan", dur: 3.8 }
       ]
     };
   })(),
@@ -754,11 +754,11 @@ const SCENES = {
         b2: { svg: bentuk(0, 2), enter: "fade" }
       },
       steps: [
-        { caption: "Di menu Gaya, klik tab Bentuk.", focus: PANELF, at: [320, 188], click: true, show: ["b0"], mark: [PX + (2 * PW) / 3, BY, PW / 3, 38], lens: { src: [80, 160, 310, 190] } },
+        { caption: "Di menu Gaya, klik tab Bentuk.", focus: PANELF, at: [320, 188], click: true, show: ["b0"], mark: [PX + (2 * PW) / 3, BY, PW / 3, 38], lens: { src: [80, 160, 302, 128] } },
         { caption: "Klik Lembut: sudut tombol, kartu, dan bingkai foto jadi membulat.", focus: [[72, 154, 327, 220], PREVF], at: [128, SEG(0, false)], click: true, show: ["b1", "soft"],
-          mark: [PX, SEG(0, false) - 19, lembutW, 38], lens: { src: [80, 211, 310, 150], at: [12, 262] }, dur: 3.8 },
+          mark: [PX, SEG(0, false) - 19, lembutW, 38], lens: { src: [80, 281, 302, 73], at: [12, 262] }, dur: 3.8 },
         { caption: "Di Gerak pilih Tanpa, Halus, atau Hidup. Hidup bergerak lebih jauh.", focus: PANELF, at: [PX + PW - 30, SEG(1, true)], click: true, show: ["b2"],
-          mark: [PX + (2 * PW) / 3, SEG(1, true) - 19, PW / 3, 38], lens: { src: [80, 360, 310, 110] }, dur: 3.8 }
+          mark: [PX + (2 * PW) / 3, SEG(1, true) - 19, PW / 3, 38], lens: { src: [80, 360, 302, 110] }, dur: 3.8 }
       ]
     };
   })(),
@@ -770,7 +770,7 @@ const SCENES = {
     const [R, QR] = lapList(SECS), [R2] = lapList(SECS, { dock: false });
     const up = (svg) => `<g transform="translate(0 -${DY})">${svg}</g>`, P = (list) => ({ svg: stack(list), enter: "fade" });
     const rows = [[72, rowY(6), 327, 150], PREVF], foot = [[72, Q2.btn - DY - 110, 327, 200], PREVF];
-    const rowLens = { src: [PX, rowY(6), PW, 150], at: [12, 60] };
+    const rowLens = { src: [80, rowY(6) + 1, 302, 148], at: [12, 60] };
     return {
       title: "Mengatur urutan dan menyembunyikan bagian di Lapisan",
       base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), stack([galeriSec, videoSec, acaraSec])],
@@ -786,15 +786,15 @@ const SCENES = {
       },
       steps: [
         { caption: "Klik Lapisan di rel kiri. Daftar bagian tampil sesuai urutan undangan.", focus: LEFT, at: ED.rail.Lapisan, click: true, show: ["tabs", "lap", "lhdr", "bar"],
-          mark: railBox("Lapisan"), lens: { src: [0, 96, 390, 240], at: [300, 40] }, dur: 3.4 },
+          mark: railBox("Lapisan"), lens: { src: [0, 96, 384, 237], at: [300, 40] }, dur: 3.4 },
         { caption: "Klik panah naik di Video. Video naik, pratinjau ikut berubah.", focus: rows, at: [270, rowY(8) + 25], click: true, show: ["l1", "p1"], mark: [261, rowY(8) + 16, 18, 18], lens: rowLens, dur: 3.6 },
         { caption: "Klik panah turun di Galeri Foto. Rangkaian Acara kini di atasnya.", at: [304, rowY(8) + 25], click: true, hide: ["lap"], show: ["l2", "p2"], mark: [295, rowY(8) + 16, 18, 18], lens: rowLens, dur: 3.6 },
         { caption: "Matikan sakelar Video. Tertulis Disembunyikan, Video hilang dari pratinjau.", at: [342, rowY(7) + 25], click: true, hide: ["l1", "p1"], show: ["l3", "p3"], mark: { box: [324, rowY(7) + 15, 36, 20], r: 10 }, lens: rowLens, dur: 3.6 },
         { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, hide: ["l2", "p2"], show: ["l4", "p4"], mark: { box: [324, rowY(7) + 15, 36, 20], r: 10 }, lens: rowLens, dur: 3.6 },
         { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", focus: foot, at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, hide: ["l3", "p3"], show: ["r", "p0"],
-          mark: nkBtnBox(PX, Q2.btn - DY, "Kembalikan urutan template"), lens: { src: [80, Q2.btn - DY - 104, 310, 150], at: [12, 100] }, dur: 4 },
+          mark: nkBtnBox(PX, Q2.btn - DY, "Kembalikan urutan template"), lens: { src: [80, Q2.btn - DY - 61, 302, 105], at: [12, 100] }, dur: 4 },
         { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", focus: [foot[0], [SC.x, 790, SC.w, 100]], at: [PX + PW - 18, QR.dock - DY + 20], click: true, hide: ["dock", "l4", "p4"], show: ["r2"],
-          mark: { box: [PX + PW - 36, QR.dock - DY + 10, 36, 20], r: 10 }, lens: { src: [80, QR.dock - DY - 54, 310, 100], at: [12, 100] }, dur: 3.6 }
+          mark: { box: [PX + PW - 36, QR.dock - DY + 10, 36, 20], r: 10 }, lens: { src: [80, QR.dock - DY - 61, 302, 105], at: [12, 100] }, dur: 3.6 }
       ]
     };
   })(),
@@ -833,7 +833,7 @@ const SCENES = {
         toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" }
       },
       steps: [
-        { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", focus: TOOLS, at: ED.tool.Klik, mark: toolBox(725), lens: { src: [0, 566, 72, 236], zoom: 3 }, dur: 3.2 },
+        { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", focus: TOOLS, at: ED.tool.Klik, mark: toolBox(725), lens: { src: [0, 566, 72, 232], zoom: 3 }, dur: 3.2 },
         { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", focus: PREVF, at: [922, 492], hover: "hover",
           mark: [[SC.x, SC.y, tw(TAG, 12, 500) + 16, 22], NAMES], lens: { src: [SC.x - 4, SC.y - 4, 260, 44] }, dur: 3.4 },
         { caption: "Klik namanya. Mempelai terbuka, kursor langsung di Nama panggilan.", focus: [panelTop, PREVF], at: [922, 492], click: true, show: ["tabs", "konten", "selCover"],
@@ -841,9 +841,9 @@ const SCENES = {
         { caption: "Ketik isi baru. Pratinjau ikut berubah, kaki rel Menulis... lalu Tersimpan.", focus: [panelTop, FOOT, PREVF], at: [ACC_X + 120, nY + 18], click: true,
           hide: ["selCover"], show: ["clr", "nama", "busy", "saved", "page", "mask"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], mark: [NICK, FOOT_MARK], lens: nickLens, dur: 4.2 },
         { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", focus: PREVF, at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["pageS"],
-          mark: [SC.x, salamTop, SC.w, 420], lens: { src: [SC.x + SC.w - 250, salamTop - 6, 250, 50], at: [140, 190] }, dur: 3.8 },
+          mark: [SC.x, salamTop, SC.w, 420], lens: { src: [SC.x + SC.w - 250, salamTop + 1, 250, 78], at: [140, 190] }, dur: 3.8 },
         { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", focus: [[72, 820, 327, 80], PREVF], at: at.Sembunyikan, click: true, show: ["gone", "toast"], mark: tbBox.Sembunyikan,
-          lens: { src: [SC.x + SC.w - 250, salamTop - 6, 250, 50], at: [140, 190] }, dur: 4 },
+          note: "Sembunyikan", dur: 4 },
         { caption: "Muncul Salam Pembuka disembunyikan. Klik Urungkan untuk menampilkannya lagi.", at: [343, 862], click: true, hide: ["toast", "gone"],
           mark: URUNG_BOX, note: "Urungkan", dur: 3.6 }
       ]
@@ -858,7 +858,7 @@ const SCENES = {
       para(ACC_X, sY + 24, ["Nama dan tanggal diambil dari Mempelai dan", "Acara."], { size: 12, fill: C.faint, lh: 16 }) +
       text(ACC_X, sY + 76, "Foto sampul", { size: 12, weight: 500 }) + photo(ACC_X, sY + 86, 64, 64, 2) + quiet(ACC_X, sY + 158, "Ganti foto", { icon: "image" }) +
       text(ACC_X, sY + 218, "Foto slideshow (opsional, maks. 4)", { size: 12, weight: 500 }) + scrollbar(157, 300);
-    const toolLens = { src: [0, 690, 72, 80], zoom: 3 };
+    const toolLens = { src: [0, 694, 72, 56], zoom: 3 };
     return {
       title: "Memakai Inspect bila Klik aktif tidak tersedia",
       base: [shell("Konten", "Konten"), insTool(false), kontenClosed(), coverScreen()],
@@ -870,7 +870,7 @@ const SCENES = {
       steps: [
         { caption: "Klik Inspect di rel. Tulisannya berubah menjadi Inspect aktif.", focus: TOOLS, at: [36, 725], click: true, show: ["on"], mark: toolBox(725), lens: toolLens, dur: 3.4 },
         { caption: "Klik bagian di pratinjau. Formnya terbuka di Konten, tanpa toolbar.", focus: [[72, GROUPS_Y - 10, 327, 300], PREVF], at: [922, 492], click: true, show: ["sel", "form"],
-          mark: NAMES, lens: { src: [80, GROUPS_Y - 6, 310, 130], at: [12, 410] }, dur: 3.8 },
+          mark: NAMES, lens: { src: [80, GROUPS_Y - 6, 302, 118], at: [12, 410] }, dur: 3.8 },
         { caption: "Selesai? Klik Inspect aktif lagi untuk mematikan.", focus: TOOLS, at: [36, 725], click: true, hide: ["on"], mark: toolBox(725), lens: toolLens, dur: 3.4 }
       ]
     };
@@ -879,7 +879,7 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Urungkan dan Ulangi
   "editor-urungkan-ulangi": (() => {
     const NICK = [ACC_X, NICK_Y, ACC_W, 36], UNDO = [8, 621, 24, 24], REDO = [40, 621, 24, 24];
-    const focus = [[0, 600, 72, 60], [ACC_X - 8, NICK_Y - 30, ACC_W + 16, 80], PREVF], nickLens = { src: [ACC_X - 8, NICK_Y - 28, ACC_W + 16, 76], at: [12, 230] };
+    const focus = [[0, 600, 72, 60], [ACC_X - 8, NICK_Y - 30, ACC_W + 16, 80], PREVF], nickLens = { src: [ACC_X - 8, NICK_Y - 26, ACC_W + 16, 70], at: [12, 230] };
     return {
       title: "Mengurungkan dan mengulangi perubahan",
       base: [shell("Konten", "Konten"), priaPanel("Dimaz"), coverScreen({ names: "Rani & Dimaz" })],
@@ -890,7 +890,7 @@ const SCENES = {
       },
       steps: [
         { caption: "Di bawah Bagikan ada dua panah: kiri Urungkan, kanan Ulangi.", focus: [0, 554, 260, 170], at: ED.tool.Urungkan, show: ["tipU"], mark: [UNDO[0], UNDO[1], REDO[0] + REDO[2] - UNDO[0], 24],
-          lens: { src: [0, 606, 200, 106] }, dur: 3.8 },
+          note: "Urungkan dan Ulangi", dur: 3.8 },
         { caption: "Klik panah kiri. Perubahan terakhir batal: nama kembali Dimas.", focus, at: ED.tool.Urungkan, click: true, hide: ["tipU"], show: ["fix"], mark: [NICK, UNDO], lens: nickLens, dur: 3.6 },
         { caption: "Kebablasan? Klik panah kanan untuk mengulangi perubahan tadi.", at: ED.tool.Ulangi, click: true, show: ["redo"], mark: [NICK, REDO], lens: nickLens, dur: 3.6 }
       ]
@@ -946,11 +946,11 @@ const SCENES = {
       steps: [
         { caption: "Kaki rel menunjukkan Dijeda. Baca kotak kuning di atas panel.", focus: [FOOT, banner], at: [36, 878], mark: [[PX, BY, PW, 126], FOOT_MARK], lens: bannerLens, dur: 3.8 },
         { caption: "Klik Lihat di kode. Tab Code terbuka, bagian yang diubah ditandai.", focus: [0, 44, 399, 300], at: [150, BY + 54], click: true, show: ["code"],
-          mark: nkBtnBox(PX + 12, BY + 36, "Lihat di kode", { icon: "code-xml" }), lens: { src: [0, 92, 399, 160], at: [290, 60] }, dur: 3.8 },
-        { caption: "Putuskan: tidak penting? Lanjut. Penting? Salin dulu, atau Ctrl+Z di Code.", at: [250, 204], mark: { box: [40, 193, 359, 22], r: 0 }, lens: { src: [0, 100, 399, 200], at: [290, 60] }, dur: 4 },
+          mark: nkBtnBox(PX + 12, BY + 36, "Lihat di kode", { icon: "code-xml" }), lens: { src: [0, 96, 399, 120], at: [290, 60] }, dur: 3.8 },
+        { caption: "Putuskan: tidak penting? Lanjut. Penting? Salin dulu, atau Ctrl+Z di Code.", at: [250, 204], mark: { box: [40, 193, 359, 22], r: 0 }, lens: { src: [0, 100, 399, 116], at: [290, 60] }, dur: 4 },
         { caption: "Kembali ke tab NikahKit di strip atas editor Scalev.", focus: [0, 44, 399, 48], at: ED.tab.NikahKit, click: true, hide: ["code"], mark: [228, 54, 84, 28], lens: { src: [0, 44, 340, 48] }, dur: 3.4 },
         { caption: "Klik Timpa dengan NikahKit. Perubahan manual dibuang, bisa diurungkan.", focus: [[72, 154, 327, 200], FOOT], at: [180, BY + 98], click: true, show: ["fixed"],
-          mark: nkBtnBox(PX + 12, BY + 80, "Timpa dengan NikahKit"), lens: bannerLens, dur: 3.6 },
+          mark: nkBtnBox(PX + 12, BY + 80, "Timpa dengan NikahKit"), note: "Timpa dengan NikahKit", dur: 3.6 },
         { caption: "Kotak kuning hilang, kaki rel kembali Tersimpan. Lalu Simpan di Scalev.", focus: [FOOT, banner, [1180, 44, 260, 48]], at: [36, 878], mark: [FOOT_MARK, SIMPAN],
           lens: { src: [0, 846, 72, 54], zoom: 3 }, dur: 3.6 }
       ]
