@@ -7,7 +7,7 @@
 // checkin} dan nikahkit/ext/pin.html; ikon WhatsApp dan template pesan dibaca langsung dari sumbernya.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { C, WORLD, PHONE, rect, text, line, circle, para, group, tw, textWidth, wrap, clamp, icon, iconX, skeleton, clipped } from "../lib.mjs";
+import { C, WORLD, PHONE, rect, text, line, circle, para, group, textWidth, wrap, clamp, icon, iconX, skeleton, clipped } from "../lib.mjs";
 import { BAGIKAN_TOOL, NO_NOTE, ACC_Y, COUPLE_Y, shareTop, shareBtns, accessHead, forCouple, pinBtn, pinHint, pinBox } from "../ui/bagikan.mjs";
 import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk, onPhone } from "../ui/kit.mjs";
 
