@@ -10,9 +10,9 @@ import { CHECKS, helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs"
 import { securityPanel, SECURITY } from "../ui/scalev.mjs";
 import { ACCOUNT, kList } from "../ui/editor-panels.mjs";
 import { MAROON, SERIF, CREAM, PHOTO_DEFS, pvMempelai, secTitle, dock } from "../ui/invitation.mjs";
+import { WA, WA_X, WA_HEAD, waWeb, waFoot, waFootBox, waBubble } from "../ui/whatsapp.mjs";
 
 const tr = (dx, dy, ...kids) => group({ transform: `translate(${dx} ${dy})` }, ...kids);
-const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
 
 // The editor as these scenes open it: the invitation's Mempelai section in the preview, rail on Konten, the Konten panel
 // (every group filled, all closed). Konten's list can sit lower (dy) under a note at the panel top.
@@ -57,7 +57,7 @@ const IZ1 = iz.end - 900; // fully scrolled: Izin domain (CSP) section in view
 // which also turns the check row "Izin domain di tab Security" to OK (help.jsx checks; store.js recheckCsp).
 const izF = helpBody({ csp: IZ_CSP.map((r) => ({ ...r, st: r.st === "failed" ? "exists" : r.st })), cspMsg: true });
 const IZF = izF.end - 900;
-const izCopied = white(16, iz.pos.cspMsg[1] - IZ1, 351, 18) + text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
+const izCopied = rect(16, iz.pos.cspMsg[1] - IZ1, 351, 18, { fill: C.white }) + text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
 const izDialog = (copied) => dlgSheet + dlgHead + dlgView(iz, IZ1) + (copied ? izCopied : "");
 const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[0][1]];
 // Scalev Security tab: the measured panel (ui/scalev.mjs; Connect Sources on top; at: "image" scrolls to Image Sources,
@@ -128,10 +128,11 @@ function accountWindow() {
 // The invitation's section title and Menu bawah (ui/invitation.mjs, drawn for the editor preview) moved onto the phone;
 // the dock sits 60 px lower on the taller phone screen. The Ucapan form is scene-local.
 const PX = PHONE.x, PY = PHONE.y, PCX = PX + 195, FX = PX + 32, FW = 326;
-const onPhone = (svg, dy = 0) => tr(PX - ED.screen.x, PY - ED.screen.y + dy, svg);
+// Places preview-panel markup (ui/invitation, drawn at the editor's preview screen) on the guest phone.
+const previewToPhone = (svg, dy = 0) => tr(PX - ED.screen.x, PY - ED.screen.y + dy, svg);
 function guestPhone(closed) {
-  let s = rect(PX, PY, 390, 844, { fill: CREAM }) + onPhone(secTitle("Ucapan"));
-  const nav = onPhone(dock("Ucapan"), 60);
+  let s = rect(PX, PY, 390, 844, { fill: CREAM }) + previewToPhone(secTitle("Ucapan"));
+  const nav = previewToPhone(dock("Ucapan"), 60);
   if (closed) return s + rect(FX, PY + 150, FW, 96, { r: 12, fill: C.white, stroke: "#ead8cf" }) + text(PCX, PY + 205, "Ucapan & RSVP sudah ditutup.", { size: 16, fill: "#333", anchor: "middle", font: SERIF }) + nav;
   const lab = (yy, l) => text(FX, yy, l, { size: 14, fill: "#333", font: SERIF });
   const fld = (yy, h = 40) => rect(FX + 0.5, yy + 0.5, FW - 1, h, { r: 8, fill: C.white, stroke: "#d8c6bd" });
@@ -163,7 +164,7 @@ const drun = (x, y, parts, o = {}) => parts.map((p) => {
 const dpara = (x, y, lines, o = {}) => lines.map((l, i) => (Array.isArray(l) ? drun(x, y + i * (o.lh ?? 28), l, o) : dt(x, y + i * (o.lh ?? 28), l, o))).join("");
 const docsTab = (title, path) => chrome(0, 0, 1440, 900, { tabs: [{ title, active: true, fav: (cx, cy) => nkLogo(cx, cy, 14) }], url: `docs.page/hasyaapp/nikahkit-panduan/${path}` });
 const moon = (cx, cy) => `<path d="M${cx + 6} ${cy + 3} A7 7 0 1 1 ${cx - 2} ${cy - 7} A5.5 5.5 0 0 0 ${cx + 6} ${cy + 3} Z" fill="${DOC.ink}"/>`;
-const docsHeader = (scrolled) => white(0, T, 1440, 65) + (scrolled ? line(0, T + 64.5, 1440, T + 64.5, { stroke: DOC.line }) : "") +
+const docsHeader = (scrolled) => rect(0, T, 1440, 65, { fill: C.white }) + (scrolled ? line(0, T + 64.5, 1440, T + 64.5, { stroke: DOC.line }) : "") +
   nkLogo(32, T + 28, 20) + dt(56, T + 33, "Panduan NikahKit", { size: 16, weight: 500, fill: DOC.ink, len: 131 }) +
   rect(1075.5, T + 12.5, 126, 31, { r: 8, fill: C.white, stroke: DOC.line }) + iconX("search", 1094, T + 28, 15, DOC.ink) + dt(1110, T + 33, "Search", { size: 14, weight: 500, fill: DOC.ink, len: 46 }) +
   rect(1164, T + 20, 27, 17, { r: 4, fill: DOC.muted }) + text(1177.5, T + 32, "⌘K", { size: 11, weight: 500, fill: DOC.sub, anchor: "middle" }) +
@@ -180,7 +181,7 @@ const docsToc = (items, active) => icon("list", 1178, T + 115, 15, DOC.ink) + dt
   line(1173.5, T + 141, 1173.5, T + 141 + items.length * 29 - 8, { stroke: DOC.line }) +
   items.map(([l, sub], i) => (i === active ? line(1173.5, T + 141 + i * 29, 1173.5, T + 162 + i * 29, { stroke: DOC.ink }) : "") +
     dt(sub ? 1210 : 1198, T + 156 + i * 29, l, { size: 14, fill: i === active ? DOC.accent : DOC.sub, max: sub ? 199 : 211 })).join("");
-const copyPage = white(937, T + 109, 152, 32) + rect(937.5, T + 109.5, 151, 31, { r: 8, fill: C.white, stroke: DOC.line }) + icon("copy", 955, T + 125, 14, DOC.ink) +
+const copyPage = rect(937, T + 109, 152, 32, { fill: C.white }) + rect(937.5, T + 109.5, 151, 31, { r: 8, fill: C.white, stroke: DOC.line }) + icon("copy", 955, T + 125, 14, DOC.ink) +
   dt(972, T + 130, "Copy page", { size: 14, weight: 500, fill: DOC.ink, len: 71 }) + line(1054.5, T + 110, 1054.5, T + 140, { stroke: DOC.line }) + icon("chevron-down", 1071, T + 125, 14, DOC.ink);
 const infoBox = (y, h, lines) => rect(320.5, y + 0.5, 768, h - 1, { r: 12, fill: "#f1f9fd", stroke: "#bde3f4" }) + circle(345, y + 23, 7, { fill: DOC.ink }) +
   text(345, y + 27, "i", { size: 10, weight: 700, fill: C.white, anchor: "middle" }) + dt(361, y + 28, "Information", { size: 14, weight: 500, fill: DOC.ink, len: 76 }) + lines;
@@ -211,7 +212,7 @@ const galatScreen = docsTab("Kamus pesan galat", "bantuan/pesan-galat") + galatT
 const STEP_T = [120, 249, 349, 478, 578].map((y) => T + y), STEP_P = [164, 293, 393, 522, 622].map((y) => T + y);
 const MATCH1 = [451, T + 396, 124, 23];
 const galatSteps = (() => {
-  let s = white(...MAIN) + dt(704.5, T + 95, "Mencari arti pesan dengan Ctrl+F", { size: 14, fill: DOC.sub, anchor: "middle", len: 215 });
+  let s = rect(...MAIN, { fill: C.white }) + dt(704.5, T + 95, "Mencari arti pesan dengan Ctrl+F", { size: 14, fill: DOC.sub, anchor: "middle", len: 215 });
   [["Catat pesannya", 139], ["Tekan Ctrl+F di halaman ini", 240], ["Ketik beberapa kata awal pesan", 282], ["Baca kolom Artinya", 171], ["Kerjakan kolom Yang harus dilakukan", 330]].forEach(([t, len], i) => {
     const cy = STEP_T[i] + 14, next = i < 4 ? STEP_T[i + 1] + 14 - 32 : T + 688;
     s += circle(340, cy, 20, { fill: DOC.muted }) + text(340, cy + 6, String(i + 1), { size: 17, weight: 500, fill: DOC.ink, anchor: "middle" }) + line(340.5, cy + 31, 340.5, next, { stroke: DOC.line }) +
@@ -254,7 +255,7 @@ const ROW3 = [321, ROW_T[2] + 11, 767, 54];
 const ARTI = [COLX[1] - 4, ROW_T[2] + 12, 84, 22];
 const TODO = [COLX[2] - 4, ROW_T[2] + 12, 160, 42];
 const galatTable = (() => {
-  let s = white(...MAIN) + dt(320, T + 149, "Jendela akun NikahKit", { size: 30, fill: DOC.ink, len: 287 }) +
+  let s = rect(...MAIN, { fill: C.white }) + dt(320, T + 149, "Jendela akun NikahKit", { size: 30, fill: DOC.ink, len: 287 }) +
     drun(320, T + 191, [{ t: "Jendela kecil yang terbuka dari chip akun, ", len: 307 }, { t: "Masuk dengan Google", w: 700, len: 169 }, { t: ", ", len: 8 }, { t: "Pilih paket", w: 700, len: 78 },
       { t: ", atau ", len: 45 }, { t: "Kelola PIN", w: 700, len: 76 }]) +
     drun(320, T + 219, [{ t: "dashboard", w: 700, len: 81 }, { t: ".", len: 4 }]);
@@ -273,7 +274,7 @@ const FB_BOX = [FB.x, FB.y, FB.w, FB.h];
 const findBar = shadow(FB.x, FB.y, FB.w, FB.h, 8, 2) + rect(FB.x, FB.y, FB.w, FB.h, { r: 8, fill: C.white }) + line(FB.x + 266.5, FB.y + 12, FB.x + 266.5, FB.y + 36, { stroke: "#dadce0" }) +
   icon("chevron-up", FB.x + 290, FB.y + 24, 18, C.crIcon) + icon("chevron-down", FB.x + 320, FB.y + 24, 18, C.crIcon) + iconX("x", FB.x + 354, FB.y + 24, 16, C.crIcon);
 const QUERY = text(FB.x + 18, FB.y + 29, "Sesi berakhir", { size: 14, fill: C.crText });
-const findCount = (s) => white(FB.x + 200, FB.y + 10, 60, 28) + text(FB.x + 256, FB.y + 29, s, { size: 13, fill: C.crSub, anchor: "end" });
+const findCount = (s) => rect(FB.x + 200, FB.y + 10, 60, 28, { fill: C.white }) + text(FB.x + 256, FB.y + 29, s, { size: 13, fill: C.crSub, anchor: "end" });
 const hl = (b) => `<rect x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" rx="2" fill="#ff9632" style="mix-blend-mode:multiply"/>`;
 
 // FAQ (bantuan/faq.mdx) at scroll 3569: the end of "Paket dan harga", then "Masa aktif dan refund" (measured).
@@ -301,7 +302,7 @@ const ANSWER = { i: 0, h: 94, svg: dt(338, T + 325, "Ada tenggang 7 hari. Selama
   dt(338, T + 353, "Setelah itu RSVP, ucapan, dan dashboard pasangan berhenti. Halaman undangan tetap tampil untuk tamu, dan", { size: 14, len: 710 }) +
   drun(338, T + 381, [{ t: "form ucapan menulis ", len: 138 }, { t: "Ucapan & RSVP sudah ditutup.", w: 700, len: 206 }, { t: " Perpanjang untuk menyalakan lagi. Lihat ", len: 267 },
     { t: "Masuk dan bayar", w: 500, len: 112, u: true, uc: DOC.accent }, { t: ".", len: 4 }], { size: 14 }) };
-const faqMain = (open) => white(...MAIN) + clipped(...MAIN, accGroup(T - 52, PAKET_Q) + dt(320, T + 239, "Masa aktif dan refund", { size: 30, fill: DOC.ink, len: 278 }) +
+const faqMain = (open) => rect(...MAIN, { fill: C.white }) + clipped(...MAIN, accGroup(T - 52, PAKET_Q) + dt(320, T + 239, "Masa aktif dan refund", { size: 30, fill: DOC.ink, len: 278 }) +
   accGroup(T + 264, AKTIF_Q, open ? { open: ANSWER } : {}) +
   (open ? dt(320, T + 606, "Scalev dan perangkat", { size: 30, fill: DOC.ink, len: 278 }) + accGroup(T + 631, SCALEV_Q) + dt(320, T + 922, "Tamu dan data", { size: 30, fill: DOC.ink, len: 189 })
     : dt(320, T + 512, "Scalev dan perangkat", { size: 30, fill: DOC.ink, len: 278 }) + accGroup(T + 537, SCALEV_Q) + dt(320, T + 828, "Tamu dan data", { size: 30, fill: DOC.ink, len: 189 }) + accGroup(T + 853, TAMU_Q)));
@@ -309,7 +310,7 @@ const faqScreen = docsTab("Pertanyaan yang sering ditanyakan", "bantuan/faq") + 
 // Masuk dan bayar membership (gabung/masuk-dan-bayar.mdx) at scroll 0.
 const MDB_TOC = [["Langkah"], ["Bagian 1: Masuk dengan Goo...", 1], ["Bagian 2: Pilih paket dan bayar", 1], ["Punya kode uji?", 1], ["Tanda berhasil"], ["Kalau ada masalah"], ["Pesan saat masuk", 1], ["Pesan saat membayar", 1], ["Lanjut"]];
 const MDB_SIDE = [16, T + 406, 232, 36];
-const mdbScreen = docsTab("Masuk dan bayar membership", "gabung/masuk-dan-bayar") + white(0, T, 1440, 815) +
+const mdbScreen = docsTab("Masuk dan bayar membership", "gabung/masuk-dan-bayar") + rect(0, T, 1440, 815, { fill: C.white }) +
   dt(320, T + 135, "Masuk dan bayar membership", { size: 36, fill: DOC.ink, len: 463 }) + copyPage +
   dt(320, T + 173, "Masuk ke NikahKit dengan akun Google, pilih paket, bayar di halaman Scalev, lalu aktifkan", { size: 18, fill: DOC.sub, len: 716 }) +
   dt(320, T + 201, "langganan dengan Cek pembayaran dan Periksa lagi. Lengkap dengan arti setiap pesan.", { size: 18, fill: DOC.sub, len: 703 }) +
@@ -324,52 +325,28 @@ const mdbScreen = docsTab("Masuk dan bayar membership", "gabung/masuk-dan-bayar"
   dt(320, T + 717, "Langkah", { size: 30, fill: DOC.ink, len: 112 }) + dt(320, T + 797, "Bagian 1: Masuk dengan Google", { size: 24, fill: DOC.ink, len: 330 }) +
   docsHeader(false) + docsSidebar("Masuk dan bayar membership") + docsToc(MDB_TOC, 0);
 
-// ---- WhatsApp Web in Chrome at 1440 (generic layout, not measured) ----------------------------------------------------
-const WA = { green: "#00a884", bg: "#efeae2", bar: "#f0f2f5", ink: "#111b21", sub: "#667781", out: "#d9fdd3", line: "#e9edef" };
+// ---- WhatsApp Web (ui/whatsapp.mjs), chat with the Nikahin admin; the composer holds the 9-line report -------------------
 const ADMIN = "+62 821-7527-4118";
-const WC = 504; // chat pane from here; nav rail 0..64 and chat list 64..504
-const CMP = { x: WC + 52, y: 900 - 22 - 200, w: 1440 - WC - 52 - 64, h: 200 }; // composer input, 9 lines
-const CMP_AREA = [WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10]; // footer: attach, composer, send
-const SEND = [1440 - 33, CMP.y + CMP.h - 21];
-const SEND_BOX = [SEND[0] - 21, SEND[1] - 21, 42, 42];
+const { box: CMP_BOX, area: CMP_AREA, send: SEND, sendBox: SEND_BOX } = waFootBox(200);
+const [CX, CY, CW] = CMP_BOX;
 const VERSI = "[versi]";
 const MSG = ["Halo Nikahin, NikahKit saya bermasalah.", "", `Laporan NikahKit ${VERSI}`, "Waktu: 2026-10-14T03:12:45.000Z", "Halaman: /pages/365671", "Build Scalev: e5cbe30-37178432877-1",
   "Browser: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36", "",
   ...CHECKS.map((c) => (SL_BAD[c] ? `[X] ${c}: ${SL_BAD[c]}` : `[OK] ${c}`)), "", "Izin domain:", "- script_src https://www.youtube.com: exists", "- frame_src https://www.youtube.com: exists", ""];
 // Composer text soft-wraps at the composer width, as WhatsApp does.
-const CMP_LINES = MSG.flatMap((l) => (l ? wrap(l, CMP.w - 40, 14) : ["\u00a0"]));
+const CMP_LINES = MSG.flatMap((l) => (l ? wrap(l, CW - 40, 14) : ["\u00a0"]));
 const TYPED = ["Saya klik Simpan & Terbitkan, lalu tertahan.", "Halaman: app.scalev.com/pages/365671"];
-const cmpLine = (i) => CMP.y + 25 + i * 20;
+const cmpLine = (i) => CY + 25 + i * 20;
 // At first the composer shows the start of the message; once you click at its end it shows the last 7 lines + 2 typed.
-const cmpTop = para(CMP.x + 14, cmpLine(0), CMP_LINES.slice(0, 9), { size: 14, fill: WA.ink, lh: 20 });
-const cmpEnd = rect(CMP.x + 4, CMP.y + 4, CMP.w - 8, CMP.h - 8, { fill: C.white }) + para(CMP.x + 14, cmpLine(0), CMP_LINES.slice(-7), { size: 14, fill: WA.ink, lh: 20 });
+const waChat = waWeb(ADMIN, { tabs: [{ title: "Landing Page Studio", fav: favScalev }], h: 200, draft: true }) +
+  rect(1440 - 60 - 300, T + 100, 300, 40, { r: 8, fill: WA.out }) + rect(1440 - 60 - 290, T + 112, 200, 9, { r: 4.5, fill: "#b5e3ad" }) + // an earlier message
+  para(CX + 14, cmpLine(0), CMP_LINES.slice(0, 9), { size: 14, fill: WA.ink, lh: 20 });
+const cmpEnd = rect(CX + 4, CY + 4, CW - 8, CMP_BOX[3] - 8, { fill: C.white }) + para(CX + 14, cmpLine(0), CMP_LINES.slice(-7), { size: 14, fill: WA.ink, lh: 20 });
 const typedY = (i) => cmpLine(7 + i);
-const CMP_BOX = [CMP.x, CMP.y, CMP.w, CMP.h];
-const CHAT_HEAD = [WC + 1, T, 1440 - WC - 1, 60];
-function waScreen(composer) {
-  let s = chrome(0, 0, 1440, 900, { tabs: [{ title: "Landing Page Studio", fav: favScalev }, { title: "WhatsApp", active: true, fav: (cx, cy) => circle(cx, cy, 8, { fill: "#25d366" }) }], url: "web.whatsapp.com" }) +
-    rect(0, T, 64, 815, { fill: WA.bar }) + line(64.5, T, 64.5, 900, { stroke: WA.line }) +
-    [0, 1, 2, 3].map((i) => circle(32, T + 34 + i * 52, 11, { stroke: "#54656f", sw: 1.6 })).join("") + circle(32, 900 - 34, 14, { fill: "#dfe5e7" }) +
-    white(65, T, WC - 65, 815) + text(84, T + 44, "WhatsApp", { size: 22, weight: 700, fill: WA.green }) + rect(80, T + 66, WC - 96, 36, { r: 18, fill: WA.bar }) +
-    iconX("search", 102, T + 84, 16, "#54656f") + text(122, T + 89, "Cari", { size: 14, fill: WA.sub });
-  for (let k = 0; k < 10; k++) {
-    const ry = T + 118 + k * 72, on = k === 0;
-    if (on) s += rect(72, ry, WC - 80, 72, { r: 10, fill: WA.bar });
-    s += circle(108, ry + 36, 24, { fill: "#dfe5e7" }) + (on ? text(144, ry + 32, ADMIN, { size: 16, fill: WA.ink }) + rect(144, ry + 44, 210, 9, { r: 4.5, fill: WA.line })
-      : rect(144, ry + 22, 120 + ((k * 37) % 90), 11, { r: 5.5, fill: WA.line }) + rect(144, ry + 44, 200 + ((k * 53) % 60), 9, { r: 4.5, fill: WA.bar }));
-  }
-  s += line(WC + 0.5, T, WC + 0.5, 900, { stroke: WA.line }) + rect(...CHAT_HEAD, { fill: WA.bar }) + circle(WC + 34, T + 30, 20, { fill: "#dfe5e7" }) +
-    text(WC + 66, T + 36, ADMIN, { size: 16, fill: WA.ink }) + iconX("search", 1440 - 80, T + 30, 18, "#54656f") + iconX("more-vertical", 1440 - 36, T + 30, 18, "#54656f") +
-    rect(WC + 1, T + 60, 1440 - WC - 1, 900 - T - 60, { fill: WA.bg }) +
-    rect(1440 - 60 - 300, T + 100, 300, 40, { r: 8, fill: WA.out }) + rect(1440 - 60 - 290, T + 112, 200, 9, { r: 4.5, fill: "#b5e3ad" }) + // an earlier message
-    rect(WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10, { fill: WA.bar }) + icon("plus", WC + 26, SEND[1], 22, "#54656f") + rect(...CMP_BOX, { r: 8, fill: C.white }) +
-    circle(SEND[0], SEND[1], 21, { fill: WA.green }) + icon("send", SEND[0] - 1, SEND[1], 18, C.white);
-  return s + composer;
-}
 // Screenshot pasted from the clipboard: a thumbnail of the editor, as an attachment and later as a sent image.
 const shotImg = (x, y, w, h) => rect(x, y, w, h, { r: 4, fill: "#f3f5f9" }) + rect(x, y, w, h * 0.08, { fill: C.svTop }) + rect(x, y + h * 0.08, w * 0.05, h * 0.92, { fill: C.page }) +
   rect(x + w * 0.05, y + h * 0.08, w * 0.23, h * 0.92, { fill: C.white }) + rect(x + w * 0.09, y + h * 0.2, w * 0.15, h * 0.3, { r: 2, fill: C.warnSoft }) + rect(x + w * 0.5, y + h * 0.14, w * 0.3, h * 0.8, { fill: "#fdf6ee" });
-const SHOT = { x: 1440 - 320, y: CMP.y - 10 - 150, w: 220, h: 138 };
+const SHOT = { x: 1440 - 320, y: CMP_AREA[1] - 150, w: 220, h: 138 };
 const SHOT_BOX = [SHOT.x, SHOT.y, SHOT.w, SHOT.h];
 const shotAttach = shadow(SHOT.x, SHOT.y, SHOT.w, SHOT.h, 8, 2) + rect(SHOT.x, SHOT.y, SHOT.w, SHOT.h, { r: 8, fill: C.white }) + shotImg(SHOT.x + 6, SHOT.y + 6, SHOT.w - 12, SHOT.h - 12) +
   circle(SHOT.x + SHOT.w - 4, SHOT.y + 4, 11, { fill: "#54656f" }) + iconX("x", SHOT.x + SHOT.w - 4, SHOT.y + 4, 12, C.white, 2.4);
@@ -378,11 +355,9 @@ const BUB = { w: 560, h: 24 + bubbleLines.length * 20 + 14 }; BUB.x = 1440 - 60 
 const sentBubble = (() => {
   const { x, y, w, h } = BUB, ix = x + w - 232, iy = y - 8 - 150;
   return rect(ix, iy, 232, 150, { r: 8, fill: WA.out }) + shotImg(ix + 4, iy + 4, 224, 142) +
-    rect(x, y, w, h, { r: 8, fill: WA.out }) + para(x + 12, y + 26, bubbleLines.map((l) => l || "\u00a0"), { size: 14, fill: WA.ink, lh: 20 }) +
-    text(x + w - 40, y + h - 10, "10.12", { size: 11, fill: WA.sub, anchor: "end" }) + iconX("check", x + w - 26, y + h - 14, 13, "#53bdeb", 2.2) + iconX("check", x + w - 20, y + h - 14, 13, "#53bdeb", 2.2);
+    waBubble(x, y, w, h, "10.12") + para(x + 12, y + 26, bubbleLines.map((l) => l || "\u00a0"), { size: 14, fill: WA.ink, lh: 20 });
 })();
-const cmpEmpty = rect(WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10, { fill: WA.bg }) + rect(WC + 1, 900 - 62, 1440 - WC - 1, 62, { fill: WA.bar }) + icon("plus", WC + 26, 900 - 31, 22, "#54656f") +
-  rect(CMP.x, 900 - 52, CMP.w, 42, { r: 8, fill: C.white }) + text(CMP.x + 14, 900 - 26, "Ketik pesan", { size: 14, fill: WA.sub }) + circle(SEND[0], 900 - 31, 21, { fill: WA.bar }) + icon("send", SEND[0] - 1, 900 - 31, 18, "#8696a0");
+const cmpEmpty = rect(...CMP_AREA, { fill: WA.bg }) + waFoot();
 
 const REST = [560, 700]; // pointer rest in the grey preview area, clear of the panel
 const KW_S = sl.pos.salin[1] - 600; // bantuan-buka-wa: Salin laporan and Kirim lewat WhatsApp sit low in the dialog view
@@ -416,7 +391,7 @@ export const scenes = {
         body: { svg: sl.svg, skel: true },
         cover: { svg: dlgCover, skel: true },
         salin: { svg: tr(0, -SLT, sl.part.salin), skel: true, enter: "fade", delay: 1.2 },
-        copied: { svg: white(16, sl.pos.hint[1] - SLT - 2, 300, 20) + text(16, sl.pos.hint[1] - SLT + 12, "Tersalin.", { size: 12, fill: C.faint }), skel: true, enter: "fade", delay: 0.1 }
+        copied: { svg: rect(16, sl.pos.hint[1] - SLT - 2, 300, 20, { fill: C.white }) + text(16, sl.pos.hint[1] - SLT + 12, "Tersalin.", { size: 12, fill: C.faint }), skel: true, enter: "fade", delay: 0.1 }
       },
       steps: [
         { caption: "Baca baris versi: Versi, dengan tombol Cek update di kanan.", focus: ver, mark: sl.pos.version, lens: { src: helpLens(ver) } },
@@ -613,14 +588,14 @@ export const scenes = {
         body: { svg: sl.svg, skel: true, enter: "fade" },
         cover: { svg: dlgCover, skel: true, enter: "fade" },
         waBtn: { svg: tr(0, -KW_S, sl.part.wa), skel: true, enter: "fade", delay: 1.2 },
-        wa: { svg: waScreen(cmpTop), skel: true, enter: "fade", delay: 0.25 }
+        wa: { svg: waChat, skel: true, enter: "fade", delay: 0.25 }
       },
       steps: [
         { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", dur: D[0], focus: [0, 92, 399, 140], mark: { box: HELP, r: 6 },
           at: mid(HELP), click: true, show: ["sheet", "body", "cover"], lens: { src: [0, 92, 399, 140], at: [330, 60] } },
         { caption: "Gulir ke tombol laporan: Salin laporan dan Kirim lewat WhatsApp.", dur: D[1], focus: at([16, BTNS[1], 351, 80], KW_S), mark: at([16, BTNS[1], 351, 80], KW_S),
           scroll: { id: "body", dy: KW_S }, show: ["waBtn"], lens: { src: helpLens([16, BTNS[1], 351, 80], KW_S, 4) } },
-        { caption: "Klik Kirim lewat WhatsApp. WhatsApp terbuka di chat admin Nikahin.", dur: D[2], focus: [CHAT_HEAD, CMP_AREA], mark: at(sl.pos.wa, KW_S),
+        { caption: "Klik Kirim lewat WhatsApp. WhatsApp terbuka di chat admin Nikahin.", dur: D[2], focus: [WA_HEAD, CMP_AREA], mark: at(sl.pos.wa, KW_S),
           at: mid(at(sl.pos.wa, KW_S)), click: true, press: "waBtn", show: ["wa"] }
       ]
     };
@@ -629,27 +604,27 @@ export const scenes = {
   "bantuan-kirim-wa": {
     title: "Melengkapi dan mengirim laporan lewat WhatsApp",
     cursorStart: [1100, 300],
-    base: [waScreen(cmpTop)],
+    base: [waChat],
     els: {
       end: { svg: cmpEnd, enter: "fade" },
-      typed1: text(CMP.x + 14, typedY(0), TYPED[0], { size: 14, fill: WA.ink }),
-      typed2: text(CMP.x + 14, typedY(1), TYPED[1], { size: 14, fill: WA.ink }),
+      typed1: text(CX + 14, typedY(0), TYPED[0], { size: 14, fill: WA.ink }),
+      typed2: text(CX + 14, typedY(1), TYPED[1], { size: 14, fill: WA.ink }),
       shot: { svg: shotAttach, enter: "pop", origin: [SHOT.x + SHOT.w / 2, SHOT.y + SHOT.h] },
       empty: { svg: cmpEmpty, enter: "fade" },
       sent: { svg: sentBubble, delay: 0.15 }
     },
     steps: [
-      { caption: "Pesannya sudah terisi: salam dan laporan teknis. Biarkan, jangan dihapus.", dur: 3.6, focus: [CHAT_HEAD, CMP_AREA], mark: { box: CMP_BOX, r: 8 },
-        lens: { src: [CMP.x, CMP.y, 440, 92] } },
-      { caption: "Tulis apa yang kamu lakukan di bawah laporan, dengan kalimat pendek.", dur: 4, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 }, at: [CMP.x + 420, typedY(0) - 5],
-        click: true, show: ["end"], type: [{ id: "typed1", n: 22, box: [CMP.x + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], lens: { src: [CMP.x, CMP.y + 89, 400, 103] } },
+      { caption: "Pesannya sudah terisi: salam dan laporan teknis. Biarkan, jangan dihapus.", dur: 3.6, focus: [WA_HEAD, CMP_AREA], mark: { box: CMP_BOX, r: 8 },
+        lens: { src: [CX, CY, 440, 92] } },
+      { caption: "Tulis apa yang kamu lakukan di bawah laporan, dengan kalimat pendek.", dur: 4, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 }, at: [CX + 420, typedY(0) - 5],
+        click: true, show: ["end"], type: [{ id: "typed1", n: 22, box: [CX + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], lens: { src: [CX, CY + 89, 400, 103] } },
       { caption: "Tulis alamat halamannya, misalnya app.scalev.com/pages/365671.", dur: 3.6, mark: { box: CMP_BOX, r: 8 },
-        type: [{ id: "typed2", n: 18, box: [CMP.x + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], lens: { src: [CMP.x, CMP.y + 111, 400, 89] } },
+        type: [{ id: "typed2", n: 18, box: [CX + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], lens: { src: [CX, CY + 111, 400, 89] } },
       { caption: "Ambil screenshot layarnya, lalu tempel (Ctrl+V) di chat.", dur: 3.4, focus: [grow(SHOT_BOX, 12), CMP_AREA], mark: { box: SHOT_BOX, r: 8 }, show: ["shot"],
         note: "Tempel: Ctrl+V" },
       { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", dur: 3.8, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 },
         note: "Jangan kirim PIN, kode staff, atau data klien" },
-      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [WC + 1, T + 60, 1440 - WC - 1, 900 - T - 60],
+      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [WA_X + 1, T + 60, 1440 - WA_X - 1, 900 - T - 60],
         mark: { box: SEND_BOX, r: 21 }, at: SEND, click: true, hide: ["shot", "end", "typed1", "typed2"], show: ["empty", "sent"] }
     ]
   }
