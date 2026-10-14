@@ -1,10 +1,12 @@
-// Bantuan: dialog Bantuan (nikahkit/src/ui/help.jsx), Izin domain (CSP), pola memperbaiki dari pesan akses (App.jsx
-// AccessGate), mencari pesan di panduan (docs.page), masa aktif (RenewNote, gate expired, pin.html), dan kirim laporan
-// lewat WhatsApp. Ukuran dari /tmp/ref/editor-bantuan.png + editor-metrics.json (Bantuan), gaya dari ui/styles.js.
-import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, nkBtn, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3,
-  chrome, scalevEditor, nkRail, nkHead, ED, note, ring, dim, tw, esc } from "../lib.mjs";
+// Bantuan: dialog Bantuan (nikahkit/src/ui/help.jsx), Izin domain (CSP) dan tab Security Scalev, pola memperbaiki dari
+// pesan akses (App.jsx AccessGate), mencari pesan di panduan (docs.page), masa aktif (RenewNote, gate expired, pin.html,
+// halaman tamu), dan kirim laporan lewat WhatsApp. Setiap adegan satu layar 1440x900 (lib v4).
+// Editor: /tmp/ref/editor-bantuan.png + editor-metrics.json, gaya dari ui/styles.js. docs.page: diukur di Chromium
+// 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Isi tab Security Scalev dan WhatsApp Web: tata letak
+// umum, belum diukur.
+import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3,
+  chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, tw, esc, phoneDesk, PHONE } from "../lib.mjs";
 
-const BG = "#eef1f5"; // stage background (covers below the world)
 const wrap = (s, w, size = 12, weight = 400) => {
   const out = []; let cur = "";
   // Roboto/SF average advance ≈ 0.5em (lib's tw() is a deliberate over-estimate for sizing pills).
@@ -16,6 +18,9 @@ const wrap = (s, w, size = 12, weight = 400) => {
 const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 14}" fill="${o.fill ?? C.strong}" xml:space="preserve">${parts.map((p) => typeof p === "string" ? esc(p)
   : `<tspan${p.w ? ` font-weight="${p.w}"` : ""}${p.fill ? ` fill="${p.fill}"` : ""}${p.u ? ` text-decoration="underline"` : ""}>${esc(p.t)}</tspan>`).join("")}</text>`;
 const tr = (dx, dy, ...kids) => group({ transform: `translate(${dx} ${dy})` }, ...kids);
+const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
+const grow = (b, d) => [b[0] - d, b[1] - d, b[2] + 2 * d, b[3] + 2 * d];
+const mid = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
 
 // ---- Pratinjau undangan (template QA di editor-bantuan.png, data contoh) -------------------------------------------
 const MAROON = "#8a2c22", SCRIPT = "'Great Vibes','Brush Script MT','Snell Roundhand',cursive", SERIF = "Georgia,'Times New Roman',serif";
@@ -53,6 +58,12 @@ const PLAN = "Tahunan";
 const panelKonten = (o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: PLAN }) +
   line(72, 153.5, 399, 153.5, { stroke: C.line }) + (o.top ?? "") + clipped(72, 154, 327, 746, kontenBody(o.dy ?? 0));
 const editorKonten = (o = {}) => scalevEditor(0, 0, { rail: "Konten", ...o }) + PREVIEW + panelKonten(o);
+// Editor element boxes (marks): Scalev tabs, Simpan, rail Bantuan, the close × of a panel-wide dialog.
+const TAB = { Security: [101, 54, 69, 38], NikahKit: [224, 54, 88, 38] };
+const SIMPAN = [1193, 50, 82, 34];
+const HELP = [6, 800, 60, 44];
+const XBOX = [357, 111, 22, 22];
+const TABROW = [0, 44, 399, 48];
 
 // ---- Dialog Bantuan (help.jsx) --------------------------------------------------------------------------------------
 const BASE_CHECKS = ["Aplikasi Scalev (Nuxt/Vue)", "Komponen halaman studio", "HTML Mode aktif", "Editor kode (CodeMirror)", "Strip tab sidebar", "Area panel sidebar",
@@ -69,74 +80,80 @@ const cspLi = (r, y) => {
   return { h, svg: rect(16.5, y + 0.5, 350, h - 1, { r: 4, fill: C.white, stroke: C.line }) + text(27, y + 21, r.o, { size: 12, mono: true, fill: C.strong }) +
     para(27, y + 39, why, { size: 12, fill: C.text, lh: 16 }) + cspBadge(366 - 10 - bw, y + h / 2 - 9, r.st) };
 };
-const mark = (y, kind) => kind === "ok" ? circle(30, y + 18, 10, { fill: C.okSoft }) + iconX("check", 30, y + 18, 12, C.ok, 2.6)
+const glyph = (y, kind) => kind === "ok" ? circle(30, y + 18, 10, { fill: C.okSoft }) + iconX("check", 30, y + 18, 12, C.ok, 2.6)
   : circle(30, y + 18, 10, { fill: C.warnSoft }) + text(30, y + 22.5, "!", { size: 12, weight: 700, fill: C.warnStrong, anchor: "middle" });
-const VERSI = "[versi]";
 
 // Lays out the dialog body exactly like the DOM flow (padding 16, margins from styles.js/base.css) at scroll 0.
 // o.bad: { feature: detail }, o.csp: [{ o: origin, d: directive, st, why }], o.cspMsg: reserve the status line.
+// Returns the whole body, each item's box (pos) and markup (part; buttons are pressed as their own elements).
 function helpBody(o) {
-  const bad = o.bad ?? {}, csp = o.csp ?? [], nBad = Object.keys(bad).length, pos = {};
+  const bad = o.bad ?? {}, csp = o.csp ?? [], nBad = Object.keys(bad).length, pos = {}, part = {};
   let s = "", y = 169;
-  s += text(16, y + 23, "Versi", { size: 14, fill: C.text }) + nkBtn(270, y, "Cek update", { variant: "quiet", w: 97, size: 14 });
-  y += 36; s += text(16, y + 16, "Sudah versi terbaru.", { size: 12, fill: C.faint }); y += 20 + 12;
+  const add = (k, svg) => { part[k] = (part[k] ?? "") + svg; s += svg; };
+  pos.version = [16, y, 351, 36];
+  add("version", text(16, y + 23, "Versi", { size: 14, fill: C.text }) + nkBtn(270, y, "Cek update", { variant: "quiet", w: 97, size: 14 }));
+  y += 36; add("version", text(16, y + 16, "Sudah versi terbaru.", { size: 12, fill: C.faint })); y += 20 + 12;
   const st = wrap(nBad ? `${nBad} perlu perhatian. Muat ulang editor; bila tetap, kirim laporan.` : "Semua berjalan normal.", 327);
   pos.status = [16, y, 351, 20 + st.length * 18];
-  s += nkNote(16, y, 351, st, { tone: nBad ? "warn" : "info" }); y += 20 + st.length * 18 + 12;
+  add("status", nkNote(16, y, 351, st, { tone: nBad ? "warn" : "info" })); y += 20 + st.length * 18 + 12;
   const tip = wrap('Terbit tertahan "not finished previewing"? Muat ulang editor, lalu tekan Simpan & Terbitkan.', 351);
-  s += para(16, y + 12, tip, { size: 12, fill: C.faint, lh: 16 }); y += tip.length * 16;
+  pos.tip = [16, y, 351, tip.length * 16 + 4];
+  add("tip", para(16, y + 12, tip, { size: 12, fill: C.faint, lh: 16 })); y += tip.length * 16;
   pos.rows = {};
   for (const c of CHECKS) {
     const det = bad[c] ? wrap(bad[c], 300) : [], h = 36 + (det.length ? 2 + det.length * 20 : 0) + 1;
     pos.rows[c] = [16, y, 351, h];
-    s += mark(y, bad[c] ? "bad" : "ok") + text(50, y + 23, c, { size: 14, weight: 500, fill: C.strong }) +
-      (det.length ? para(50, y + 44, det, { size: 12, fill: C.text, lh: 20 }) : "") + line(16, y + h - 0.5, 367, y + h - 0.5, { stroke: C.line });
+    add(c, glyph(y, bad[c] ? "bad" : "ok") + text(50, y + 23, c, { size: 14, weight: 500, fill: C.strong }) +
+      (det.length ? para(50, y + 44, det, { size: 12, fill: C.text, lh: 20 }) : "") + line(16, y + h - 0.5, 367, y + h - 0.5, { stroke: C.line }));
     y += h + 2;
   }
   y += -2 + 12;
   pos.salin = [16, y, 351, 36]; pos.wa = [16, y + 44, 351, 36]; pos.panduan = [16, y + 88, 351, 36];
-  s += nkBtn(16, y, "Salin laporan", { variant: "ghost", w: 351, size: 14, icon: "copy" }) + nkBtn(16, y + 44, "Kirim lewat WhatsApp", { variant: "quiet", w: 351, size: 14, icon: "message-circle" }) +
-    nkBtn(16, y + 88, "Panduan", { variant: "quiet", w: 351, size: 14, icon: "book-open" });
+  add("salin", nkBtn(16, y, "Salin laporan", { variant: "ghost", w: 351, size: 14, icon: "copy" }));
+  add("wa", nkBtn(16, y + 44, "Kirim lewat WhatsApp", { variant: "quiet", w: 351, size: 14, icon: "message-circle" }));
+  add("panduan", nkBtn(16, y + 88, "Panduan", { variant: "quiet", w: 351, size: 14, icon: "book-open" }));
   y += 124; pos.hint = [16, y + 4, 351, 16];
-  s += text(16, y + 16, "Tanpa data undangan.", { size: 12, fill: C.faint }); y += 20 + 24;
-  pos.cspH3 = y; s += nkH3(16, y + 12, "Izin domain (CSP)"); y += 24;
+  add("hint", text(16, y + 16, "Tanpa data undangan.", { size: 12, fill: C.faint })); y += 20 + 24;
+  pos.cspH3 = y; add("cspH3", nkH3(16, y + 12, "Izin domain (CSP)")); y += 24;
   pos.csp = [];
-  if (!csp.length) { s += nkNote(16, y, 351, ["Tidak butuh izin tambahan."]); y += 38 + 12; }
+  if (!csp.length) { add("csp", nkNote(16, y, 351, ["Tidak butuh izin tambahan."])); y += 38 + 12; }
   else {
-    csp.forEach((r) => { const li = cspLi(r, y); pos.csp.push([16, y, 351, li.h]); s += li.svg; y += li.h + 6; });
+    csp.forEach((r, i) => { const li = cspLi(r, y); pos.csp.push([16, y, 351, li.h]); add(`csp${i}`, li.svg); y += li.h + 6; });
     y += -6 + 10;
     const failed = csp.some((r) => r.st === "failed");
     pos.periksa = [16, y, 351, 36]; pos.salinCsp = [16, y + 44, 351, 36];
-    s += nkBtn(16, y, "Periksa ulang", { variant: "ghost", w: 351, size: 14 }) + nkBtn(16, y + 44, failed ? "Salin domain kurang" : "Salin daftar domain", { variant: "quiet", w: 351, size: 14, icon: "copy" });
+    add("periksa", nkBtn(16, y, "Periksa ulang", { variant: "ghost", w: 351, size: 14 }));
+    add("salinCsp", nkBtn(16, y + 44, failed ? "Salin domain kurang" : "Salin daftar domain", { variant: "quiet", w: 351, size: 14, icon: "copy" }));
     y += 80; pos.cspMsg = [16, y + 4, 351, 16]; if (o.cspMsg) y += 20;
   }
   y += 12;
-  s += text(20, y + 20, "▸", { size: 12, fill: C.action }) + text(34, y + 20, "Lihat isi laporan", { size: 12, fill: C.action }); y += 32;
-  return { svg: s, pos, end: y + 16 };
+  add("more", text(20, y + 20, "▸", { size: 12, fill: C.action }) + text(34, y + 20, "Lihat isi laporan", { size: 12, fill: C.action })); y += 32;
+  return { svg: s, pos, part, end: y + 16 };
 }
-// Dialog chrome: static white sheet, and a cover drawn after the scrolling body (Scalev bars, dialog header, below 900).
+// Dialog pieces: white sheet, header (title + ×), the body scrolled by dy inside the view (y 154..900), and the Scalev
+// bars over the dialog's column (they hide a body that scrolls up past the header).
 const dlgSheet = rect(0, 92, 398, 808, { fill: C.white });
-const dlgCover = (tab = "NikahKit") => clipped(0, 0, 399, 92, scalevEditor(0, 0, { tab, rail: "Konten" })) + rect(0, 92, 398, 61, { fill: C.white }) +
-  text(16, 128, "Bantuan", { size: 16, weight: 700, fill: C.strong }) + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line }) +
-  rect(0, 900, 400, 3000, { fill: BG });
-const box = (p, dy = 0) => [p[0], p[1] - dy, p[2], p[3]];
-const mid = (p, dy = 0, dx = 0) => [p[0] + p[2] / 2 + dx, p[1] - dy + p[3] / 2];
-const RAIL_HELP = [36, 821];
-// Guide callout below its target (lib's note() points down from the pill; this one points up).
-const calloutUp = (x, y, label, tx, ty) => { const w = tw(label, 14, 600) + 28; return line(x + w / 2, y, tx, ty, { stroke: C.accent, sw: 2 }) + circle(tx, ty, 4, { fill: C.accent }) +
-  rect(x, y, w, 32, { r: 16, fill: C.accent }) + text(x + w / 2, y + 21, label, { size: 14, weight: 600, fill: C.white, anchor: "middle" }); };
+const dlgHead = white(0, 92, 398, 61) + text(16, 128, "Bantuan", { size: 16, weight: 700, fill: C.strong }) + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
+const dlgView = (b, dy) => white(0, 154, 398, 746) + clipped(0, 154, 398, 746, tr(0, -dy, b.svg));
+const edBars = clipped(0, 0, 399, 92, scalevEditor(0, 0, { rail: "Konten" }));
+const dlgCover = edBars + dlgHead;
+// Box of a dialog item at scroll dy, and a lens source around it (the dialog's full width).
+const at = (b, dy = 0) => [b[0], b[1] - dy, b[2], b[3]];
+const helpLens = (b, dy = 0, pad = 14) => [0, b[1] - dy - pad, 399, b[3] + 2 * pad];
 
-// ---- Scene 1: Bantuan + Salin laporan ------------------------------------------------------------------------------
+// ---- bantuan-salin-laporan / bantuan-buka-wa: one report state --------------------------------------------------------
 const SL_BAD = { "Penyimpanan ucapan dan RSVP": "simpan halaman di Scalev dulu" };
 const SL_CSP = [{ o: "https://www.youtube.com", d: "script_src", st: "exists", why: "Musik atau video YouTube" },
   { o: "https://www.youtube.com", d: "frame_src", st: "exists", why: "Musik atau video YouTube" }];
 const sl = helpBody({ bad: SL_BAD, csp: SL_CSP });
-// View shows dialog y 154..687. Scroll increments (scroll dy is relative): bad row to y 560, then Salin laporan to y 520.
-const SL1 = sl.pos.rows["Penyimpanan ucapan dan RSVP"][1] - 560;
+const BAD_ROW = "Penyimpanan ucapan dan RSVP";
+// Scroll increments (scroll dy is relative): the bad row to y 560, then Salin laporan to y 520.
+const SL1 = sl.pos.rows[BAD_ROW][1] - 560;
 const SL2 = sl.pos.salin[1] - 520 - SL1;
-const TIP = [12, sl.pos.status[1] + sl.pos.status[3] + 7, 359, 37];
+const SLT = SL1 + SL2;
+const BTNS = [16, sl.pos.salin[1], 351, 124];
 
-// ---- Scene 2: Izin domain (CSP) -------------------------------------------------------------------------------------
+// ---- bantuan-izin-domain / -security / -simpan ------------------------------------------------------------------------
 const ORIGIN = "https://foto.contoh.com";
 const IZ_BAD = { "Izin domain di tab Security": `${ORIGIN} (img_src)` };
 const IZ_CSP = [{ o: "https://www.youtube.com", d: "script_src", st: "added", why: "Musik atau video YouTube" },
@@ -144,19 +161,23 @@ const IZ_CSP = [{ o: "https://www.youtube.com", d: "script_src", st: "added", wh
   { o: ORIGIN, d: "img_src", st: "failed", why: "Foto dari luar Media Scalev" }];
 const iz = helpBody({ bad: IZ_BAD, csp: IZ_CSP, cspMsg: true });
 const IZ1 = iz.end - 900; // fully scrolled: Izin domain (CSP) section in view
-const todoBox = box(iz.pos.csp[2], IZ1);
 // After Periksa ulang: store.recheckCsp() re-reads the Security tab, so cspList turns "exists" and cspWarn empties,
 // which also turns the check row "Izin domain di tab Security" to OK (help.jsx checks; store.js recheckCsp).
 const izF = helpBody({ csp: IZ_CSP.map((r) => ({ ...r, st: r.st === "failed" ? "exists" : r.st })), cspMsg: true });
 const IZF = izF.end - 900;
-const SIMPAN = [1234, 67];
-// Scalev Security tab (column names from the guide's Izin domain page; Scalev tutorial).
+const izCopied = text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint });
+const izDialog = (copied) => dlgSheet + dlgHead + dlgView(iz, IZ1) + (copied ? izCopied : "");
+const CSP_AREA = [0, iz.pos.csp[0][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[0][1]];
+// Scalev Security tab (column names from the guide's Izin domain page and Scalev's tutorial; layout not measured).
 const SOURCES = ["Connect Sources", "Image Sources", "Media Sources", "Font Sources", "Style Sources", "Script Sources", "Frame Sources"];
 const srcY = (i) => 116 + i * 72;
-const securityTab = clipped(0, 44, 399, 856, scalevEditor(0, 0, { tab: "Security" })) + rect(0, 93, 398, 807, { fill: C.white }) +
+const securityBody = rect(0, 93, 398, 807, { fill: C.white }) +
   SOURCES.map((l, i) => text(20, srcY(i) + 14, l, { size: 13, weight: 500, fill: C.strong }) + rect(20.5, srcY(i) + 24.5, 357, 36, { r: 4, fill: C.white, stroke: C.svDivider })).join("");
+const IMG_IN = [20, srcY(1) + 24, 358, 37];
+const pasted = rect(20, srcY(1) + 24, 358, 37, { r: 4, fill: C.white, stroke: C.primary, sw: 2 }) + text(32, srcY(1) + 48, ORIGIN, { size: 14, fill: C.strong });
+const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PREVIEW + securityBody + (o.pasted ? pasted : "");
 
-// ---- Scene 3: pola memperbaiki (AccessGate) -------------------------------------------------------------------------
+// ---- bantuan-cek-gejala: AccessGate ----------------------------------------------------------------------------------
 function gate(lines, o = {}) {
   let s = rect(0, 92, 398, 808, { fill: C.white }) + text(16, 128, "NikahKit", { size: 16, weight: 700, fill: C.strong }) +
     (o.chip ? chip(262, 108, PLAN) : "") + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
@@ -166,499 +187,565 @@ function gate(lines, o = {}) {
 }
 const chip = (x, y, label, warn) => rect(x + 0.5, y + 0.5, 79, 27, { r: 14, fill: warn ? C.warnSoft : C.white, stroke: warn ? "#fde7c7" : C.field }) +
   icon("circle-user-round", x + 16, y + 14, 14, warn ? C.warn : C.action) + text(x + 27, y + 18, label, { size: 12, weight: 500, fill: warn ? C.warnStrong : C.strong });
-const GATE_SERVER = gate([[{ t: "Server NikahKit tidak terjangkau.", w: 700 }, " Periksa"], ["internet, lalu tekan Periksa lagi."]], { warn: true });
-const RECHECK = [16, 237, tw("Periksa lagi", 14, 500) + 24, 36];
+const RECHECK = nkBtnBox(16, 237, "Periksa lagi", { size: 14 });
+const recheckBtn = nkBtn(16, 237, "Periksa lagi", { variant: "quiet", w: RECHECK[2], size: 14 });
+const GATE_SERVER = gate([[{ t: "Server NikahKit tidak terjangkau.", w: 700 }, " Periksa"], ["internet, lalu tekan Periksa lagi."]], { warn: true, buttons: recheckBtn });
+const GATE_MSG = [16, 169, 351, 56];
+const RAIL_TABS = [0, 104, 72, 336];
 
-// ---- Scene 5: masa aktif ---------------------------------------------------------------------------------------------
-const PH = { x: 672, y: 92 }; // guest phone screen 390x844 (its own scene, cropped to the phone)
+// ---- bantuan-masa-aktif ------------------------------------------------------------------------------------------------
 const renewNote = (lines, err) => {
   const h = Math.max(56, 20 + lines.length * 18), fg = err ? C.danger : C.warnStrong;
-  return { h, svg: rect(88, 169, 279, h, { r: 4, fill: err ? C.dangerSoft : C.warnSoft }) + para(100, 169 + h / 2 - (lines.length - 1) * 9 + 4, lines, { size: 12, fill: fg, lh: 18 }) +
+  return { h, box: [88, 169, 279, h], svg: rect(88, 169, 279, h, { r: 4, fill: err ? C.dangerSoft : C.warnSoft }) + para(100, 169 + h / 2 - (lines.length - 1) * 9 + 4, lines, { size: 12, fill: fg, lh: 18 }) +
     nkBtn(265, 169 + h / 2 - 18, "Perpanjang", { variant: "quiet", w: 90 }) };
 };
 const RN_WARN = renewNote(["Langganan berakhir 5 hari", "lagi."]);
 const RN_ERR = renewNote(["Langganan berakhir. 6 hari", "lagi ucapan, RSVP, dan", "Dashboard berhenti."], true);
-const panelWith = (rn, warnChip) => rect(72, 154, 327, 746, { fill: C.white }) + rn.svg + clipped(72, 154, 327, 746, kontenBody(rn.h + 12)) +
-  (warnChip ? rect(262, 108, 81, 29, { fill: C.white }) + chip(262, 108, PLAN, true) : "");
-const TL = { x: 410, y: 136, w: 256 };
+const CHIP = [262, 108, 80, 28];
+const panelWith = (rn) => rect(72, 154, 327, 746, { fill: C.white }) + rn.svg + clipped(72, 154, 327, 746, kontenBody(rn.h + 12)) +
+  rect(262, 108, 81, 29, { fill: C.white }) + chip(262, 108, PLAN, true);
+// Guide timeline (not part of the UI), in the grey preview area left of the invitation.
+const TL = { x: 435, y: 136, w: 256 };
 const TL_ROWS = [["Aktif", "Semua fitur jalan", C.ok], ["7 hari terakhir", "Panel mengingatkan", C.changed], ["Tenggang 7 hari", "Fitur masih jalan", C.warn], ["Habis", "RSVP dan ucapan berhenti", C.danger]];
 const tlY = (i) => TL.y + 56 + i * 68;
 const timeline = shadow(TL.x, TL.y, TL.w, 330, 10, 2) + rect(TL.x, TL.y, TL.w, 330, { r: 10, fill: C.white }) +
   text(TL.x + 20, TL.y + 32, "Masa aktif paket", { size: 15, weight: 700, fill: C.ink }) + line(TL.x + 30, tlY(0) + 10, TL.x + 30, tlY(3) + 10, { stroke: "#d9dee5", sw: 2 }) +
   TL_ROWS.map(([l, sub, c], i) => circle(TL.x + 30, tlY(i) + 10, 8, { fill: c }) + text(TL.x + 50, tlY(i) + 14, l, { size: 14, weight: 600, fill: C.ink }) +
     text(TL.x + 50, tlY(i) + 33, sub, { size: 12, fill: C.faint })).join("");
-const tlRing = (i) => rect(TL.x + 10, tlY(i) - 10, TL.w - 20, 56, { r: 8, stroke: C.accent, sw: 2.5 });
-// Guest phone: published invitation, section Ucapan (runtime labels from the template build).
-function guestPhone(closed) {
-  const x = PH.x, y = PH.y, cx = x + 195;
-  let s = shadow(x, y, 390, 844, 0) + rect(x, y, 390, 844, { fill: "#fdf6ee" }) + scallops(x, y);
-  s += text(cx, y + 110, "Ucapan", { size: 46, fill: MAROON, anchor: "middle", font: SCRIPT, italic: true });
-  const fx = x + 32, fw = 326;
-  if (closed) return s + rect(fx, y + 150, fw, 96, { r: 12, fill: C.white, stroke: "#ead8cf" }) + text(cx, y + 205, "Ucapan & RSVP sudah ditutup.", { size: 16, fill: "#333", anchor: "middle", font: SERIF }) + bottomNav(x, y + 762);
-  const lab = (yy, l) => text(fx, yy, l, { size: 14, fill: "#333", font: SERIF });
-  const fld = (yy, h = 40) => rect(fx + 0.5, yy + 0.5, fw - 1, h, { r: 8, fill: C.white, stroke: "#d8c6bd" });
-  s += lab(y + 170, "Nama") + fld(y + 180) + lab(y + 250, "Konfirmasi kehadiran") +
-    ["Hadir", "Masih ragu", "Tidak hadir"].map((l, i) => rect(fx + 0.5 + i * 110, y + 260.5, 104, 38, { r: 19, fill: i ? C.white : MAROON, stroke: MAROON }) +
-      text(fx + 52 + i * 110, y + 285, l, { size: 13, fill: i ? MAROON : C.white, anchor: "middle", font: SERIF })).join("") +
-    lab(y + 330, "Jumlah yang hadir") + fld(y + 340) + text(fx + 14, y + 366, "1 orang", { size: 14, fill: "#333", font: SERIF }) + icon("chevron-down", fx + fw - 18, y + 360, 16, "#333") +
-    lab(y + 410, "Ucapan & doa") + fld(y + 420, 96) + rect(fx, y + 532, fw, 44, { r: 22, fill: MAROON }) + text(cx, y + 559, "Kirim", { size: 15, fill: C.white, anchor: "middle", font: SERIF });
-  return s + bottomNav(x, y + 762);
-}
-const GATE_EXP_BTN = [16, 237, tw("Pilih paket", 14, 500) + 24, 36];
+const tlBox = (i) => [TL.x + 14, tlY(i) - 6, TL.w - 28, 48];
+const GATE_EXP_BTN = nkBtnBox(16, 237, "Pilih paket", { size: 14 });
+const pilihBtn = nkBtn(16, 237, "Pilih paket", { w: GATE_EXP_BTN[2], size: 14 });
 const GATE_EXPIRED = gate([[{ t: "Langganan NikahKit sudah habis.", w: 700 }, " Undangan tayang"], ["tetap tampil."]], {
-  warn: true, chip: true,
-  buttons: nkBtn(16, 237, "Pilih paket", { w: GATE_EXP_BTN[2], size: 14 }) + nkBtn(24 + GATE_EXP_BTN[2], 237, "Periksa lagi", { variant: "quiet", size: 14 })
+  warn: true, chip: true, buttons: pilihBtn + nkBtn(24 + GATE_EXP_BTN[2], 237, "Periksa lagi", { variant: "quiet", size: 14 })
 });
 // NikahKit account window (ext/pin.html, editor-akun.png): header, email + Keluar, Paket card, Bisnis Scalev card.
+const AW = { x: 500, y: 261, w: 440 };
+const AW_LIC = wrap("Langganan habis. Undangan tetap tampil, tetapi RSVP dan ucapan berhenti. Pilih paket.", 370, 14);
+const AW_PH = 16 + 16 + 8 + AW_LIC.length * 20 + 8 + 36 + 16, AW_BY = AW.y + 92 + AW_PH + 12, AW_H = AW_BY - AW.y + 122 + 16;
 function accountWindow() {
-  const x = 500, y = 261, w = 440;
-  const lic = wrap("Langganan habis. Undangan tetap tampil, tetapi RSVP dan ucapan berhenti. Pilih paket.", 370, 14);
-  const pH = 16 + 16 + 8 + lic.length * 20 + 8 + 36 + 16, bY = y + 92 + pH + 12, h = bY - y + 122 + 16;
-  return shadow(x, y, w, h, 8, 3) + rect(x, y, w, h, { r: 8, fill: C.white }) +
+  const { x, y, w } = AW;
+  return shadow(x, y, w, AW_H, 8, 3) + rect(x, y, w, AW_H, { r: 8, fill: C.white }) +
     rect(x + 16, y + 16, 32, 32, { r: 7, fill: "#4a9de8" }) + circle(x + 27, y + 32, 6.5, { stroke: C.white, sw: 2.6 }) + circle(x + 37, y + 32, 6.5, { stroke: C.white, sw: 2.6 }) +
     text(x + 58, y + 38, "NikahKit", { size: 16, weight: 700, fill: C.strong }) + iconX("x", x + w - 30, y + 30, 18, C.text) +
     text(x + 16, y + 76, "rina@contoh.com", { size: 12, weight: 700, fill: C.faint }) + text(x + w - 16, y + 76, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
-    rect(x + 16.5, y + 92.5, w - 33, pH, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, y + 92 + 28, "Paket") +
-    para(x + 33, y + 92 + 54, lic, { size: 14, fill: C.warnStrong, lh: 20 }) + nkBtn(x + 33, y + 92 + 40 + lic.length * 20 + 8, "Pilih paket", { size: 14 }) +
-    rect(x + 16.5, bY + 0.5, w - 33, 121, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, bY + 28, "Bisnis Scalev") +
-    text(x + 33, bY + 54, "Rina WO", { size: 14, fill: C.text }) + nkBtn(x + 33, bY + 70, "Hubungkan ulang", { variant: "quiet", size: 14 });
+    rect(x + 16.5, y + 92.5, w - 33, AW_PH, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, y + 92 + 28, "Paket") +
+    para(x + 33, y + 92 + 54, AW_LIC, { size: 14, fill: C.warnStrong, lh: 20 }) + nkBtn(x + 33, y + 92 + 40 + AW_LIC.length * 20 + 8, "Pilih paket", { size: 14 }) +
+    rect(x + 16.5, AW_BY + 0.5, w - 33, 121, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, AW_BY + 28, "Bisnis Scalev") +
+    text(x + 33, AW_BY + 54, "Rina WO", { size: 14, fill: C.text }) + nkBtn(x + 33, AW_BY + 70, "Hubungkan ulang", { variant: "quiet", size: 14 });
 }
 
-// ---- Scene 4: docs.page (panduan) in a 1110 px Chrome window ----------------------------------------------------------
-// Below 1280 px docs.page hides "On this page"; the content column (320..1104) stays, the header's right group and
-// Chrome's find bar sit at the window's right edge. The crop shows only the content column (x 300..1110).
-const T = 85; // Chrome content top
-const DOCW = 1110;
-const DOC = { ink: "#171717", sub: "#737373", line: "#e5e5e5", head: "#f9f9f9", code: "#f5f5f5" };
-const docsHeader = rect(0, T, DOCW, 64, { fill: C.white }) + tr(DOCW - 1440, 0,
-  rect(1090.5, T + 12.5, 126, 31, { r: 8, fill: C.white, stroke: DOC.line }) + iconX("search", 1109, T + 28, 15, DOC.ink) + text(1125, T + 33, "Search", { size: 14, weight: 500, fill: DOC.ink }) +
-  text(1203, T + 33, "⌘K", { size: 12, fill: DOC.sub, anchor: "end" }) + rect(1227, T + 12, 92, 32, { r: 8, fill: C.accent }) + text(1273, T + 33, "WhatsApp", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
-  circle(1345, T + 28, 9, { fill: DOC.ink }) + text(1367, T + 33, "0", { size: 13, fill: DOC.sub, anchor: "middle" }) + circle(1401, T + 28, 8, { fill: DOC.ink }) + circle(1405, T + 25, 7, { fill: C.white }));
-const DOC_VIEW = { x: 300, y: T, w: DOCW - 300, h: 640 };
-const TOP = T + 64; // first content y under the docs header
-const docClip = (...k) => clipped(290, TOP, 860, 985 - TOP, ...k);
-// Runs whose width must line up with a highlight are drawn at an exact advance (textLength), so the search highlight
-// and inline code chip fit their text in any viewer font.
-const adv = (s, size, o = {}) => s.length * size * (o.mono ? 0.6 : (o.weight ?? 400) >= 600 ? 0.53 : 0.5);
-const run = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 14}" fill="${o.fill ?? DOC.ink}"${o.weight ? ` font-weight="${o.weight}"` : ""}${o.mono ? ` font-family="'Roboto Mono',ui-monospace,Menlo,monospace"` : ""} textLength="${adv(s, o.size ?? 14, o)}" lengthAdjust="spacingAndGlyphs" xml:space="preserve">${esc(s)}</text>`;
-const codeChip = (x, y, s) => { const w = adv(s, 14, { mono: true }) + 10; return { w, svg: rect(x, y - 16, w, 22, { r: 4, fill: DOC.code, stroke: DOC.line }) + run(x + 5, y, s, { mono: true }) }; };
-const pageTop = docClip(
-  text(320, T + 138, "Kamus pesan galat", { size: 36, weight: 500, fill: DOC.ink }),
-  rect(952.5, T + 109.5, 151, 31, { r: 8, fill: C.white, stroke: DOC.line }) + icon("copy", 970, T + 125, 14, DOC.ink) + text(986, T + 130, "Copy page", { size: 14, weight: 500, fill: DOC.ink }) +
-    line(1068.5, T + 110, 1068.5, T + 140, { stroke: DOC.line }) + icon("chevron-down", 1086, T + 125, 14, DOC.ink),
-  para(320, T + 173, ["Semua pesan yang bisa muncul di NikahKit, Buku Tamu, Dashboard pasangan, halaman tamu,", "halaman check-in, dan form pesanan klien, lengkap dengan artinya dan yang harus dilakukan."], { size: 18, fill: DOC.sub, lh: 28 }),
-  para(320, T + 261, ["Lihat pesan aneh di layar? Cari kalimatnya di halaman ini. Setiap tabel berisi pesan persis seperti di layar,", "artinya, dan langkah yang harus kamu lakukan."], { size: 16, fill: DOC.ink, lh: 28 }),
-  rect(320.5, T + 313.5, 783, 235, { r: 12, fill: "#f0fafe", stroke: "#b9e4f6" }) + circle(345, T + 336, 7, { fill: DOC.ink }) + text(345, T + 340, "i", { size: 10, weight: 700, fill: C.white, anchor: "middle" }) +
-    text(361, T + 341, "Information", { size: 14, weight: 500, fill: DOC.ink }) + text(361, T + 367, "Yang kamu perlukan", { size: 14, weight: 700, fill: DOC.ink }) +
-    [[406, "Kalimat pesan yang kamu lihat. Cukup beberapa kata awalnya."], [442, "Tahu di layar mana pesan itu muncul: panel NikahKit di editor Scalev, jendela akun NikahKit, Buku Tamu,"],
-      [470, "Dashboard pasangan, halaman tamu, atau halaman check-in.", true], [506, "Untuk gejala tanpa pesan, pakai Masalah umum."]]
-      .map(([y, t, cont]) => (cont ? "" : circle(372, T + y - 5, 2.2, { fill: "#525252" })) + text(389, T + y, t, { size: 14, fill: "#404040" })).join(""),
-  rect(320, T + 565, 784, 520, { r: 12, fill: "#f8f9fa" }) + rect(352.5, T + 584.5, 719, 470, { r: 8, fill: C.white, stroke: DOC.line }) + rect(353, T + 585, 718, 28, { r: 8, fill: "#e8eaed" }) +
-    rect(372, T + 640, 220, 14, { r: 7, fill: "#e5e7eb" }) + rect(372, T + 668, 300, 9, { r: 4.5, fill: "#eceef1" }) + rect(372, T + 710, 680, 30, { fill: DOC.head })
-);
-// "Langkah" (Steps). Match 1 = the code chip "Sesi berakhir" in step 3.
-const STEPS = [["Catat pesannya", [["Salin atau tulis kalimat pesan persis seperti di layar, termasuk titiknya. Kalau ada kode dalam"], ["kurung, misalnya ", { code: "Gagal (rate_limited)." }, ", catat kodenya juga."]]],
-  ["Tekan Ctrl+F di halaman ini", [["Di Mac tekan Cmd+F. Kotak cari muncul di kanan atas Chrome."]]],
-  ["Ketik beberapa kata awal pesan", [["Misalnya ", { code: "Sesi berakhir", match: true }, ". Chrome menandai kata yang cocok dengan warna kuning. Tekan Enter untuk"], ["lompat ke hasil berikutnya."]]],
-  ["Baca kolom Artinya", [["Kolom ini menjelaskan penyebab pesan itu muncul."]]],
-  ["Kerjakan kolom Yang harus dilakukan", [["Ikuti langkahnya, lalu ulangi tindakan yang tadi gagal. Kalau di editor, klik Periksa lagi bila"], ["tombolnya ada."]]]];
-const MATCH = {};
-const pageSteps = (() => {
-  let s = text(320, TOP + 58, "Langkah", { size: 28, weight: 500, fill: DOC.ink }), y = TOP + 112;
-  const y0 = y;
-  STEPS.forEach(([title, body], i) => {
-    s += circle(336, y - 6, 14, { fill: "#f5f5f5", stroke: DOC.line }) + text(336, y - 1, String(i + 1), { size: 13, weight: 600, fill: DOC.ink, anchor: "middle" }) +
-      text(366, y, title, { size: 16, weight: 600, fill: DOC.ink });
-    y += 32;
-    body.forEach((ln) => {
-      let x = 366;
-      ln.forEach((p) => {
-        if (typeof p === "string") { s += ln.length > 1 ? run(x, y, p, { size: 16, fill: "#404040" }) : text(x, y, p, { size: 16, fill: "#404040" }); x += adv(p, 16); }
-        else { const c = codeChip(x + 2, y, p.code); if (p.match) MATCH.one = [x + 2, y - 16, c.w, 22]; s += c.svg; x += c.w + 4; }
-      });
-      y += 28;
-    });
-    y += 26;
+// ---- bantuan-masa-aktif-tamu: published invitation, section Ucapan (runtime labels from the template build) ----------
+const PX = PHONE.x, PY = PHONE.y, PCX = PX + 195, FX = PX + 32, FW = 326;
+function guestPhone(closed) {
+  let s = rect(PX, PY, 390, 844, { fill: "#fdf6ee" }) + scallops(PX, PY) +
+    text(PCX, PY + 110, "Ucapan", { size: 46, fill: MAROON, anchor: "middle", font: SCRIPT, italic: true });
+  if (closed) return s + rect(FX, PY + 150, FW, 96, { r: 12, fill: C.white, stroke: "#ead8cf" }) + text(PCX, PY + 205, "Ucapan & RSVP sudah ditutup.", { size: 16, fill: "#333", anchor: "middle", font: SERIF }) + bottomNav(PX, PY + 762);
+  const lab = (yy, l) => text(FX, yy, l, { size: 14, fill: "#333", font: SERIF });
+  const fld = (yy, h = 40) => rect(FX + 0.5, yy + 0.5, FW - 1, h, { r: 8, fill: C.white, stroke: "#d8c6bd" });
+  s += lab(PY + 170, "Nama") + fld(PY + 180) + lab(PY + 250, "Konfirmasi kehadiran") +
+    ["Hadir", "Masih ragu", "Tidak hadir"].map((l, i) => rect(FX + 0.5 + i * 110, PY + 260.5, 104, 38, { r: 19, fill: i ? C.white : MAROON, stroke: MAROON }) +
+      text(FX + 52 + i * 110, PY + 285, l, { size: 13, fill: i ? MAROON : C.white, anchor: "middle", font: SERIF })).join("") +
+    lab(PY + 330, "Jumlah yang hadir") + fld(PY + 340) + text(FX + 14, PY + 366, "1 orang", { size: 14, fill: "#333", font: SERIF }) + icon("chevron-down", FX + FW - 18, PY + 360, 16, "#333") +
+    lab(PY + 410, "Ucapan & doa") + fld(PY + 420, 96) + rect(FX, PY + 532, FW, 44, { r: 22, fill: MAROON }) + text(PCX, PY + 559, "Kirim", { size: 15, fill: C.white, anchor: "middle", font: SERIF });
+  return s + bottomNav(PX, PY + 762);
+}
+const FORM = [FX - 4, PY + 150, FW + 8, 432];
+const CLOSED = [FX, PY + 150, FW, 96];
+
+// ---- docs.page (panduan) in a 1440x900 Chrome window, measured at 1440 wide --------------------------------------------
+// Viewport y + 85 = world y. Header 65 (border once scrolled), sidebar 16..248, content column 320..1089, "On this page"
+// 1169..1409. Every line is pinned to its width (textLength): measured where given (len), else Roboto's average advance
+// (0.48 / 0.51 / 0.55 em by weight), so the text and its skeleton bar keep the real line length in any viewer font.
+const T = 85;
+const DOC = { ink: "#171717", body: "#2e2e2e", sub: "#737373", line: "#e5e5e5", muted: "#f5f5f5", head: "#fafafa", accent: "#b8460d" };
+const dw = (s, o = {}) => Math.round(s.length * (o.size ?? 16) * ((o.weight ?? 400) >= 600 ? 0.55 : (o.weight ?? 400) >= 500 ? 0.51 : 0.48));
+const dt = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 16}" fill="${o.fill ?? DOC.body}"${o.weight ? ` font-weight="${o.weight}"` : ""}${o.anchor ? ` text-anchor="${o.anchor}"` : ""}` +
+  ` textLength="${o.len ?? Math.min(dw(s, o), o.max ?? Infinity)}" lengthAdjust="spacingAndGlyphs" xml:space="preserve">${esc(s)}</text>`;
+// A line of runs (strings or { t, w, u, uc, len }), each pinned, laid out left to right; u = underlined (links).
+const drun = (x, y, parts, o = {}) => parts.map((p) => {
+  const q = typeof p === "string" ? { t: p } : p, oo = { ...o, weight: q.w ?? o.weight }, w = q.len ?? dw(q.t, oo);
+  const s = dt(x, y, q.t, { ...oo, len: w }) + (q.u ? line(x, y + 3.5, x + w, y + 3.5, { stroke: q.uc ?? DOC.sub }) : "");
+  x += w; return s;
+}).join("");
+const dpara = (x, y, lines, o = {}) => lines.map((l, i) => (Array.isArray(l) ? drun(x, y + i * (o.lh ?? 28), l, o) : dt(x, y + i * (o.lh ?? 28), l, o))).join("");
+const docsTab = (title, path) => chrome(0, 0, 1440, 900, { tabs: [{ title, active: true, fav: (cx, cy) => nkLogo(cx, cy, 14) }], url: `docs.page/hasyaapp/nikahkit-panduan/${path}` });
+const moon = (cx, cy) => `<path d="M${cx + 6} ${cy + 3} A7 7 0 1 1 ${cx - 2} ${cy - 7} A5.5 5.5 0 0 0 ${cx + 6} ${cy + 3} Z" fill="${DOC.ink}"/>`;
+const docsHeader = (scrolled) => white(0, T, 1440, 65) + (scrolled ? line(0, T + 64.5, 1440, T + 64.5, { stroke: DOC.line }) : "") +
+  nkLogo(32, T + 28, 20) + dt(56, T + 33, "Panduan NikahKit", { size: 16, weight: 500, fill: DOC.ink, len: 131 }) +
+  rect(1075.5, T + 12.5, 126, 31, { r: 8, fill: C.white, stroke: DOC.line }) + iconX("search", 1094, T + 28, 15, DOC.ink) + dt(1110, T + 33, "Search", { size: 14, weight: 500, fill: DOC.ink, len: 46 }) +
+  rect(1164, T + 20, 27, 17, { r: 4, fill: DOC.muted }) + text(1177.5, T + 32, "⌘K", { size: 11, weight: 500, fill: DOC.sub, anchor: "middle" }) +
+  rect(1211, T + 12, 95, 32, { r: 8, fill: DOC.accent }) + dt(1258.5, T + 33, "WhatsApp", { size: 14, weight: 500, fill: C.white, anchor: "middle", len: 67 }) +
+  circle(1330, T + 28, 9, { fill: DOC.ink }) + text(1352, T + 32, "0", { size: 12, weight: 500, fill: DOC.sub, anchor: "middle" }) + moon(1386, T + 28);
+const SIDEBAR = [["rocket", "Mulai", 120, [["Selamat datang", 141], ["Alur kerja dari nol sampai jualan", 181], ["Istilah penting", 221]], 273],
+  ["users", "Gabung dan pasang", 305, [["Pilih paket membership", 326], ["Pasang ekstensi NikahKit", 366], ["Masuk dan bayar membership", 406], ["Hubungkan bisnis Scalev", 446], ["Update ekstensi", 486]], 538],
+  ["home", "Siapkan Scalev", 570, [["Akun dan paket Scalev", 591], ["Buat halaman undangan", 631], ["Simpan dan terbitkan", 671], ["Thumbnail WhatsApp dan|sosmed", 711], ["Alamat dan domain sendiri", 771]]]];
+const docsSidebar = (active) => SIDEBAR.map(([ic, h, hy, items, sep]) => iconX(ic, 32, T + hy, 14, DOC.ink) + dt(50, T + hy + 4, h, { size: 12, weight: 500, fill: DOC.ink }) +
+  items.map(([l, y]) => { const on = l === active; return (on ? rect(16, T + y, 232, 36, { r: 8, fill: DOC.muted }) : "") + dpara(24, T + y + 23, l.split("|"), { size: 14, weight: on ? 500 : undefined, fill: on ? DOC.ink : y > 760 ? "#a3a3a3" : DOC.sub, lh: 20 }); }).join("") +
+  (sep ? line(16, T + sep + 0.5, 248, T + sep + 0.5, { stroke: DOC.line }) : "")).join("");
+// "On this page": items [label, sub?] (sub items indented), the active one in the accent colour; truncated at 211 px.
+const docsToc = (items, active) => icon("list", 1178, T + 115, 15, DOC.ink) + dt(1195, T + 120, "On this page", { size: 16, fill: DOC.ink, len: 82 }) +
+  line(1173.5, T + 141, 1173.5, T + 141 + items.length * 29 - 8, { stroke: DOC.line }) +
+  items.map(([l, sub], i) => (i === active ? line(1173.5, T + 141 + i * 29, 1173.5, T + 162 + i * 29, { stroke: DOC.ink }) : "") +
+    dt(sub ? 1210 : 1198, T + 156 + i * 29, l, { size: 14, fill: i === active ? DOC.accent : DOC.sub, max: sub ? 199 : 211 })).join("");
+const copyPage = white(937, T + 109, 152, 32) + rect(937.5, T + 109.5, 151, 31, { r: 8, fill: C.white, stroke: DOC.line }) + icon("copy", 955, T + 125, 14, DOC.ink) +
+  dt(972, T + 130, "Copy page", { size: 14, weight: 500, fill: DOC.ink, len: 71 }) + line(1054.5, T + 110, 1054.5, T + 140, { stroke: DOC.line }) + icon("chevron-down", 1071, T + 125, 14, DOC.ink);
+const infoBox = (y, h, lines) => rect(320.5, y + 0.5, 768, h - 1, { r: 12, fill: "#f1f9fd", stroke: "#bde3f4" }) + circle(345, y + 23, 7, { fill: DOC.ink }) +
+  text(345, y + 27, "i", { size: 10, weight: 700, fill: C.white, anchor: "middle" }) + dt(361, y + 28, "Information", { size: 14, weight: 500, fill: DOC.ink, len: 76 }) + lines;
+const bullets = (rows) => rows.map(([y, t, len, cont]) => (cont ? "" : circle(372, T + y - 5, 2.2, { fill: DOC.sub })) + dt(389, T + y, t, { size: 14, fill: DOC.sub, len })).join("");
+// Inline code chip at an exact measured box; textLength pins the text to it in any viewer font.
+const codeChip = (x, y, w, s) => rect(x, y, w, 23, { r: 6, fill: DOC.muted }) +
+  `<text x="${x + 6}" y="${y + 16.5}" font-size="14.4" fill="${DOC.ink}" font-family="'Roboto Mono',ui-monospace,Menlo,monospace" textLength="${w - 12}" lengthAdjust="spacingAndGlyphs">${esc(s)}</text>`;
+const MAIN = [256, T + 65, 900, 900 - T - 65]; // the scrolling column between sidebar and "On this page"
+
+// Kamus pesan galat (bantuan/pesan-galat.mdx) at scroll 0.
+const GALAT_TOC = [["Langkah"], ["Panel NikahKit: akses"], ["Panel NikahKit: catatan di atas ..."], ["Editor: template dan undangan..."], ["Editor: Bagikan, PIN, dan salin"],
+  ["Editor: isian Konten, foto, dan ..."], ["Editor: Profil merek dan Market..."], ["Editor: Pesanan masuk"], ["Bantuan dan update"], ["Jendela akun NikahKit"], ["Buku Tamu (menu Scalev)"],
+  ["Halaman tamu (undangan)"], ["Dashboard pasangan"], ["Halaman check-in"], ["Form pesanan klien"], ["Kode dalam kurung"], ["Tanda berhasil"], ["Kalau ada masalah"], ["Lanjut"]];
+const H1 = [320, T + 105, 291, 40];
+const galatTop = dt(320, T + 135, "Kamus pesan galat", { size: 36, fill: DOC.ink, len: 291 }) + copyPage +
+  dt(320, T + 173, "Semua pesan yang bisa muncul di NikahKit, Buku Tamu, Dashboard pasangan, halaman tamu,", { size: 18, fill: DOC.sub, len: 747 }) +
+  dt(320, T + 201, "halaman check-in, dan form pesanan klien, lengkap dengan artinya dan yang harus dilakukan.", { size: 18, fill: DOC.sub, len: 746 }) +
+  dt(320, T + 260, "Lihat pesan aneh di layar? Cari kalimatnya di halaman ini. Setiap tabel berisi pesan persis seperti di layar,", { len: 753 }) +
+  dt(320, T + 288, "artinya, dan langkah yang harus kamu lakukan.", { len: 336 }) +
+  infoBox(T + 313, 235, dt(361, T + 367, "Yang kamu perlukan", { size: 14, weight: 600, fill: DOC.ink, len: 136 }) +
+    bullets([[411, "Kalimat pesan yang kamu lihat. Cukup beberapa kata awalnya.", 400], [447, "Tahu di layar mana pesan itu muncul: panel NikahKit di editor Scalev, jendela akun NikahKit, Buku Tamu,", 666],
+      [475, "Dashboard pasangan, halaman tamu, atau halaman check-in.", 392, true], [511, "Untuk gejala tanpa pesan, pakai Masalah umum.", 312]])) +
+  dt(320, T + 625, "Langkah", { size: 30, fill: DOC.ink, len: 112 }) +
+  // The page's own animation (an image) below the heading.
+  rect(320, T + 650, 769, 180, { r: 12, fill: "#f3f1ee" });
+const galatScreen = docsTab("Kamus pesan galat", "bantuan/pesan-galat") + galatTop + docsHeader(false) + docsSidebar() + docsToc(GALAT_TOC, 0);
+// "Langkah" (Steps) at scroll 1226. Step tops (viewport): titles 120/249/349/478/578, text 164/293/393/522/622.
+const STEP_T = [120, 249, 349, 478, 578].map((y) => T + y), STEP_P = [164, 293, 393, 522, 622].map((y) => T + y);
+const MATCH1 = [451, T + 396, 124, 23];
+const galatSteps = (() => {
+  let s = white(...MAIN) + dt(704.5, T + 95, "Mencari arti pesan dengan Ctrl+F", { size: 14, fill: DOC.sub, anchor: "middle", len: 215 });
+  [["Catat pesannya", 139], ["Tekan Ctrl+F di halaman ini", 240], ["Ketik beberapa kata awal pesan", 282], ["Baca kolom Artinya", 171], ["Kerjakan kolom Yang harus dilakukan", 330]].forEach(([t, len], i) => {
+    const cy = STEP_T[i] + 14, next = i < 4 ? STEP_T[i + 1] + 14 - 32 : T + 688;
+    s += circle(340, cy, 20, { fill: DOC.muted }) + text(340, cy + 6, String(i + 1), { size: 17, weight: 500, fill: DOC.ink, anchor: "middle" }) + line(340.5, cy + 31, 340.5, next, { stroke: DOC.line }) +
+      dt(384, STEP_T[i] + 21, t, { size: 20, weight: 500, len });
   });
-  s += line(336, y0 + 10, 336, y - 72, { stroke: DOC.line }) +
-    rect(320.5, y + 0.5, 783, 70, { r: 12, fill: "#f0fafe", stroke: "#b9e4f6" }) + circle(345, y + 24, 7, { fill: DOC.ink }) + text(345, y + 28, "i", { size: 10, weight: 700, fill: C.white, anchor: "middle" }) +
-    text(361, y + 29, "Information", { size: 14, weight: 500, fill: DOC.ink }) + text(361, y + 54, "Bagian di dalam kurung, misalnya (nama) atau N, di layar diganti nama atau angka yang sebenarnya.", { size: 14, fill: "#404040" }) +
-    text(320, y + 140, "Panel NikahKit: akses", { size: 28, weight: 500, fill: DOC.ink }) + text(320, y + 184, "Muncul di panel NikahKit saat editor dibuka, menggantikan rel menu.", { size: 16, fill: "#404040" });
-  return docClip(s);
+  const p = (i, k) => STEP_P[i] + 19.5 + k * 28.5;
+  s += dt(384, p(0, 0), "Salin atau tulis kalimat pesan persis seperti di layar, termasuk titiknya. Kalau ada kode dalam", { len: 665 }) +
+    dt(384, p(0, 1), "kurung, misalnya ", { len: 121 }) + codeChip(510, T + 195, 193, "Gagal (rate_limited).") + dt(707, p(0, 1), ", catat kodenya juga.", { len: 145 }) +
+    dt(384, p(1, 0), "Di Mac tekan Cmd+F. Kotak cari muncul di kanan atas Chrome.", { len: 452 }) +
+    dt(384, p(2, 0), "Misalnya ", { len: 63 }) + codeChip(...MATCH1.slice(0, 3), "Sesi berakhir") + dt(577, p(2, 0), ". Chrome menandai kata yang cocok dengan warna kuning. Tekan", { len: 472 }) +
+    dt(384, p(2, 1), "Enter untuk lompat ke hasil berikutnya.", { len: 281 }) +
+    dt(384, p(3, 0), "Kolom ini menjelaskan penyebab pesan itu muncul.", { len: 366 }) +
+    drun(384, p(4, 0), [{ t: "Ikuti langkahnya, lalu ulangi tindakan yang tadi gagal. Kalau di editor, klik ", len: 526 }, { t: "Periksa lagi", w: 700, len: 87 }, { t: " bila", len: 29 }]) +
+    dt(384, p(4, 1), "tombolnya ada.", { len: 111 }) +
+    infoBox(T + 718, 76, dt(361, T + 772, "Bagian di dalam kurung, misalnya (nama) atau N, di layar diganti nama atau angka yang sebenarnya.", { size: 14, fill: DOC.sub, len: 645 }));
+  return s;
 })();
-// "Jendela akun NikahKit" table. Match 2 = "Sesi berakhir" in row 3.
-const COLX = [337, 637, 887];
+const STEP3 = [376, STEP_T[2] - 8, 720, 112];
+// "Jendela akun NikahKit" table at scroll 9622. Columns 321/690/886 (text +16), header 44, rows from the measured tops.
+const COLX = [337, 706, 902];
+const ROW_T = [297, 361, 406, 471, 536, 601, 706, 811, 876].map((y) => T + y);
+const B = (t) => ({ t, w: 700 });
 const ROWS = [
-  [[[{ t: "Sudah masuk. Kembali ke editor", w: 700 }], [{ t: "Scalev.", w: 700 }]], [["Login berhasil."]], [["Tutup jendela, klik ", { t: "Periksa lagi", w: 700 }], ["di panel."]]],
-  [[[{ t: "Akun dinonaktifkan. Hubungi tim", w: 700 }], [{ t: "Nikahin.", w: 700 }]], [["Akun dinonaktifkan."]], [[{ t: "Hubungi tim Nikahin", u: true }, "."]]],
-  [[[{ t: "Sesi berakhir. Masuk lagi.", w: 700 }]], [["Login habis."]], [["Klik ", { t: "Masuk dengan Google", w: 700 }], ["lagi."]]],
-  [[[{ t: "Login dibatalkan.", w: 700 }]], [["Jendela Google ditutup."]], [["Klik ", { t: "Masuk dengan Google", w: 700 }], ["lagi."]]],
-  [[[{ t: "Login Google belum diatur.", w: 700 }]], [["Login Google belum aktif di"], ["server."]], [["Hubungi tim Nikahin."]]],
-  [[[{ t: "Login sudah dipakai. Masuk lagi. /", w: 700 }], [{ t: "Login kedaluwarsa. Masuk lagi.", w: 700 }]], [["Proses login terputus atau"], ["terlalu lama."]], [["Klik ", { t: "Masuk dengan Google", w: 700 }], ["lagi."]]]
+  [[[B("Sudah masuk. Kembali ke editor Scalev.")]], [["Login berhasil."]], [["Tutup jendela, klik"], [B("Periksa lagi"), " di panel."]]],
+  [[[B("Akun dinonaktifkan. Hubungi tim Nikahin.")]], [["Akun dinonaktifkan."]], [[{ t: "Hubungi tim Nikahin", u: true, uc: DOC.accent }, "."]]],
+  [[[{ t: "Sesi berakhir", w: 700, len: 96 }, B(". Masuk lagi.")]], [["Login habis."]], [["Klik ", B("Masuk dengan")], [B("Google"), " lagi."]]],
+  [[[B("Login dibatalkan.")]], [["Jendela Google ditutup."]], [["Klik ", B("Masuk dengan")], [B("Google"), " lagi."]]],
+  [[[B("Login Google belum diatur.")]], [["Login Google belum aktif"], ["di server."]], [["Hubungi tim Nikahin."]]],
+  [[[B("Login sudah dipakai. Masuk lagi. / Login")], [B("kedaluwarsa. Masuk lagi. / Login Google")], [B("kedaluwarsa. Masuk lagi. / Login tidak lengkap.")], [B("Masuk lagi.")]],
+    [["Proses login terputus"], ["atau terlalu lama."]], [["Klik ", B("Masuk dengan")], [B("Google"), " lagi."]]],
+  [[[B("Login Google tidak sah. Masuk lagi. / Login")], [B("Google tidak cocok. Masuk lagi.")]], [["Server Nikahin menolak"], ["bukti login dari Google."]],
+    [["Klik ", B("Masuk dengan")], [B("Google"), " lagi. Bila"], ["berulang, ", { t: "hubungi tim", u: true, uc: DOC.accent }], [{ t: "Nikahin", u: true, uc: DOC.accent }, "."]]],
+  [[[B("Email Google belum terverifikasi.")]], [["Email akun Google belum"], ["diverifikasi."]], [["Verifikasi email, atau"], ["pakai akun lain."]]],
+  [[[B("Terlalu banyak permintaan. Coba lagi nanti.")]], [["Terlalu sering mencoba"], ["dalam waktu singkat."]], [["Tunggu beberapa menit."]]]
 ];
-const CELL = {};
-const pageTable = (() => {
-  let s = text(320, TOP + 58, "Jendela akun NikahKit", { size: 28, weight: 500, fill: DOC.ink }) +
-    rich(320, TOP + 106, ["Jendela kecil yang terbuka dari chip akun, ", { t: "Masuk dengan Google", w: 700 }, ", ", { t: "Pilih paket", w: 700 }, ", atau ", { t: "Kelola PIN", w: 700 }], { size: 16, fill: "#404040" }) +
-    rich(320, TOP + 134, [{ t: "dashboard", w: 700 }, "."], { size: 16, fill: "#404040" });
-  const ty = TOP + 166;
-  let y = ty + 44, rows = "";
+const MATCH2 = [COLX[0] - 1, ROW_T[2] + 13, 98, 19]; // "Sesi berakhir" (bold 14 px, pinned to 96 px)
+const ROW3 = [321, ROW_T[2], 767, 65];
+const ARTI = [COLX[1] - 4, ROW_T[2] + 12, 84, 22];
+const TODO = [COLX[2] - 4, ROW_T[2] + 12, 160, 42];
+const galatTable = (() => {
+  let s = white(...MAIN) + dt(320, T + 149, "Jendela akun NikahKit", { size: 30, fill: DOC.ink, len: 287 }) +
+    drun(320, T + 191, [{ t: "Jendela kecil yang terbuka dari chip akun, ", len: 307 }, { t: "Masuk dengan Google", w: 700, len: 169 }, { t: ", ", len: 8 }, { t: "Pilih paket", w: 700, len: 78 },
+      { t: ", atau ", len: 45 }, { t: "Kelola PIN", w: 700, len: 76 }]) +
+    drun(320, T + 219, [{ t: "dashboard", w: 700, len: 81 }, { t: ".", len: 4 }]);
+  const ty = T + 253, bottom = 900 + 60;
+  s += rect(320.5, ty + 0.5, 768, bottom - ty, { r: 8, fill: C.white, stroke: DOC.line }) + rect(321, ty + 1, 767, 43, { r: 7.5, fill: DOC.head }) + rect(321, ty + 30, 767, 14, { fill: DOC.head }) +
+    ["Pesan", "Artinya", "Yang harus dilakukan"].map((h, j) => dt(COLX[j], ty + 27, h, { size: 14, weight: 500, fill: DOC.ink })).join("");
   ROWS.forEach((r, i) => {
-    const n = Math.max(...r.map((c) => c.length)), h = 25 + n * 20;
-    r.forEach((cell, j) => cell.forEach((ln, k) => (rows += i === 2 && j === 0 ? run(COLX[0], y + 30, ln[0].t, { weight: 700 }) : rich(COLX[j], y + 30 + k * 20, ln, { size: 14, fill: j ? "#404040" : DOC.ink }))));
-    if (i === 2) { CELL.row = [320, y, 784, h]; CELL.arti = [COLX[1] - 8, y + 12, 120, 26]; CELL.do = [COLX[2] - 8, y + 12, 210, 46]; MATCH.two = [COLX[0] - 1, y + 14, adv("Sesi berakhir", 14, { weight: 700 }) + 2, 21]; }
-    y += h;
-    if (i < ROWS.length - 1) rows += line(320, y - 0.5, 1104, y - 0.5, { stroke: DOC.line });
+    const y = ROW_T[i];
+    s += line(321, y - 0.5, 1088, y - 0.5, { stroke: DOC.line }) + r.map((cell, j) => dpara(COLX[j], y + 27, cell, { size: 14, lh: 20 })).join("");
   });
-  s += rect(320.5, ty + 0.5, 783, y - ty, { r: 12, fill: C.white, stroke: DOC.line }) + rect(321, ty + 1, 782, 43, { r: 11, fill: DOC.head }) + rect(321, ty + 30, 782, 14, { fill: DOC.head }) +
-    line(320, ty + 44.5, 1104, ty + 44.5, { stroke: DOC.line }) + ["Pesan", "Artinya", "Yang harus dilakukan"].map((h, j) => text(COLX[j], ty + 28, h, { size: 14, weight: 500, fill: DOC.ink })).join("") + rows;
-  return docClip(s);
+  return s;
 })();
-// Chrome find bar (top right, under the toolbar) and highlights (active match orange, others yellow).
-const FB = { x: DOCW - 24 - 380, y: T + 4, w: 380, h: 48 };
+// Chrome find bar (under the toolbar, right) and match highlights (active orange, under the glyphs).
+const FB = { x: 1440 - 24 - 380, y: T + 4, w: 380, h: 48 };
+const FB_BOX = [FB.x, FB.y, FB.w, FB.h];
 const findBar = shadow(FB.x, FB.y, FB.w, FB.h, 8, 2) + rect(FB.x, FB.y, FB.w, FB.h, { r: 8, fill: C.white }) + line(FB.x + 266.5, FB.y + 12, FB.x + 266.5, FB.y + 36, { stroke: "#dadce0" }) +
   icon("chevron-up", FB.x + 290, FB.y + 24, 18, C.crIcon) + icon("chevron-down", FB.x + 320, FB.y + 24, 18, C.crIcon) + iconX("x", FB.x + 354, FB.y + 24, 16, C.crIcon);
-const findCount = (s) => rect(FB.x + 200, FB.y + 10, 60, 28, { fill: C.white }) + text(FB.x + 256, FB.y + 29, s, { size: 13, fill: C.crSub, anchor: "end" });
-// Highlight under the text (multiply keeps the glyphs dark, as Chrome paints matches).
-const hl = (b, active) => `<rect x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" rx="2" fill="${active ? "#ff9632" : "#ffff00"}" style="mix-blend-mode:multiply"/>`;
-const docsChrome = chrome(0, 0, DOCW, 985, { tabs: [{ title: "Kamus pesan galat", active: true, fav: (cx, cy) => rect(cx - 7, cy - 7, 14, 14, { r: 3.5, fill: "#2bace6" }) }], url: "docs.page/hasyaapp/nikahkit-panduan/bantuan/pesan-galat" });
+const QUERY = text(FB.x + 18, FB.y + 29, "Sesi berakhir", { size: 14, fill: C.crText });
+const findCount = (s) => white(FB.x + 200, FB.y + 10, 60, 28) + text(FB.x + 256, FB.y + 29, s, { size: 13, fill: C.crSub, anchor: "end" });
+const hl = (b) => `<rect x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" rx="2" fill="#ff9632" style="mix-blend-mode:multiply"/>`;
 
-// ---- FAQ (bantuan/faq.mdx) di docs.page: grup pertanyaan (AccordionGroup) -------------------------------------------
-const ACC = 56;
-const accGroup = (y, titles, open) => {
-  let s = "", yy = y;
+// FAQ (bantuan/faq.mdx) at scroll 3569: the end of "Paket dan harga", then "Masa aktif dan refund" (measured).
+const FAQ_TOC = [["Langkah"], ["Paket dan harga"], ["Masa aktif dan refund"], ["Scalev dan perangkat"], ["Tamu dan data"], ["Jualan ke klien"], ["Pasang dan update"], ["Tanda berhasil"], ["Kalau ada masalah"], ["Lanjut"]];
+// Accordion group: item rows 42 + 1 px line; o.open: { i, h, svg } expands item i.
+const accGroup = (top, titles, o = {}) => {
+  let s = "", y = top;
   titles.forEach((t, i) => {
-    if (i) s += line(321, yy + 0.5, 1103, yy + 0.5, { stroke: DOC.line });
-    s += text(344, yy + 34, t, { size: 16, weight: 500, fill: DOC.ink }) + icon(i === 0 && open ? "chevron-up" : "chevron-down", 1076, yy + 28, 16, DOC.sub);
-    yy += ACC;
-    if (i === 0 && open) { s += open.svg; yy += open.h; }
+    if (i) { s += line(321, y + 0.5, 1088, y + 0.5, { stroke: DOC.line }); y += 1; }
+    const open = o.open?.i === i;
+    s += dt(338, y + 26, t, { size: 14 }) + icon(open ? "chevron-up" : "chevron-down", 1062, y + 20, 16, DOC.sub);
+    y += 42;
+    if (open) { s += o.open.svg; y += o.open.h; }
   });
-  return { h: yy - y, svg: rect(320.5, y + 0.5, 783, yy - y - 1, { r: 12, fill: C.white, stroke: DOC.line }) + s };
+  return rect(320.5, top + 0.5, 768, y - top, { r: 8, fill: C.white, stroke: DOC.line }) + s;
 };
-const PAKET_Q = ["Berapa harga paket NikahKit?", "Apa beda Bulanan, Tahunan, dan Sekali Bayar?", "Ada batas jumlah undangan atau tamu?", "Bagaimana cara membayar?",
-  "Bisa perpanjang sebelum habis?", "Bisa turun dari Tahunan ke Bulanan?", "Satu akun bisa dipakai bersama tim?"];
+const PAKET_Q = ["Bagaimana cara membayar?", "Bisa perpanjang sebelum habis?", "Bisa turun dari Tahunan ke Bulanan?", "Satu akun bisa dipakai bersama tim?"];
 const AKTIF_Q = ["Apa yang terjadi saat masa aktif habis?", "Kapan saya diingatkan?", "Ada garansi uang kembali?", "Apa yang terjadi pada undangan khusus saat paket habis?"];
-const FAQ_H2 = TOP + 176, FAQ_G = FAQ_H2 + 30; // "Masa aktif dan refund" heading baseline; its group top
-const ANS = wrap("Ada tenggang 7 hari. Selama tenggang, fitur masih jalan dan panel mengingatkan kamu untuk memperpanjang. Setelah itu RSVP, ucapan, dan dashboard pasangan berhenti. Halaman undangan tetap tampil untuk tamu, dan form ucapan menulis Ucapan & RSVP sudah ditutup. Perpanjang untuk menyalakan lagi.", 720, 16);
-const ansY = FAQ_G + ACC, LINK_Y = ansY + 4 + (ANS.length + 1) * 28;
-const FAQ_LINK = [344 + adv("Lihat ", 16), LINK_Y - 17, adv("Masuk dan bayar", 16), 22];
-const answer = { h: 4 + (ANS.length + 1) * 28 + 18, svg: para(344, ansY + 4 + 24, ANS, { size: 16, fill: "#404040", lh: 28 }) +
-  run(344, LINK_Y, "Lihat ", { size: 16, fill: "#404040" }) + run(FAQ_LINK[0], LINK_Y, "Masuk dan bayar", { size: 16, fill: C.accent }) +
-  line(FAQ_LINK[0], LINK_Y + 3.5, FAQ_LINK[0] + FAQ_LINK[2], LINK_Y + 3.5, { stroke: C.accent }) + run(FAQ_LINK[0] + FAQ_LINK[2], LINK_Y, ".", { size: 16, fill: "#404040" }) };
-const faqBelow = (open) => { const g = accGroup(FAQ_G, AKTIF_Q, open); return g.svg + text(320, FAQ_G + g.h + 62, "Scalev dan perangkat", { size: 28, weight: 500, fill: DOC.ink }); };
-const faqPage = docClip(accGroup(TOP + 16 - ACC * 5, PAKET_Q).svg + text(320, FAQ_H2, "Masa aktif dan refund", { size: 28, weight: 500, fill: DOC.ink }) + faqBelow());
-const faqOpen = docClip(rect(290, FAQ_G, 860, 985, { fill: C.white }) + faqBelow(answer));
-const MDB = wrap("Masuk ke NikahKit dengan akun Google, pilih paket, bayar di halaman Scalev, lalu aktifkan langganan dengan Cek pembayaran dan Periksa lagi. Lengkap dengan arti setiap pesan.", 780, 18);
-const mdbPage = rect(290, TOP, 860, 985 - TOP, { fill: C.white }) + text(320, T + 138, "Masuk dan bayar membership", { size: 36, weight: 500, fill: DOC.ink }) +
-  para(320, T + 182, MDB, { size: 18, fill: DOC.sub, lh: 28 }) + text(320, T + 182 + MDB.length * 28 + 40, "Langkah", { size: 28, weight: 500, fill: DOC.ink });
+const SCALEV_Q = ["Perlu Scalev berbayar?", "Bisa dipakai di HP?", "Undangannya tayang di mana?", "Bisa dipakai bersama ekstensi Landing Hero?", "Kenapa harus menghubungkan bisnis Scalev?"];
+const TAMU_Q = ["Di mana data tamu disimpan?", "Bagaimana staff penerima tamu masuk?"];
+const H2_AKTIF = [320, T + 211, 278, 36];
+const Q1 = [337, T + 264, 735, 42];
+const FAQ_LINK = [949, T + 367, 112, 17];
+const ANSWER = { i: 0, h: 94, svg: dt(338, T + 325, "Ada tenggang 7 hari. Selama tenggang, fitur masih jalan dan panel mengingatkan kamu untuk memperpanjang.", { size: 14, len: 712 }) +
+  dt(338, T + 353, "Setelah itu RSVP, ucapan, dan dashboard pasangan berhenti. Halaman undangan tetap tampil untuk tamu, dan", { size: 14, len: 710 }) +
+  drun(338, T + 381, [{ t: "form ucapan menulis ", len: 138 }, { t: "Ucapan & RSVP sudah ditutup.", w: 700, len: 206 }, { t: " Perpanjang untuk menyalakan lagi. Lihat ", len: 267 },
+    { t: "Masuk dan bayar", w: 500, len: 112, u: true, uc: DOC.accent }, { t: ".", len: 4 }], { size: 14 }) };
+const faqMain = (open) => white(...MAIN) + clipped(...MAIN, accGroup(T - 52, PAKET_Q) + dt(320, T + 239, "Masa aktif dan refund", { size: 30, fill: DOC.ink, len: 278 }) +
+  accGroup(T + 264, AKTIF_Q, open ? { open: ANSWER } : {}) +
+  (open ? dt(320, T + 606, "Scalev dan perangkat", { size: 30, fill: DOC.ink, len: 278 }) + accGroup(T + 631, SCALEV_Q) + dt(320, T + 922, "Tamu dan data", { size: 30, fill: DOC.ink, len: 189 })
+    : dt(320, T + 512, "Scalev dan perangkat", { size: 30, fill: DOC.ink, len: 278 }) + accGroup(T + 537, SCALEV_Q) + dt(320, T + 828, "Tamu dan data", { size: 30, fill: DOC.ink, len: 189 }) + accGroup(T + 853, TAMU_Q)));
+const faqScreen = docsTab("Pertanyaan yang sering ditanyakan", "bantuan/faq") + faqMain(false) + docsHeader(true) + docsSidebar() + docsToc(FAQ_TOC, 2);
+// Masuk dan bayar membership (gabung/masuk-dan-bayar.mdx) at scroll 0.
+const MDB_TOC = [["Langkah"], ["Bagian 1: Masuk dengan Goo...", 1], ["Bagian 2: Pilih paket dan bayar", 1], ["Punya kode uji?", 1], ["Tanda berhasil"], ["Kalau ada masalah"], ["Pesan saat masuk", 1], ["Pesan saat membayar", 1], ["Lanjut"]];
+const MDB_SIDE = [16, T + 406, 232, 36];
+const mdbScreen = docsTab("Masuk dan bayar membership", "gabung/masuk-dan-bayar") + white(0, T, 1440, 815) +
+  dt(320, T + 135, "Masuk dan bayar membership", { size: 36, fill: DOC.ink, len: 463 }) + copyPage +
+  dt(320, T + 173, "Masuk ke NikahKit dengan akun Google, pilih paket, bayar di halaman Scalev, lalu aktifkan", { size: 18, fill: DOC.sub, len: 716 }) +
+  dt(320, T + 201, "langganan dengan Cek pembayaran dan Periksa lagi. Lengkap dengan arti setiap pesan.", { size: 18, fill: DOC.sub, len: 703 }) +
+  dt(320, T + 260, "Di halaman ini kamu masuk ke NikahKit dengan akun Google, lalu membayar membership lewat Scalev.", { len: 741 }) +
+  dt(320, T + 288, "Setelah selesai, editor NikahKit terbuka di halaman Scalev-mu.", { len: 452 }) +
+  infoBox(T + 313, 207, dt(361, T + 367, "Yang kamu perlukan", { size: 14, weight: 600, fill: DOC.ink, len: 136 }) +
+    bullets([[411, "NikahKit sudah terpasang dan tab NikahKit muncul. Lihat Pasang ekstensi NikahKit.", 541], [447, "Akun Google yang akan kamu pakai terus untuk NikahKit. Membership menempel di email Google ini.", 648],
+      [483, "Sudah tahu paket yang mau dibeli. Lihat Pilih paket membership.", 419]])) +
+  rect(320.5, T + 537.5, 768, 103, { r: 12, fill: "#fefbeb", stroke: "#f6e7b4" }) + dt(361, T + 565, "Warning", { size: 14, weight: 500, fill: DOC.ink, len: 54 }) +
+  dt(361, T + 591, "Pakai satu akun Google yang sama setiap kali. Langganan, PIN, dan kepemilikan undangan tercatat di email", { size: 14, fill: DOC.sub, len: 689 }) +
+  dt(361, T + 619, "Google itu. Kalau masuk dengan email lain, NikahKit menganggapnya akun baru tanpa langganan.", { size: 14, fill: DOC.sub, len: 627 }) +
+  dt(320, T + 717, "Langkah", { size: 30, fill: DOC.ink, len: 112 }) + dt(320, T + 797, "Bagian 1: Masuk dengan Google", { size: 24, fill: DOC.ink, len: 330 }) +
+  docsHeader(false) + docsSidebar("Masuk dan bayar membership") + docsToc(MDB_TOC, 0);
 
-// ---- Scene 6: WhatsApp ----------------------------------------------------------------------------------------------
-const KW = helpBody({ bad: SL_BAD, csp: SL_CSP });
-const KW_S = KW.pos.salin[1] - 600; // dialog scrolled so Salin laporan and Kirim lewat WhatsApp sit low in view
-const WA = { green: "#00a884", bg: "#efeae2", bar: "#f0f2f5", ink: "#111b21", sub: "#667781", out: "#d9fdd3" };
+// ---- WhatsApp Web in Chrome at 1440 (generic layout, not measured) ----------------------------------------------------
+const WA = { green: "#00a884", bg: "#efeae2", bar: "#f0f2f5", ink: "#111b21", sub: "#667781", out: "#d9fdd3", line: "#e9edef" };
 const ADMIN = "+62 821-7527-4118";
-// WhatsApp Web in a 1100 px window: chat list 0..470, chat pane and composer fill the rest.
-const WR = 1100;
-const CMP = { x: 556, y: 765, w: WR - 620, h: 200 }; // composer input (9 lines)
+const WC = 504; // chat pane from here; nav rail 0..64 and chat list 64..504
+const CMP = { x: WC + 52, y: 900 - 22 - 200, w: 1440 - WC - 52 - 64, h: 200 }; // composer input, 9 lines
+const CMP_AREA = [WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10]; // footer: attach, composer, send
+const SEND = [1440 - 33, CMP.y + CMP.h - 21];
+const SEND_BOX = [SEND[0] - 21, SEND[1] - 21, 42, 42];
+const VERSI = "[versi]";
 const MSG = ["Halo Nikahin, NikahKit saya bermasalah.", "", `Laporan NikahKit ${VERSI}`, "Waktu: 2026-10-14T03:12:45.000Z", "Halaman: /pages/365671", "Build Scalev: e5cbe30-37178432877-1",
   "Browser: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36", "",
   ...CHECKS.map((c) => (SL_BAD[c] ? `[X] ${c}: ${SL_BAD[c]}` : `[OK] ${c}`)), "", "Izin domain:", "- script_src https://www.youtube.com: exists", "- frame_src https://www.youtube.com: exists", ""];
-// Composer text soft-wraps at the composer width, as WhatsApp does (wrap() measures 0.5 em; keep 12 px slack).
+// Composer text soft-wraps at the composer width, as WhatsApp does.
 const CMP_LINES = MSG.flatMap((l) => (l ? wrap(l, CMP.w - 40, 14) : ["\u00a0"]));
 const TYPED = ["Saya klik Simpan & Terbitkan, lalu tertahan.", "Halaman: app.scalev.com/pages/365671"];
-const CMP_SCROLL = (CMP_LINES.length + TYPED.length - 9) * 20;
-const SEND = [WR - 33, CMP.y + CMP.h - 21];
-const waPage = (() => {
-  let s = rect(0, T, WR, 900, { fill: C.white }) + rect(0, T, 64, 900, { fill: WA.bar }) + line(64.5, T, 64.5, 985, { stroke: "#e9edef" }) +
-    [0, 1, 2, 3].map((i) => circle(32, T + 34 + i * 52, 11, { stroke: "#54656f", sw: 1.6 })).join("") + circle(32, 985 - 34, 14, { fill: "#dfe5e7" }) +
-    text(84, T + 44, "WhatsApp", { size: 22, weight: 700, fill: WA.green }) + rect(80, T + 66, 374, 36, { r: 18, fill: WA.bar }) + iconX("search", 102, T + 84, 16, "#54656f");
-  for (let k = 0; k < 9; k++) {
+const cmpLine = (i) => CMP.y + 25 + i * 20;
+// At first the composer shows the start of the message; once you click at its end it shows the last 7 lines + 2 typed.
+const cmpTop = para(CMP.x + 14, cmpLine(0), CMP_LINES.slice(0, 9), { size: 14, fill: WA.ink, lh: 20 });
+const cmpEnd = rect(CMP.x + 4, CMP.y + 4, CMP.w - 8, CMP.h - 8, { fill: C.white }) + para(CMP.x + 14, cmpLine(0), CMP_LINES.slice(-7), { size: 14, fill: WA.ink, lh: 20 });
+const typedY = (i) => cmpLine(7 + i);
+const CMP_BOX = [CMP.x, CMP.y, CMP.w, CMP.h];
+const CHAT_HEAD = [WC + 1, T, 1440 - WC - 1, 60];
+function waScreen(composer) {
+  let s = chrome(0, 0, 1440, 900, { tabs: [{ title: "Landing Page Studio", fav: favScalev }, { title: "WhatsApp", active: true, fav: (cx, cy) => circle(cx, cy, 8, { fill: "#25d366" }) }], url: "web.whatsapp.com" }) +
+    rect(0, T, 64, 815, { fill: WA.bar }) + line(64.5, T, 64.5, 900, { stroke: WA.line }) +
+    [0, 1, 2, 3].map((i) => circle(32, T + 34 + i * 52, 11, { stroke: "#54656f", sw: 1.6 })).join("") + circle(32, 900 - 34, 14, { fill: "#dfe5e7" }) +
+    white(65, T, WC - 65, 815) + text(84, T + 44, "WhatsApp", { size: 22, weight: 700, fill: WA.green }) + rect(80, T + 66, WC - 96, 36, { r: 18, fill: WA.bar }) +
+    iconX("search", 102, T + 84, 16, "#54656f") + text(122, T + 89, "Cari", { size: 14, fill: WA.sub });
+  for (let k = 0; k < 10; k++) {
     const ry = T + 118 + k * 72, on = k === 0;
-    if (on) s += rect(72, ry, 390, 72, { r: 10, fill: WA.bar });
-    s += circle(108, ry + 36, 24, { fill: "#dfe5e7" }) + (on ? text(144, ry + 32, ADMIN, { size: 16, fill: WA.ink }) + rect(144, ry + 44, 210, 9, { r: 4.5, fill: "#e9edef" })
-      : rect(144, ry + 22, 120 + ((k * 37) % 90), 11, { r: 5.5, fill: "#e9edef" }) + rect(144, ry + 44, 200 + ((k * 53) % 60), 9, { r: 4.5, fill: "#f0f2f5" }));
+    if (on) s += rect(72, ry, WC - 80, 72, { r: 10, fill: WA.bar });
+    s += circle(108, ry + 36, 24, { fill: "#dfe5e7" }) + (on ? text(144, ry + 32, ADMIN, { size: 16, fill: WA.ink }) + rect(144, ry + 44, 210, 9, { r: 4.5, fill: WA.line })
+      : rect(144, ry + 22, 120 + ((k * 37) % 90), 11, { r: 5.5, fill: WA.line }) + rect(144, ry + 44, 200 + ((k * 53) % 60), 9, { r: 4.5, fill: WA.bar }));
   }
-  s += line(470.5, T, 470.5, 985, { stroke: "#e9edef" }) + rect(471, T, WR - 471, 60, { fill: WA.bar }) + circle(504, T + 30, 20, { fill: "#dfe5e7" }) +
-    text(536, T + 36, ADMIN, { size: 16, fill: WA.ink }) + iconX("search", WR - 80, T + 30, 18, "#54656f") + iconX("more-vertical", WR - 36, T + 30, 18, "#54656f");
-  s += rect(471, T + 60, WR - 471, 985 - T - 60, { fill: WA.bg }) + rect(471, CMP.y - 10, WR - 471, 985 - CMP.y + 10, { fill: WA.bar }) +
-    icon("plus", 506, CMP.y + CMP.h - 21, 22, "#54656f") + rect(CMP.x, CMP.y, CMP.w, CMP.h, { r: 8, fill: C.white }) +
+  s += line(WC + 0.5, T, WC + 0.5, 900, { stroke: WA.line }) + rect(...CHAT_HEAD, { fill: WA.bar }) + circle(WC + 34, T + 30, 20, { fill: "#dfe5e7" }) +
+    text(WC + 66, T + 36, ADMIN, { size: 16, fill: WA.ink }) + iconX("search", 1440 - 80, T + 30, 18, "#54656f") + iconX("more-vertical", 1440 - 36, T + 30, 18, "#54656f") +
+    rect(WC + 1, T + 60, 1440 - WC - 1, 900 - T - 60, { fill: WA.bg }) +
+    rect(1440 - 60 - 300, T + 100, 300, 40, { r: 8, fill: WA.out }) + rect(1440 - 60 - 290, T + 112, 200, 9, { r: 4.5, fill: "#b5e3ad" }) + // an earlier message
+    rect(WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10, { fill: WA.bar }) + icon("plus", WC + 26, SEND[1], 22, "#54656f") + rect(...CMP_BOX, { r: 8, fill: C.white }) +
     circle(SEND[0], SEND[1], 21, { fill: WA.green }) + icon("send", SEND[0] - 1, SEND[1], 18, C.white);
-  return s;
-})();
-const cmpText = para(CMP.x + 14, CMP.y + 25, CMP_LINES, { size: 14, fill: WA.ink, lh: 20 });
-const typedY = (i) => CMP.y + 25 + (CMP_LINES.length + i) * 20 - CMP_SCROLL;
-// Cover: chat area above and bar below the composer, so the scrolling composer text shows only inside its box.
-// The bar runs 2 px into the box and the white strip (inset past the rounded corners) sits on top, so no glyph edge
-// can bleed through an anti-aliased seam.
-const waCover = rect(471, T + 60, WR - 471, CMP.y - 10 - T - 60, { fill: WA.bg }) + rect(471, CMP.y - 10, WR - 471, 12, { fill: WA.bar }) + rect(CMP.x + 8, CMP.y, CMP.w - 16, 12, { fill: C.white }) +
-  rect(CMP.x, CMP.y + CMP.h - 4, CMP.w, 4, { fill: C.white }) + rect(471, CMP.y + CMP.h, WR - 471, 985 - CMP.y - CMP.h, { fill: WA.bar });
-const bubbleLines = [MSG[0], "", MSG[2], MSG[3], MSG[4], MSG[5], "...", "[X] Penyimpanan ucapan dan RSVP: simpan halaman di Scalev dulu", "...", ...TYPED];
-// Screenshot: thumbnail of the editor (pasted from the clipboard), as an attachment and later as a sent image.
+  return s + composer;
+}
+// Screenshot pasted from the clipboard: a thumbnail of the editor, as an attachment and later as a sent image.
 const shotImg = (x, y, w, h) => rect(x, y, w, h, { r: 4, fill: "#f3f5f9" }) + rect(x, y, w, h * 0.08, { fill: C.svTop }) + rect(x, y + h * 0.08, w * 0.05, h * 0.92, { fill: C.page }) +
   rect(x + w * 0.05, y + h * 0.08, w * 0.23, h * 0.92, { fill: C.white }) + rect(x + w * 0.09, y + h * 0.2, w * 0.15, h * 0.3, { r: 2, fill: C.warnSoft }) + rect(x + w * 0.5, y + h * 0.14, w * 0.3, h * 0.8, { fill: "#fdf6ee" });
-const SHOT = { x: WR - 300, y: CMP.y - 10 - 150, w: 220, h: 138 };
+const SHOT = { x: 1440 - 320, y: CMP.y - 10 - 150, w: 220, h: 138 };
+const SHOT_BOX = [SHOT.x, SHOT.y, SHOT.w, SHOT.h];
 const shotAttach = shadow(SHOT.x, SHOT.y, SHOT.w, SHOT.h, 8, 2) + rect(SHOT.x, SHOT.y, SHOT.w, SHOT.h, { r: 8, fill: C.white }) + shotImg(SHOT.x + 6, SHOT.y + 6, SHOT.w - 12, SHOT.h - 12) +
   circle(SHOT.x + SHOT.w - 4, SHOT.y + 4, 11, { fill: "#54656f" }) + iconX("x", SHOT.x + SHOT.w - 4, SHOT.y + 4, 12, C.white, 2.4);
+const bubbleLines = [MSG[0], "", MSG[2], MSG[3], MSG[4], MSG[5], "...", "[X] Penyimpanan ucapan dan RSVP: simpan halaman di Scalev dulu", "...", ...TYPED];
+const BUB = { w: 560, h: 24 + bubbleLines.length * 20 + 14 }; BUB.x = 1440 - 60 - BUB.w; BUB.y = 900 - 62 - 16 - BUB.h;
 const sentBubble = (() => {
-  const w = 540, h = 24 + bubbleLines.length * 20 + 14, x = WR - 60 - w, y = 985 - 74 - 16 - h;
-  const ix = x + w - 232, iy = y - 8 - 150;
+  const { x, y, w, h } = BUB, ix = x + w - 232, iy = y - 8 - 150;
   return rect(ix, iy, 232, 150, { r: 8, fill: WA.out }) + shotImg(ix + 4, iy + 4, 224, 142) +
     rect(x, y, w, h, { r: 8, fill: WA.out }) + para(x + 12, y + 26, bubbleLines.map((l) => l || "\u00a0"), { size: 14, fill: WA.ink, lh: 20 }) +
     text(x + w - 40, y + h - 10, "10.12", { size: 11, fill: WA.sub, anchor: "end" }) + iconX("check", x + w - 26, y + h - 14, 13, "#53bdeb", 2.2) + iconX("check", x + w - 20, y + h - 14, 13, "#53bdeb", 2.2);
 })();
-const cmpEmpty = rect(471, CMP.y - 10, WR - 471, 985 - CMP.y + 10, { fill: WA.bg }) + rect(471, 985 - 74, WR - 471, 74, { fill: WA.bar }) + icon("plus", 506, 985 - 37, 22, "#54656f") +
-  rect(CMP.x, 985 - 59, CMP.w, 44, { r: 8, fill: C.white }) + circle(SEND[0], 985 - 37, 21, { fill: "#e9edef" }) + icon("send", SEND[0] - 1, 985 - 37, 18, "#8696a0");
+const cmpEmpty = rect(WC + 1, CMP.y - 10, 1440 - WC - 1, 900 - CMP.y + 10, { fill: WA.bg }) + rect(WC + 1, 900 - 62, 1440 - WC - 1, 62, { fill: WA.bar }) + icon("plus", WC + 26, 900 - 31, 22, "#54656f") +
+  rect(CMP.x, 900 - 52, CMP.w, 42, { r: 8, fill: C.white }) + text(CMP.x + 14, 900 - 26, "Ketik pesan", { size: 14, fill: WA.sub }) + circle(SEND[0], 900 - 31, 21, { fill: WA.bar }) + icon("send", SEND[0] - 1, 900 - 31, 18, "#8696a0");
 
-// Crops (stage takes the crop's shape). Rail + panel/dialog: 400 x 808 (~1.03 scale).
-const PANEL_VIEW = { y: 92, w: 400, h: 808 };
-const REST = [386, 640]; // pointer rest: right gutter of the panel/dialog, clear of content
+const REST = [560, 700]; // pointer rest in the grey preview area, clear of the panel
+const KW_S = sl.pos.salin[1] - 600; // bantuan-buka-wa: Salin laporan and Kirim lewat WhatsApp sit low in the dialog view
 
 export const scenes = {
   "bantuan-buka": {
     title: "Membuka Bantuan di editor",
     cursorStart: REST,
-    world: PANEL_VIEW,
     base: [editorKonten()],
     els: {
-      ringHelp: { svg: ring(2, 797, 67, 48, { r: 6 }), enter: "fade" },
-      sheet: { svg: dlgSheet, enter: "fade" },
-      body: { svg: sl.svg, enter: "fade" },
-      cover: { svg: dlgCover(), enter: "fade" }
+      dlg: { svg: dlgSheet + dlgHead + dlgView(sl, 0), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Buka halaman undangan di editor Scalev. Rel NikahKit ada di kiri.", dur: 3 },
-      { caption: "Cari tombol Bantuan: paling bawah rel, di bawah Kosongkan.", show: ["ringHelp"] },
-      { caption: "Klik Bantuan. Dialog Bantuan terbuka di atas panel.", hide: ["ringHelp"], at: RAIL_HELP, click: true, show: ["sheet", "body", "cover"], dur: 3.6 }
+      { caption: "Buka halaman undangan di editor Scalev. Rel NikahKit ada di kiri.", dur: 3.4, focus: [TABROW, [0, 92, 72, 808]],
+        mark: TAB.NikahKit, lens: { src: [150, 46, 249, 44] } },
+      { caption: "Cari tombol Bantuan: paling bawah rel, di bawah Kosongkan.", dur: 3.4, focus: [0, 554, 72, 346], mark: { box: HELP, r: 6 }, lens: { src: [0, 752, 72, 100], zoom: 3 } },
+      { caption: "Klik Bantuan. Dialog Bantuan terbuka di atas panel.", dur: 3.8, focus: [0, 92, 399, 808], mark: { box: HELP, r: 6 }, at: mid(HELP), click: true, show: ["dlg"],
+        lens: { src: [0, 92, 399, 150], at: [330, 60] } }
     ]
   },
 
-  "bantuan-salin-laporan": {
-    title: "Membaca Bantuan dan menyalin laporan",
-    cursorStart: REST,
-    world: PANEL_VIEW,
-    base: [editorKonten()],
-    els: {
-      sheet: dlgSheet,
-      body: sl.svg,
-      salin: { svg: nkBtn(16, sl.pos.salin[1] - SL1 - SL2, "Salin laporan", { variant: "ghost", w: 351, size: 14, icon: "copy" }), enter: "fade" },
-      copied: { svg: rect(16, sl.pos.hint[1] - SL1 - SL2 - 2, 300, 20, { fill: C.white }) + text(16, sl.pos.hint[1] - SL1 - SL2 + 12, "Tersalin.", { size: 12, fill: C.faint }), enter: "fade", delay: 0.1 },
-      cover: dlgCover(),
-      ringVer: { svg: ring(16, 169, 351, 36, { r: 6 }), enter: "fade" },
-      ringStatus: { svg: ring(...sl.pos.status), enter: "fade" },
-      ringTip: { svg: ring(...TIP, { r: 6 }), enter: "fade" },
-      ringBad: { svg: ring(...box(sl.pos.rows["Penyimpanan ucapan dan RSVP"], SL1), { r: 6 }), enter: "fade", delay: 1.2 },
-      ringCopied: { svg: ring(12, sl.pos.hint[1] - SL1 - SL2 - 1, 64, 18, { r: 6 }), enter: "fade", delay: 0.3 },
-      ringWa: { svg: ring(...box(sl.pos.wa, SL1 + SL2), { r: 6 }), enter: "fade" }
-    },
-    steps: [
-      { caption: "Baca baris versi: Versi, dengan tombol Cek update di kanan.", show: ["ringVer"] },
-      { caption: "Baca baris status: 1 perlu perhatian. Muat ulang editor dulu.", hide: ["ringVer"], show: ["ringStatus"], dur: 3.4 },
-      { caption: "Baca tips Terbit tertahan: muat ulang, lalu Simpan & Terbitkan.", hide: ["ringStatus"], show: ["ringTip"], dur: 3.6 },
-      { caption: "Periksa daftar cek. Tanda ! bermasalah, penyebabnya di bawah namanya.", hide: ["ringTip"], scroll: { id: "body", dy: SL1 }, show: ["ringBad"], dur: 3.8 },
-      { caption: "Gulir ke bawah sampai tombol laporan.", hide: ["ringBad"], scroll: { id: "body", dy: SL2 }, dur: 2.4 },
-      { caption: "Klik Salin laporan. Tulisan kecil berubah: Tersalin.", at: mid(sl.pos.salin, SL1 + SL2), click: true, press: "salin", show: ["salin", "copied", "ringCopied"], dur: 3.4 },
-      { caption: "Kirim laporannya ke admin: tempel di WhatsApp, atau Kirim lewat WhatsApp.", hide: ["ringCopied"], show: ["ringWa"], dur: 3.6 },
-      { caption: "Tutup Bantuan: klik × di kanan atas, atau tekan Esc.", hide: ["ringWa", "sheet", "body", "salin", "copied", "cover"], at: [368, 122], click: true }
-    ]
-  },
+  "bantuan-salin-laporan": (() => {
+    const ver = [16, 169, 351, 52], btns = [16, BTNS[1], 351, 146];
+    return {
+      title: "Membaca Bantuan dan menyalin laporan",
+      cursorStart: REST,
+      base: [editorKonten()],
+      // The open dialog is part of the screen (skel): skeleton, with the step's item in detail as the body scrolls.
+      els: {
+        sheet: { svg: dlgSheet, skel: true },
+        body: { svg: sl.svg, skel: true },
+        cover: { svg: dlgCover, skel: true },
+        salin: { svg: tr(0, -SLT, sl.part.salin), skel: true, enter: "fade", delay: 1.2 },
+        copied: { svg: white(16, sl.pos.hint[1] - SLT - 2, 300, 20) + text(16, sl.pos.hint[1] - SLT + 12, "Tersalin.", { size: 12, fill: C.faint }), skel: true, enter: "fade", delay: 0.1 }
+      },
+      steps: [
+        { caption: "Baca baris versi: Versi, dengan tombol Cek update di kanan.", focus: ver, mark: sl.pos.version, lens: { src: helpLens(ver) } },
+        { caption: "Baca baris status: 1 perlu perhatian. Muat ulang editor dulu.", dur: 3.4, focus: sl.pos.status, mark: sl.pos.status, lens: { src: helpLens(sl.pos.status) } },
+        { caption: "Baca tips Terbit tertahan: muat ulang, lalu Simpan & Terbitkan.", dur: 3.6, focus: sl.pos.tip, mark: sl.pos.tip, lens: { src: helpLens(sl.pos.tip) } },
+        { caption: "Periksa daftar cek. Tanda ! bermasalah, penyebabnya di bawah namanya.", dur: 3.8, focus: at(sl.pos.rows[BAD_ROW], SL1), mark: at(sl.pos.rows[BAD_ROW], SL1),
+          scroll: { id: "body", dy: SL1 }, lens: { src: helpLens(sl.pos.rows[BAD_ROW], SL1) } },
+        { caption: "Gulir ke bawah sampai tombol laporan.", focus: at(btns, SLT), mark: at(BTNS, SLT), scroll: { id: "body", dy: SL2 }, show: ["salin"],
+          lens: { src: helpLens(btns, SLT, 8) } },
+        { caption: "Klik Salin laporan. Tulisan kecil berubah: Tersalin.", dur: 3.4, mark: at(sl.pos.salin, SLT), at: mid(at(sl.pos.salin, SLT)), click: true, press: "salin",
+          show: ["copied"], lens: { src: helpLens(btns, SLT, 8) } },
+        { caption: "Kirim laporannya ke admin: tempel di WhatsApp, atau Kirim lewat WhatsApp.", dur: 3.6, focus: at(sl.pos.wa, SLT), mark: at(sl.pos.wa, SLT),
+          lens: { src: helpLens(sl.pos.wa, SLT) } },
+        { caption: "Tutup Bantuan: klik × di kanan atas, atau tekan Esc.", focus: [200, 92, 199, 62], mark: XBOX, at: mid(XBOX), click: true,
+          hide: ["sheet", "body", "salin", "copied", "cover"], lens: { src: [200, 96, 199, 54] } }
+      ]
+    };
+  })(),
 
   "bantuan-izin-domain": {
     title: "Izin domain (CSP) di Bantuan: salin, lalu periksa ulang",
     cursorStart: REST,
-    world: PANEL_VIEW,
-    base: [editorKonten(), dlgSheet, tr(0, -IZ1, iz.svg), dlgCover()],
+    base: [editorKonten(), izDialog(false)],
     els: {
-      salinCsp: nkBtn(16, iz.pos.salinCsp[1] - IZ1, "Salin domain kurang", { variant: "quiet", w: 351, size: 14, icon: "copy" }),
-      periksa: nkBtn(16, iz.pos.periksa[1] - IZ1, "Periksa ulang", { variant: "ghost", w: 351, size: 14 }),
-      ringTodo: { svg: ring(...todoBox, { r: 6 }), enter: "fade" },
-      copied: { svg: text(16, iz.pos.cspMsg[1] - IZ1 + 12, "Tersalin. Tempel di tab Security.", { size: 12, fill: C.faint }), enter: "fade", delay: 0.1 },
-      fixed: { svg: rect(0, 154, 398, 746, { fill: C.white }) + clipped(0, 154, 398, 746, tr(0, -IZF, izF.svg,
-        text(16, izF.pos.cspMsg[1] + 12, "Diperiksa ulang.", { size: 12, fill: C.faint }))), enter: "fade", delay: 0.1 },
-      ringFixed: { svg: ring(...box(izF.pos.csp[2], IZF), { r: 6, color: C.ok }) + ring(...box(izF.pos.rows["Izin domain di tab Security"], IZF), { r: 6, color: C.ok }), enter: "fade", delay: 0.3 }
+      salinCsp: { svg: tr(0, -IZ1, iz.part.salinCsp), skel: true },
+      periksa: { svg: tr(0, -IZ1, iz.part.periksa), skel: true },
+      copied: { svg: izCopied, skel: true, enter: "fade", delay: 0.1 },
+      fixed: { svg: dlgView(izF, IZF) + text(16, izF.pos.cspMsg[1] - IZF + 12, "Diperiksa ulang.", { size: 12, fill: C.faint }), skel: true, enter: "fade", delay: 0.1 }
     },
     steps: [
-      { caption: "Klik Salin domain kurang. Muncul Tersalin. Tempel di tab Security.", at: mid(iz.pos.salinCsp, IZ1), click: true, press: "salinCsp", show: ["copied"], dur: 3.6 },
-      { caption: "Buka tab Security, tempel, lalu Simpan (dua animasi berikutnya).", dur: 2.8 },
-      { caption: "Kembali ke Bantuan, klik Periksa ulang: Diperiksa ulang, Sudah diizinkan.", hide: ["ringTodo", "copied"], at: mid(iz.pos.periksa, IZ1), click: true, press: "periksa", show: ["fixed", "ringFixed"], dur: 4 }
+      { caption: "Klik Salin domain kurang. Muncul Tersalin. Tempel di tab Security.", dur: 3.8, focus: CSP_AREA, mark: at(iz.pos.salinCsp, IZ1), at: mid(at(iz.pos.salinCsp, IZ1)),
+        click: true, press: "salinCsp", show: ["copied"], lens: { src: [0, iz.pos.csp[2][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[2][1]] } },
+      { caption: "Buka tab Security, tempel, lalu Simpan (dua animasi berikutnya).", dur: 3.2, focus: [TABROW, [1183, 44, 257, 48]], mark: [TAB.Security, SIMPAN],
+        lens: { src: [0, 46, 330, 46] } },
+      { caption: "Kembali ke Bantuan, klik Periksa ulang: Diperiksa ulang, Sudah diizinkan.", dur: 4.2, focus: [CSP_AREA, helpLens(izF.pos.rows["Izin domain di tab Security"], IZF, 2)],
+        mark: at(iz.pos.periksa, IZ1), at: mid(at(iz.pos.periksa, IZ1)),
+        click: true, press: "periksa", hide: ["copied"], show: ["fixed"], lens: { src: [0, izF.pos.csp[2][1] - IZF - 8, 399, izF.pos.cspMsg[1] + 24 - izF.pos.csp[2][1]] } }
     ]
   },
 
   "bantuan-izin-security": {
     title: "Menempel domain di tab Security Scalev",
-    cursorStart: [330, 610],
-    world: { y: 40, w: 400, h: 600 }, // Scalev tabs and the Security columns
-    base: [editorKonten(), dlgSheet, tr(0, -IZ1, iz.svg), dlgCover()],
+    cursorStart: REST,
+    base: [editorSecurity()],
     els: {
-      sec: { svg: securityTab, enter: "fade" },
-      pasted: { svg: rect(20, srcY(1) + 24, 358, 37, { r: 4, fill: C.white, stroke: C.primary, sw: 2 }) + text(32, srcY(1) + 48, ORIGIN, { size: 14, fill: C.strong }), enter: "fade", delay: 0.1 }
+      before: { svg: clipped(0, 44, 399, 856, scalevEditor(0, 0, { rail: "Konten" }) + izDialog(true)), skel: true },
+      pasted: { svg: pasted, enter: "fade", delay: 0.1 }
     },
     steps: [
-      { caption: "Buka tab Security di deretan tab editor Scalev.", at: ED.tab.Security, click: true, show: ["sec"] },
-      { caption: "Tempel di kolom yang sesuai: img_src masuk ke Image Sources.", at: [190, srcY(1) + 42], click: true, show: ["pasted"], dur: 3.4 }
+      { caption: "Buka tab Security di deretan tab editor Scalev.", dur: 3.4, focus: TABROW, mark: TAB.Security, at: mid(TAB.Security), click: true, hide: ["before"],
+        lens: { src: [0, 46, 330, 46] } },
+      { caption: "Tempel di kolom yang sesuai: img_src masuk ke Image Sources.", dur: 3.6, focus: [0, srcY(1) - 6, 399, 76], mark: IMG_IN, at: [190, srcY(1) + 42], click: true,
+        show: ["pasted"], lens: { src: [0, srcY(1) - 6, 399, 76] } }
     ]
   },
 
   "bantuan-izin-simpan": {
     title: "Menyimpan tab Security di Scalev",
-    cursorStart: [1330, 180],
-    world: { x: 1040, y: 40, w: 400, h: 160 }, // Scalev top bar, right end
-    base: [editorKonten()],
+    cursorStart: [1300, 400],
+    base: [editorSecurity({ pasted: true })],
     els: {
-      ringSave: { svg: ring(1189, 46, 90, 42, { r: 6 }), enter: "fade", delay: 0.3 },
-      ringDone: { svg: ring(1189, 46, 90, 42, { r: 6, color: C.ok }), enter: "fade", delay: 0.3 }
+      simpan: rect(SIMPAN[0], SIMPAN[1], SIMPAN[2], SIMPAN[3], { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong)
     },
     steps: [
-      { caption: "Simpan ada di kanan atas editor Scalev, di kiri Simpan & Terbitkan.", show: ["ringSave"] },
-      { caption: "Klik Simpan supaya domain yang kamu tempel tersimpan.", hide: ["ringSave"], at: SIMPAN, click: true, show: ["ringDone"] }
+      { caption: "Simpan ada di kanan atas editor Scalev, di kiri Simpan & Terbitkan.", dur: 3.4, focus: [1183, 44, 257, 48], mark: SIMPAN, lens: { src: [1150, 46, 290, 44] } },
+      { caption: "Klik Simpan supaya domain yang kamu tempel tersimpan.", dur: 3.2, mark: SIMPAN, at: mid(SIMPAN), click: true, press: "simpan", lens: { src: [1150, 46, 290, 44] } }
     ]
   },
 
   "bantuan-cek-gejala": {
     title: "Pola memperbaiki masalah: baca pesan, perbaiki, periksa lagi",
-    cursorStart: [330, 440],
-    world: { y: 92, w: 400, h: 388 }, // rail + panel top: message, Periksa lagi, then the rail menu
-    base: [editorKonten()],
+    cursorStart: REST,
+    base: [scalevEditor(0, 0) + PREVIEW + GATE_SERVER],
     els: {
-      gate: GATE_SERVER,
-      recheck: nkBtn(RECHECK[0], RECHECK[1], "Periksa lagi", { variant: "quiet", w: RECHECK[2], size: 14 }),
-      ringMsg: { svg: ring(16, 169, 351, 56, { r: 6 }), enter: "fade", delay: 0.4 },
-      search: { svg: calloutUp(130, 300, "Ctrl+F: tidak terjangkau", 110, 196), delay: 0.3 },
-      fix: { svg: calloutUp(100, 300, "Cek Wi-Fi atau data seluler dulu", 120, 214), delay: 0.3 },
-      checking: { svg: gate([[{ t: "Memeriksa akses...", w: 700 }]]), enter: "fade" },
-      ok: { svg: panelKonten(), enter: "fade", delay: 0.6 },
-      ringRail: { svg: ring(2, 104, 68, 330, { r: 6 }), enter: "fade", delay: 1.1 }
+      recheck: { svg: recheckBtn, skel: true },
+      checking: { svg: gate([[{ t: "Memeriksa akses...", w: 700 }]]), skel: true, enter: "fade" },
+      ok: { svg: panelKonten(), skel: true, enter: "fade", delay: 0.6 }
     },
     steps: [
-      { caption: "Catat gejalanya: salin kalimat pesannya persis seperti di layar.", show: ["ringMsg"], dur: 3.6 },
-      { caption: "Cari bagiannya di Masalah umum: Ctrl+F, ketik beberapa kata gejalanya.", hide: ["ringMsg"], show: ["search"], dur: 3.6 },
-      { caption: "Ikuti Langkah perbaikan. Contoh ini: pastikan internet tersambung.", hide: ["search"], show: ["fix"], dur: 3.6 },
-      { caption: "Klik Periksa lagi. Panel menulis Memeriksa akses... sebentar.", hide: ["fix"], at: mid(RECHECK), click: true, press: "recheck", show: ["checking"] },
-      { caption: "Rel menu tampil lagi: beres. Masih belum? Kirim laporan lewat Bantuan.", hide: ["gate", "recheck", "checking"], show: ["ok", "ringRail"], dur: 3.8 }
+      { caption: "Catat gejalanya: salin kalimat pesannya persis seperti di layar.", dur: 3.6, focus: [0, 154, 399, 80], mark: GATE_MSG, lens: { src: [0, 158, 399, 78] } },
+      { caption: "Cari bagiannya di Masalah umum: Ctrl+F, ketik beberapa kata gejalanya.", dur: 3.6, mark: GATE_MSG, note: "Ctrl+F: tidak terjangkau" },
+      { caption: "Ikuti Langkah perbaikan. Contoh ini: pastikan internet tersambung.", dur: 3.6, mark: GATE_MSG, note: "Cek Wi-Fi atau data seluler dulu" },
+      { caption: "Klik Periksa lagi. Panel menulis Memeriksa akses... sebentar.", dur: 3.4, focus: [0, 154, 399, 130], mark: RECHECK, at: mid(RECHECK), click: true, press: "recheck",
+        show: ["checking"], lens: { src: [0, 158, 399, 90] } },
+      { caption: "Rel menu tampil lagi: beres. Masih belum? Kirim laporan lewat Bantuan.", dur: 3.8, focus: [0, 92, 72, 360], mark: { box: RAIL_TABS, r: 0 },
+        hide: ["recheck", "checking"], show: ["ok"], lens: { src: [0, 100, 72, 344] } }
     ]
   },
 
   "bantuan-cari-galat": {
     title: "Mencari arti pesan galat di panduan",
-    world: DOC_VIEW,
-    base: [docsChrome, docsHeader],
+    cursorStart: [1200, 700],
+    base: [galatScreen],
     els: {
-      top: pageTop,
-      steps: { svg: rect(290, TOP, 860, 985 - TOP, { fill: C.white }) + pageSteps + hl([MATCH.one[0] + 3, MATCH.one[1] + 1, MATCH.one[2] - 6, 20], true), enter: "fade", delay: 1.45 },
-      table: { svg: rect(290, TOP, 860, 985 - TOP, { fill: C.white }) + pageTable + hl(MATCH.two, true), enter: "fade", delay: 0.5 },
+      steps: { svg: galatSteps + hl([MATCH1[0] + 5, MATCH1[1] + 2, MATCH1[2] - 10, 19]) + line(0, T + 64.5, 1425, T + 64.5, { stroke: DOC.line }), skel: true, enter: "fade", delay: 1.45 },
+      table: { svg: galatTable + hl(MATCH2) + line(0, T + 64.5, 1425, T + 64.5, { stroke: DOC.line }), skel: true, enter: "fade", delay: 0.5 },
       find: { svg: findBar, enter: "pop", origin: [FB.x + FB.w, FB.y] },
-      query: text(FB.x + 18, FB.y + 29, "Sesi berakhir", { size: 14, fill: C.crText }),
+      query: QUERY,
       n1: { svg: findCount("1/2"), enter: "fade", delay: 1.4 },
       n2: { svg: findCount("2/2"), enter: "fade", delay: 0.5 },
-      ringArti: { svg: ring(...CELL.arti, { r: 6 }), enter: "fade", delay: 0.4 },
-      ringDo: { svg: ring(...CELL.do, { r: 6 }), enter: "fade", delay: 0.4 }
+      findSk: { svg: findBar + QUERY + findCount("2/2"), skel: true }
     },
     steps: [
-      { caption: "Catat pesannya persis seperti di layar. Buka halaman Pesan galat.", dur: 3 },
-      { caption: "Tekan Ctrl+F (Mac: Cmd+F). Kotak cari muncul di kanan atas Chrome.", show: ["find"] },
-      { caption: "Ketik beberapa kata awal, misalnya Sesi berakhir. Chrome lompat ke hasilnya.", type: [{ id: "query", n: 13, box: [FB.x + 16, FB.y + 12, tw("Sesi berakhir", 14) + 6, 24] }], show: ["n1", "steps"], dur: 3.8 },
-      { caption: "Tekan Enter untuk lompat ke hasil berikutnya: baris di tabel pesan.", hide: ["n1"], show: ["n2", "table"], dur: 3.4 },
-      { caption: "Baca kolom Artinya. Di sini: Login habis.", show: ["ringArti"] },
-      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", hide: ["ringArti"], show: ["ringDo"], dur: 3.8 }
+      { caption: "Catat pesannya persis seperti di layar. Buka halaman Pesan galat.", dur: 3.2, focus: [316, T + 98, 780, 120], mark: H1 },
+      { caption: "Tekan Ctrl+F (Mac: Cmd+F). Kotak cari muncul di kanan atas Chrome.", dur: 3.2, focus: FB_BOX, mark: { box: FB_BOX, r: 8 }, show: ["find"], note: "Ctrl+F (Mac: Cmd+F)" },
+      { caption: "Ketik beberapa kata awal, misalnya Sesi berakhir. Chrome lompat ke hasilnya.", dur: 3.8, focus: [FB_BOX, STEP3], mark: [MATCH1, [FB.x + 12, FB.y + 10, 250, 28]],
+        type: [{ id: "query", n: 13, box: [FB.x + 16, FB.y + 12, tw("Sesi berakhir", 14) + 6, 24] }], show: ["n1", "steps"], lens: { src: [376, STEP_T[2] - 6, 560, 80] } },
+      { caption: "Tekan Enter untuk lompat ke hasil berikutnya: baris di tabel pesan.", dur: 3.4, focus: [FB_BOX, ROW3], mark: [MATCH2, [FB.x + 200, FB.y + 10, 62, 28]],
+        hide: ["n1"], show: ["n2", "table"], lens: { src: [321, ROW_T[2] - 4, 560, 73] } },
+      { caption: "Baca kolom Artinya. Di sini: Login habis.", dur: 3.2, focus: ROW3, mark: ARTI, hide: ["find", "query", "n2"], show: ["findSk"], lens: { src: [530, ROW_T[2] - 4, 560, 73] } },
+      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", dur: 3.8, mark: TODO, lens: { src: [530, ROW_T[2] - 4, 560, 73] } }
     ]
   },
 
   "bantuan-faq": {
     title: "Mencari jawaban di FAQ",
-    world: DOC_VIEW,
-    base: [rect(0, T, DOCW, 900, { fill: C.white }), docsHeader, faqPage],
+    cursorStart: [1200, 700],
+    base: [faqScreen],
     els: {
-      ringH2: { svg: ring(312, FAQ_H2 - 31, tw("Masa aktif dan refund", 28, 500) + 16, 44, { r: 6 }), enter: "fade", delay: 0.3 },
-      open: { svg: faqOpen, enter: "fade" },
-      mdb: { svg: mdbPage, enter: "fade" }
+      open: { svg: faqMain(true), skel: true, enter: "fade" },
+      mdb: { svg: mdbScreen, skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Cari kelompok pertanyaanmu, misalnya Masa aktif dan refund.", show: ["ringH2"], dur: 3.4 },
-      { caption: "Klik pertanyaannya. Jawaban terbuka di bawah judulnya.", hide: ["ringH2"], at: [560, FAQ_G + 28], click: true, show: ["open"], dur: 3.6 },
-      { caption: "Buka tautan untuk detail: klik Masuk dan bayar.", at: mid(FAQ_LINK), click: true, show: ["mdb"], dur: 3.6 }
+      { caption: "Cari kelompok pertanyaanmu, misalnya Masa aktif dan refund.", dur: 3.4, focus: [316, H2_AKTIF[1] - 6, 780, 230], mark: H2_AKTIF },
+      { caption: "Klik pertanyaannya. Jawaban terbuka di bawah judulnya.", dur: 3.8, focus: [316, Q1[1], 780, 134], mark: Q1, at: [560, Q1[1] + 21], click: true, show: ["open"],
+        lens: { src: [330, Q1[1] + 44, 740, 90], zoom: 1.5, at: [110, 420] } },
+      { caption: "Buka tautan untuk detail: klik Masuk dan bayar.", dur: 3.8, focus: [grow(FAQ_LINK, 8), [316, T + 98, 780, 56], MDB_SIDE], mark: { box: FAQ_LINK, r: 2 },
+        at: mid(FAQ_LINK), click: true, show: ["mdb"],
+        note: "Tautan: Masuk dan bayar" }
     ]
   },
 
   "bantuan-masa-aktif": {
     title: "Apa yang terjadi saat masa aktif habis",
-    cursorStart: [540, 600],
-    world: { y: 92, w: 680, h: 588 }, // panel + timeline; the guest's phone is its own scene
+    cursorStart: [600, 700],
     base: [editorKonten(), timeline],
     els: {
-      h0: { svg: tlRing(0), enter: "fade" },
-      warn: { svg: panelWith(RN_WARN, true), enter: "fade", delay: 0.5 }, h1: { svg: tlRing(1), enter: "fade", delay: 0.5 },
-      err: { svg: panelWith(RN_ERR, true), enter: "fade", delay: 0.5 }, h2: { svg: tlRing(2), enter: "fade", delay: 0.5 },
-      expired: { svg: GATE_EXPIRED, enter: "fade", delay: 0.5 }, h3: { svg: tlRing(3), enter: "fade", delay: 0.5 },
-      pilih: nkBtn(16, 237, "Pilih paket", { w: GATE_EXP_BTN[2], size: 14 }),
-      acct: { svg: dim(0, 0, 1440, 900) + tr(-330, 0, accountWindow()), enter: "pop", origin: [390, 450], delay: 0.1 }
+      warn: { svg: panelWith(RN_WARN), skel: true, enter: "fade", delay: 0.5 },
+      err: { svg: panelWith(RN_ERR), skel: true, enter: "fade", delay: 0.5 },
+      expired: { svg: GATE_EXPIRED, skel: true, enter: "fade", delay: 0.5 },
+      pilih: pilihBtn,
+      acct: { svg: dim(0, 0, 1440, 900) + accountWindow(), enter: "pop", origin: [AW.x + AW.w / 2, AW.y + 100], delay: 0.1 }
     },
     steps: [
-      { caption: "Selama paket aktif, semua fitur jalan: editor, RSVP, ucapan, dashboard.", show: ["h0"], dur: 3.4 },
-      { caption: "Mulai 7 hari sebelum berakhir, panel menulis Langganan berakhir N hari lagi.", hide: ["h0"], show: ["warn", "h1"], dur: 3.8 },
-      { caption: "Lewat tanggal berakhir: tenggang 7 hari. Fitur masih jalan, segera perpanjang.", hide: ["h1"], show: ["err", "h2"], dur: 3.8 },
-      { caption: "Lewat tenggang: RSVP, ucapan, dan Dashboard pasangan berhenti.", hide: ["h2"], show: ["expired", "h3", "pilih"], dur: 3.6 },
-      { caption: "Klik Pilih paket, lalu bayar. RSVP dan ucapan jalan lagi.", at: mid(GATE_EXP_BTN), click: true, press: "pilih", show: ["acct"], dur: 4 }
+      { caption: "Selama paket aktif, semua fitur jalan: editor, RSVP, ucapan, dashboard.", dur: 3.4, focus: [tlBox(0), [72, 92, 327, 808]], mark: { box: tlBox(0), r: 8 },
+        lens: { src: grow(tlBox(0), 6) } },
+      { caption: "Mulai 7 hari sebelum berakhir, panel menulis Langganan berakhir N hari lagi.", dur: 3.8, focus: [tlBox(1), grow(RN_WARN.box, 6), grow(CHIP, 4)],
+        mark: [{ box: RN_WARN.box }, { box: tlBox(1), r: 8 }],
+        show: ["warn"], lens: { src: [72, 100, 327, 135], at: [480, 330] } },
+      { caption: "Lewat tanggal berakhir: tenggang 7 hari. Fitur masih jalan, segera perpanjang.", dur: 3.8, focus: [tlBox(2), grow(RN_ERR.box, 6), grow(CHIP, 4)],
+        mark: [{ box: RN_ERR.box }, { box: tlBox(2), r: 8 }],
+        hide: ["warn"], show: ["err"], lens: { src: [72, 100, 327, 154], at: [480, 330] } },
+      { caption: "Lewat tenggang: RSVP, ucapan, dan Dashboard pasangan berhenti.", dur: 3.6, focus: [tlBox(3), [0, 154, 399, 130], grow(CHIP, 4)],
+        mark: [{ box: GATE_MSG }, { box: tlBox(3), r: 8 }], hide: ["err"],
+        show: ["expired", "pilih"], lens: { src: [0, 154, 399, 130], zoom: 1.6, at: [480, 330] } },
+      { caption: "Klik Pilih paket, lalu bayar. RSVP dan ucapan jalan lagi.", dur: 4, focus: [0, 154, 399, 130], mark: GATE_EXP_BTN, at: mid(GATE_EXP_BTN), click: true,
+        press: "pilih", show: ["acct"], lens: { src: [0, 154, 399, 130], zoom: 1.6, at: [480, 440] } }
     ]
   },
 
   "bantuan-masa-aktif-tamu": {
     title: "Halaman tamu saat masa aktif habis",
-    cursorStart: [PH.x + 340, PH.y + 700],
-    world: { x: PH.x - 10, y: PH.y - 10, w: 410, h: 864 },
-    base: [guestPhone(false)],
+    cursorStart: [PX + 340, PY + 700],
+    base: [phoneDesk(guestPhone(false), { screen: "#fdf6ee" })],
     els: {
-      closed: { svg: guestPhone(true), enter: "fade" },
-      ringClosed: { svg: ring(PH.x + 28, PH.y + 146, 334, 104, { r: 14 }), enter: "fade", delay: 0.4 }
+      closed: { svg: clipped(PX, PY, 390, 844, guestPhone(true)), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Selama paket aktif, tamu bisa mengisi kehadiran dan Ucapan & doa.", dur: 3.4 },
-      { caption: "Lewat tenggang, halaman tetap tampil. Form menulis Ucapan & RSVP sudah ditutup.", show: ["closed", "ringClosed"], dur: 4 }
+      { caption: "Selama paket aktif, tamu bisa mengisi kehadiran dan Ucapan & doa.", dur: 3.4, focus: FORM, mark: { box: FORM, r: 12 },
+        lens: { src: [FX - 6, PY + 236, FW + 12, 190], zoom: 1.4, at: [625, 230] } },
+      { caption: "Lewat tenggang, halaman tetap tampil. Form menulis Ucapan & RSVP sudah ditutup.", dur: 4, focus: grow(CLOSED, 8), mark: { box: CLOSED, r: 12 }, show: ["closed"],
+        lens: { src: grow(CLOSED, 8), zoom: 1.4, at: [625, 90] } }
     ]
   },
 
-  "bantuan-buka-wa": {
-    title: "Membuka WhatsApp admin dari Bantuan",
-    cursorStart: REST,
-    world: PANEL_VIEW,
-    base: [editorKonten()],
-    els: {
-      sheet: { svg: dlgSheet, enter: "fade" },
-      body: { svg: KW.svg, enter: "fade" },
-      cover: { svg: dlgCover(), enter: "fade" },
-      ringBtns: { svg: ring(12, KW.pos.salin[1] - KW_S - 4, 359, 88, { r: 6 }), enter: "fade", delay: 1.2 },
-      waBtn: { svg: nkBtn(16, KW.pos.wa[1] - KW_S, "Kirim lewat WhatsApp", { variant: "quiet", w: 351, size: 14, icon: "message-circle" }), enter: "fade", delay: 1.2 },
-      wa: { svg: tr(0, 92 - T, waPage), enter: "fade", delay: 0.25 }
-    },
-    steps: [
-      { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", at: RAIL_HELP, click: true, show: ["sheet", "body", "cover"], dur: 3.4 },
-      { caption: "Gulir ke tombol laporan: Salin laporan dan Kirim lewat WhatsApp.", scroll: { id: "body", dy: KW_S }, show: ["ringBtns", "waBtn"], dur: 3.6 },
-      { caption: "Klik Kirim lewat WhatsApp. WhatsApp terbuka di chat admin Nikahin.", hide: ["ringBtns"], at: mid(KW.pos.wa, KW_S), click: true, press: "waBtn", show: ["wa"], dur: 3.8 }
-    ]
-  },
+  "bantuan-buka-wa": (() => {
+    const D = [3.4, 3.6, 3.8];
+    return {
+      title: "Membuka WhatsApp admin dari Bantuan",
+      cursorStart: REST,
+      base: [editorKonten()],
+      els: {
+        sheet: { svg: dlgSheet, skel: true, enter: "fade" },
+        body: { svg: sl.svg, skel: true, enter: "fade" },
+        cover: { svg: dlgCover, skel: true, enter: "fade" },
+        waBtn: { svg: tr(0, -KW_S, sl.part.wa), skel: true, enter: "fade", delay: 1.2 },
+        wa: { svg: waScreen(cmpTop), skel: true, enter: "fade", delay: 0.25 }
+      },
+      steps: [
+        { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", dur: D[0], focus: [[0, 554, 72, 346], [0, 92, 399, 140]], mark: { box: HELP, r: 6 },
+          at: mid(HELP), click: true, show: ["sheet", "body", "cover"], lens: { src: [0, 92, 399, 150], at: [330, 60] } },
+        { caption: "Gulir ke tombol laporan: Salin laporan dan Kirim lewat WhatsApp.", dur: D[1], focus: at([16, BTNS[1], 351, 80], KW_S), mark: at([16, BTNS[1], 351, 80], KW_S),
+          scroll: { id: "body", dy: KW_S }, show: ["waBtn"], lens: { src: helpLens([16, BTNS[1], 351, 80], KW_S) } },
+        { caption: "Klik Kirim lewat WhatsApp. WhatsApp terbuka di chat admin Nikahin.", dur: D[2], focus: [CHAT_HEAD, CMP_AREA], mark: at(sl.pos.wa, KW_S),
+          at: mid(at(sl.pos.wa, KW_S)), click: true, press: "waBtn", show: ["wa"] }
+      ]
+    };
+  })(),
 
   "bantuan-kirim-wa": {
     title: "Melengkapi dan mengirim laporan lewat WhatsApp",
-    cursorStart: [WR - 120, T + 300],
-    world: { x: 471, y: T, w: WR - 471, h: 900 }, // chat pane only
-    base: [waPage],
+    cursorStart: [1100, 300],
+    base: [waScreen(cmpTop)],
     els: {
-      cmp: cmpText,
+      end: { svg: cmpEnd, enter: "fade" },
       typed1: text(CMP.x + 14, typedY(0), TYPED[0], { size: 14, fill: WA.ink }),
       typed2: text(CMP.x + 14, typedY(1), TYPED[1], { size: 14, fill: WA.ink }),
-      cover: waCover,
-      ringC: { svg: ring(CMP.x, CMP.y, CMP.w, CMP.h, { r: 8 }), enter: "fade", delay: 0.4 },
       shot: { svg: shotAttach, enter: "pop", origin: [SHOT.x + SHOT.w / 2, SHOT.y + SHOT.h] },
-      warnN: { svg: note(490, CMP.y - 210, "Jangan kirim PIN, kode staff, atau data klien", 700, CMP.y + 2), delay: 0.3 },
       empty: { svg: cmpEmpty, enter: "fade" },
       sent: { svg: sentBubble, delay: 0.15 }
     },
     steps: [
-      { caption: "Pesannya sudah terisi: salam dan laporan teknis. Biarkan, jangan dihapus.", show: ["ringC"], dur: 3.6 },
-      { caption: "Tulis apa yang kamu lakukan di bawah laporan, dengan kalimat pendek.", hide: ["ringC"], scroll: { id: "cmp", dy: CMP_SCROLL }, at: [CMP.x + 380, typedY(0) - 5], click: true,
-        type: [{ id: "typed1", n: 22, box: [CMP.x + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], dur: 4 },
-      { caption: "Tulis alamat halamannya, misalnya app.scalev.com/pages/365671.", type: [{ id: "typed2", n: 18, box: [CMP.x + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], dur: 3.6 },
-      { caption: "Ambil screenshot layarnya, lalu tempel (Ctrl+V) di chat.", show: ["shot"], dur: 3.4 },
-      { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", show: ["warnN"], dur: 3.8 },
-      { caption: "Klik kirim. Admin membalas di chat yang sama.", hide: ["warnN", "shot"], at: SEND, click: true, show: ["empty", "sent"], dur: 3.8 }
+      { caption: "Pesannya sudah terisi: salam dan laporan teknis. Biarkan, jangan dihapus.", dur: 3.6, focus: [CHAT_HEAD, CMP_AREA], mark: { box: CMP_BOX, r: 8 },
+        lens: { src: [CMP.x, CMP.y, 440, 110] } },
+      { caption: "Tulis apa yang kamu lakukan di bawah laporan, dengan kalimat pendek.", dur: 4, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 }, at: [CMP.x + 420, typedY(0) - 5],
+        click: true, show: ["end"], type: [{ id: "typed1", n: 22, box: [CMP.x + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], lens: { src: [CMP.x, typedY(0) - 74, 440, 104] } },
+      { caption: "Tulis alamat halamannya, misalnya app.scalev.com/pages/365671.", dur: 3.6, mark: { box: CMP_BOX, r: 8 },
+        type: [{ id: "typed2", n: 18, box: [CMP.x + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], lens: { src: [CMP.x, typedY(1) - 74, 440, 104] } },
+      { caption: "Ambil screenshot layarnya, lalu tempel (Ctrl+V) di chat.", dur: 3.4, focus: [grow(SHOT_BOX, 12), CMP_AREA], mark: { box: SHOT_BOX, r: 8 }, show: ["shot"],
+        note: "Tempel: Ctrl+V" },
+      { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", dur: 3.8, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 },
+        note: "Jangan kirim PIN, kode staff, atau data klien" },
+      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [[BUB.x - 250, BUB.y - 170, BUB.w + 260, BUB.h + 180], [WC + 1, 838, 1440 - WC - 1, 62], SEND_BOX],
+        mark: { box: SEND_BOX, r: 21 }, at: SEND, click: true, hide: ["shot", "end", "typed1", "typed2"], show: ["empty", "sent"] }
     ]
   }
 };
