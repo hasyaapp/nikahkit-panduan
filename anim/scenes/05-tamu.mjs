@@ -655,7 +655,7 @@ export const scenes = {
     base: [appShell(), detail()],
     els: {
       filter: { svg: selectMenu(SEL[0], DY.tools + 40, 235, ["Semua", "Baru sejak terakhir dibuka", "Disembunyikan", "Belum dibalas", "Diubah/dicatat pemilik"], 2), enter: "pop", origin: [SEL[0] + 117, DY.tools + 38] },
-      d1: { svg: focusEl(detail({ hidden: true }), [[BX, DY.items, BW2, 93]]), enter: "fade" },
+      d1: { svg: focusEl(detail({ hidden: true }), [[BX, DY.items, BW2, 186]]), enter: "fade" },
       d2: { svg: focusEl(detail({ hidden: true, picked: true }), [[BX, DY.tools - 8, BW2, 126], [BX, DY.items + 66 + 93, BW2, 93]]), enter: "fade" },
       dl: { svg: dlBubble, enter: "pop", origin: [1220, 8], delay: 0.1 }
     },
