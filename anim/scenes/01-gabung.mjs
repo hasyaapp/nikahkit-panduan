@@ -17,7 +17,7 @@ import {
 } from "../ui/kit.mjs";
 import { securityPanel, settingsPanel, slugText, SLUG as SLUG_BOX, SLUG_LENS, lpScreen, LP_ROWS, head, genericBody } from "../ui/scalev.mjs";
 import { templatePanel, cardAt, kList, panelBody, panelBg, seg, ACCOUNT } from "../ui/editor-panels.mjs";
-import { brandClosed, brandOpen, mkCards, BOX, MKY, CARD_X } from "../ui/marketing.mjs";
+import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY } from "../ui/marketing.mjs";
 import { pvCover, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W } from "../ui/gate.mjs";
@@ -406,14 +406,14 @@ export const scenes = {
   "mulai-alur-serahkan": checklist("Bagian 4: bagikan dan serahkan", "Bagian 4: Bagikan dan serahkan", "Langkah 16 sampai 20.", [
     ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg), -184, 92, shareBox("lihat", NO_NOTE), { lens: [8, 166, 384, 204] })],
     ["17. Pasang Dashboard pasangan milikmu (sekali saja)", "Template > Marketing: pasang Dashboard pasangan, sekali saja.",
-      pv(edLeft(marketing()), -184, 92, [CARD_X.dashboard, MKY, 134, 167], { lens: [CARD_X.dashboard - 8, MKY - 8, 150, 245] })],
+      pv(edLeft(marketing()), -184, 92, [...cardXY("dashboard"), 134, 167], { lens: [cardXY("dashboard")[0] - 8, MKY - 8, 150, 245] })],
     ["18. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 8, 408, 104] })],
     ["19. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 58, 408, 148] })],
     ["20. Siapkan hari-H (opsional)", "Hari-H: tamu di-check-in dari Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })]
   ]),
   "mulai-alur-jualan": checklist("Bagian 5: jualan", "Bagian 5: Jualan", "Langkah 21 sampai 24.", [
     ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
-    ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing()), -184, 92, [CARD_X.landing, MKY, 134, 167], { lens: [CARD_X.landing - 8, MKY - 8, 150, 245] })],
+    ["22. Pasang Landing page jualan", "Pasang salah satu Landing page (Klasik, Etalase, Langit) di Marketing.", pv(edLeft(marketing()), -184, 92, [...cardXY("landing"), 134, 167], { lens: [cardXY("landing")[0] - 8, MKY - 8, 150, 245] })],
     ["23. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
       pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, SALIN_BOX, { lens: [8, 369, 382, 217] })],
     ["24. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
