@@ -101,9 +101,10 @@ export const textWidth = (s, size = 14, weight = 400, { mono = false, spacing = 
   const em = glyphs.reduce((t, c) => t + (mono ? 60 : adv[GLYPH.get(c)] ?? 60), 0) / 100;
   return +(em * size * (mono ? 1 : opsz(size)) + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
 };
-// Greedy word wrap to a width, using tw(); a word longer than the width (a URL) is split where the line is full.
-export function wrap(s, width, size = 14, weight = 400) {
-  const lines = [], fits = (t) => tw(t, size, weight) <= width;
+// Greedy word wrap to a width; a word longer than the width (a URL) is split where the line is full. measure: tw
+// (keeps every line inside its column on every system) or textWidth (breaks where a Mac breaks, as clamp() needs).
+export function wrap(s, width, size = 14, weight = 400, measure = tw) {
+  const lines = [], fits = (t) => measure(t, size, weight) <= width;
   for (let w of String(s).split(" ")) {
     const last = lines.at(-1);
     if (last && fits(last + " " + w)) { lines[lines.length - 1] = last + " " + w; continue; }
@@ -116,6 +117,15 @@ export function wrap(s, width, size = 14, weight = 400) {
     lines.push(w);
   }
   return lines;
+}
+// Text cut to n lines of a width with an ellipsis, as CSS text-overflow (n = 1) and line-clamp do: the last line holds
+// the rest of the text, cut where it no longer fits.
+export function clamp(s, width, n = 1, size = 14, weight = 400) {
+  const ls = wrap(s, width, size, weight, textWidth);
+  if (ls.length <= n) return ls;
+  let last = ls.slice(n - 1).join(" ");
+  while (last.length > 1 && textWidth(last + "…", size, weight) > width) last = last.slice(0, -1);
+  return [...ls.slice(0, n - 1), last.trimEnd() + "…"];
 }
 // Clip children to a rect (scrolling panels, truncated text) or to any shape markup (clipShape: an arch path, a rounded
 // rect). The id comes from the shape itself, so a build never renumbers clips in unrelated scenes; equal shapes share

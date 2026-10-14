@@ -1,6 +1,6 @@
 // node panduan/anim/lib.test.mjs — the scene compiler's rules (canvas, skeleton, focus, marks, lens, timing, reduced motion).
 import assert from "node:assert/strict";
-import { compile, skeleton, text, rect, textWidth, tw, wrap, clipShape } from "./lib.mjs";
+import { compile, skeleton, text, rect, textWidth, tw, wrap, clamp, clipShape } from "./lib.mjs";
 
 const scene = (over = {}) => ({
   title: "uji",
@@ -55,6 +55,10 @@ assert.ok(wl.length > 2 && wl.every((l) => tw(l, 14) <= 200) && wl.join("") === 
 // Clip ids come from the shape: the same shape shares an id, another shape gets its own (no renumbering).
 const cid = (s) => /clipPath id="(\w+)"/.exec(s)[1];
 assert.ok(cid(clipShape('<path d="M0 0h9v9z"/>', "<a/>")) === cid(clipShape('<path d="M0 0h9v9z"/>', "<b/>")) && cid(clipShape('<path d="M0 0h8v9z"/>')) !== cid(clipShape('<path d="M0 0h9v9z"/>')), "clip id from the shape");
+// clamp: as CSS line-clamp: whole words on the first lines, the last line cut with an ellipsis inside the width.
+const cl = clamp("Kirim undangan, RSVP, ucapan, dan check-in tamu.", 134, 2, 12);
+assert.ok(cl.length === 2 && cl[1].endsWith("…") && cl.every((l) => textWidth(l, 12) <= 134) && cl[0] === wrap("Kirim undangan, RSVP, ucapan, dan check-in tamu.", 134, 12, 400, textWidth)[0], "clamp: " + cl);
+assert.deepEqual(clamp("Rani", 134, 2, 12), ["Rani"], "clamp: short text untouched");
 
 // Focus: the skeleton base under one detailed layer per run of steps with the same focus. Its clip lands on whole
 // stage pixels (y 92 → 91.5 = 61 px), so no half-covered row blends detail and skeleton into a line.
