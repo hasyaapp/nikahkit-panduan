@@ -247,8 +247,28 @@ const SENT_ROWS = (sent) => [
 // Kartu tautan di HP (share/index.html .lp, @media max-width 760px): selebar gelembung, gambar persegi 1:1, judul maks 2 baris,
 // deskripsi, domain. Isinya contoh SEO & Page Identity Scalev. unpub: penanda .lpn "Belum diterbitkan" di bawah kartu.
 const GUEST_LINK = SITE + "?to=Dewi+Lestari&u=K7Q2MX";
-function chatContent(unpub = false) {
-  const msg = MUSLIM.replace(/\*\[nama\]\*/g, "*Dewi Lestari*").replace(/\[nama\]/g, "Dewi Lestari").replace(/\[link-undangan\]/g, GUEST_LINK);
+// Ikon daftar periksa (share/index.html CHECK_ICON: ✅ ⚠️ ❌ ✏️ ➖ 🚫), digambar sebagai bentuk agar tidak bergantung font emoji.
+const emo = (k, x, y) => ({
+  ok: rect(x, y, 15, 15, { r: 3, fill: "#43b54a" }) + `<path d="M${x + 3.5} ${y + 7.8} l2.8 2.8 l5.2 -5.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+  no: `<path d="M${x + 2.5} ${y + 2.5} l10 10 M${x + 12.5} ${y + 2.5} l-10 10" stroke="#e5383b" stroke-width="3.2" stroke-linecap="round"/>`,
+  warn: `<path d="M${x + 7.5} ${y + 1} l7 13 h-14 z" fill="#f4b400" stroke="#f4b400" stroke-linejoin="round"/>` + rect(x + 6.6, y + 5, 1.8, 5, { fill: "#111" }) + rect(x + 6.6, y + 11, 1.8, 1.8, { fill: "#111" }),
+  free: `<path d="M${x + 2} ${y + 13} l1 -4 l8 -8 l3 3 l-8 8 z" fill="#f2a33a"/>`,
+  optional: rect(x + 1, y + 6, 13, 3, { r: 1, fill: "#8696a0" }),
+  rule: circle(x + 7.5, y + 7.5, 6.5, { stroke: "#e5383b", sw: 2 }) + `<path d="M${x + 3} ${y + 3} l9 9" stroke="#e5383b" stroke-width="2"/>`
+})[k];
+// Status layak kirim (.ready) dan daftar periksa (.mhint) untuk Dewi Lestari; mode "no" = baris [link-undangan] terhapus.
+const READY = { ok: ["ok", "Siap dikirim ke Dewi Lestari", ""], no: ["no", "Belum bisa dikirim", "[link-undangan] terhapus, tamu tidak dapat tautan undangan"] };
+const CHECKS = (mode) => [["free", "Kalimat, urutan, emoji, *tebal*", "boleh diubah bebas"],
+  mode === "no" ? ["no", "[link-undangan] terhapus", "tamu tidak dapat tautan undangan"] : ["ok", "[link-undangan]", "jadi tautan pribadi tiap tamu"],
+  ["ok", "[nama]", "jadi nama tamu"], ["ok", "[pasangan]", "jadi Rani & Dimas"],
+  ["rule", "Jangan isi nama/tautan manual", "tulis penanda persis dengan [ ], diganti otomatis saat dikirim"]];
+const NO_LINK = MUSLIM.replace("\n[link-undangan]", "");
+const xe = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+// Satu baris teks: awalan tebal gelap lalu sisanya, mengalir seperti <b> di HTML.
+const boldLead = (x, y, size, bold, rest, fill) => `<text x="${x}" y="${y}" font-size="${size}"><tspan font-weight="600" fill="#111b21">${xe(bold)}</tspan><tspan fill="${fill}" xml:space="preserve">${xe(rest)}</tspan></text>`;
+function chatContent(unpub = false, mode = "ok") {
+  const tpl = mode === "no" ? NO_LINK : MUSLIM;
+  const msg = tpl.replace(/\*\[nama\]\*/g, "*Dewi Lestari*").replace(/\[nama\]/g, "Dewi Lestari").replace(/\[pasangan\]/g, "Rani & Dimas").replace(/\[link-undangan\]/g, GUEST_LINK);
   const bw = 305, bx = 374 - bw, inner = bw - 16;
   const lines = msg.split("\n").flatMap((l) => { const bold = /^\*[^*]+\*$/.test(l.trim()); return wrap(bold ? l.trim().slice(1, -1) : l, inner, 14.2, bold ? 600 : 400).map((t) => ({ t, bold, link: /^https?:/.test(l) })); });
   let y = 116;
@@ -266,19 +286,38 @@ function chatContent(unpub = false) {
   lines.forEach((l, i) => (s += text(bx + 9, y + top + 15 + i * 19, l.t, { size: 14.2, fill: l.link ? T.link : T.text, weight: l.bold ? 600 : undefined })));
   s += text(bx + bw - 7, y + bh - 8, "Draf · belum dikirim", { size: 11, fill: T.sub, anchor: "end" });
   y += bh + 20;
-  // Penyusun: pilihan teks + kotak pesan (tumbuh setinggi isi) + tombol kirim.
-  let cx = 12;
-  ["formal", "muslim", "nasrani", "hindu", "custom"].forEach((k) => { const w = tw(k, 13, 500) + 26; s += rect(cx + 0.5, y + 0.5, w - 1, 29, { r: 15, fill: k === "muslim" ? T.soft : "#fff", stroke: T.outline }) + text(cx + w / 2, y + 20, k, { size: 13, weight: 500, fill: k === "muslim" ? T.strong : T.sub, anchor: "middle" }); cx += w + 6; });
-  s += rect(cx, y + 4, 1, 22, { fill: T.outline });
-  const raw = wrap(MUSLIM, 286, 15);
-  const ch = Math.max(52, 20 + raw.length * 22 + 10), cy = y + 38;
+  // Penyusun (.chead: pilihan teks, tombol penanda, status layak kirim) + kotak pesan (tumbuh setinggi isi) + daftar periksa.
+  // Mode "no"/"fixed": baris tombol digeser (di HP bergulir ke samping) sampai + [link-undangan] terlihat.
+  let cx = 12, chip = null; const s0 = s.length;
+  const chipBtn = (k, on) => { const w = tw(k, 13, 500) + 26; s += rect(cx + 0.5, y + 0.5, w - 1, 29, { r: 15, fill: on ? T.soft : "#fff", stroke: T.outline }) + text(cx + w / 2, y + 20, k, { size: 13, weight: 500, fill: on ? T.strong : T.sub, anchor: "middle" }); const c = [cx + w / 2, y + 15]; cx += w + 6; return c; };
+  (mode === "ok" ? ["formal", "muslim", "nasrani", "hindu", "custom"] : ["custom"]).forEach((k) => chipBtn(k, k === "muslim"));
+  s += rect(cx, y + 4, 1, 22, { fill: T.outline }); cx += 7;
+  ["+ [nama]", "+ [link-undangan]", "+ [pasangan]"].forEach((k) => { const c = chipBtn(k, false); if (k === "+ [link-undangan]") chip = c; });
+  // Status: ikon + judul tebal · keterangan, latar hijau/merah.
+  const [st, title, detail] = READY[mode === "no" ? "no" : "ok"], rl = wrap(title + (detail ? " · " + detail : ""), 296, 13);
+  const ry = y + 38, rh = 14 + rl.length * 18;
+  s += rect(12, ry, 366, rh, { r: 8, fill: st === "no" ? "#ffe0de" : "#d9fdd3" }) + emo(st, 22, ry + 9);
+  rl.forEach((t, i) => (s += i ? text(42, ry + 20 + i * 18, t, { size: 13, fill: "#111b21" }) : boldLead(42, ry + 20, 13, title, t.slice(title.length), "#111b21")));
+  // .chead menempel di bawah kepala percakapan (top 64px, padding-top 8px) saat pesan digulir.
+  const sticky = `<g transform="translate(0 ${72 - y})">` + rect(0, y - 8, 390, 38 + rh + 16, { fill: T.wall }) + s.slice(s0) + "</g>";
+  const raw = wrap(tpl, 286, 15);
+  const ch = Math.max(52, 20 + raw.length * 22 + 10), cy = ry + rh + 8;
   s += rect(8, cy + 2, 374, ch, { r: 26, fill: "rgba(0,0,0,.08)" }) + rect(8, cy, 374, ch, { r: 26, fill: "#fff" }) +
     raw.map((t, i) => text(29, cy + 26 + i * 22, t, { size: 15, fill: T.text })).join("");
   const send = [356, cy + ch - 26];
-  s += circle(send[0], send[1], 20, { fill: T.accent }) + wa("send", send[0], send[1], 24, "#fff");
-  return { svg: s, bottom: cy + ch + 8, send };
+  s += `<g opacity="${mode === "no" ? 0.4 : 1}">` + circle(send[0], send[1], 20, { fill: T.accent }) + wa("send", send[0], send[1], 24, "#fff") + "</g>";
+  // Daftar periksa (.mhint): ikon 20px + label tebal + keterangan, baris 17,5px, jarak 4px.
+  let hy = cy + ch + 8;
+  CHECKS(mode).forEach(([k, label, desc]) => {
+    const hl = wrap(label + " " + desc, 306, 12.5);
+    s += emo(k, 16, hy + 2);
+    hl.forEach((t, i) => (s += i ? text(40, hy + 13 + i * 17.5, t, { size: 12.5, fill: "#54656f" }) : boldLead(40, hy + 13, 12.5, label, t.slice(label.length), "#54656f")));
+    hy += hl.length * 17.5 + 4;
+  });
+  return { svg: s, bottom: hy + 8, send, chip, sticky, ready: [12, 72 + 38, 366, rh] };
 }
-const CHAT = chatContent(), CHAT_U = chatContent(true);
+const CHAT = chatContent(), CHAT_U = chatContent(true), CHAT_NO = chatContent(true, "no"), CHAT_FIX = chatContent(true, "fixed");
+const NO_DY = CHAT_NO.bottom - 844;
 const CHAT_DY = CHAT_U.bottom - 844;
 
 // ---- Hari-H (HP) -----------------------------------------------------------------------------------------------------
@@ -299,6 +338,21 @@ const resultBox = (kind, [name, info] = DEWI) => kind === "ok"
   : rect(16, 80, 358, 200, { r: 7.5, fill: T.system }) + text(195, 159, name, { size: 28, weight: 500, fill: T.text, anchor: "middle" }) +
     text(195, 189, "Sudah check-in pukul 10.12", { size: 18, fill: T.text, anchor: "middle" }) + text(195, 217, info, { size: 18, fill: T.text, anchor: "middle" });
 const recentRow = (y, ok, [name, info, at] = DEWI) => row(y, { x0: 24, right: 351, name, ini: iniS(name), time: at, parts: [{ icon: "read", iconFill: ok ? T.accent : T.sub, t: (ok ? "Selamat datang · " : "Sudah check-in sebelumnya · ") + info }] });
+// Kamera terbuka (.ck-stage[data-cam], diukur di Chromium 390 lebar, tinggi bingkai 773): jendela persegi min(100%,46svh) = 356px
+// di tengah, garis bidik inset 18%, hasil scan = kartu di dalam jendela (kiri/kanan/bawah 10px), tombol 12px di bawahnya.
+const STAGE = { x: 17, y: 80, s: 356 };
+const camStage = () => {
+  const { x, y, s } = STAGE, i = Math.round(s * 0.18), ax = x + i, ay = y + i, a = s - 2 * i, k = 28, c = "#fff";
+  const corner = (cx, cy, dx, dy) => rect(dx > 0 ? cx : cx - k, dy > 0 ? cy : cy - 4, k, 4, { fill: c }) + rect(dx > 0 ? cx : cx - 4, dy > 0 ? cy : cy - k, 4, k, { fill: c });
+  return rect(x, y, s, s, { r: 12, fill: "#18242c" }) + rect(ax, ay, a, a, { r: 16, fill: "#2a3640" }) +
+    corner(ax, ay, 1, 1) + corner(ax + a, ay, -1, 1) + corner(ax, ay + a, 1, -1) + corner(ax + a, ay + a, -1, -1);
+};
+const camCard = (kind, [name, info] = DEWI) => {
+  const ok = kind === "ok", h = ok ? 128 : 104, y = STAGE.y + STAGE.s - 10 - h, fill = ok ? T.strong : T.text;
+  return rect(27, y + 3, 336, h, { r: 7.5, fill: "rgba(11,20,26,.18)" }) + rect(27, y, 336, h, { r: 7.5, fill: ok ? T.soft : T.system }) + (ok ? wa("read", 195, y + 24, 24, T.accent) : "") +
+    text(195, y + (ok ? 62 : 34), name, { size: 22, weight: 500, fill: T.text, anchor: "middle" }) +
+    text(195, y + (ok ? 87 : 59), ok ? "Selamat datang" : "Sudah check-in pukul 10.12", { size: 15, fill, anchor: "middle" }) + text(195, y + (ok ? 111 : 83), info, { size: 15, fill, anchor: "middle" });
+};
 // Kartu Check-in di perangkat ini (terbaru di atas): baris [ok, tamu].
 const recentBox = (y, rows) => rect(16, y, 358, 52 + rows.length * 72, { r: 12, fill: "#fff" }) + text(32, y + 31, "Check-in di perangkat ini", { size: 14, weight: 500, fill: T.sub }) +
   rows.map(([ok, g], i) => recentRow(y + 44 + i * 72, ok, g)).join("");
@@ -520,6 +574,10 @@ const SCENES = {
         chat: { svg: ph(CHAT.svg), enter: "fade" },
         chatU: { svg: ph(CHAT_U.svg), enter: "fade" },
         nUnpub: ring(PX + 72, PY + 490, 296, 40),
+        stickOk: { svg: ph(CHAT_U.sticky), enter: "fade" },
+        broken: { svg: ph(`<g transform="translate(0 ${-NO_DY})">${CHAT_NO.svg}</g>`, CHAT_NO.sticky), enter: "fade" },
+        nNo: ring(PX + CHAT_NO.ready[0], PY + CHAT_NO.ready[1], CHAT_NO.ready[2], CHAT_NO.ready[3]),
+        fixed: { svg: ph(`<g transform="translate(0 ${-CHAT_DY})">${CHAT_FIX.svg}</g>`, CHAT_FIX.sticky), enter: "fade" },
         chatTop: { svg: ph(chatBar("Dewi Lestari", "", "+6282198765432", { av: false })), enter: "fade" },
         opened: { svg: ph(waToast(195, 684, "WhatsApp dibuka untuk Dewi Lestari.")), enter: "slide" },
         sent: { svg: ph(kirimTop([3, 2, 1]), SENT_ROWS(true), fab(), tabbar("kirim")), enter: "fade" },
@@ -532,7 +590,10 @@ const SCENES = {
         { caption: "Ketuk nama tamu. Pratinjau pesan dengan tautan pribadinya muncul.", at: dewi, click: true, hide: ["ready"], show: ["chat", "chatTop"], dur: 3.6 },
         { caption: "Kartu berisi gambar, judul, dan deskripsi dari SEO & Page Identity Scalev.", dur: 3.6 },
         { caption: "Versi terbaru belum terbit? Muncul Belum diterbitkan: terbitkan dulu di Scalev.", show: ["chatU", "nUnpub"], dur: 4.2 },
-        { caption: "Gulir ke bawah, tekan tombol kirim hijau. WhatsApp terbuka.", scroll: { id: "chatU", dy: CHAT_DY }, at: P(CHAT_U.send[0], CHAT_U.send[1] - CHAT_DY), click: true, hide: ["nUnpub"], show: ["opened"], dur: 4 },
+        { caption: "Gulir ke bawah. Status Siap dikirim dan daftar periksa semuanya hijau.", scroll: { id: "chatU", dy: CHAT_DY }, hide: ["nUnpub"], show: ["stickOk"], dur: 4 },
+        { caption: "Baris [link-undangan] terhapus? Belum bisa dikirim, tombol kirim mati.", at: P(CHAT_NO.send[0], CHAT_NO.send[1] - NO_DY), show: ["broken", "nNo"], dur: 4.4 },
+        { caption: "Tekan + [link-undangan]. Tanda kembali hijau, tombol kirim menyala.", at: P(CHAT_NO.chip[0], 87), click: true, hide: ["broken", "nNo"], show: ["fixed"], dur: 4 },
+        { caption: "Tekan tombol kirim hijau. WhatsApp terbuka.", at: P(CHAT_U.send[0], CHAT_U.send[1] - CHAT_DY), click: true, show: ["opened"], dur: 3.6 },
         { caption: "Kembali ke daftar: tamu itu bercentang dan masuk hitungan Terkirim.", at: P(24, 32), click: true, hide: ["opened"], show: ["sent"], dur: 3.8 }
       ]
     };
@@ -603,30 +664,26 @@ const SCENES = {
     base: [...phoneBase(T.wash), ph(HOME_STATIC)],
     els: {
       scan: { svg: ph(rect(0, 0, 390, 844, { fill: T.wall }), pillBtn(16, 80, 358, "Buka kamera"), linkBox(132)), enter: "fade" },
-      cam: ph(rect(0, 64, 390, 1000, { fill: T.wall }), rect(16, 80, 358, 358, { r: 7.5, fill: "#0b141a" }), rect(36, 100, 318, 318, { r: 6, fill: "#18242c" }),
-        pillBtn(16, 450, 358, "Tutup kamera"), text(195, 515, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(524)),
+      cam: ph(rect(0, 64, 390, 709, { fill: T.wall }), camStage(), pillBtn(16, 448, 358, "Tutup kamera"), text(195, 501, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(517)),
       qr: { svg: ph(rect(110, 150, 170, 218, { r: 14, fill: "#2c3a43" }), rect(118, 160, 154, 198, { r: 8, fill: "#fdf6ee" }), qrCode(139, 200, 112)), enter: "rise" },
-      ok: ph(rect(0, 64, 390, 228, { fill: T.wall }), resultBox("ok")),
-      warn: ph(rect(0, 64, 390, 228, { fill: T.wall }), resultBox("warn")),
-      // Halaman Scan setelah dua kali pindai (posisi seperti langkah 5), lalu digulir 212px ke kolom tempel link.
-      pv: ph(rect(0, 64, 390, 1200, { fill: T.wall }), resultBox("warn"), rect(16, 292, 358, 358, { r: 7.5, fill: "#0b141a" }), rect(36, 312, 318, 318, { r: 6, fill: "#18242c" }),
-        pillBtn(16, 662, 358, "Tutup kamera"), text(195, 727, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(736), recentBox(832, [[false], [true]])),
-      pasted: { svg: ph(rect(30, 550, 290, 46, { fill: "#fff" }), text(37, 579, fit(SITE + "?to=Bapak+Andi+%26+Ibu+Rina&u=P4N8RW", 280, 16), { size: 16, fill: T.text })), enter: "fade" },
-      andi: ph(rect(30, 550, 290, 46, { fill: "#fff" }), text(37, 579, "https://…?to=Nama&u=KODE", { size: 16, fill: T.grey }), recentBox(620, [[true, ANDI], [false], [true]])),
-      closed: { svg: ph(rect(0, 64, 390, 709, { fill: T.wall }), resultBox("ok", ANDI), pillBtn(16, 292, 358, "Buka kamera"), linkBox(344), recentBox(443, [[true, ANDI], [false], [true]])), enter: "fade" },
+      // Hasil scan = kartu di dalam jendela kamera; tombol dan kolom link tidak bergeser. Riwayat: satu baris per tamu.
+      ok: { svg: ph(camCard("ok"), recentBox(604, [[true]])), enter: "rise" },
+      warn: ph(camStage(), camCard("warn")),
+      pasted: { svg: ph(rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, fit(SITE + "?to=Bapak+Andi+%26+Ibu+Rina&u=P4N8RW", 280, 16), { size: 16, fill: T.text })), enter: "fade" },
+      andi: ph(camStage(), camCard("ok", ANDI), rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, "https://…?to=Nama&u=KODE", { size: 16, fill: T.grey }), recentBox(604, [[true, ANDI], [true]])),
+      closed: { svg: ph(rect(0, 64, 390, 709, { fill: T.wall }), resultBox("ok", ANDI), pillBtn(16, 292, 358, "Buka kamera"), text(195, 345, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(361), recentBox(448, [[true, ANDI], [true]])), enter: "fade" },
       cover: { svg: ph(scanBar(), tabbar("harih")), enter: "fade" },
       masks: MASKS
     },
     steps: [
       { caption: "Buka tab Hari-H di HP penerima tamu.", at: tabAt("harih"), click: true, show: ["scan", "cover"], dur: 3 },
       { caption: "Tekan Buka kamera, lalu izinkan kamera.", at: P(195, 100), click: true, show: ["cam"] },
-      { caption: "Arahkan kamera ke QR di undangan tamu.", show: ["qr"], dur: 2.8 },
-      { caption: "Kotak hijau Selamat datang: tamu tercatat datang.", scroll: { id: "cam", dy: -212 }, hide: ["qr"], show: ["ok"], dur: 3.4 },
-      { caption: "Dipindai lagi? Kotak kuning: Sudah check-in pukul 10.12.", hide: ["ok"], show: ["warn"], dur: 3.4 },
-      { caption: "QR tidak terbaca? Gulir ke kolom Atau tempel link tamu.", show: ["pv"], scroll: { id: "pv", dy: 212 }, dur: 3 },
-      { caption: "Ketuk kolom itu, lalu tempel link pribadi tamu.", at: P(180, 573), click: true, show: ["pasted"] },
-      { caption: "Tekan tombol kirim hijau. Hasilnya sama seperti scan.", at: P(347, 573), click: true, hide: ["pasted"], show: ["andi"], dur: 3.4 },
-      { caption: "Tekan Tutup kamera. Riwayat ada di Check-in di perangkat ini.", at: P(195, 470), click: true, show: ["closed"], dur: 3.8 }
+      { caption: "Arahkan QR tamu ke dalam garis bidik di jendela kamera.", show: ["qr"], dur: 3 },
+      { caption: "Kartu hijau Selamat datang muncul di jendela kamera.", hide: ["qr"], show: ["ok"], dur: 3.4 },
+      { caption: "Dipindai lagi? Kartu kuning: Sudah check-in pukul 10.12.", show: ["warn"], dur: 3.4 },
+      { caption: "QR tidak terbaca? Ketuk kolom Atau tempel link tamu, tempel link.", at: P(180, 566), click: true, show: ["pasted"], dur: 3.4 },
+      { caption: "Tekan tombol kirim hijau. Hasilnya sama seperti scan.", at: P(347, 566), click: true, hide: ["pasted"], show: ["andi"], dur: 3.4 },
+      { caption: "Tekan Tutup kamera. Riwayat ada di Check-in di perangkat ini.", at: P(195, 468), click: true, show: ["closed"], dur: 3.8 }
     ]
   },
 

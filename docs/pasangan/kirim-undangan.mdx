@@ -16,7 +16,7 @@ Tab **Kirim** membuat tautan pribadi untuk tiap tamu (berisi nama tamu) dan memb
 
 ## Langkah
 
-<Image src="/assets/anim/pasangan-kirim.svg" alt="Di tab Kirim, tekan tombol tambah hijau. Tempel daftar tamu satu per baris, tekan Simpan daftar. Muncul 3 tamu siap. Ketuk nama tamu, pratinjau pesan dengan tautan pribadi muncul, di atasnya kartu tautan dengan gambar persegi, judul Undangan Rani & Dimas, deskripsi, dan domain tokomu.myscalev.com. Bila versi terbaru di Scalev belum diterbitkan, di bawah kartu muncul tulisan oranye Belum diterbitkan: tamu masih melihat versi lama. Gulir ke bawah dan tekan tombol kirim hijau, WhatsApp terbuka. Kembali ke daftar, tamu itu bercentang dan masuk hitungan Terkirim." caption="Mengirim undangan per tamu" />
+<Image src="/assets/anim/pasangan-kirim.svg" alt="Di tab Kirim, tekan tombol tambah hijau. Tempel daftar tamu satu per baris, tekan Simpan daftar. Muncul 3 tamu siap. Ketuk nama tamu, pratinjau pesan dengan tautan pribadi muncul, di atasnya kartu tautan dengan gambar persegi, judul Undangan Rani & Dimas, deskripsi, dan domain tokomu.myscalev.com. Bila versi terbaru di Scalev belum diterbitkan, di bawah kartu muncul tulisan oranye Belum diterbitkan: tamu masih melihat versi lama. Gulir ke bawah: di atas kotak pesan status hijau Siap dikirim ke Dewi Lestari, di bawahnya daftar periksa bercentang. Saat baris [link-undangan] terhapus, status berubah merah Belum bisa dikirim dan tombol kirim pudar. Tekan + [link-undangan], status hijau lagi dan tombol kirim menyala. Tekan tombol kirim hijau, WhatsApp terbuka. Kembali ke daftar, tamu itu bercentang dan masuk hitungan Terkirim." caption="Mengirim undangan per tamu" />
 
 <Steps>
 <Step title="Buka tab Kirim">
@@ -45,14 +45,27 @@ Tekan **Simpan daftar**. Muncul **Menyiapkan link tamu...**, lalu misalnya **3 t
 Ketuk satu tamu. Pratinjau pesan muncul seperti gelembung chat. Di layar lebar (laptop), penyusun pesan ada di kiri dan pratinjau di kanan. Di HP, pilihan teks ada di bawah pratinjau: **formal**, **muslim**, **nasrani**, **hindu**, **custom**. Bawaannya **muslim**.
 
 Di atas pesan ada kartu tautan, seperti yang dilihat tamu di WhatsApp: gambar, judul, deskripsi, dan domain (misalnya `tokomu.myscalev.com`). Isinya diambil dari **Settings > SEO & PAGE IDENTITY** halaman undangan di Scalev, versi tersimpan terbaru. Atur isinya lewat [Thumbnail WhatsApp dan sosmed](/scalev/thumbnail-sosmed).
-- Di HP, kartu selebar gelembung dan gambar persegi dipotong 1:1, seperti WhatsApp di HP.
+- Di HP, kartu selebar gelembung dan gambar persegi dipotong 1:1, seperti WhatsApp di HP. Di laptop, gelembung yang berkartu selebar kartunya, seperti WhatsApp Web.
 - Judul paling banyak 2 baris. Tanpa judul, kartu hanya menampilkan domain.
 - Muncul **Belum diterbitkan: tamu masih melihat versi lama.** di bawah kartu? Perubahan terakhir di Scalev baru disimpan, belum diterbitkan. Klik **Simpan & Terbitkan** di Scalev dulu, baru kirim. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan).
 
-Kamu boleh mengubah isi pesan. Pakai tombol **+ [nama]** dan **+ [link-undangan]** untuk menyisipkan nama tamu dan tautannya. Keduanya diganti otomatis per tamu. Pesan ini berlaku untuk semua tamu.
+Kamu boleh mengubah isi pesan. Pesan ini berlaku untuk semua tamu.
+</Step>
+<Step title="Cek status dan daftar periksa pesan">
+Di atas kotak pesan ada status yang berubah setiap kamu mengetik:
+- ✅ **Siap dikirim ke** nama tamu: pesan aman dikirim.
+- ⚠️ **Bisa dikirim, cek dulu**: pesan bisa dikirim, tapi ada yang kurang, misalnya **[nama] tidak ada** (pesan tanpa nama tamu).
+- ❌ **Belum bisa dikirim**: tombol kirim mati sampai masalahnya diperbaiki.
+
+Di bawah kotak pesan ada daftar periksa per penanda:
+- ✏️ **Kalimat, urutan, emoji, \*tebal\*** boleh diubah bebas.
+- **[link-undangan]** jadi tautan pribadi tiap tamu, **[nama]** jadi nama tamu, **[pasangan]** jadi nama pasangan dari undangan (misalnya Rani & Dimas). Ketiganya diisi otomatis saat dikirim.
+- 🚫 **Jangan isi nama/tautan manual**: tulis penanda persis dengan `[ ]`. Jangan mengetik nama tamu atau tautan sendiri.
+
+Penanda yang terhapus bisa disisipkan lagi dengan tombol **+ [nama]**, **+ [link-undangan]**, dan **+ [pasangan]** di samping pilihan teks. Di HP, geser baris tombol itu ke kiri untuk melihatnya.
 </Step>
 <Step title="Tekan kirim lewat WhatsApp">
-Tekan tombol bulat hijau (**Kirim lewat WhatsApp**). WhatsApp terbuka dengan pesan terisi. Muncul **WhatsApp dibuka untuk** nama tamu.
+Tekan tombol bulat hijau (**Kirim lewat WhatsApp**). Saat pesan panjang digulir, status tetap menempel di atas dan tombol kirim tetap terlihat di kotak pesan. WhatsApp terbuka dengan pesan terisi. Muncul **WhatsApp dibuka untuk** nama tamu.
 - Tamu punya nomor: chat tamu langsung terbuka.
 - Tamu tanpa nomor: pilih kontaknya sendiri di WhatsApp.
 
@@ -114,6 +127,15 @@ File yang dipilih bukan CSV. Di Excel, pilih **Save As** lalu format CSV, kemudi
 </Accordion>
 <Accordion title="Tunggu beberapa menit.">
 Terlalu banyak permintaan dalam waktu singkat. Tunggu beberapa menit, lalu coba lagi.
+</Accordion>
+<Accordion title="Tombol kirim mati">
+Tombol kirim pudar dan tidak bisa ditekan saat status menunjukkan ❌ **Belum bisa dikirim**. Baca keterangan di sebelahnya:
+- **[link-undangan] terhapus, tamu tidak dapat tautan undangan**: tekan **+ [link-undangan]** untuk menyisipkannya lagi.
+- **Salah tulis** diikuti penandanya, misalnya `[Nama]` atau `[link undangan]`: penanda itu tidak dikenali dan akan terkirim apa adanya. Hapus, lalu sisipkan lewat tombol **+** di atas kotak pesan.
+- **Pesan masih kosong.**: tulis pesan, atau buka ⋮ di kepala daftar lalu **Kembalikan pesan bawaan**.
+- Tautan pribadi belum ada: lihat **Masuk dengan PIN dulu.** dan **Link belum siap. Simpan daftar tamu dulu.** di atas.
+
+Jangan mengganti penanda dengan nama atau tautan yang diketik sendiri. Penanda diisi otomatis untuk tiap tamu.
 </Accordion>
 <Accordion title="WhatsApp tidak terbuka">
 Browser memblokir jendela baru. Izinkan pop-up untuk halaman ini, atau pakai **Salin pesan** di menu tamu lalu tempel sendiri di WhatsApp.
