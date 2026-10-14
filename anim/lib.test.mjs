@@ -78,4 +78,10 @@ assert.ok(/@keyframes fz0\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(f1), "a fir
 const rm = compile(scene({ els: {}, steps: [{ caption: "a", focus: "all", at: [10, 10], click: true, mark: [[0, 0, 30, 30], [300, 300, 60, 30]] }] }));
 assert.ok(/<g class="om0_0"><rect x="-4" y="-4" width="28" height="28"/.test(rm) && /<g class="om0_1"><rect x="196" y="196" width="48" height="28"/.test(rm), "target ring and result ring in separate groups");
 assert.ok(/@keyframes om0_1\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(rm), "result ring appears at the click (1.22 s of 4.8 s)");
+// A lens on a click step whose source does not hold the click point shows the result: it appears at the click, and
+// its arrow points at its own source (an arrow always joins a lens to what it magnifies), not at the clicked ring.
+const rl = compile(scene({ els: {}, steps: [{ caption: "a", focus: "all", at: [10, 10], click: true, mark: [0, 0, 30, 30], lens: { src: [600, 450, 150, 60] } }] }));
+assert.ok(/@keyframes ov0\{0%\{opacity:0\}25\.417%\{opacity:0;/.test(rl), "result lens appears at the click");
+const rt = /<g class="ov0"><line [^>]*\/><path d="M([\d.]+) ([\d.]+) L/.exec(rl), [sx, sy, sw, sh] = [400, 300, 100, 40], near = (a, b) => Math.abs(a - b) < 0.1;
+assert.ok(rt && +rt[1] >= sx - 0.1 && +rt[1] <= sx + sw + 0.1 && +rt[2] >= sy - 0.1 && +rt[2] <= sy + sh + 0.1 && [near(+rt[1], sx), near(+rt[1], sx + sw), near(+rt[2], sy), near(+rt[2], sy + sh)].some(Boolean), "arrow tip on the lens source's edge: " + (rt && rt.slice(1)));
 console.log("lib.mjs: ok");

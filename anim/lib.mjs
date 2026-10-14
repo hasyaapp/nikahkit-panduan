@@ -440,19 +440,27 @@ export function compile(scene) {
     const w = [[start[i] + 0.15, i === steps.length - 1 ? null : end[i]]];
     const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * S + 4, hit: !!(s.click && s.at && hits(s.at, m.box)) }; });
     const lensOf = s.lens && { src: s.lens.src, zoom: s.lens.zoom ?? 2 }, note = typeof s.note === "string" ? { text: s.note } : s.note;
+    const srcSt = lensOf && boxStage(lensOf.src);
+    // On a click step a lens whose source does not hold the click point shows the result: it appears at the click.
+    const after = !!(lensOf && s.click && s.at && !hits(s.at, lensOf.src));
+    // What the arrow points at: for a lens, the first mark over its source (else the source itself); for a note, the
+    // first mark. So an arrow always joins a lens to what it magnifies.
+    const aim = lensOf ? marks.find((m) => (!after || !m.hit) && overlap(m.box, srcSt)) : marks[0];
     let box = null, inner = "", arrow = "";
     if (lensOf) { const z = lensOf.zoom * S; box = [0, 0, lensOf.src[2] * z, lensOf.src[3] * z]; }
     else if (note) box = [0, 0, tw(note.text, 15, 600) + 32, 36];
     if (box) {
-      const target = marks[0]?.box ?? boxStage(lensOf ? lensOf.src : [0, 0, 0, 0]), avoid = [target, ...rectsOf(focusOf[i]).map(boxStage)];
+      const target = aim?.box ?? srcSt ?? [0, 0, 0, 0], avoid = [target, ...marks.map((m) => m.box), ...rectsOf(focusOf[i]).map(boxStage)];
       if (s.at) avoid.push([...toStage(s.at).map((v) => v - 12), 24, 24]);
-      const place = s.lens?.at ?? note?.at; // stage point; otherwise beside the mark, clear of it, the focus and the pointer
-      const fits = (p) => p[0] >= 12 && p[1] >= 12 && p[0] + box[2] <= W - 12 && p[1] + box[3] <= VH - 12;
-      const tc = [target[0] + target[2] / 2, target[1] + target[3] / 2], gap = 44;
-      const cands = [[target[0] + target[2] + gap, tc[1] - box[3] / 2], [target[0] - gap - box[2], tc[1] - box[3] / 2], [tc[0] - box[2] / 2, target[1] + target[3] + gap], [tc[0] - box[2] / 2, target[1] - gap - box[3]]]
+      const place = s.lens?.at ?? note?.at; // stage point; otherwise beside its target (then the first mark), clear of marks, focus and pointer
+      const fits = (p) => p[0] >= 12 && p[1] >= 12 && p[0] + box[2] <= W - 12 && p[1] + box[3] <= VH - 12, gap = 44;
+      const around = (t) => { const c = [t[0] + t[2] / 2, t[1] + t[3] / 2]; return [[t[0] + t[2] + gap, c[1] - box[3] / 2], [t[0] - gap - box[2], c[1] - box[3] / 2], [c[0] - box[2] / 2, t[1] + t[3] + gap], [c[0] - box[2] / 2, t[1] - gap - box[3]]]; };
+      const cands = [...around(target), ...(marks[0] && marks[0].box !== target ? around(marks[0].box) : [])]
         .map(([x, y]) => [Math.min(Math.max(x, 12), W - 12 - box[2]), Math.min(Math.max(y, 12), VH - 12 - box[3])]);
-      const free = (p) => fits(p) && !avoid.some((a, k) => overlap([p[0], p[1], box[2], box[3]], a, k ? 0 : 12));
-      const pos = place ?? cands.find(free) ?? cands.find((p) => fits(p) && !overlap([p[0], p[1], box[2], box[3]], target, 12)) ?? cands[0];
+      const at = (p) => [p[0], p[1], box[2], box[3]];
+      const free = (p) => fits(p) && !avoid.some((a, k) => overlap(at(p), a, k ? 0 : 12));
+      const clear = (p) => fits(p) && !marks.some((m) => overlap(at(p), m.box)) && !overlap(at(p), target, 12);
+      const pos = place ?? cands.find(free) ?? cands.find(clear) ?? cands[0];
       if (box[2] > W - 24 || box[3] > VH - 24) throw new Error(`${scene.title}: langkah ${i + 1} lens/note lebih besar dari panggung`);
       box = [pos[0], pos[1], box[2], box[3]];
       if (marks.some((mk) => overlap(box, mk.box))) throw new Error(`${scene.title}: langkah ${i + 1} lens/note menutupi mark`);
@@ -464,8 +472,8 @@ export function compile(scene) {
           rect(box[0], box[1], box[2], box[3], { r: 10, stroke: C.accent, sw: 2.5 });
         defs.push(`<clipPath id="lc${i}"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}" rx="10"/></clipPath>`);
       } else inner = rect(box[0], box[1], box[2], box[3], { r: 18, fill: C.accent }) + text(box[0] + box[2] / 2, box[1] + 23, note.text, { size: 15, weight: 600, fill: C.white, anchor: "middle" });
-      if (marks.length || lensOf) { // straight arrow from the lens or note to the nearest edge of the ring
-        const t = marks[0]?.box ?? target, b = [box[0] + box[2] / 2, box[1] + box[3] / 2], tcc = [t[0] + t[2] / 2, t[1] + t[3] / 2];
+      if (aim || lensOf) { // straight arrow from the lens or note to the nearest edge of what it points at
+        const t = target, b = [box[0] + box[2] / 2, box[1] + box[3] / 2], tcc = [t[0] + t[2] / 2, t[1] + t[3] / 2];
         const p = edge(box, tcc), q = edge(t, b), ang = Math.atan2(q[1] - p[1], q[0] - p[0]), L = 11, A = 0.45;
         const head = [[q[0], q[1]], [q[0] - L * Math.cos(ang - A), q[1] - L * Math.sin(ang - A)], [q[0] - L * Math.cos(ang + A), q[1] - L * Math.sin(ang + A)]];
         const back = [q[0] - (L - 2) * Math.cos(ang), q[1] - (L - 2) * Math.sin(ang)];
@@ -476,16 +484,15 @@ export function compile(scene) {
     const ring = (m) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
       return rect(m.box[0], m.box[1], m.box[2], m.box[3], { r: m.r, stroke: C.accent, sw: 2.5 }) +
         circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(i + 1), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); };
-    // The lens or note stays for the whole step (it shows the result). On a click step the ring around the click point
-    // leaves just after the click, so it never floats over a screen the click has changed; the step's other marks point
-    // at the result, so they appear at the click. The arrow goes with the first mark.
-    if (inner) { css.push(fadeRule(`.ov${i}`, `ov${i}`, w, "opacity:1", "opacity:0", 0.22, 0.14)); overlays.push(`<g class="ov${i}">${inner}</g>`); }
+    // A lens or note stays for the whole step (a result lens from the click). On a click step the ring around the click
+    // point leaves just after the click, so it never floats over a screen the click has changed; the step's other marks
+    // point at the result, so they appear at the click. The arrow goes with the ring it points at, else with the lens.
+    if (inner) { css.push(fadeRule(`.ov${i}`, `ov${i}`, after ? [[act[i], w[0][1]]] : w, "opacity:1", "opacity:0", 0.22, 0.14)); overlays.push(`<g class="ov${i}">${aim ? "" : arrow}${inner}</g>`); }
     const groups = s.click && s.at ? [[marks.filter((m) => m.hit), [[start[i] + 0.15, act[i] + 0.35]]], [marks.filter((m) => !m.hit), [[act[i], w[0][1]]]]] : [[marks, w]];
     groups.forEach(([ms, mw], g) => {
-      const withArrow = arrow && (marks.length ? ms.includes(marks[0]) : g === 0);
-      if (!ms.length && !withArrow) return;
+      if (!ms.length) return;
       css.push(fadeRule(`.om${i}_${g}`, `om${i}_${g}`, mw, "opacity:1", "opacity:0", 0.22, 0.2));
-      overlays.push(`<g class="om${i}_${g}">${withArrow ? arrow : ""}${ms.map(ring).join("")}</g>`);
+      overlays.push(`<g class="om${i}_${g}">${aim && ms.includes(aim) ? arrow : ""}${ms.map(ring).join("")}</g>`);
     });
   });
   // Pointer in stage space (constant size).
