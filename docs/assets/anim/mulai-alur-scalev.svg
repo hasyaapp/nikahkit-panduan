@@ -46,12 +46,15 @@
 <rect x="40" y="246" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="275" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="269.6" width="396" height="10" rx="5" fill="#dde2e8"/><rect x="100" y="295.6" width="44" height="10" rx="5" fill="#dde2e8"/>
 <rect x="40" y="342" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="371" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="378.6" width="429" height="10" rx="5" fill="#dde2e8"/>
 <rect x="40" y="438" width="520" height="84" rx="10" fill="#ffffff" stroke="#e0e4e9" stroke-width="1"/><rect x="56" y="467" width="26" height="26" rx="6" fill="#ffffff" stroke="#e0e4e9" stroke-width="1.5"/><rect x="100" y="474.6" width="341" height="10" rx="5" fill="#dde2e8"/>
-
-<g class="fz0" clip-path="url(#fz0)"><use href="#db"/></g>
-<g class="fz1" clip-path="url(#fz1)"><use href="#db"/></g>
-<g class="fz2" clip-path="url(#fz2)"><use href="#db"/></g>
-<g class="fz3" clip-path="url(#fz3)"><use href="#db"/></g>
-<use href="#ed-k0"/><use href="#ed-p0"/><use href="#ed-k1"/><use href="#ed-p1"/><use href="#ed-k2"/><use href="#ed-p2"/><use href="#ed-k3"/><use href="#ed-p3"/>
+<g class="fz0" clip-path="url(#fz0)"><use href="#db"/></g><g class="fz1" clip-path="url(#fz1)"><use href="#db"/></g><g class="fz2" clip-path="url(#fz2)"><use href="#db"/></g><g class="fz3" clip-path="url(#fz3)"><use href="#db"/></g>
+<use href="#ed-k0"/>
+<use href="#ed-p0"/>
+<use href="#ed-k1"/>
+<use href="#ed-p1"/>
+<use href="#ed-k2"/>
+<use href="#ed-p2"/>
+<use href="#ed-k3"/>
+<use href="#ed-p3"/>
 
 </g>
 <g class="ov0"><rect x="257.7" y="156.3" width="668.6666666666666" height="240" rx="11" fill="rgba(16,24,40,.14)"/><rect x="258.7" y="153.3" width="666.6666666666666" height="240" rx="10" fill="#ffffff"/><g clip-path="url(#lc0)"><g transform="translate(258.7 153.3) scale(1.3333) translate(-621 -96)"><g clip-path="url(#ln0)"><use href="#db"/><use href="#ed-k0"/><use href="#ed-p0"/></g></g></g><rect x="258.7" y="153.3" width="666.6666666666666" height="240" rx="10" fill="none" stroke="#b8460d" stroke-width="2.5"/></g>
