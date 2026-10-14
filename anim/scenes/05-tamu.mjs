@@ -166,7 +166,7 @@ function pinWindow(made) {
   const h = made ? 598 : 512, X = PX0, Y = pinY(made), L = PL, W2 = PW;
   let s = shadow(X, Y, 440, h, 8, 3) + rect(X, Y, 440, h, { r: 8, fill: C.page }) + iconX("x", X + 410, Y + 30, 18, C.text) +
     nkLogo(L + 16, Y + 32, 32) + text(L + 42, Y + 34, "NikahKit", { size: 16, weight: 700, fill: C.strong }) + text(L + 42, Y + 52, `ID ${WID}`, { size: 12, fill: C.faint }) +
-    text(L, Y + 88, "rinawo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(L + W2, Y + 88, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
+    text(L, Y + 88, "rina.wo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(L + W2, Y + 88, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
   let y = Y + 104;
   s += card(L, y, W2, 120) + nkH3(L + 17, y + 28, "Paket") + text(L + 17, y + 55, "Paket Tahunan, aktif sampai 14 Oktober 2027.", { size: 14, fill: C.text }) +
     btn(L + 17, y + 68, "Perpanjang atau ganti paket", { variant: "primary" });
@@ -231,7 +231,7 @@ function landingPages() {
 const frameBg = () => rect(256, 0, 1184, 900, { fill: C.page });
 const frameHead = (msg) => nkLogo(BX + 16, 40, 32) + text(BX + 42, 46, "Buku Tamu", { size: 16, weight: 700, fill: C.strong }) +
   (msg ? rect(BX, 72, BW2, 38, { r: 4, fill: C.primarySoft }) + text(BX + 12, 95, msg, { size: 12, fill: C.strong }) : "") +
-  text(BX, msg ? 134 : 84, "rinawo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(BR, msg ? 134 : 84, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
+  text(BX, msg ? 134 : 84, "rina.wo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(BR, msg ? 134 : 84, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
 const MSG_BT = [BX, 72, BW2, 38];
 const LIST = [
   ["The Wedding of Rani & Dimas", WID, true, "Ucapan 52 (tampil 50) · Hadir 86 orang · Tidak 9 · Ragu 4", true],
