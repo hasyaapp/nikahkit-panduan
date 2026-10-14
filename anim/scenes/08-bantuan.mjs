@@ -503,10 +503,10 @@ export const scenes = {
     },
     steps: [
       { caption: "Buka halaman undangan di editor Scalev. Rel NikahKit ada di kiri.", dur: 3.4, focus: [TABROW, [0, 92, 72, 808]],
-        mark: TAB.NikahKit, lens: { src: [150, 46, 249, 44] } },
+        mark: TAB.NikahKit, lens: { src: [101, 48, 215, 42] } },
       { caption: "Cari tombol Bantuan: paling bawah rel, di bawah Kosongkan.", dur: 3.4, focus: [0, 554, 72, 346], mark: { box: HELP, r: 6 }, lens: { src: [0, 752, 72, 100], zoom: 3 } },
       { caption: "Klik Bantuan. Dialog Bantuan terbuka di atas panel.", dur: 3.8, focus: [0, 92, 399, 808], mark: { box: HELP, r: 6 }, at: mid(HELP), click: true, show: ["dlg"],
-        lens: { src: [0, 92, 399, 150], at: [330, 60] } }
+        lens: { src: [0, 92, 399, 140], at: [330, 60] } }
     ]
   },
 
@@ -526,16 +526,17 @@ export const scenes = {
       },
       steps: [
         { caption: "Baca baris versi: Versi, dengan tombol Cek update di kanan.", focus: ver, mark: sl.pos.version, lens: { src: helpLens(ver) } },
-        { caption: "Baca baris status: 1 perlu perhatian. Muat ulang editor dulu.", dur: 3.4, focus: sl.pos.status, mark: sl.pos.status, lens: { src: helpLens(sl.pos.status) } },
-        { caption: "Baca tips Terbit tertahan: muat ulang, lalu Simpan & Terbitkan.", dur: 3.6, focus: sl.pos.tip, mark: sl.pos.tip, lens: { src: helpLens(sl.pos.tip) } },
+        { caption: "Baca baris status: 1 perlu perhatian. Muat ulang editor dulu.", dur: 3.4, focus: sl.pos.status, mark: sl.pos.status, lens: { src: helpLens(sl.pos.status, 0, 8) } },
+        { caption: "Baca tips Terbit tertahan: muat ulang, lalu Simpan & Terbitkan.", dur: 3.6, focus: sl.pos.tip, mark: sl.pos.tip,
+          lens: { src: [0, sl.pos.tip[1] - 6, 399, sl.pos.tip[3] + 7] } },
         { caption: "Periksa daftar cek. Tanda ! bermasalah, penyebabnya di bawah namanya.", dur: 3.8, focus: at(sl.pos.rows[BAD_ROW], SL1), mark: at(sl.pos.rows[BAD_ROW], SL1),
-          scroll: { id: "body", dy: SL1 }, lens: { src: helpLens(sl.pos.rows[BAD_ROW], SL1) } },
+          scroll: { id: "body", dy: SL1 }, lens: { src: helpLens(sl.pos.rows[BAD_ROW], SL1, 1) } },
         { caption: "Gulir ke bawah sampai tombol laporan.", focus: at(btns, SLT), mark: at(BTNS, SLT), scroll: { id: "body", dy: SL2 }, show: ["salin"],
           lens: { src: helpLens(btns, SLT, 8) } },
         { caption: "Klik Salin laporan. Tulisan kecil berubah: Tersalin.", dur: 3.4, mark: at(sl.pos.salin, SLT), at: mid(at(sl.pos.salin, SLT)), click: true, press: "salin",
           show: ["copied"], lens: { src: helpLens(btns, SLT, 8) } },
         { caption: "Kirim laporannya ke admin: tempel di WhatsApp, atau Kirim lewat WhatsApp.", dur: 3.6, focus: at(sl.pos.wa, SLT), mark: at(sl.pos.wa, SLT),
-          lens: { src: helpLens(sl.pos.wa, SLT) } },
+          lens: { src: helpLens(sl.pos.wa, SLT, 4) } },
         { caption: "Tutup Bantuan: klik × di kanan atas, atau tekan Esc.", focus: [72, 92, 327, 62], mark: XBOX, at: mid(XBOX), click: true,
           hide: ["sheet", "body", "salin", "copied", "cover"], lens: { src: [200, 96, 199, 54] } }
       ]
@@ -554,12 +555,12 @@ export const scenes = {
     },
     steps: [
       { caption: "Klik Salin domain kurang. Muncul Tersalin. Tempel di tab Security.", dur: 3.8, focus: CSP_AREA, mark: at(iz.pos.salinCsp, IZ1), at: mid(at(iz.pos.salinCsp, IZ1)),
-        click: true, press: "salinCsp", show: ["copied"], lens: { src: [0, iz.pos.csp[2][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 24 - iz.pos.csp[2][1]] } },
+        click: true, press: "salinCsp", show: ["copied"], lens: { src: [0, iz.pos.csp[2][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 32 - iz.pos.csp[2][1]] } },
       { caption: "Buka tab Security, tempel, lalu Simpan (dua animasi berikutnya).", dur: 3.2, focus: [TABROW, [1183, 44, 257, 48]], mark: [TAB.Security, SIMPAN],
         lens: { src: [0, 46, 330, 46] } },
       { caption: "Kembali ke Bantuan, klik Periksa ulang: Diperiksa ulang, Sudah diizinkan.", dur: 4.2, focus: [CSP_AREA, helpLens(izF.pos.rows["Izin domain di tab Security"], IZF, 2)],
         mark: at(iz.pos.periksa, IZ1), at: mid(at(iz.pos.periksa, IZ1)),
-        click: true, press: "periksa", hide: ["copied"], show: ["fixed"], lens: { src: [0, izF.pos.csp[2][1] - IZF - 8, 399, izF.pos.cspMsg[1] + 24 - izF.pos.csp[2][1]] } }
+        click: true, press: "periksa", hide: ["copied"], show: ["fixed"], lens: { src: [0, izF.pos.csp[2][1] - IZF - 8, 399, izF.pos.cspMsg[1] + 32 - izF.pos.csp[2][1]] } }
     ]
   },
 
@@ -602,11 +603,11 @@ export const scenes = {
       ok: { svg: panelKonten(), skel: true, enter: "fade", delay: 0.6 }
     },
     steps: [
-      { caption: "Catat gejalanya: salin kalimat pesannya persis seperti di layar.", dur: 3.6, focus: [0, 154, 399, 80], mark: GATE_MSG, lens: { src: [0, 158, 399, 78] } },
+      { caption: "Catat gejalanya: salin kalimat pesannya persis seperti di layar.", dur: 3.6, focus: [0, 154, 399, 80], mark: GATE_MSG, lens: { src: [0, 158, 399, 72] } },
       { caption: "Cari bagiannya di Masalah umum: Ctrl+F, ketik beberapa kata gejalanya.", dur: 3.6, mark: GATE_MSG, note: "Ctrl+F: tidak terjangkau" },
       { caption: "Ikuti Langkah perbaikan. Contoh ini: pastikan internet tersambung.", dur: 3.6, mark: GATE_MSG, note: "Cek Wi-Fi atau data seluler dulu" },
       { caption: "Klik Periksa lagi. Panel menulis Memeriksa akses... sebentar.", dur: 3.4, focus: [0, 154, 399, 130], mark: RECHECK, at: mid(RECHECK), click: true, press: "recheck",
-        show: ["checking"], lens: { src: [0, 158, 399, 90] } },
+        show: ["checking"], lens: { src: [0, 158, 399, 60] } },
       { caption: "Rel menu tampil lagi: beres. Masih belum? Kirim laporan lewat Bantuan.", dur: 3.8, focus: [0, 92, 72, 360], mark: { box: RAIL_TABS, r: 0 },
         hide: ["recheck", "checking"], show: ["ok"], lens: { src: [0, 100, 72, 344] } }
     ]
@@ -629,11 +630,11 @@ export const scenes = {
       { caption: "Catat pesannya persis seperti di layar. Buka halaman Pesan galat.", dur: 3.2, focus: [316, T + 98, 780, 120], mark: H1 },
       { caption: "Tekan Ctrl+F (Mac: Cmd+F). Kotak cari muncul di kanan atas Chrome.", dur: 3.2, focus: FB_BOX, mark: { box: FB_BOX, r: 8 }, show: ["find"], note: "Ctrl+F (Mac: Cmd+F)" },
       { caption: "Ketik beberapa kata awal, misalnya Sesi berakhir. Chrome lompat ke hasilnya.", dur: 3.8, focus: [FB_BOX, STEP3], mark: [MATCH1, [FB.x + 12, FB.y + 10, 250, 28]],
-        type: [{ id: "query", n: 13, box: [FB.x + 16, FB.y + 12, tw("Sesi berakhir", 14) + 6, 24] }], show: ["n1", "steps"], lens: { src: [376, STEP_T[2] - 6, 560, 80] } },
+        type: [{ id: "query", n: 13, box: [FB.x + 16, FB.y + 12, tw("Sesi berakhir", 14) + 6, 24] }], show: ["n1", "steps"], lens: { src: [376, STEP_T[2] - 6, 680, 110], zoom: 1.5 } },
       { caption: "Tekan Enter untuk lompat ke hasil berikutnya: baris di tabel pesan.", dur: 3.4, focus: [FB_BOX, ROW3], mark: [MATCH2, [FB.x + 200, FB.y + 10, 62, 28]],
         hide: ["n1"], show: ["n2", "table"], lens: { src: [321, ROW_T[2] - 4, 560, 73] } },
-      { caption: "Baca kolom Artinya. Di sini: Login habis.", dur: 3.2, focus: ROW3, mark: ARTI, hide: ["find", "query", "n2"], show: ["findSk"], lens: { src: [530, ROW_T[2] - 4, 560, 73] } },
-      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", dur: 3.8, mark: TODO, lens: { src: [530, ROW_T[2] - 4, 560, 73] } }
+      { caption: "Baca kolom Artinya. Di sini: Login habis.", dur: 3.2, focus: ROW3, mark: ARTI, hide: ["find", "query", "n2"], show: ["findSk"], lens: { src: [600, ROW_T[2] - 4, 490, 73] } },
+      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", dur: 3.8, mark: TODO, lens: { src: [600, ROW_T[2] - 4, 490, 73] } }
     ]
   },
 
@@ -692,7 +693,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Selama paket aktif, tamu bisa mengisi kehadiran dan Ucapan & doa.", dur: 3.4, focus: FORM, mark: { box: FORM, r: 12 },
-        lens: { src: [FX - 6, PY + 236, FW + 12, 190], zoom: 1.4, at: [625, 230] } },
+        lens: { src: [FX - 8, PY + 229, FW + 16, 161], zoom: 1.4, at: [625, 230] } },
       { caption: "Lewat tenggang, halaman tetap tampil. Form menulis Ucapan & RSVP sudah ditutup.", dur: 4, focus: grow(CLOSED, 8), mark: { box: CLOSED, r: 12 }, show: ["closed"],
         lens: { src: grow(CLOSED, 8), zoom: 1.4, at: [625, 90] } }
     ]
@@ -713,9 +714,9 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", dur: D[0], focus: [0, 92, 399, 140], mark: { box: HELP, r: 6 },
-          at: mid(HELP), click: true, show: ["sheet", "body", "cover"], lens: { src: [0, 92, 399, 150], at: [330, 60] } },
+          at: mid(HELP), click: true, show: ["sheet", "body", "cover"], lens: { src: [0, 92, 399, 140], at: [330, 60] } },
         { caption: "Gulir ke tombol laporan: Salin laporan dan Kirim lewat WhatsApp.", dur: D[1], focus: at([16, BTNS[1], 351, 80], KW_S), mark: at([16, BTNS[1], 351, 80], KW_S),
-          scroll: { id: "body", dy: KW_S }, show: ["waBtn"], lens: { src: helpLens([16, BTNS[1], 351, 80], KW_S) } },
+          scroll: { id: "body", dy: KW_S }, show: ["waBtn"], lens: { src: helpLens([16, BTNS[1], 351, 80], KW_S, 4) } },
         { caption: "Klik Kirim lewat WhatsApp. WhatsApp terbuka di chat admin Nikahin.", dur: D[2], focus: [CHAT_HEAD, CMP_AREA], mark: at(sl.pos.wa, KW_S),
           at: mid(at(sl.pos.wa, KW_S)), click: true, press: "waBtn", show: ["wa"] }
       ]
@@ -736,11 +737,11 @@ export const scenes = {
     },
     steps: [
       { caption: "Pesannya sudah terisi: salam dan laporan teknis. Biarkan, jangan dihapus.", dur: 3.6, focus: [CHAT_HEAD, CMP_AREA], mark: { box: CMP_BOX, r: 8 },
-        lens: { src: [CMP.x, CMP.y, 440, 110] } },
+        lens: { src: [CMP.x, CMP.y, 440, 92] } },
       { caption: "Tulis apa yang kamu lakukan di bawah laporan, dengan kalimat pendek.", dur: 4, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 }, at: [CMP.x + 420, typedY(0) - 5],
-        click: true, show: ["end"], type: [{ id: "typed1", n: 22, box: [CMP.x + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], lens: { src: [CMP.x, typedY(0) - 74, 440, 104] } },
+        click: true, show: ["end"], type: [{ id: "typed1", n: 22, box: [CMP.x + 12, typedY(0) - 16, tw(TYPED[0], 14) + 6, 22] }], lens: { src: [CMP.x, CMP.y + 89, 400, 103] } },
       { caption: "Tulis alamat halamannya, misalnya app.scalev.com/pages/365671.", dur: 3.6, mark: { box: CMP_BOX, r: 8 },
-        type: [{ id: "typed2", n: 18, box: [CMP.x + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], lens: { src: [CMP.x, typedY(1) - 74, 440, 104] } },
+        type: [{ id: "typed2", n: 18, box: [CMP.x + 12, typedY(1) - 16, tw(TYPED[1], 14) + 6, 22] }], lens: { src: [CMP.x, CMP.y + 111, 400, 89] } },
       { caption: "Ambil screenshot layarnya, lalu tempel (Ctrl+V) di chat.", dur: 3.4, focus: [grow(SHOT_BOX, 12), CMP_AREA], mark: { box: SHOT_BOX, r: 8 }, show: ["shot"],
         note: "Tempel: Ctrl+V" },
       { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", dur: 3.8, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 },
