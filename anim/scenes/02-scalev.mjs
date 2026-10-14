@@ -110,18 +110,20 @@ const typeDlg = shadow(DLG.x, DLG.y, DLG.w, DLG.h, 8, 3) + rect(DLG.x, DLG.y, DL
 const HTML_TILE = [DLG.x + 368, DLG.y + 170];
 // Desktop preview (no NikahKit yet): empty white page across the preview area.
 const desktopPreview = rect(400, T + 93, 1040, 807, { fill: C.svPreview }) + rect(424, T + 106, 992, 794, { fill: C.white }) + shadow(424, T + 106, 992, 0);
-// Template panel (editor-template.png, update note left out): segment, template cards.
-const TEMPLATES = [["Dasar", "#55524f"], ["Folio", "#2e2e33"], ["Galeri Putih", "#f6f4f1"], ["Modern Estetik", "#efe7dc"]];
+// Template panel (editor-template.png, update note left out): segment, template cards; the description as the card
+// clamps it (two lines, same text as 03-editor-konten.mjs).
+const TEMPLATES = [["Dasar", "#55524f", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], ["Folio", "#2e2e33", ["Hitam & krem gaya", "majalah, foto penuh…"]],
+  ["Galeri Putih", "#f6f4f1", ["Putih bersih gaya", "majalah, huruf serif…"]], ["Modern Estetik", "#efe7dc", ["Putih & krem, bingkai", "lengkung, bayangan…"]]];
 function templatePanel() {
   const y = T;
   let s = nkHead(0, T, "Template") + rect(88.5, y + 169.5, 278, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(89, y + 170, 138, 36, { r: 3, fill: C.primarySoft }) +
     icon("layout-grid", 129, y + 188, 16, C.action) + text(141, y + 193, "Template", { size: 12, weight: 600, fill: C.action }) + line(227.5, y + 170, 227.5, y + 206, { stroke: C.field }) + megaphone(297, y + 188, 16, C.text);
-  TEMPLATES.forEach(([n, tone], i) => {
+  TEMPLATES.forEach(([n, tone, desc], i) => {
     const cx = 88 + (i % 2) * 145, cy = y + 219 + Math.floor(i / 2) * 241;
     s += rect(cx + 0.5, cy + 0.5, 132, 165, { r: 6, fill: "#f2f5fa", stroke: C.line }) + rect(cx + 5, cy + 5, 72, 156, { r: 3, fill: tone }) +
       [0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => rect(cx + 84 + (k % 2) * 22, cy + 8 + Math.floor(k / 2) * 34, 18, 28, { r: 2, fill: k % 3 ? "#e4e0da" : "#cfc8bf" })).join("") +
       text(cx + 41, cy + 70, n.split(" ")[0], { size: 9, fill: tone === "#f6f4f1" || tone === "#efe7dc" ? "#6b5b4a" : "#f2ece4", anchor: "middle", font: SERIF }) +
-      text(cx, cy + 184, n, { size: 14, weight: 500, fill: C.strong }) + para(cx, cy + 205, [i ? "20 bagian · HP &" : "Polos · 20 bagian · HP &", "desktop · ID/EN"], { size: 12, fill: C.text, lh: 16 });
+      text(cx, cy + 184, n, { size: 14, weight: 500, fill: C.strong }) + para(cx, cy + 205, desc, { size: 12, fill: C.text, lh: 16 });
   });
   return s + rect(72, y + 685, 327, 215, { fill: C.white }) + rect(88, y + 701, 133, 165, { r: 6, fill: "#f2f5fa" }) + rect(233, y + 701, 133, 165, { r: 6, fill: "#f2f5fa" });
 }

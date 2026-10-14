@@ -173,8 +173,10 @@ const GATE_BIZ = (ex, ey) => gate(ex, ey, { chip: "Tahunan", warn: true, lines: 
 // The editor's NikahKit tab with a gate, as an element over a Code-tab base (tab row + left area).
 const gateEl = (g) => clipped(0, CT + 44, 400, VIEW - 44, scalevEditor(0, CT, { tab: "NikahKit", rail: "" }) + g.svg);
 
-// Template panel (editor-template.png): rail, header with chip, optional update banner, Template/Marketing, cards.
-const TPL = [["Dasar", "#3d3a38"], ["Folio", "#2a2d33"], ["Galeri Putih", "#f4f1ec"], ["Modern Estetik", "#efe9e2"]];
+// Template panel (editor-template.png): rail, header with chip, optional update banner, Template/Marketing, cards. The
+// description as the card clamps it (two lines, same text as 03-editor-konten.mjs).
+const TPL = [["Dasar", "#3d3a38", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], ["Folio", "#2a2d33", ["Hitam & krem gaya", "majalah, foto penuh…"]],
+  ["Galeri Putih", "#f4f1ec", ["Putih bersih gaya", "majalah, huruf serif…"]], ["Modern Estetik", "#efe9e2", ["Putih & krem, bingkai", "lengkung, bayangan…"]]];
 function thumb(x, y, dark) {
   const fg = dark === "#f4f1ec" || dark === "#efe9e2" ? "#7a6a5c" : "#e8e2da";
   return rect(x + 0.5, y + 0.5, 133, 166, { r: 4, fill: C.page, stroke: C.line, sw: 2 }) + rect(x + 5, y + 5, 72, 157, { r: 2, fill: dark }) +
@@ -187,9 +189,9 @@ function templatePanel(ex, ey, o = {}) {
   let y = ey + 169;
   if (o.banner) y += 112 + (o.hint ? 36 : 0);
   s += nkSeg(ex + 88, y, 279, ["Template", "Marketing"], 0);
-  TPL.forEach(([n, bg], i) => {
+  TPL.forEach(([n, bg, desc], i) => {
     const x = ex + 88 + (i % 2) * 146, cy = y + 50 + Math.floor(i / 2) * 241;
-    s += thumb(x, cy, bg) + text(x, cy + 188, n, { size: 14, weight: 500 }) + para(x, cy + 209, ["20 bagian · HP &", "desktop · ID/EN"], { size: 12, fill: C.faint, lh: 16 });
+    s += thumb(x, cy, bg) + text(x, cy + 188, n, { size: 14, weight: 500 }) + para(x, cy + 209, desc, { size: 12, fill: C.faint, lh: 16 });
   });
   return clipped(ex, ey + 92, 399, 808, s);
 }

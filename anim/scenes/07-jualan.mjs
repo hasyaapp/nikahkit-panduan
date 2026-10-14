@@ -52,9 +52,10 @@ const badgeAt = (right, y, label, tone) => { const w = tw(label, 10, 500) + 12; 
 const brandClosed = (y, ready = true) => rect(88.5, y + 0.5, 278, 49, { r: 4, fill: C.white, stroke: C.line }) + text(101, y + 30, "Profil merek", { size: 14, weight: 500 }) +
   badgeAt(354, y + 16, ready ? "Terisi" : "Belum diisi", ready ? "ok" : "plain");
 
-// Template cards (Template category). Thumbnails are the worker's images: drawn here as neutral page sketches.
-const TPL = [["Dasar", ["Polos · 20 bagian · HP &", "desktop · ID/EN"], ["#ffffff", "#8b8178"]], ["Folio", ["20 bagian · HP & desktop ·", "ID/EN"], ["#f3ece2", "#7a5c3e"]],
-  ["Galeri Putih", ["20 bagian · HP & desktop ·", "ID/EN"], ["#fafafa", "#9aa3ad"]], ["Modern Estetik", ["20 bagian · HP & desktop ·", "ID/EN"], ["#e9efe7", "#5d7a5a"]]];
+// Template cards (Template category). Thumbnails are the worker's images: drawn here as neutral page sketches; the
+// description as the card clamps it (two lines, same text as 03-editor-konten.mjs).
+const TPL = [["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"], ["#ffffff", "#8b8178"]], ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"], ["#f3ece2", "#7a5c3e"]],
+  ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"], ["#fafafa", "#9aa3ad"]], ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"], ["#e9efe7", "#5d7a5a"]]];
 function pageSketch(x, y, w, h, [bg, ac]) {
   const cx = x + w / 2;
   return rect(x, y, w, h, { fill: bg }) + rect(x, y, w, h * 0.06, { fill: ac, opacity: 0.25 }) +
@@ -131,6 +132,8 @@ const kontenBody = nkLabel(88, 181, "Bahasa undangan") + nkInput(88, 189, 279, "
   nkAcc(88, 305, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, 363, 279, "Mempelai", { badge: "Terisi" }) + nkAcc(88, 421, 279, "Acara & Tanggal", { badge: "Terisi" });
 
 // ---- Landing page (server/pages/src/landing/index.html), 390 wide, mobile styles ----------------------------------
+// Measured in Chrome at 390x844: Rina WO, Basic + Premium, every design in the extension's order, Gaya Grid. Only the
+// first four designs are drawn; the sections after the catalogue sit where they would under a two-row catalogue.
 const LP = { paper: "#ffffff", tint: "#f7efe9", ink: "#171717", cocoa: "#2b1a07", muted: "#6f675f", accent: "#b8460d", danger: "#913a34", line: "rgba(43,26,7,.22)", dash: "#d2bbad" };
 const DISP = "Fraunces,Georgia,serif", BODY = "Nunito,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
 const body = (...s) => `<g font-family="${BODY}">${s.join("")}</g>`;
@@ -143,53 +146,105 @@ function lpBtn(x, y, label, o = {}) {
   return rect(x, y + 1, w, hh, { r: 20, fill: "rgba(0,0,0,.2)" }) + rect(x, y, w, hh, { r: 20, fill: LP.paper }) + rect(x + 5, y + 5, w - 10, hh - 10, { r: 15, fill, stroke, sw: 2 }) +
     text(x + w / 2, y + hh / 2 + size * 0.36, label, { size, weight: 700, fill: fg, anchor: "middle" });
 }
-const lpBtnW = (label, small) => tw(label, small ? 15 : 17, 700) + (small ? 28 : 36) + 8;
 const THUMB = (x, y, w, hh, pal, rot = 0) => group({ transform: `rotate(${rot} ${x + w / 2} ${y + hh / 2})` },
   rect(x, y + 10, w, hh, { r: 14, fill: "rgba(43,26,7,.08)" }), clipped(x, y, w, hh, pageSketch(x, y, w, hh, pal)), rect(x, y, w, hh, { r: 14, stroke: LP.cocoa, sw: 1.5 }));
 const PKG = [["Basic", "Rp150.000", ["Isi dan foto dari kalian", "Revisi 2 kali"]], ["Premium", "Rp350.000", ["Semua isi paket Basic", "Revisi 5 kali"]]];
 // Page positions (relative to the page top) used by scenes.
-const LPY = { cta: 377, katalog: 805, grid: 992, harga: 1864, pkg1: 2055, pesan: 3289, card: 3502 };
+const LPY = { cta: 350.3, art: 442.3, katalog: 778.3, chips: 966.6, grid: 1040.6, fitur: 1791.8, harga: 3337.7, pkg1: 3528, cara: 4194.2, faq: 4731.3, pesan: 5424.4, card: 5637.1 };
+
+// Pilihan tema (#catFilter): Semua, then one button per category with its number of designs, most first. The row
+// scrolls sideways, so a phone shows the first few. [label, count, x, width]; `on` is the pressed one. Label and count
+// are one centred text: the guide's SVG may fall back to another font, and two separately placed texts would collide.
+const CHIPS = [["Semua", "62", 20, 103.3], ["Adat", "32", 131.3, 89.7], ["Floral", "15", 228.9, 96.8], ["Elegan", "6", 333.7, 95.7], ["Minimalis", "5", 437.4, 114.6], ["Ceria", "4", 559.9, 83.5]];
+const chipRow = (x0, y, on = "Semua") => CHIPS.map(([l, n, x, w]) => {
+  const p = l === on, fg = p ? LP.paper : LP.cocoa;
+  return rect(x0 + x + 0.75, y + 0.75, w - 1.5, 42.5, { r: 21.25, fill: p ? LP.cocoa : LP.paper, stroke: LP.cocoa, sw: 1.5 }) +
+    `<text x="${x0 + x + w / 2}" y="${y + 26.7}" font-size="15" font-weight="700" fill="${fg}" text-anchor="middle">${l}<tspan dx="6" font-size="13" font-weight="600" opacity=".75">${n}</tspan></text>`;
+}).join("");
+const chipX = (label) => { const [, , x, w] = CHIPS.find((c) => c[0] === label); return x + w / 2; };
+// Design notes (the description) as each Gaya katalog clamps them at 390 px, read off the screen.
+const NOTES = {
+  grid: [["Abu-abu gelap di atas", "foto, tanpa ornamen · 20…"], ["Hitam & krem gaya", "majalah, foto penuh di…"], ["Putih bersih gaya majalah,", "huruf serif besar, tombol…"],
+    ["Putih & krem, bingkai", "lengkung, bayangan dau…"]],
+  daftar: [["Abu-abu gelap di atas foto, tanpa", "ornamen · 20 bagian · HP & desktop ·…"], ["Hitam & krem gaya majalah, foto", "penuh di sampul, huruf serif · 20…"],
+    ["Putih bersih gaya majalah, huruf serif", "besar, tombol biru dongker · 20…"], ["Putih & krem, bingkai lengkung,", "bayangan daun, tombol cokelat · 20…"]],
+  kartu: [["Abu-abu gelap di atas foto, tanpa ornamen ·", "20 bagian · HP & desktop · ID/EN"], ["Hitam & krem gaya majalah, foto penuh di", "sampul, huruf serif · 20 bagian · HP & desktop", "· ID/EN"]],
+  geser: [["Abu-abu gelap di atas foto, tanpa", "ornamen · 20 bagian · HP & desktop ·…"], ["Hitam & krem gaya majalah, foto penuh", "di sampul, huruf serif · 20 bagian · HP…"]]
+};
+// One Grid design: picture, name lines, note, Lihat demo and Pilih. `act` is the top of Pilih, shared by both designs
+// of a row (a two-line name pushes it down).
+const gridItem = (x, t, names, note, pal, act = 287.6) => clipped(x, t, 168, 210, pageSketch(x, t, 168, 210, pal)) + rect(x, t, 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
+  names.map((n, k) => h(x, t + 229 + k * 23, n, 20)).join("") + para(x, t + 251 + (names.length - 1) * 23, note, { size: 14, fill: LP.muted, lh: 20.3 }) +
+  text(x, t + act + 27.2, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true }) + lpBtn(x + 92, t + act, "Pilih", { small: true, w: 71 });
+const tplGrid = (x0, top) => TPL.map(([n, , pal], i) => gridItem(x0 + 20 + (i % 2) * 182, top + Math.floor(i / 2) * 357.6, [n], NOTES.grid[i], pal)).join("");
+
+// Fitur undangan digital (.feat-grid, two columns): icons and words from the page. [x, top, height, title, text]; the
+// title starts 75 below the card top, the text 126.6 below (103.8 under a one-line title).
+const FEAT_ICON = ['<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', '<path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"/>',
+  '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>', '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>', '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/>',
+  '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  '<path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>',
+  '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>', '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM18 18h3v3h-3"/>',
+  '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>'];
+const FEAT = [[20, 2004.4, 212.8, ["Nama tamu di", "sampul"], ["Tiap tamu dapat link", "pribadi dengan", "namanya."]], [201, 2004.4, 212.8, ["RSVP dan", "ucapan"], ["Tamu konfirmasi", "hadir dan menulis", "doa langsung di", "undangan."]],
+  [20, 2229.2, 192.5, ["Galeri dan", "video"], ["Foto prewedding,", "kisah kalian, dan", "video."]], [201, 2229.2, 192.5, ["Musik latar"], ["Lagu pilihan kalian", "saat undangan", "dibuka."]],
+  [20, 2433.7, 212.8, ["Peta dan", "kalender"], ["Lokasi acara sekali", "ketuk, simpan", "tanggal ke kalender", "HP."]], [201, 2433.7, 212.8, ["Hitung", "mundur"], ["Hari, jam, dan menit", "menuju acara."]],
+  [20, 2658.4, 192.5, ["Amplop digital"], ["Nomor rekening dan", "alamat kirim kado."]], [201, 2658.4, 192.5, ["Siaran", "langsung"], ["Link YouTube atau", "Instagram untuk", "tamu yang jauh."]],
+  [20, 2862.9, 212.8, ["Filter", "Instagram"], ["Tamu ikut", "mengabadikan", "momen dengan filter", "kalian."]], [201, 2862.9, 212.8, ["Kirim lewat", "WhatsApp"], ["Dashboard pasangan", "untuk mengirim ke", "tiap tamu dan", "memantau RSVP."]],
+  [20, 3087.7, 190, ["Check-in QR"], ["Penerima tamu", "memindai QR tamu", "di hari H."]], [201, 3087.7, 190, ["Dua bahasa"], ["Teks undangan", "dalam bahasa", "Indonesia atau", "Inggris."]]];
+const featIcon = (d, x, y) => `<g transform="translate(${x} ${y}) scale(${28 / 24})" fill="none" stroke="${LP.accent}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</g>`;
+// Pertanyaan (shared accordion .faq-list, all closed): [top, height, question lines]; plus icon 28 px at the right.
+const FAQ = [[4892.2, 63, ["Apakah tamu perlu memasang aplikasi?"]], [4955.2, 78.6, ["Bisakah nama tiap tamu ditulis di", "undangan?"]], [5033.8, 63, ["Berapa lama sampai undangannya jadi?"]],
+  [5096.8, 63, ["Bisakah isi undangan diubah setelah jadi?"]], [5159.8, 78.6, ["Bagaimana kami tahu siapa yang akan", "hadir?"]], [5238.4, 63, ["Bagaimana cara membayar?"]],
+  [5301.4, 63, ["Berapa lama undangan bisa dibuka?"]]];
+const faqPlus = (cx, cy) => circle(cx, cy, 13.25, { stroke: LP.dash, sw: 1.5 }) + rect(cx - 5.5, cy - 1, 11, 2, { fill: LP.cocoa }) + rect(cx - 1, cy - 5.5, 2, 11, { fill: LP.cocoa });
 
 function landingTop(x0, y0, name) {
   const X = x0 + 20, Y = (v) => y0 + v;
-  let s = rect(x0, y0, 390, 3502, { fill: LP.paper });
+  let s = rect(x0, y0, 390, LPY.card, { fill: LP.paper });
   // header
   s += circle(X + 20, Y(37), 20, { fill: LP.tint }) + h(X + 20, Y(43), name[0], 18, { weight: 600, anchor: "middle" }) + h(X + 50, Y(43), name, 18, { weight: 600 }) +
-    lpBtn(x0 + 370 - lpBtnW("Pesan", true), Y(14), "Pesan", { small: true });
+    lpBtn(x0 + 288.2, Y(14), "Pesan", { small: true, w: 81.8 });
   // hero
-  ["Undangan digital", "untuk hari", "bahagia kalian"].forEach((l, i) => (s += h(X, Y(129 + i * 44), l, 43)));
-  s += para(X, Y(263), ["Pilih desain, pilih paket, lalu isi data", `pernikahan kalian. ${name} menyiapkan`, "undangannya sampai siap dibagikan ke", "tamu."], { size: 17, fill: LP.muted, lh: 26.35 });
-  s += lpBtn(X, Y(LPY.cta), "Pesan undangan", { solid: true }) + lpBtn(X + lpBtnW("Pesan undangan") + 12, Y(LPY.cta), "Lihat desain");
-  s += THUMB(X + 10.5, Y(469 + 28), 175, 219, TPL[1][2], -6) + THUMB(X + 164.5, Y(469 + 28), 175, 219, TPL[2][2], 6) + THUMB(X + 87.5, Y(469), 175, 219, TPL[0][2]);
-  // katalog
-  s += dash(X, Y(LPY.katalog), 350) + h(X, Y(892), "Pilih desain undangan", 32) +
-    para(X, Y(930), ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.35 });
-  TPL.forEach(([n, note, pal], i) => {
-    const cx = X + (i % 2) * 182, ry = LPY.grid + Math.floor(i / 2) * 418;
-    s += clipped(cx, Y(ry), 168, 210, pageSketch(cx, Y(ry), 168, 210, pal)) + rect(cx, Y(ry), 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
-      h(cx, Y(ry + 240), n, 20) + para(cx, Y(ry + 263), note, { size: 14, fill: LP.muted, lh: 20.3 }) +
-      text(cx, Y(ry + 327), "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true }) + lpBtn(cx, Y(ry + 348), "Pilih", { small: true });
-  });
+  ["Undangan digital", "untuk hari", "bahagia kalian"].forEach((l, i) => (s += h(X, Y([131, 174.8, 218.5][i]), l, 42.9)));
+  s += para(X, Y(261.3), ["Pilih desain, pilih paket, lalu isi data", `pernikahan kalian. ${name} menyiapkan`, "undangannya sampai siap dibagikan ke tamu."], { size: 17, fill: LP.muted, lh: 26.3 });
+  s += lpBtn(X, Y(LPY.cta), "Pesan undangan", { solid: true, w: 178.8 }) + lpBtn(x0 + 210.8, Y(LPY.cta), "Lihat desain", { w: 143.6 });
+  s += THUMB(X + 10.5, Y(LPY.art + 28), 175, 219, TPL[1][2], -6) + THUMB(X + 164.5, Y(LPY.art + 28), 175, 219, TPL[2][2], 6) + THUMB(X + 87.5, Y(LPY.art), 175, 219, TPL[0][2]);
+  // katalog: theme buttons, the first four designs
+  s += dash(X, Y(LPY.katalog), 350) + h(X, Y(866.3), "Pilih desain undangan", 32) +
+    para(X, Y(901.9), ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.3 }) +
+    chipRow(x0, Y(LPY.chips)) + tplGrid(x0, Y(LPY.grid));
+  // fitur undangan digital
+  s += dash(X, Y(LPY.fitur), 350) + h(X, Y(1879.8), "Fitur undangan digital", 32) +
+    para(X, Y(1915.4), ["Semua desain memakai fitur yang sama. Yang", "termasuk di undangan kalian mengikuti paket", "yang kalian pilih."], { size: 17, fill: LP.muted, lh: 26.3 }) +
+    FEAT.map(([x, top, hh, title, txt], i) => rect(x0 + x + 0.75, Y(top + 0.75), 167.5, hh - 1.5, { r: 16, fill: LP.paper, stroke: LP.line, sw: 1.5 }) + featIcon(FEAT_ICON[i], x0 + x + 17, Y(top + 19)) +
+      title.map((l, k) => h(x0 + x + 17, Y(top + 75 + k * 22.8), l, 19)).join("") + para(x0 + x + 17, Y(top + (title.length > 1 ? 126.6 : 103.8)), txt, { size: 14, fill: LP.muted, lh: 20.3 })).join("");
   // paket dan harga
-  s += rect(x0, Y(LPY.harga), 390, 2719 - LPY.harga, { fill: LP.tint }) + h(X, Y(1955), "Paket dan harga", 32) +
-    para(X, Y(1993), ["Pilih paket yang pas, lalu isi datanya di", "form di bawah."], { size: 17, fill: LP.muted, lh: 26.35 });
+  s += rect(x0, Y(LPY.harga), 390, LPY.cara - LPY.harga, { fill: LP.tint }) + h(X, Y(3429.7), "Paket dan harga", 32) +
+    para(X, Y(3465.3), ["Pilih paket yang pas, lalu isi datanya di form", "di bawah."], { size: 17, fill: LP.muted, lh: 26.3 });
   PKG.forEach(([n, price, inc], i) => {
-    const t = LPY.pkg1 + i * 310;
-    s += rect(X + 0.75, Y(t + 0.75), 348.5, 292.5, { r: 16, fill: LP.paper, stroke: LP.cocoa, sw: 1.5 }) + h(X + 25, Y(t + 45), n, 24) + h(X + 25, Y(t + 91), price, 32, { weight: 600 }) +
-      dash(X + 25, Y(t + 120), 300) + inc.map((x, k) => iconX("check", X + 34, Y(t + 151 + k * 32), 18, LP.cocoa, 2.4) + text(X + 53, Y(t + 156 + k * 32), x, { size: 15, fill: LP.ink })).join("") +
-      lpBtn(X + 25, Y(t + 218), "Pilih paket ini", { solid: true, w: 300 });
+    const t = LPY.pkg1 + i * 311.1;
+    s += rect(X + 0.75, Y(t + 0.75), 348.5, 293.6, { r: 16, fill: LP.paper, stroke: LP.cocoa, sw: 1.5 }) + h(X + 25, Y(t + 47), n, 24) + h(X + 25, Y(t + 91.6), price, 32, { weight: 600 }) +
+      dash(X + 25, Y(t + 120.6), 300) + inc.map((x, k) => iconX("check", X + 34, Y(t + 151.6 + k * 31.7), 18, LP.cocoa, 2.4) + text(X + 53, Y(t + 155.6 + k * 31.7), x, { size: 15, fill: LP.ink })).join("") +
+      lpBtn(X + 25, Y(t + 218.1), "Pilih paket ini", { solid: true, w: 300 });
   });
   // cara pesan
-  s += h(X, Y(2810), "Cara pesan", 32);
-  [["1", "Pilih desain dan paket", ["Lihat demo desain di atas, lalu", "pilih paket yang sesuai."]], ["2", "Isi data pernikahan", ["Nama, acara, dan detail lain lewat", "form di bawah. Yang belum siap", "boleh menyusul."]],
-    ["3", "Dihubungi lewat WhatsApp", [`${name} mengonfirmasi pesanan dan`, "pembayaran, lalu menyiapkan", "undangan kalian."]]].forEach(([n, t, p], i) => {
-    const top = [2845, 2965, 3111][i];
+  s += h(X, Y(4286.2), "Cara pesan", 32);
+  [["1", 4319.8, "Pilih desain dan paket", ["Lihat demo desain di atas, lalu pilih", "paket yang sesuai."]], ["2", 4429.7, "Isi data pernikahan", ["Nama, acara, dan detail lain lewat form", "di bawah. Yang belum siap boleh", "menyusul."]],
+    ["3", 4564.5, "Dihubungi lewat WhatsApp", [`${name} mengonfirmasi pesanan dan`, "pembayaran, lalu menyiapkan", "undangan kalian."]]].forEach(([n, top, t, p]) => {
     s += circle(X + 24, Y(top + 24), 23, { fill: LP.paper, stroke: LP.cocoa, sw: 2 }) + h(X + 24, Y(top + 32), n, 22, { weight: 600, fill: LP.accent, anchor: "middle" }) +
-      h(X + 64, Y(top + 30), t, 22) + para(X + 64, Y(top + 59), p, { size: 17, fill: LP.muted, lh: 26.35 });
+      h(X + 64, Y(top + 21), t, 22) + para(X + 64, Y(top + 49.3), p, { size: 16, fill: LP.muted, lh: 24.8 });
   });
+  // pertanyaan
+  s += dash(X, Y(LPY.faq), 350) + h(X, Y(4819.3), "Pertanyaan", 32) + text(X, Y(4854.9), "Belum terjawab?", { size: 17, fill: LP.muted }) +
+    text(x0 + 152.6, Y(4854.9), "Tanya lewat WhatsApp", { size: 17, weight: 700, fill: LP.cocoa, underline: true }) + text(x0 + 339.7, Y(4854.9), ".", { size: 17, fill: LP.muted }) +
+    line(X, Y(4891.95), X + 350, Y(4891.95), { stroke: LP.dash, sw: 1.5 }) +
+    FAQ.map(([top, hh, q]) => para(X, Y(top + 33), q, { size: 16, weight: 500, fill: LP.cocoa, lh: 20.8 }) + faqPlus(x0 + 356, Y(top + 30)) +
+      line(X, Y(top + hh - 0.75), X + 350, Y(top + hh - 0.75), { stroke: LP.dash, sw: 1.5 })).join("");
   // form section head
-  s += dash(X, Y(LPY.pesan), 350) + h(X, Y(3376), "Isi data pesanan", 32) +
-    para(X, Y(3414), [`Data langsung terkirim ke ${name}. Yang`, "belum siap boleh dikosongkan dan", "dilengkapi lewat WhatsApp."], { size: 17, fill: LP.muted, lh: 26.35 });
+  s += dash(X, Y(LPY.pesan), 350) + h(X, Y(5512.4), "Isi data pesanan", 32) +
+    para(X, Y(5548), [`Data langsung terkirim ke ${name}. Yang`, "belum siap boleh dikosongkan dan dilengkapi", "lewat WhatsApp."], { size: 17, fill: LP.muted, lh: 26.3 });
   return body(s);
 }
 
@@ -369,44 +424,54 @@ const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + clipped(0, 63, 
   rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Dasar", 19, { weight: 600 }) +
   iconX("x", DEMO_X[0], DEMO_X[1], 24, LP.cocoa, 2.2));
 const demoPick = body(lpBtn(181, 8, "Pakai desain ini", { small: true, solid: true, w: 147 }));
-const KAT = LPY.katalog, LIHAT_DEMO = [62, LPY.grid + 322 - KAT];
+const KAT = LPY.katalog, LIHAT_DEMO = [62, LPY.grid + 310 - KAT];
 // The phone's address bar (56 px) above a 844 viewport, for the shareable ?demo= link.
 const ADDR = "tokomu.myscalev.com/rina-wo";
 const urlBar = (u) => rect(0, 0, 390, 56, { fill: "#f1f3f4" }) + rect(12, 8, 366, 40, { r: 20, fill: "#e3e5e8" }) + icon("lock", 32, 28, 14, C.text) + text(46, 33, u, { size: 14, fill: C.strong });
 const inBrowser = (...s) => clipped(0, 56, 390, 844, group({ transform: "translate(0 56)" }, ...s));
 
-// Gaya katalog (renderCatalog + .cat-* CSS at 390 px, measured in Chrome): y from the katalog's dashed line.
+// Gaya katalog (renderCatalog + .cat-* CSS at 390 px, measured in Chrome): y from the katalog's dashed line; the designs
+// start under the theme buttons.
 let rcN = 0;
 const rclip = (x, y, w, hh, r, ...kids) => { const id = `rc${rcN++}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="${r}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
 const pic = (x, y, w, hh, pal, r = 14) => rclip(x, y, w, hh, r, pageSketch(x, y, w, hh, pal)) + rect(x, y, w, hh, { r, stroke: LP.cocoa, sw: 1.5 });
 const demoLink = (x, top) => text(x, top + 28, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true });
-const NOTE = "20 bagian · HP & desktop · ID/EN", NOTE2 = ["20 bagian · HP & desktop ·", "ID/EN"], CT = 187;
-const catHead = rect(0, 0, 390, 844, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 87, "Pilih desain undangan", 32) +
-  para(20, 125, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.35 });
+const CT = LPY.grid - KAT, CHIP_Y = LPY.chips - KAT;
+const catHead = rect(0, 0, 390, 844, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 88, "Pilih desain undangan", 32) +
+  para(20, 123.6, ["Buka demo untuk melihat undangan", "contohnya, lalu pilih desain yang kalian suka."], { size: 17, fill: LP.muted, lh: 26.3 }) + chipRow(0, CHIP_Y);
+// Mozaik with every design: the fourth is a tall tile on the right, the fifth (Cute Gemoy) starts beside it.
+const GEMOY = ["Cute Gemoy", null, ["#fde7ec", "#e48aa3"]];
 const CAT_STYLE = {
-  grid: TPL.map(([n, , pal], i) => { const x = 20 + (i % 2) * 182, t = CT + Math.floor(i / 2) * 357;
-    return pic(x, t, 168, 210, pal) + h(x, t + 230, n, 20) + para(x, t + 252, NOTE2, { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(x, t + 288) + lpBtn(x + 92, t + 287, "Pilih", { small: true, w: 71 }); }).join(""),
-  daftar: TPL.map(([n, , pal], i) => { const t = CT + i * 149;
-    return pic(20, t + 16, 92, 115, pal, 10) + h(128, t + 34, n, 20) + text(128, t + 57, NOTE, { size: 14, fill: LP.muted }) + demoLink(128, t + 70) + lpBtn(220, t + 69, "Pilih", { small: true, w: 71 }) + dash(20, t + 147, 350); }).join(""),
-  kartu: TPL.slice(0, 2).map(([n, , pal], i) => { const t = CT + i * 448;
-    return rect(20, t, 350, 429, { r: 16, fill: LP.paper }) + rclip(20, t, 350, 429, 16, pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
-      rect(20.75, t + 0.75, 348.5, 427.5, { r: 16, stroke: LP.cocoa, sw: 1.5 }) + h(41, t + 302, n, 26) + text(41, t + 332, NOTE, { size: 15, fill: LP.muted }) +
-      demoLink(41, t + 359) + lpBtn(137, t + 355, "Pilih", { solid: true, w: 83 }); }).join(""),
-  geser: TPL.slice(0, 2).map(([n, , pal], i) => { const x = 20 + i * 268, t = CT + 4;
-    return pic(x, t, 252, 315, pal) + h(x, t + 335, n, 20) + text(x, t + 357, NOTE, { size: 14, fill: LP.muted }) + demoLink(x, t + 373) + lpBtn(x + 92, t + 372, "Pilih", { small: true, w: 71 }); }).join("") +
-    rect(0, 735, 390, 109, { fill: LP.tint }) + h(20, 828, "Paket dan harga", 32),
+  grid: tplGrid(0, CT),
+  daftar: TPL.map(([n, , pal], i) => { const t = CT + i * 153.6;
+    return pic(20, t + 16, 92, 115, pal, 10) + h(128, t + 35, n, 20) + para(128, t + 57, NOTES.daftar[i], { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(128, t + 88.8) +
+      lpBtn(220, t + 89.6, "Pilih", { small: true, w: 71 }) + dash(20, t + 151.6, 350); }).join(""),
+  // Kartu besar: a third note line makes the card 21.8 taller and moves Lihat demo and Pilih down with it.
+  kartu: [0, 1].map((i) => { const [n, , pal] = TPL[i], note = NOTES.kartu[i], more = (note.length - 2) * 21.8, t = CT + i * 470.6, hh = 450.6 + more;
+    return rect(20, t, 350, hh, { r: 16, fill: LP.paper }) + rclip(20, t, 350, hh, 16, pageSketch(21, t + 1, 348, 261, pal)) + line(20, t + 262.25, 370, t + 262.25, { stroke: LP.cocoa, sw: 1.5 }) +
+      rect(20.75, t + 0.75, 348.5, hh - 1.5, { r: 16, stroke: LP.cocoa, sw: 1.5 }) + h(41, t + 303, n, 26) + para(41, t + 331, note, { size: 15, fill: LP.muted, lh: 21.8 }) +
+      demoLink(41, t + 379.8 + more) + lpBtn(137, t + 377.5 + more, "Pilih", { solid: true, w: 83.1 }); }).join(""),
+  // Geser: on a phone (no arrows) the next section, Fitur undangan digital, starts 778.9 below the dashed line.
+  geser: [0, 1].map((i) => { const [n, , pal] = TPL[i], x = 20 + i * 268, t = CT + 4;
+    return pic(x, t, 252, 315, pal) + h(x, t + 334, n, 20) + para(x, t + 356, NOTES.geser[i], { size: 14, fill: LP.muted, lh: 20.3 }) + demoLink(x, t + 391.8) +
+      lpBtn(x + 92, t + 392.6, "Pilih", { small: true, w: 71 }); }).join("") + dash(20, 778.9, 350),
   mozaik: `<defs><linearGradient id="mzfade" x1="0" y1="1" x2="0" y2="0"><stop offset="${(79 / 135).toFixed(3)}" stop-color="rgb(20,12,8)" stop-opacity=".88"/><stop offset="1" stop-color="rgb(20,12,8)" stop-opacity="0"/></linearGradient></defs>` +
-    [[20, CT, 450], [200, CT, 220], [200, CT + 230, 220], [20, CT + 460, 220]].map(([x, y, hh], i) => { const [n, , pal] = TPL[i], b = y + hh;
+    [[TPL[0], 20, CT, 450], [TPL[1], 200, CT, 220], [TPL[2], 200, CT + 230, 220], [TPL[3], 200, CT + 460, 450], [GEMOY, 20, CT + 460, 220]].map(([[n, , pal], x, y, hh]) => { const b = y + hh;
       return rclip(x, y, 170, hh, 14, pageSketch(x, y, 170, hh, pal), rect(x, b - 135, 170, 135, { fill: "url(#mzfade)" })) + rect(x + 0.75, y + 0.75, 168.5, hh - 1.5, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
         rect(x + 10, y + 11, 84, 24, { r: 12, fill: "rgba(20,12,8,.3)" }) + rect(x + 10, y + 10, 84, 24, { r: 12, fill: LP.paper }) + text(x + 52, y + 27, "Lihat demo", { size: 12, weight: 800, fill: LP.cocoa, anchor: "middle" }) +
         h(x + 12, b - 64, n, 18, { fill: LP.paper }) + rect(x + 12, b - 50, 59, 38, { r: 15, fill: LP.paper }) + text(x + 41.5, b - 25.5, "Pilih", { size: 15, weight: 700, fill: LP.cocoa, anchor: "middle" }); }).join("")
 };
+// Pilihan tema Adat (page y): the first four adat designs; Tradisional Elegan's name takes two lines, so its row is taller.
+const ADAT = [[["Tradisional", "Elegan"], ["Hitam & emas, bingkai", "lengkung, judul huruf…"], ["#1f1c1a", "#ecbb6c"]], [["Kencana"], ["Krem & merah bata,", "wayang golek berwarna…"], ["#fff7e9", "#8e2818"]],
+  [["Kembang Joyo"], ["Kertas cokelat muda,", "bingkai lengkung dan…"], ["#d8c9ae", "#18150f"]], [["Lado Mudo"], ["Krem merah muda &", "marun, pita ulos dan…"], ["#fffaf0", "#520000"]]];
+const adatView = body(rect(0, LPY.chips - 4, 390, KAT + 844 - LPY.chips + 4, { fill: LP.paper }), chipRow(0, LPY.chips, "Adat"),
+  ADAT.map(([names, note, pal], i) => gridItem(20 + (i % 2) * 182, LPY.grid + (i > 1 ? 380.6 : 0), names, note, pal, i > 1 ? 287.6 : 310.6)).join(""));
 const PKG_Y = LPY.pkg1 - 40, FORM_Y = LPY.card - 20;
 
 // form-klien: the #pesan section from its top; the phone shows it from FY0.
 const FK = { card: LPY.card - LPY.pesan };
-const fkHead = body(rect(0, 0, 390, FK.card, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 87, "Isi data pesanan", 32) +
-  para(20, 125, ["Data langsung terkirim ke Rina WO. Yang", "belum siap boleh dikosongkan dan", "dilengkapi lewat WhatsApp."], { size: 17, fill: LP.muted, lh: 26.35 }));
+const fkHead = body(rect(0, 0, 390, FK.card, { fill: LP.paper }) + dash(20, 0, 350) + h(20, 88, "Isi data pesanan", 32) +
+  para(20, 123.6, ["Data langsung terkirim ke Rina WO. Yang", "belum siap boleh dikosongkan dan dilengkapi", "lewat WhatsApp."], { size: 17, fill: LP.muted, lh: 26.3 }));
 const K1 = formTail(0, FK.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Dasar"], desain: "Dasar", paket: "Basic" });
 const K2 = formTail(0, FK.card, PEMESAN);
 const K2e = formTail(0, FK.card, { ...PEMESAN, bad: true, status: "Nama wajib diisi." });
@@ -638,12 +703,27 @@ export const scenes = {
       f2: { svg: scr(FORM_Y, LAND, F2.svg), enter: "fade", delay: 0.3 }
     },
     steps: [
-      { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", at: [287, LPY.cta + 26], click: true, show: ["v1"], dur: 3.4 },
+      { caption: "Pembuka: nama bisnismu, Pesan undangan, dan Lihat desain.", at: [283, LPY.cta + 26], click: true, show: ["v1"], dur: 3.4 },
       { caption: "Lihat desain turun ke katalog. Klien menekan Lihat demo.", at: LIHAT_DEMO, click: true, show: ["dlg", "pick"], dur: 3.4 },
       { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: DEMO_PICK, click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"], dur: 3.4 },
       { caption: "Form menulis Pilihan kalian: desain Dasar.", dur: 2.6 },
       { caption: "Di Paket dan harga, setiap paket punya Pilih paket ini.", hide: ["f1"], show: ["vPkg", "p2"], dur: 2.8 },
       { caption: "Pilih paket ini: form mencatat Paket Basic, desain Dasar.", at: [195, LPY.pkg1 + 244 - PKG_Y], click: true, press: "p2", show: ["f2"], dur: 3.8 }
+    ]
+  },
+
+  "jualan-landing-tema": {
+    title: "Pilihan tema di katalog Landing page",
+    world: PHONE,
+    base: [scr(KAT, LAND, F0.svg)],
+    els: {
+      row: { svg: ring(18, CHIP_Y, 368, 44, { r: 26 }), enter: "fade", delay: 0.3 },
+      adat: { svg: scr(KAT, adatView), enter: "fade", delay: 0.1 }
+    },
+    steps: [
+      { caption: "Di atas katalog ada tombol tema: Semua dan tiap kategori, dengan jumlahnya.", show: ["row"], dur: 3.8 },
+      { caption: "Klik Adat: katalog hanya menampilkan desain adat.", at: [chipX("Adat"), CHIP_Y + 22], click: true, hide: ["row"], show: ["adat"], dur: 3.6 },
+      { caption: "Klik Semua untuk menampilkan lagi seluruh desain.", at: [chipX("Semua"), CHIP_Y + 22], click: true, hide: ["adat"], dur: 3.2 }
     ]
   },
 
@@ -673,7 +753,7 @@ export const scenes = {
     title: "Lima Gaya katalog di Landing page",
     world: PHONE,
     base: [body(catHead)],
-    els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: body(rect(0, 160, 390, 684, { fill: LP.paper }), svg), enter: "fade" }])),
+    els: Object.fromEntries(Object.entries(CAT_STYLE).map(([k, svg]) => [k, { svg: body(rect(0, CHIP_Y + 52, 390, 844 - CHIP_Y - 52, { fill: LP.paper }), svg), enter: "fade" }])),
     steps: [
       { caption: "Grid (bawaan): dua desain sejajar, Lihat demo dan Pilih di bawahnya.", show: ["grid"], dur: 3.4 },
       { caption: "Daftar: gambar kecil di kiri, nama dan catatan di kanan.", hide: ["grid"], show: ["daftar"], dur: 3.2 },
