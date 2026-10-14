@@ -55,7 +55,7 @@ const shoot = async (label, ms) => {
   console.log(p);
 };
 for (let i = 0; i < steps; i++) {
-  const end = i + 1 < steps ? starts[i + 1] : total - 0.5;
+  const end = i + 1 < steps ? starts[i + 1] : total - 1.6; // lib adds a 1.6 s tail after the last step
   await shoot(String(i + 1), Math.round((starts[i] + (end - starts[i]) * (+process.env.FRAC || 0.8)) * 1000));
 }
 await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
