@@ -344,7 +344,7 @@ const PAY = { x: WIN / 2 - 250, w: 500 }, PAYBTN = [PAY.x + PAY.w / 2, CT + 524]
 const payPage = () => rect(0, CT, WIN, VIEW, { fill: "#f5f6f8" }) + rect(PAY.x, CT + 30, PAY.w, 560, { r: 10, fill: C.white, stroke: "#e6e8ec" }) +
   circle(PAY.x + 40, CT + 70, 16, { fill: C.primary }) + rect(PAY.x + 66, CT + 63, 140, 14, { r: 7, fill: BAR }) + line(PAY.x, CT + 106.5, PAY.x + PAY.w, CT + 106.5, { stroke: "#eef0f3" }) +
   rect(PAY.x + 24, CT + 130, 180, 12, { r: 6, fill: BAR }) + text(PAY.x + PAY.w - 24, CT + 142, "Rp299.000", { size: 18, weight: 700, fill: C.strong, anchor: "end" }) +
-  [0, 1, 2, 3].map((k) => rect(PAY.x + 24, CT + 176 + k * 64, PAY.w - 48, 44, { r: 6, fill: C.white, stroke: "#dcdfe4" }) + rect(PAY.x + 40, CT + 194 + k * 64, [120, 180, 90, 150][k], 9, { r: 4, fill: "#eceef1" })).join("") +
+  [0, 1, 2, 3].map((k) => rect(PAY.x + 24, CT + 176 + k * 64, PAY.w - 48, 44, { r: 6, fill: C.white, stroke: "#dcdfe4" }) + (k < 2 ? text(PAY.x + 40, CT + 203 + k * 64, ["QRIS", "Virtual Account"][k], { size: 14, weight: 500, fill: C.strong }) : rect(PAY.x + 40, CT + 194 + k * 64, [120, 180, 90, 150][k], 9, { r: 4, fill: "#eceef1" }))).join("") +
   rect(PAY.x + 24, CT + 500, PAY.w - 48, 48, { r: 6, fill: C.primary });
 const payDone = rect(PAY.x + 24, CT + 500, PAY.w - 48, 48, { r: 6, fill: C.ok }) + iconX("check", PAYBTN[0], PAYBTN[1], 22, C.white, 3);
 const TABS_PAY = [{ ...TAB_ED, active: false }, { title: "nikahin.myscalev.com", active: true, fav: favScalev }];
@@ -695,7 +695,7 @@ export const scenes = {
       mask: { svg: frameMask, enter: "fade" },
       prices: ring(t.col(0) + 6, t.t0 + 58, 3 * t.pc - 12, 28, { r: 6 }),
       noRows: { svg: ring(t.tx + 4, t.rowY[4] + 2 - D, 720, t.rowY[5] + t.rowsH[5] - t.rowY[4] - 4, { r: 6 }), delay: 1.1 },
-      payTab: { svg: crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/…" }) + payPage(), enter: "fade" }
+      payTab: { svg: crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/pay/…" }) + payPage(), enter: "fade" }
     };
     return {
       title: "Membuka tabel Pilih paket di NikahKit", world: LAP_WORLD,
@@ -723,7 +723,7 @@ export const scenes = {
       d0: { svg: d0.svg, enter: "fade" },
       table: { svg: t.svg, enter: "pop", origin: DLG_O },
       d1: { svg: d1.svg, enter: "fade" },
-      payTab: { svg: crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/…" }) + payPage(), enter: "fade" },
+      payTab: { svg: crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/pay/…" }) + payPage(), enter: "fade" },
       payDone: { svg: payDone, enter: "pop", origin: PAYBTN },
       paidRing: { svg: ring(...d1.at.paid, { r: 6 }), delay: 0.3 },
       d2: { svg: d2.svg, enter: "fade" },
@@ -737,7 +737,7 @@ export const scenes = {
       steps: [
         { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table"] },
         { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", at: mid(t.btns[1]), click: true, hide: ["table"], show: ["d1", "payTab"], dur: 3.6 },
-        { caption: "Bayar di tab Scalev sampai selesai. Biaya layanan Scalev ditambahkan di sini.", at: PAYBTN, click: true, show: ["payDone"], dur: 3.6 },
+        { caption: "Pilih QRIS atau Virtual Account, lalu bayar sebelum batas waktu.", at: PAYBTN, click: true, show: ["payDone"], dur: 3.6 },
         { caption: "Kembali ke tab editor Scalev. Di kartu Paket ada tombol Cek pembayaran.", at: [200, 23], click: true, hide: ["payTab", "payDone"], show: ["paidRing"], dur: 3.6 },
         { caption: "Klik Cek pembayaran. Kartu Paket berubah, muncul Langganan aktif.", at: mid(d1.at.paid), click: true, hide: ["d1", "paidRing"], show: ["d2", "okRing"], dur: 3.8 },
         { caption: "Tutup jendela NikahKit: tekan Esc, atau klik area gelap di luarnya.", at: DARK, click: true, hide: ["d2", "okRing", "dim"] },
