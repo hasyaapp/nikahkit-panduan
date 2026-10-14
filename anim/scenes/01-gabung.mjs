@@ -396,7 +396,7 @@ const payTab = () => crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/pay/…"
 const popup = (x, y, w, h, url) => shadow(x, y, w, h, 10, 4) + rect(x, y, w, h, { r: 10, fill: C.white, stroke: "#d0d4d9" }) + rect(x, y, w, 40, { r: 10, fill: C.crFrame }) + rect(x, y + 30, w, 10, { fill: C.crFrame }) +
   rect(x + 10, y + 7, w - 20, 26, { r: 13, fill: C.white }) + icon("lock", x + 26, y + 20, 12, C.crIcon) + text(x + 40, y + 25, url, { size: 12, fill: C.crText });
 // Separate Scalev window (OAuth): login, then consent with the business chosen. Not measured: grey bars.
-const SW = { x: 880, y: 130, w: 460, h: 560 };
+const SW = { x: 960, y: 130, w: 460, h: 560 };
 const SW_BTN = [SW.x + 40, SW.y + SW.h - 120, SW.w - 80, 48];
 const scalevWin = (consent) => {
   const { x, y, w, h } = SW;
@@ -481,7 +481,7 @@ function lensSpot(src, boxes) {
 const edLeft = (inner, o = {}) => clipped(0, o.top ?? 92, 400, 900 - (o.top ?? 92), scalevEditor(0, 0, { tab: o.tab ?? "NikahKit", rail: o.rail ?? "Template" }) + inner);
 const PV = {
   dialog: (o, key, lens) => { const d = pinDlg(0, 0, o); return pv(d.svg, -164, -40, d.at[key], { r: key === "bizCard" || key === "licCard" ? 8 : 4, lens: lens?.(d) }); },
-  ext: () => pv(extPage(0, 0, { dev: true, card: true }), 360, 120, EXT_CARD, { r: 8, lens: [384, 203, 400, 150] }),
+  ext: () => pv(extPage(0, 0, { dev: true, card: true }), 360, 120, EXT_CARD, { r: 8, lens: [376, 195, 416, 158] }),
   files: () => pv(explorer(10, 40, 600, 460, { title: "NikahKit", path: "Unduhan › nikahkit-… › NikahKit", side: "Unduhan" }) + NK_FILES.map((f, i) => fileIcon(214 + i * 96, 150, f, i === 0)).join(""),
     -74, -60, SEL(214, 150), { lens: [184, 130, 400, 128] }),
   plans: () => { const t = planDlg(0, 0, 788); return pv(t.svg, 4, 0, [t.col(1), t.t0, t.pc, 170], { r: 4, lens: [t.col(0), t.t0, 3 * t.pc, 168] }); },
@@ -493,12 +493,12 @@ const PV = {
 export const scenes = {
   // Home page overview: eight stops, each with a glimpse of the screen involved.
   "mulai-peta-perjalanan": checklist("Peta perjalanan member NikahKit", "Perjalanan member NikahKit", "Dari gabung sampai jualan, delapan titik.", [
-    ["1. Gabung: pilih paket, bayar", "Gabung: pilih paket dan bayar membership di jendela NikahKit.", PV.dialog({ msg: null }, "choose", (d) => [16, d.at.licCard[1], 408, d.at.licCard[3]])],
+    ["1. Gabung: pilih paket, bayar", "Gabung: pilih paket dan bayar membership di jendela NikahKit.", PV.dialog({ msg: null }, "choose", (d) => grow(d.at.licCard, 8))],
     ["2. Pasang: ekstensi di Chrome", "Pasang NikahKit di Chrome komputer lewat chrome://extensions.", PV.ext()],
-    ["3. Scalev: hubungkan bisnis", "Scalev: hubungkan bisnismu, buat halaman dengan HTML Mode.", pv(lpRowCard(0, 0), -180, -200, [0, 10, 408, 121], { r: 8, lens: [0, 10, 408, 121] })],
+    ["3. Scalev: hubungkan bisnis", "Scalev: hubungkan bisnismu, buat halaman dengan HTML Mode.", pv(lpRowCard(0, 0), -180, -200, [0, 10, 408, 121], { r: 8, lens: [-8, 2, 424, 137] })],
     ["4. Buat undangan: template, Konten", "Buat undangan: pilih template, isi Konten, lalu Simpan.", PV.template()],
-    ["5. Serahkan: tautan, Dashboard, PIN", "Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { more: [[PIN_MSG_IC]], lens: [0, 0, 408, 120] })],
-    ["6. Tamu: tautan pribadi, RSVP", "Tamu membuka undangan lewat tautan pribadi berisi namanya.", pv(coverAt(0, 0, 195, "Andi"), -189, 0, [75, 512, 240, 30], { lens: [30, 488, 330, 70] })],
+    ["5. Serahkan: tautan, Dashboard, PIN", "Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { more: [[PIN_MSG_IC]], lens: [0, 8, 408, 104] })],
+    ["6. Tamu: tautan pribadi, RSVP", "Tamu membuka undangan lewat tautan pribadi berisi namanya.", pv(coverAt(0, 0, 195, "Andi"), -189, 0, [75, 512, 240, 30], { lens: [30, 486, 330, 66] })],
     ["7. Hari-H: check-in tamu", "Hari-H: tamu dicatat lewat check-in di Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })],
     ["8. Jualan: landing page, pesanan", "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", pv(clipped(0, 92, 399, 808, ordersDlg(0, 0)), -184, 92, [16, 196, 367, 50], { lens: [0, 100, 399, 210] })]
   ]),
@@ -510,38 +510,38 @@ export const scenes = {
     ["3. Pasang lewat Load unpacked", "Di chrome://extensions: Developer mode, Load unpacked, folder NikahKit.", PV.ext()],
     ["4. Masuk dengan Google", "Di tab NikahKit editor Scalev, klik Masuk dengan Google.", PV.gate(GATE_OUT(0, 0), "google")],
     ["5. Bayar membership", "Klik Pilih paket, Pilih, bayar di Scalev, lalu Cek pembayaran.",
-      PV.dialog({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] }, "paid", (d) => [16, d.at.licCard[1], 408, d.at.licCard[3]])],
-    ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => d.at.bizCard)]
+      PV.dialog({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
+    ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
   ]),
   "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 7 sampai 10.", [
     ["7. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
-      pv(scalevApp(0, 0, { active: "Landing Pages" }) + lpPage(0), 276, 220, LP_ALL(0), { lens: [281, 260, 500, 180] })],
+      pv(scalevApp(0, 0, { active: "Landing Pages" }) + lpPage(0), 276, 220, LP_ALL(0), { lens: [281, 256, 500, 148] })],
     ["8. Buat halaman undangan dengan HTML Mode", "Buat Landing Page HTML Mode, isi slug di Settings, lalu Simpan.",
       pv(edLeft(settingsPanel(0), { tab: "Settings", top: 44 }), -184, 44, SLUG_FIELD(0), { lens: [16, 240, 368, 90] })],
     ["9. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
-      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1193, 50, 241, 34], { lens: [1180, 40, 260, 56] })],
+      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1193, 50, 241, 34], { lens: [1183, 45, 257, 44] })],
     ["10. Atur alamat dan izin domain", "Atur alamat di Settings dan izin domain di tab Security.",
       pv(edLeft("", { tab: "Security", rail: "", top: 44 }), -184, 44, [107, 57, 169 + tw("Settings", 12, 500) + 2 - 107, 18], { lens: [0, 44, 340, 48] })]
   ]),
   "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 11 sampai 15.", [
-    ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 104, 72, 332], { lens: [0, 100, 150, 340] })],
+    ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
     ["12. Pilih template", "Pilih template di panel Template.", PV.template()],
     ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(konten(0, 0), { rail: "Konten" }), -184, 92, [88, 169, 279, 166], { lens: [80, 160, 296, 182] })],
-    ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 160, 72, 220], { lens: [0, 150, 150, 240] })],
+    ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(templatePanel(0, 0)), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
     ["15. Simpan & Terbitkan", "Tekan Simpan & Terbitkan supaya tamu melihat versi terbaru.",
-      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1283, 50, 151, 34], { lens: [1180, 40, 260, 56] })]
+      pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + coverAt(727, 106, 922, "Tamu Undangan"), 672, 0, [1283, 50, 151, 34], { lens: [1183, 45, 257, 44] })]
   ]),
   "mulai-alur-serahkan": checklist("Bagian 4: bagikan dan serahkan", "Bagian 4: Bagikan dan serahkan", "Langkah 16 sampai 20.", [
-    ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg(0)), -184, 92, SHARE_VIEW(0), { lens: [8, 170, 384, 200] })],
+    ["16. Cek tampilan tamu lewat Bagikan", "Bagikan: isi nama tamu, lalu klik Lihat sebagai tamu.", pv(edLeft(shareDlg(0)), -184, 92, SHARE_VIEW(0), { lens: [8, 166, 384, 204] })],
     ["17. Pasang Dashboard pasangan milikmu (sekali saja)", "Template > Marketing: pasang Dashboard pasangan, sekali saja.",
-      pv(edLeft(marketing(0, 0)), -184, 92, [88, 279, 134, 167], { lens: [80, 270, 150, 270] })],
-    ["18. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 0, 408, 120] })],
-    ["19. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 50, 408, 160] })],
+      pv(edLeft(marketing(0, 0)), -184, 92, [88, 279, 134, 167], { lens: [80, 271, 150, 291] })],
+    ["18. Buat PIN dashboard", "Buat PIN dashboard di jendela NikahKit.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { lens: [0, 8, 408, 104] })],
+    ["19. Serahkan ke pasangan", "Salin pesan untuk pengantin, kirim lewat WhatsApp.", pv(pinCard(0, 0), -180, -240, PIN_MSG_IC, { more: [[PIN_COPIED]], lens: [0, 58, 408, 148] })],
     ["20. Siapkan hari-H (opsional)", "Hari-H: tamu di-check-in dari Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })]
   ]),
   "mulai-alur-jualan": checklist("Bagian 5: jualan", "Bagian 5: Jualan", "Langkah 21 sampai 24.", [
-    ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing(0, 0, { open: true })), -184, 92, [88, 217, 279, 380], { lens: [88, 260, 279, 140] })],
-    ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing(0, 0)), -184, 92, [234, 279, 134, 167], { lens: [226, 270, 150, 306] })],
+    ["21. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing(0, 0, { open: true })), -184, 92, [88, 217, 279, 380], { lens: [96, 274, 263, 135] })],
+    ["22. Pasang Landing page jualan", "Pasang Landing page dari kartu Landing page di Marketing.", pv(edLeft(marketing(0, 0)), -184, 92, [234, 279, 134, 167], { lens: [226, 270, 150, 312] })],
     ["23. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
       pv(clipped(0, 92, 399, 808, ordersDlg(0, 0, { link: true })), -184, 92, [32, 360, tw("Salin link form", 12, 500) + 44, 36], { lens: [16, 254, 367, 160] })],
     ["24. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
@@ -572,7 +572,7 @@ export const scenes = {
         { caption: "Klik tab Settings di editor Scalev.", focus: [LEFT], at: [191, CT + 66], click: true, show: ["settings"], mark: tabBox("Settings", 169, false), lens: { src: [0, CT + 44, 330, 48] } },
         { caption: "Kolom Slug URL berisi slug, bagian akhir alamat: rani-dimas.", mark: SLUG_FIELD(CT), lens: { src: [16, CT + 240, 368, 90] }, dur: 3.6 },
         { caption: "Klik tab NikahKit.", at: TAB_NK, click: true, hide: ["settings"], show: ["nk"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 330, 48] }, dur: 3 },
-        { caption: "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", mark: [0, CT + 104, 72, 332], lens: { src: [0, CT + 100, 150, 340], at: [296, 70] }, dur: 3.6 },
+        { caption: "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", mark: [0, CT + 104, 72, 332], lens: { src: [0, CT + 98, 72, 342] }, dur: 3.6 },
         { caption: "Cocokkan istilah: alamat umum, lalu tautan pribadi berisi nama tamu.", focus: [CARD], show: ["terms"], dur: 4 },
         { caption: "PIN dashboard untuk pasangan, kode staff untuk penerima tamu.", show: ["keys"], dur: 3.8 }
       ]
@@ -633,15 +633,15 @@ export const scenes = {
       steps: [
         { caption: "Buka halaman Cara pasang NikahKit di Chrome komputer.", focus: [TOOLBAR, [140, CT + 40, 1160, 140]], at: mid(urlBox(PURL)), mark: { box: urlBox(PURL), r: 3 }, lens: { src: [150, 46, 480, 36], at: [120, 200] }, dur: 3 },
         { caption: "Klik Unduh NikahKit. Chrome mengunduh ZIP NikahKit, sekitar 120 KB.", focus: [[990, CT + 50, 310, 120], [1230, 41, 210, 44]], at: mid(DL), click: true, show: ["dlIcon"], mark: { box: DL, r: 16 }, lens: { src: [1004, CT + 55, 290, 110] }, dur: 3.4 },
-        { caption: "Buka folder Unduhan: klik ikon unduhan di kanan atas Chrome.", focus: [[1030, 41, 410, 135]], at: DLI, click: true, show: ["bubble"], mark: { box: DLI_BOX, r: 14 }, lens: { src: [1040, 44, 380, 126] } },
-        { caption: "Klik ikon folder di sebelah nama file. Folder Unduhan terbuka.", focus: [[1030, 41, 410, 135], XWIN], at: FOLDER, click: true, show: ["files"], mark: FOLDER_BOX, lens: { src: [1060, 96, 330, 64] }, dur: 3.4 },
-        { caption: "Ekstrak ZIP (Windows): klik kanan file ZIP.", focus: [XWIN], at: [IX + 32, IY + 36], click: true, hide: ["bubble"], show: ["menu"], mark: SEL(IX, IY), lens: { src: [IX - 30, IY - 16, 340, 224] } },
+        { caption: "Buka folder Unduhan: klik ikon unduhan di kanan atas Chrome.", focus: [[1030, 41, 410, 135]], at: DLI, click: true, show: ["bubble"], mark: { box: DLI_BOX, r: 14 }, lens: { src: [1052, 88, 340, 78] } },
+        { caption: "Klik ikon folder di sebelah nama file. Folder Unduhan terbuka.", focus: [[1030, 41, 410, 135], XWIN], at: FOLDER, click: true, show: ["files"], mark: FOLDER_BOX, lens: { src: [1060, 102, 324, 46] }, dur: 3.4 },
+        { caption: "Ekstrak ZIP (Windows): klik kanan file ZIP.", focus: [XWIN], at: [IX + 32, IY + 36], click: true, hide: ["bubble"], show: ["menu"], mark: SEL(IX, IY), lens: { src: [IX - 30, IY - 16, 340, 232] } },
         { caption: "Pilih Extract All... (di Windows Indonesia: Ekstrak Semua...).", at: mid(MENU_ROW), click: true, hide: ["menu"], show: ["extract"], mark: MENU_ROW, note: "Extract All..." },
         { caption: "Klik Extract. Muncul folder bernama sama dengan ZIP.", at: mid(EXTRACT), click: true, hide: ["extract"], show: ["outer"], mark: EXTRACT, note: "Extract" },
         { caption: "Buka folder itu. Di dalamnya ada folder NikahKit.", at: [IX + 192, IY + 40], click: true, show: ["inside"], mark: SEL(IX + 160, IY), lens: { src: [IX - 30, IY - 16, 340, 130] } },
         { caption: "Mac: cukup klik dua kali file ZIP. Folder NikahKit langsung muncul.", focus: [MAC], show: ["mac"], dur: 3.4 },
         { caption: "Buka folder NikahKit: harus ada manifest.json, nk-bg.js, pin.html.", focus: [XWIN], at: [IX + 32, IY + 40], click: true, hide: ["mac"], show: ["nkFiles"], mark: SEL(IX, IY), lens: { src: [IX - 30, IY - 16, 520, 130] }, dur: 3.6 },
-        { caption: "Seret folder NikahKit ke Dokumen. Jangan disimpan di Unduhan.", at: mid(sideRow(EX, EY, 1)), click: true, show: ["moved"], mark: sideRow(EX, EY, 1), lens: { src: [EX, EY + 81, 300, 120] }, dur: 3.6 }
+        { caption: "Seret folder NikahKit ke Dokumen. Jangan disimpan di Unduhan.", at: mid(sideRow(EX, EY, 1)), click: true, show: ["moved"], mark: sideRow(EX, EY, 1), lens: { src: [EX, EY + 86, 180, 106] }, dur: 3.6 }
       ]
     };
   })(),
@@ -684,8 +684,8 @@ export const scenes = {
         { caption: "Di Dokumen, klik sekali folder NikahKit (berisi manifest.json).", focus: [[PX, PY, PW, PH]], at: [PX + 280, PY + 137], click: true, show: ["rowSel"], mark: { box: ROW, r: 5 }, lens: { src: [PX + 190, PY + 56, 330, 104] }, dur: 3.6 },
         { caption: "Klik Select. Chrome memasang NikahKit dari folder itu.", focus: [CARD], at: mid(SELECT), click: true, hide: ["picker", "rowSel"], show: ["card"], mark: { box: SELECT, r: 6 }, note: "Select" },
         { caption: "Kartu NikahKit muncul dengan sakelar biru menyala.", focus: [CARD], mark: { box: [384 + 353, CT + 203 + 175, 36, 18], r: 9 }, lens: { src: [384, CT + 362, 400, 56] }, dur: 3.4 },
-        { caption: "Sematkan (opsional): klik ikon puzzle di kanan atas Chrome.", focus: [MENUR], at: PUZ, click: true, show: ["menu"], mark: { box: [PUZ[0] - 13, 50, 26, 26], r: 13 }, lens: { src: [1040, 44, 400, 140], at: [300, 330] } },
-        { caption: "Klik ikon pin di samping NikahKit. Ikonnya tampil di toolbar.", at: PINAT, click: true, show: ["pinOn"], mark: { box: [PINAT[0] - 12, 140, 24, 24], r: 12 }, lens: { src: [1040, 44, 400, 140], at: [300, 330] }, dur: 3.4 }
+        { caption: "Sematkan (opsional): klik ikon puzzle di kanan atas Chrome.", focus: [MENUR], at: PUZ, click: true, show: ["menu"], mark: { box: [PUZ[0] - 13, 50, 26, 26], r: 13 }, lens: { src: [1036, 88, 348, 114] } },
+        { caption: "Klik ikon pin di samping NikahKit. Ikonnya tampil di toolbar.", at: PINAT, click: true, show: ["pinOn"], mark: { box: [PINAT[0] - 12, 140, 24, 24], r: 12 }, lens: { src: [1036, 88, 348, 114] }, dur: 3.4 }
       ]
     };
   })(),
@@ -709,8 +709,8 @@ export const scenes = {
         { caption: "Buka app.scalev.com. Editor sudah terbuka? Muat ulang dengan F5.", focus: [TOOLBAR], at: [330, 63], mark: { box: urlBox("app.scalev.com"), r: 3 }, lens: { src: [124, 44, 300, 40] }, dur: 3 },
         { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [LPROW, [256, CT, 1184, 420]], at: [lp[0], CT + lp[1]], click: true, show: ["list"], mark: LPROW, lens: { src: [0, CT + 190, 260, 90] } },
         { caption: "Klik halaman undangan yang memakai HTML Mode. Editor terbuka.", focus: [TOP], at: mid(LP_NAME(CT)), click: true, hide: ["dash", "list"], mark: LP_NAME(CT), note: PAGE, dur: 3.4 },
-        { caption: "Klik tab NikahKit di samping Settings.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
-        { caption: "Panel menampilkan Masuk ke NikahKit. dan tombol Masuk dengan Google.", mark: g.at.google, lens: { src: [0, CT + 160, 330, 120] }, dur: 3.6 }
+        { caption: "Klik tab NikahKit di samping Settings.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 229] } },
+        { caption: "Panel menampilkan Masuk ke NikahKit. dan tombol Masuk dengan Google.", mark: g.at.google, lens: { src: [8, CT + 167, 384, 108] }, dur: 3.6 }
       ]
     };
   })(),
@@ -719,7 +719,7 @@ export const scenes = {
   "gabung-masuk-google": (() => {
     const g = GATE_OUT(0, CT);
     const chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, gDisabled: true }), inn = dlg({});
-    const GX = 880, GY = 130, GW = 440, GH = 560, ACCT = [GX + 32, GY + 204, GW - 64, 66];
+    const GX = 960, GY = 130, GW = 440, GH = 560, ACCT = [GX + 32, GY + 204, GW - 64, 66];
     const google = popup(GX, GY, GW, GH, "accounts.google.com") + gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
       line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
       text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
@@ -737,12 +737,12 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka editor halaman Scalev yang memakai HTML Mode.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
-        { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
+        { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 229] } },
         { caption: "Klik Masuk dengan Google. Memeriksa login..., lalu jendela Google terbuka.", focus: "none", at: mid(g.at.google), click: true,
-          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [0, CT + 160, 330, 120] }, dur: 4 },
+          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [8, CT + 167, 384, 108] }, dur: 4 },
         { caption: "Pilih akun Google: klik akunmu. Jendela Google menutup sendiri.", focus: "none", at: mid(ACCT), click: true, hide: ["google", "chk", "out"], show: ["inn"],
           mark: ACCT, note: "Rina WO", dur: 3.6 },
-        { caption: "Lihat jendela NikahKit: email Google-mu, Keluar, kartu Paket dan Bisnis.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X, inn.Y + 50, 440, 200] }, dur: 3.6 },
+        { caption: "Lihat jendela NikahKit: email Google-mu, Keluar, kartu Paket dan Bisnis.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X + 8, inn.Y + 56, 424, inn.at.licCard[1] + inn.at.licCard[3] + 8 - inn.Y - 56] }, dur: 3.6 },
         { caption: "Di bawah kartu tertulis Sudah masuk. Kembali ke editor Scalev.", mark: inn.at.msg, lens: { src: [inn.X, inn.at.msg[1] - 12, 440, 62] }, dur: 3.4 }
       ]
     };
@@ -763,14 +763,14 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka editor halaman Scalev yang memakai HTML Mode.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
-        { caption: "Klik tab NikahKit di samping Settings. Panel NikahKit terbuka.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
+        { caption: "Klik tab NikahKit di samping Settings. Panel NikahKit terbuka.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 229] } },
         { caption: "Akun belum berlangganan? Klik Pilih paket. Muncul kartu Paket.", focus: [d0.box], at: mid(g.at.choose), click: true, show: ["dim", "d0"],
-          mark: g.at.choose, lens: { src: [0, CT + 160, 330, 120] }, dur: 3.4 },
+          mark: g.at.choose, lens: { src: [8, CT + 167, 384, 108] }, dur: 3.4 },
         { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", focus: [t.box], at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table"], mark: d0.at.choose, note: "Pilih paket", dur: 3.4 },
         { caption: "Baca tabelnya: Bulanan Rp79.000, Tahunan Rp299.000, Sekali Bayar Rp699.000.", focus: [t.box], at: [t.col(1) + 60, t.t0 + 70],
-          mark: [t.col(0) + 8, t.t0 + 58, 3 * t.pc - 16, 26], lens: { src: [t.col(0), t.t0 + 30, 3 * t.pc, 90] }, dur: 3.8 },
+          mark: [t.col(0) + 8, t.t0 + 58, 3 * t.pc - 16, 26], lens: { src: [t.col(0), t.t0 + 34, 3 * t.pc, 86] }, dur: 3.8 },
         { caption: "Tanda silang: akun staff dan impor CSV tidak ada di Bulanan.", at: [t.col(0) + 21, t.rowY[4] + 22],
-          mark: [t.tx + 4, t.rowY[4] + 2, 720, t.rowsH[4] + t.rowsH[5] - 4], lens: { src: [t.tx, t.rowY[4] - 4, 570, t.rowsH[4] + t.rowsH[5] + 8] }, dur: 3.8 },
+          mark: [t.tx + 4, t.rowY[4] + 2, 720, t.rowsH[4] + t.rowsH[5] - 4], lens: { src: [t.tx, t.rowY[4] - 4, 728, t.rowsH[4] + t.rowsH[5] + 8], zoom: 1.5 }, dur: 3.8 },
         { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", focus: [PAY_CARD], at: mid(t.btns[1]), click: true, hide: ["table", "dim"], show: ["pay"], mark: t.btns[1], note: "Pilih", dur: 4 }
       ]
     };
@@ -803,7 +803,7 @@ export const scenes = {
           mark: { box: [PAY.x + 24, CT + 266, PAY.w - 48, 196], r: 6 }, lens: { src: [PAY.x + 12, CT + 206, PAY.w - 24, 100], at: [162, 452] }, dur: 3.6 },
         { caption: "Klik Bayar ke Nikahin, lalu ikuti petunjuknya sampai selesai.", at: mid(PAY_BTN), click: true, mark: { box: PAY_BTN, r: 6 }, note: "Bayar ke Nikahin", dur: 3 },
         { caption: "Kembali ke tab editor Scalev. Di kartu Paket ada tombol Cek pembayaran.", focus: [[0, 0, W, 41], d1.box], at: mid(TAB1), click: true, hide: ["pay"], show: ["tabs2", "dim", "d1"],
-          mark: { box: TAB1, r: 9 }, lens: { src: [70, 0, 520, 41] }, dur: 3.6 },
+          mark: { box: TAB1, r: 9 }, lens: { src: [76, 2, 502, 39] }, dur: 3.6 },
         { caption: "Klik Cek pembayaran. Kartu Paket berubah, muncul Langganan aktif.", focus: [d2.box], at: mid(d1.at.paid), click: true, hide: ["d1"], show: ["d2"], mark: d1.at.paid,
           note: "Cek pembayaran", dur: 3.8 },
         { caption: "Tutup jendela NikahKit: klik ×, tekan Esc, atau klik area gelap.", focus: "none", at: mid(d2.at.close), click: true, hide: ["d2", "dim"], mark: d2.at.close, note: "Tutup" },
@@ -830,9 +830,9 @@ export const scenes = {
         d1: { svg: d1.svg, enter: "fade" }
       },
       steps: [
-        { caption: "Klik Punya kode uji? di bawah kartu Paket. Kotak Kode uji muncul.", focus: [Q], at: mid(d0.at.redeem), click: true, show: ["prompt"], mark: d0.at.redeem, lens: { src: d0.at.licCard }, dur: 3.4 },
+        { caption: "Klik Punya kode uji? di bawah kartu Paket. Kotak Kode uji muncul.", focus: [Q], at: mid(d0.at.redeem), click: true, show: ["prompt"], mark: d0.at.redeem, lens: { src: grow(d0.at.licCard, 8) }, dur: 3.4 },
         { caption: "Ketik kode dari tim Nikahin di kotak Kode uji.", focus: [Q], at: [QX + 300, QY + 98], click: true, type: [{ id: "code", n: code.length, box: [QX + 36, QY + 87, tw(code, 14), 22] }], show: ["code"],
-          mark: INPUT, lens: { src: [QX, QY + 50, QW, 80] } },
+          mark: INPUT, lens: { src: [QX + 12, QY + 50, QW - 24, 74] } },
         { caption: "Klik Oke.", focus: [d1.box], at: mid(OKE), click: true, hide: ["prompt", "code", "d0"], show: ["d1"], mark: { box: OKE, r: 16 }, note: "Oke", dur: 3 },
         { caption: "Muncul Kode diterima. Kembali ke editor Scalev, lalu Periksa lagi.", focus: [d1.box], mark: [{ box: d1.at.msg, r: 4 }, { box: d1.at.licCard, r: 8 }], lens: { src: [d1.X, d1.at.msg[1] - 12, 440, 64] }, dur: 3.8 }
       ]
@@ -857,17 +857,17 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka editor halaman undangan di Scalev. Pastikan halaman sudah disimpan.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
-        { caption: "Klik tab NikahKit. Panel: Hubungkan bisnis Scalev dulu.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
+        { caption: "Klik tab NikahKit. Panel: Hubungkan bisnis Scalev dulu.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 244] } },
         { caption: "Klik Hubungkan bisnis Scalev di panel. Jendela NikahKit muncul.", focus: [d1.box], at: mid(gb.at.connect), click: true, show: ["dim", "d1"],
-          mark: gb.at.connect, lens: { src: [0, CT + 160, 400, 130] }, dur: 3.4 },
-        { caption: "Cari kartu Bisnis Scalev, paling bawah: Belum terhubung.", focus: [d1.box], at: [d1.X + 360, d1.at.bizCard[1] + 30], mark: { box: d1.at.bizCard, r: 8 }, lens: { src: d1.at.bizCard } },
-        { caption: "Klik Hubungkan bisnis Scalev di kartu itu. Jendela Scalev terbuka.", focus: [d1.box], at: mid(d1.at.connect), click: true, show: ["login"], mark: d1.at.connect, lens: { src: d1.at.bizCard }, dur: 3.4 },
+          mark: gb.at.connect, lens: { src: [8, CT + 167, 384, 120] }, dur: 3.4 },
+        { caption: "Cari kartu Bisnis Scalev, paling bawah: Belum terhubung.", focus: [d1.box], at: [d1.X + 360, d1.at.bizCard[1] + 30], mark: { box: d1.at.bizCard, r: 8 }, lens: { src: grow(d1.at.bizCard, 8) } },
+        { caption: "Klik Hubungkan bisnis Scalev di kartu itu. Jendela Scalev terbuka.", focus: [d1.box], at: mid(d1.at.connect), click: true, show: ["login"], mark: d1.at.connect, lens: { src: grow(d1.at.bizCard, 8) }, dur: 3.4 },
         { caption: "Masuk ke Scalev bila diminta, dengan akun pemilik bisnis halamanmu.", at: mid(SW_BTN), click: true, hide: ["login"], show: ["consent"],
           mark: [{ box: SW_BTN, r: 6 }, { box: SW_BIZ, r: 8 }], dur: 3.4 },
         { caption: "Setujui akses NikahKit. Ada pilihan bisnis? Pilih bisnis halamanmu.", focus: [d2.box], at: mid(SW_BTN), click: true, hide: ["consent", "d1"], show: ["d2"],
           mark: { box: SW_BTN, r: 6 }, dur: 3.6 },
         { caption: "Kartu menampilkan nama bisnismu, tombolnya jadi Hubungkan ulang.", focus: [d2.box], mark: [{ box: d2.at.bizCard, r: 8 }, { box: d2.at.msg, r: 4 }],
-          lens: { src: [d2.X, d2.at.bizCard[1], 440, d2.at.msg[1] + d2.at.msg[3] - d2.at.bizCard[1]] }, dur: 3.6 },
+          lens: { src: [d2.X + 8, d2.at.bizCard[1] - 8, 424, d2.at.msg[1] + d2.at.msg[3] - d2.at.bizCard[1] + 16] }, dur: 3.6 },
         { caption: "Tutup jendela NikahKit: klik ×, tekan Esc, atau klik area gelap.", focus: "none", at: mid(d2.at.close), click: true, hide: ["d2", "dim"], mark: d2.at.close, note: "Tutup" },
         { caption: "Klik Periksa lagi di panel. Rail editor NikahKit muncul.", focus: [LEFT], at: mid(gb.at.recheck), click: true, show: ["open"], mark: gb.at.recheck, note: "Periksa lagi", dur: 3.6 }
       ]
@@ -908,12 +908,12 @@ export const scenes = {
         { caption: "Pilih semua isinya (Ctrl+A atau Cmd+A), lalu salin (Ctrl+C atau Cmd+C).", at: [IX + 420, IY + 240], show: ["sel"], mark: [IX - 22, IY - 8, 3 * 130 + 108, 112],
           lens: { src: [IX - 30, IY - 16, 520, 130] }, dur: 3.6 },
         { caption: "Buka folder NikahKit lama, misalnya di Dokumen. Tempel (Ctrl+V).", at: mid(sideRow(EX, EY, 1)), click: true, hide: ["newWin", "sel"], show: ["old", "replace"], mark: sideRow(EX, EY, 1),
-          lens: { src: [EX, EY + 81, 300, 120] }, dur: 3.6 },
+          lens: { src: [EX, EY + 86, 180, 106] }, dur: 3.6 },
         { caption: "Pilih Replace the files in the destination: ganti semua file.", at: mid(REPL), click: true, hide: ["replace"], show: ["pasted"], mark: { box: REPL, r: 6 }, note: "Replace the files in the destination", dur: 3.4 },
-        { caption: "Buka chrome://extensions di tab Ekstensi.", focus: [[0, 0, 600, 41], CARD], at: mid(TAB2), click: true, hide: ["old", "pasted"], show: ["ext"], mark: { box: TAB2, r: 9 }, lens: { src: [70, 0, 520, 41] } },
+        { caption: "Buka chrome://extensions di tab Ekstensi.", focus: [[0, 0, 600, 41], CARD], at: mid(TAB2), click: true, hide: ["old", "pasted"], show: ["ext"], mark: { box: TAB2, r: 9 }, lens: { src: [76, 2, 502, 39] } },
         { caption: "Klik ↻ di kartu NikahKit, di samping sakelar.", focus: [CARD], at: RELOAD, click: true, mark: { box: [RELOAD[0] - 14, RELOAD[1] - 14, 28, 28], r: 14 }, lens: { src: [384, CT + 350, 400, 64] } },
-        { caption: "Kembali ke tab editor, lalu tekan F5 (Cmd+R di Mac) untuk memuat ulang.", focus: [[0, 0, 600, 41], [0, CT + 44, 400, 48]], at: mid(TAB1), click: true, hide: ["ext"], show: ["code"], mark: { box: TAB1, r: 9 }, lens: { src: [70, 0, 520, 41] } },
-        { caption: "Klik tab NikahKit. Banner update hilang: NikahKit sudah versi terbaru.", focus: [LEFT], at: TAB_NK, click: true, show: ["after"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] }, dur: 3.8 }
+        { caption: "Kembali ke tab editor, lalu tekan F5 (Cmd+R di Mac) untuk memuat ulang.", focus: [[0, 0, 600, 41], [0, CT + 44, 400, 48]], at: mid(TAB1), click: true, hide: ["ext"], show: ["code"], mark: { box: TAB1, r: 9 }, lens: { src: [76, 2, 502, 39] } },
+        { caption: "Klik tab NikahKit. Banner update hilang: NikahKit sudah versi terbaru.", focus: [LEFT], at: TAB_NK, click: true, show: ["after"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 170] }, dur: 3.8 }
       ]
     };
   })()
