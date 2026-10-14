@@ -25,10 +25,11 @@ const prof = fs.mkdtempSync("/tmp/frames-prof-");
 const chrome = spawn(CHROME, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${prof}`, `--window-size=${vw},${vh}`, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let target;
-for (let i = 0; i < 50 && !target; i++) {
+for (let i = 0; i < 300 && !target; i++) { // up to 60 s: Chrome starts slowly when many captures run at once
   await sleep(200);
   try { const port = fs.readFileSync(path.join(prof, "DevToolsActivePort"), "utf8").split("\n")[0]; target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === "page"); } catch {}
 }
+if (!target) { chrome.kill(); throw new Error(`Chrome tidak siap dalam 60 dtk: ${CHROME}`); }
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((r) => ws.addEventListener("open", r));
 let id = 0; const pending = new Map(), anims = new Set();
@@ -48,7 +49,9 @@ const shoot = async (label, ms) => {
     await send("Animation.setPaused", { animations: ids, paused: true });
     await send("Animation.seekAnimations", { animations: ids, currentTime: ms });
   }
-  await sleep(200);
+  // Two animation frames after the seek, so the capture shows the seeked state even on a loaded machine.
+  await send("Runtime.evaluate", { expression: "new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))", awaitPromise: true });
+  await sleep(100);
   const r = await send("Page.captureScreenshot", { format: "png" });
   const p = path.join(outDir, `${name}-${label}.png`);
   fs.writeFileSync(p, Buffer.from(r.result.data, "base64"));
