@@ -535,7 +535,7 @@ export const scenes = {
           show: ["copied"], lens: { src: helpLens(btns, SLT, 8) } },
         { caption: "Kirim laporannya ke admin: tempel di WhatsApp, atau Kirim lewat WhatsApp.", dur: 3.6, focus: at(sl.pos.wa, SLT), mark: at(sl.pos.wa, SLT),
           lens: { src: helpLens(sl.pos.wa, SLT) } },
-        { caption: "Tutup Bantuan: klik × di kanan atas, atau tekan Esc.", focus: [200, 92, 199, 62], mark: XBOX, at: mid(XBOX), click: true,
+        { caption: "Tutup Bantuan: klik × di kanan atas, atau tekan Esc.", focus: [72, 92, 327, 62], mark: XBOX, at: mid(XBOX), click: true,
           hide: ["sheet", "body", "salin", "copied", "cover"], lens: { src: [200, 96, 199, 54] } }
       ]
     };
@@ -648,7 +648,7 @@ export const scenes = {
       { caption: "Cari kelompok pertanyaanmu, misalnya Masa aktif dan refund.", dur: 3.4, focus: [316, H2_AKTIF[1] - 6, 780, 230], mark: H2_AKTIF },
       { caption: "Klik pertanyaannya. Jawaban terbuka di bawah judulnya.", dur: 3.8, focus: [316, Q1[1], 780, 134], mark: Q1, at: [560, Q1[1] + 21], click: true, show: ["open"],
         lens: { src: [330, Q1[1] + 44, 740, 90], zoom: 1.5, at: [110, 420] } },
-      { caption: "Buka tautan untuk detail: klik Masuk dan bayar.", dur: 3.8, focus: [grow(FAQ_LINK, 8), [316, T + 98, 780, 56], MDB_SIDE], mark: { box: FAQ_LINK, r: 2 },
+      { caption: "Buka tautan untuk detail: klik Masuk dan bayar.", dur: 3.8, focus: [[316, T + 98, 780, 56], MDB_SIDE], mark: { box: FAQ_LINK, r: 2 },
         at: mid(FAQ_LINK), click: true, show: ["mdb"],
         note: "Tautan: Masuk dan bayar" }
     ]
@@ -711,7 +711,7 @@ export const scenes = {
         wa: { svg: waScreen(cmpTop), skel: true, enter: "fade", delay: 0.25 }
       },
       steps: [
-        { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", dur: D[0], focus: [[0, 554, 72, 346], [0, 92, 399, 140]], mark: { box: HELP, r: 6 },
+        { caption: "Buka Bantuan di editor: klik Bantuan di bagian bawah rel NikahKit.", dur: D[0], focus: [0, 92, 399, 140], mark: { box: HELP, r: 6 },
           at: mid(HELP), click: true, show: ["sheet", "body", "cover"], lens: { src: [0, 92, 399, 150], at: [330, 60] } },
         { caption: "Gulir ke tombol laporan: Salin laporan dan Kirim lewat WhatsApp.", dur: D[1], focus: at([16, BTNS[1], 351, 80], KW_S), mark: at([16, BTNS[1], 351, 80], KW_S),
           scroll: { id: "body", dy: KW_S }, show: ["waBtn"], lens: { src: helpLens([16, BTNS[1], 351, 80], KW_S) } },
@@ -744,7 +744,7 @@ export const scenes = {
         note: "Tempel: Ctrl+V" },
       { caption: "Periksa sebelum kirim: tanpa PIN, kode staff, atau data klien.", dur: 3.8, focus: CMP_AREA, mark: { box: CMP_BOX, r: 8 },
         note: "Jangan kirim PIN, kode staff, atau data klien" },
-      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [[BUB.x - 250, BUB.y - 170, BUB.w + 260, BUB.h + 180], [WC + 1, 838, 1440 - WC - 1, 62], SEND_BOX],
+      { caption: "Klik kirim. Admin membalas di chat yang sama.", dur: 3.8, focus: [[BUB.x - 250, BUB.y - 170, BUB.w + 260, BUB.h + 180], [WC + 1, 838, 1440 - WC - 1, 62]],
         mark: { box: SEND_BOX, r: 21 }, at: SEND, click: true, hide: ["shot", "end", "typed1", "typed2"], show: ["empty", "sent"] }
     ]
   }
