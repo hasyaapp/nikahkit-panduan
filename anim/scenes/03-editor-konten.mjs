@@ -370,7 +370,7 @@ export const scenes = {
     els: { pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.6, skel: true }, sBtn: { svg: simpanBtn(), skel: true } },
     steps: [
       { caption: "Lihat hasilnya di pratinjau: nama yang kamu ketik langsung tampil.", focus: F.pv, mark: [784, 420, 276, 46], show: ["pvName"], at: [922, 560], dur: 3.4 },
-      { caption: "Status Tersimpan di kolom kiri? Klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, click: true, press: "sBtn" }
+      { caption: "Status Tersimpan di kolom kiri? Klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
     ]
   },
 
@@ -414,7 +414,7 @@ export const scenes = {
     steps: [
       { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: [326, 511, 41, 18], r: 9 }, lens: { src: [226, 330, 150, 236] }, at: [346, 520] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", mark: railM("Konten"), lens: { src: [80, 161, 295, 80], at: [290, 90] }, show: ["konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
-      { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, click: true, press: "sBtn" }
+      { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
     ]
   },
 
@@ -527,7 +527,7 @@ export const scenes = {
         { caption: "Klik Sampul. Pilih Foto sampul; teks sampul boleh dibiarkan kosong.", mark: accM(yS), lens: { src: [80, yS - 8, 295, 140] }, hide: ["v2"], show: ["v3"], scroll: { id: "v2d", dy: -(dyA + D6) }, at: [190, yS + 25], click: true, dur: 3.6 },
         { caption: "Klik Salam Pembuka dan pilih Preset salam. Lalu buka Ayat / Kutipan.", mark: accM(420), lens: { src: [80, 412, 295, 150] }, hide: ["v2d"], show: ["v4"], scroll: { id: "v3", dy: D8 }, at: [190, 445], click: true, dur: 3.6 },
         { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: [317, y5 + 16, 37, 18 + 58 * 5], r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
-          lens: { src: [96, y5 + 4, 270, 216] }, hide: ["v3"], show: ["v5"], at: ED.simpan, click: true, press: "sBtn", dur: 3.8 }
+          lens: { src: [96, y5 + 4, 270, 216] }, hide: ["v3"], show: ["v5"], at: ED.simpan, press: "sBtn", dur: 3.8 }
       ]
     };
   })(),
@@ -674,7 +674,7 @@ export const scenes = {
         { caption: "Klik Video. Ganti Tautan YouTube dengan video klien.", focus: F.body, mark: accM(330), lens: { src: [80, 322, 295, 320] }, hide: ["after"], scroll: { id: "vK", dy: DK }, at: [190, 355], click: true, show: ["vV"], dur: 3.6 },
         { caption: "Isi Dress Code dan Susunan Acara bila dipakai.", mark: accM(330), lens: { src: [80, 322, 295, 250] }, hide: ["vK"], scroll: { id: "vV", dy: DV }, at: [190, 355], click: true, show: ["vD"], dur: 3.6 },
         { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", focus: [F.body, F.foot, F.save], mark: [{ box: [317, 207, 37, 18 + 58 * 8], r: 9 }, FOOT, { box: SIMPAN, r: 4 }],
-          lens: { src: [96, 195, 270, 216] }, hide: ["vV"], show: ["vAll"], at: ED.simpan, click: true, press: "sBtn", dur: 3.8 }
+          lens: { src: [96, 195, 270, 216] }, hide: ["vV"], show: ["vAll"], at: ED.simpan, press: "sBtn", dur: 3.8 }
       ]
     };
   })(),
@@ -740,7 +740,7 @@ export const scenes = {
         { caption: "Isi Turut Mengundang dan Salam Penutup.", focus: [72, turutY - 8, 327, 908 - turutY], mark: accM(turutY), lens: { src: [80, turutY - 8, 295, 140] }, at: [190, turutY + 25], click: true, show: ["vF"], dur: 3.4 },
         { caption: "Periksa Kaki Halaman: nama brand dan WhatsApp pemesanan milik usahamu.", focus: F.body, mark: accM(330), lens: { src: [93, 322, 270, brandY + 44 - 322] },
           hide: ["gifts", "waClear", "waTyped"], scroll: { id: "vF", dy: D8 }, at: [190, 355], click: true, show: ["vKaki"], dur: 3.8 },
-        { caption: "Simpan: tunggu status Tersimpan, lalu klik Simpan di Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, hide: ["vF"], at: ED.simpan, click: true, press: "sBtn" }
+        { caption: "Simpan: tunggu status Tersimpan, lalu klik Simpan di Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, hide: ["vF"], at: ED.simpan, press: "sBtn" }
       ]
     };
   })()
