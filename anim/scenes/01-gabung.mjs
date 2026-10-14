@@ -337,7 +337,7 @@ function scanScreen(x, y) {
 // preview shows the real UI at 1:1; mark and lens point at the element the row is about.
 // pv(svg, sx, sy, mark, o): svg in its own coordinates, its point (sx, sy) lands on the pane's inner top-left.
 const PANE = { x: 600, y: 40, w: 800, h: 820, pad: 16 };
-const pv = (svg, sx, sy, mark, o = {}) => ({ svg, sx, sy, mark, r: o.r ?? 4, more: o.more ?? [], lens: o.lens ?? grow(mark, 24), lensAt: o.lensAt });
+const pv = (svg, sx, sy, mark, o = {}) => ({ svg, sx, sy, mark, r: o.r ?? 4, more: o.more ?? [], lens: o.lens ?? grow(mark, 24), lensAt: o.lensAt, zoom: o.zoom ?? 2 });
 function checklist(title, heading, sub, rows) {
   const x = 40, w = 520, y0 = 150, n = rows.length, RH = Math.min(96, Math.floor((860 - y0) / n)), bh = RH - 12;
   const base = [PHOTO_DEFS, rect(0, 0, W, 900, { fill: "#f7f3ef" }), text(x, 78, heading, { size: 34, weight: 700, fill: C.cocoa }), text(x, 114, sub, { size: 18, fill: "#6f675f" }),
@@ -353,14 +353,14 @@ function checklist(title, heading, sub, rows) {
     const marks = [{ box: sh(p.mark), r: p.r }, ...p.more.map(([b, r]) => ({ box: sh(b), r: r ?? 4 }))];
     els["p" + i] = { svg: clipped(PANE.x + 1, PANE.y + 1, PANE.w - 2, PANE.h - 2, group({ transform: `translate(${dx} ${dy})` }, p.svg)), enter: "fade" };
     steps.push({ caption, dur: 3.4, focus: [[x - 4, y - 4, w + 8, bh + 8], [PANE.x, PANE.y, PANE.w, PANE.h]], show: ["k" + i, "p" + i], hide: i ? ["p" + (i - 1)] : [],
-      mark: marks, lens: { src: sh(p.lens), at: p.lensAt ?? lensSpot(p.lens, marks.map((m) => m.box)) } });
+      mark: marks, lens: { src: sh(p.lens), zoom: p.zoom, at: p.lensAt ?? lensSpot(p.lens, marks.map((m) => m.box), p.zoom) } });
   });
   return { title, base, els, steps };
 }
 // Lens inside the pane, clear of the marks: centred in the larger band above or below them, else beside them
 // (stage coordinates, scale 2/3).
-function lensSpot(src, boxes) {
-  const S = 2 / 3, lw = src[2] * 4 / 3, lh = src[3] * 4 / 3, g = 6;
+function lensSpot(src, boxes, zoom) {
+  const S = 2 / 3, lw = src[2] * zoom * S, lh = src[3] * zoom * S, g = 6;
   const m = [Math.min(...boxes.map((b) => b[0])) - g, Math.min(...boxes.map((b) => b[1])) - g, Math.max(...boxes.map((b) => b[0] + b[2])) + g, Math.max(...boxes.map((b) => b[1] + b[3])) + g].map((v) => v * S);
   const P = [PANE.x * S + 8, PANE.y * S + 8, (PANE.x + PANE.w) * S - 8, (PANE.y + PANE.h) * S - 8];
   const cx = Math.min(P[2] - lw, Math.max(P[0], (P[0] + P[2]) / 2 - lw / 2)), cy = Math.min(P[3] - lh, Math.max(P[1], (m[1] + m[3]) / 2 - lh / 2));
@@ -418,7 +418,7 @@ export const scenes = {
   "mulai-alur-undangan": checklist("Bagian 3: buat undangan", "Bagian 3: Buat undangan", "Langkah 11 sampai 15.", [
     ["11. Kenali editor NikahKit", "Rail kiri: Template, Gaya, Audio, Media, Lapisan, Konten.", pv(edLeft(tplPanel()), -184, 92, [0, 104, 72, 332], { lens: [0, 98, 72, 342] })],
     ["12. Pilih template", "Pilih template di panel Template.", PV.template()],
-    ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(kontenP(), { rail: "Konten" }), -184, 92, KONTEN_TOP3, { lens: grow(KONTEN_TOP3, 8) })],
+    ["13. Isi Konten", "Isi Konten: mulai dari sampul, mempelai, dan acara.", pv(edLeft(kontenP(), { rail: "Konten" }), -184, 92, KONTEN_TOP3, { lens: grow(KONTEN_TOP3, 8), zoom: 1.5 })],
     ["14. Rapikan foto, musik, gaya, dan lapisan", "Rapikan lewat Gaya, Audio, Media, dan Lapisan di rail kiri.", pv(edLeft(tplPanel()), -184, 92, [0, 160, 72, 220], { lens: [0, 156, 72, 228] })],
     ["15. Simpan & Terbitkan", "Tekan Simpan & Terbitkan supaya tamu melihat versi terbaru.",
       pv(scalevEditor(0, 0, { tab: "NikahKit" }) + nkOpen(0) + pvCover("Rani & Dimas"), 672, 0, ED.terbitkanBox, { lens: grow(SAVE_PAIR, 5) })]
