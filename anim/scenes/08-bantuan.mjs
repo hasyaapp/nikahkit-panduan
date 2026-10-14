@@ -4,58 +4,24 @@
 // Editor: /tmp/ref/editor-bantuan.png + editor-metrics.json, gaya dari ui/styles.js. docs.page: diukur di Chromium
 // 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (ui/scalev.mjs).
 // WhatsApp Web: tata letak umum, belum diukur.
-import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, wrap, esc, PHONE } from "../lib.mjs";
-import { nkBtn, nkBtnBox, nkInput, nkLabel, nkAcc, nkH3, chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
+import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, wrap, mid, grow, esc, PHONE } from "../lib.mjs";
+import { nkBtn, nkBtnBox, nkH3, chrome, favScalev, scalevEditor, svSimpan, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
 import { CHECKS, helpBody, dlgSheet, dlgHead, dlgView } from "../ui/bantuan.mjs";
 import { securityPanel, SECURITY } from "../ui/scalev.mjs";
+import { ACCOUNT, kList } from "../ui/editor-panels.mjs";
+import { MAROON, SERIF, CREAM, PHOTO_DEFS, pvMempelai, secTitle, dock } from "../ui/invitation.mjs";
 
-// Text with mixed weight: parts are strings or { t, w, fill, u }.
-const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 14}" fill="${o.fill ?? C.strong}" xml:space="preserve">${parts.map((p) => typeof p === "string" ? esc(p)
-  : `<tspan${p.w ? ` font-weight="${p.w}"` : ""}${p.fill ? ` fill="${p.fill}"` : ""}${p.u ? ` text-decoration="underline"` : ""}>${esc(p.t)}</tspan>`).join("")}</text>`;
 const tr = (dx, dy, ...kids) => group({ transform: `translate(${dx} ${dy})` }, ...kids);
 const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
-const grow = (b, d) => [b[0] - d, b[1] - d, b[2] + 2 * d, b[3] + 2 * d];
-const mid = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
 
-// ---- Pratinjau undangan (template QA di editor-bantuan.png, data contoh) -------------------------------------------
-const MAROON = "#8a2c22", SCRIPT = "'Great Vibes','Brush Script MT','Snell Roundhand',cursive", SERIF = "Georgia,'Times New Roman',serif";
-const scallops = (x, y) => clipped(x, y, 390, 40, rect(x, y, 390, 20, { fill: MAROON }) + Array.from({ length: 13 }, (_, k) => circle(x + 15 + k * 30, y + 20, 15, { fill: MAROON })).join(""));
-function invitation(x, y) {
-  const cx = x + 195;
-  let s = scallops(x, y);
-  s += text(cx, y + 165, "Mempelai", { size: 48, fill: MAROON, anchor: "middle", font: SCRIPT, italic: true }) +
-    `<path d="M${cx - 90} ${y + 442} V${y + 292} a90 90 0 0 1 180 0 V${y + 442} Z" fill="#ead8cf" stroke="${MAROON}" stroke-width="1.5"/>` +
-    `<path d="M${cx - 76} ${y + 441} q0 -78 76 -78 q76 0 76 78 Z" fill="#9e2f35"/>` + circle(cx, y + 318, 36, { fill: "#c9a596" }) +
-    text(cx, y + 500, "Rani", { size: 36, fill: MAROON, anchor: "middle", font: SCRIPT, italic: true }) +
-    text(cx, y + 537, "Rani Ayu, S.Psi.", { size: 16, weight: 700, fill: "#111", anchor: "middle", font: SERIF }) +
-    text(cx, y + 562, "Psikolog", { size: 14, fill: "#333", anchor: "middle", font: SERIF }) +
-    text(cx, y + 588, "Putri kedua dari Bapak Ahmad & Almh. Ibu Siti", { size: 16, fill: "#111", anchor: "middle", font: SERIF }) +
-    text(cx, y + 614, "Jakarta", { size: 16, fill: "#111", anchor: "middle", font: SERIF }) +
-    rect(cx - 54, y + 626, 108, 36, { r: 18, fill: MAROON }) + icon("instagram", cx - 32, y + 644, 14, C.white) + text(cx + 8, y + 649, "@rani.ayu", { size: 13, fill: C.white, anchor: "middle", font: SERIF });
-  return s + bottomNav(x, y + 704);
-}
-const bottomNav = (x, y) => rect(x + 36, y, 318, 70, { r: 16, fill: MAROON }) + rect(x + 46, y + 9, 58, 52, { r: 10, fill: "rgba(255,255,255,.16)" }) +
-  [["heart", "Mempelai"], ["calendar", "Acara"], ["image", "Galeri"], ["message-circle", "Ucapan"], ["gift", "Hadiah"]].map(([ic, l], i) =>
-    icon(ic, x + 75 + i * 60, y + 26, 18, C.white) + text(x + 75 + i * 60, y + 51, l, { size: 11, fill: C.white, anchor: "middle", font: SERIF })).join("");
-const PREVIEW = invitation(ED.screen.x, ED.screen.y);
-
-// ---- Panel Konten (editor-konten.png): Bahasa undangan, lead, grup akordeon ---------------------------------------
-function kontenBody(dy = 0) {
-  const y = 169 + dy;
-  return nkLabel(88, y + 12, "Bahasa undangan") + nkInput(88, y + 20, 279, "Indonesia", { select: true }) +
-    para(88, y + 76, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
-    rich(88, y + 120, ["Urutan dan tampilan bagian di ", { t: "Lapisan", w: 500, u: true }, "."], { size: 12, fill: C.faint }) +
-    ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Simpan Tanggal", "Hitung Mundur", "Galeri Foto", "Rangkaian Acara", "RSVP & Ucapan"]
-      .map((t, i) => (y + 136 + i * 58 < 890 ? nkAcc(88, y + 136 + i * 58, 279, t, { badge: "Terisi" }) : "")).join("");
-}
-// Panel NikahKit lengkap (rel + Konten) di atas editor; chip akun memakai nama paket member.
-const PLAN = "Tahunan";
-const panelKonten = (o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: PLAN }) +
-  line(72, 153.5, 399, 153.5, { stroke: C.line }) + (o.top ?? "") + clipped(72, 154, 327, 746, kontenBody(o.dy ?? 0));
-const editorKonten = (o = {}) => scalevEditor(0, 0, { rail: "Konten", ...o }) + PREVIEW + panelKonten(o);
-// Editor element boxes (marks): Scalev tabs, Simpan, rail Bantuan, the close × of a panel-wide dialog.
+// The editor as these scenes open it: the invitation's Mempelai section in the preview, rail on Konten, the Konten panel
+// (every group filled, all closed). Konten's list can sit lower (dy) under a note at the panel top.
+const PREVIEW = PHOTO_DEFS + pvMempelai({ city: "Jakarta", ig: "@rani.ayu" });
+const kontenBody = (dy = 0) => kList({ left: 0, dy: -dy }).svg;
+const panelKonten = () => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kontenBody();
+const editorKonten = (o = {}) => scalevEditor(0, 0, { rail: "Konten", ...o }) + PREVIEW + panelKonten();
+// Editor element boxes (marks): Scalev tabs, rail Bantuan, the close × of a panel-wide dialog.
 const TAB = { Security: [101, 54, 69, 38], NikahKit: [224, 54, 88, 38] };
-const SIMPAN = [1193, 50, 82, 34];
 const HELP = [6, 800, 60, 44];
 const XBOX = [357, 111, 22, 22];
 const TABROW = [0, 44, 399, 48];
@@ -101,9 +67,9 @@ const editorSecurity = (o = {}) => scalevEditor(0, 0, { tab: "Security" }) + PRE
 // ---- bantuan-cek-gejala: AccessGate ----------------------------------------------------------------------------------
 function gate(lines, o = {}) {
   let s = rect(0, 92, 398, 808, { fill: C.white }) + text(16, 128, "NikahKit", { size: 16, weight: 700, fill: C.strong }) +
-    (o.chip ? chip(262, 108, PLAN) : "") + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
+    (o.chip ? chip(262, 108, ACCOUNT) : "") + iconX("x", 368, 122, 18, C.text) + line(0, 153.5, 398, 153.5, { stroke: C.line });
   const h = 20 + lines.length * 18, fg = o.warn ? C.warnStrong : C.strong;
-  s += rect(16, 169, 351, h, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + lines.map((l, i) => rich(28, 192 + i * 18, l, { size: 12, fill: fg })).join("");
+  s += rect(16, 169, 351, h, { r: 4, fill: o.warn ? C.warnSoft : C.primarySoft }) + lines.map((l, i) => text(28, 192 + i * 18, l, { size: 12, fill: fg })).join("");
   return s + (o.buttons ?? "");
 }
 const chip = (x, y, label, warn) => rect(x + 0.5, y + 0.5, 79, 27, { r: 14, fill: warn ? C.warnSoft : C.white, stroke: warn ? "#fde7c7" : C.field }) +
@@ -123,8 +89,8 @@ const renewNote = (lines, err) => {
 const RN_WARN = renewNote(["Langganan berakhir 5 hari", "lagi."]);
 const RN_ERR = renewNote(["Langganan berakhir. 6 hari", "lagi ucapan, RSVP, dan", "Dashboard berhenti."], true);
 const CHIP = [262, 108, 80, 28];
-const panelWith = (rn) => rect(72, 154, 327, 746, { fill: C.white }) + rn.svg + clipped(72, 154, 327, 746, kontenBody(rn.h + 12)) +
-  rect(262, 108, 81, 29, { fill: C.white }) + chip(262, 108, PLAN, true);
+const panelWith = (rn) => rect(72, 154, 327, 746, { fill: C.white }) + kontenBody(rn.h + 12) + rn.svg +
+  rect(262, 108, 81, 29, { fill: C.white }) + chip(262, 108, ACCOUNT, true);
 // Guide timeline (not part of the UI), in the grey preview area left of the invitation.
 const TL = { x: 435, y: 136, w: 256 };
 const TL_ROWS = [["Aktif", "Semua fitur jalan", C.ok], ["7 hari terakhir", "Panel mengingatkan", C.changed], ["Tenggang 7 hari", "Fitur masih jalan", C.warn], ["Habis", "RSVP dan ucapan berhenti", C.danger]];
@@ -135,6 +101,9 @@ const timeline = shadow(TL.x, TL.y, TL.w, 330, 10, 2) + rect(TL.x, TL.y, TL.w, 3
     text(TL.x + 50, tlY(i) + 33, sub, { size: 12, fill: C.faint })).join("");
 const tlBox = (i) => [TL.x + 14, tlY(i) - 6, TL.w - 28, 48];
 const GATE_EXP_BTN = nkBtnBox(16, 237, "Pilih paket", { size: 14 });
+// The gate's message and buttons (169..273); ends at 278, above the Konten text the gate covers (a focus edge through
+// text under it would let a sliver of that text through the anti-aliased edge).
+const GATE_AREA = [0, 154, 399, 124];
 const pilihBtn = nkBtn(16, 237, "Pilih paket", { w: GATE_EXP_BTN[2], size: 14 });
 const GATE_EXPIRED = gate([[{ t: "Langganan NikahKit sudah habis.", w: 700 }, " Undangan tayang"], ["tetap tampil."]], {
   warn: true, chip: true, buttons: pilihBtn + nkBtn(24 + GATE_EXP_BTN[2], 237, "Periksa lagi", { variant: "quiet", size: 14 })
@@ -148,7 +117,7 @@ function accountWindow() {
   return shadow(x, y, w, AW_H, 8, 3) + rect(x, y, w, AW_H, { r: 8, fill: C.white }) +
     rect(x + 16, y + 16, 32, 32, { r: 7, fill: "#4a9de8" }) + circle(x + 27, y + 32, 6.5, { stroke: C.white, sw: 2.6 }) + circle(x + 37, y + 32, 6.5, { stroke: C.white, sw: 2.6 }) +
     text(x + 58, y + 38, "NikahKit", { size: 16, weight: 700, fill: C.strong }) + iconX("x", x + w - 30, y + 30, 18, C.text) +
-    text(x + 16, y + 76, "rina@contoh.com", { size: 12, weight: 700, fill: C.faint }) + text(x + w - 16, y + 76, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
+    text(x + 16, y + 76, "rina.wo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(x + w - 16, y + 76, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
     rect(x + 16.5, y + 92.5, w - 33, AW_PH, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, y + 92 + 28, "Paket") +
     para(x + 33, y + 92 + 54, AW_LIC, { size: 14, fill: C.warnStrong, lh: 20 }) + nkBtn(x + 33, y + 92 + 40 + AW_LIC.length * 20 + 8, "Pilih paket", { size: 14 }) +
     rect(x + 16.5, AW_BY + 0.5, w - 33, 121, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, AW_BY + 28, "Bisnis Scalev") +
@@ -156,11 +125,14 @@ function accountWindow() {
 }
 
 // ---- bantuan-masa-aktif-tamu: published invitation, section Ucapan (runtime labels from the template build) ----------
+// The invitation's section title and Menu bawah (ui/invitation.mjs, drawn for the editor preview) moved onto the phone;
+// the dock sits 60 px lower on the taller phone screen. The Ucapan form is scene-local.
 const PX = PHONE.x, PY = PHONE.y, PCX = PX + 195, FX = PX + 32, FW = 326;
+const onPhone = (svg, dy = 0) => tr(PX - ED.screen.x, PY - ED.screen.y + dy, svg);
 function guestPhone(closed) {
-  let s = rect(PX, PY, 390, 844, { fill: "#fdf6ee" }) + scallops(PX, PY) +
-    text(PCX, PY + 110, "Ucapan", { size: 46, fill: MAROON, anchor: "middle", font: SCRIPT, italic: true });
-  if (closed) return s + rect(FX, PY + 150, FW, 96, { r: 12, fill: C.white, stroke: "#ead8cf" }) + text(PCX, PY + 205, "Ucapan & RSVP sudah ditutup.", { size: 16, fill: "#333", anchor: "middle", font: SERIF }) + bottomNav(PX, PY + 762);
+  let s = rect(PX, PY, 390, 844, { fill: CREAM }) + onPhone(secTitle("Ucapan"));
+  const nav = onPhone(dock("Ucapan"), 60);
+  if (closed) return s + rect(FX, PY + 150, FW, 96, { r: 12, fill: C.white, stroke: "#ead8cf" }) + text(PCX, PY + 205, "Ucapan & RSVP sudah ditutup.", { size: 16, fill: "#333", anchor: "middle", font: SERIF }) + nav;
   const lab = (yy, l) => text(FX, yy, l, { size: 14, fill: "#333", font: SERIF });
   const fld = (yy, h = 40) => rect(FX + 0.5, yy + 0.5, FW - 1, h, { r: 8, fill: C.white, stroke: "#d8c6bd" });
   s += lab(PY + 170, "Nama") + fld(PY + 180) + lab(PY + 250, "Konfirmasi kehadiran") +
@@ -168,7 +140,7 @@ function guestPhone(closed) {
       text(FX + 52 + i * 110, PY + 285, l, { size: 13, fill: i ? MAROON : C.white, anchor: "middle", font: SERIF })).join("") +
     lab(PY + 330, "Jumlah yang hadir") + fld(PY + 340) + text(FX + 14, PY + 366, "1 orang", { size: 14, fill: "#333", font: SERIF }) + icon("chevron-down", FX + FW - 18, PY + 360, 16, "#333") +
     lab(PY + 410, "Ucapan & doa") + fld(PY + 420, 96) + rect(FX, PY + 532, FW, 44, { r: 22, fill: MAROON }) + text(PCX, PY + 559, "Kirim", { size: 15, fill: C.white, anchor: "middle", font: SERIF });
-  return s + bottomNav(PX, PY + 762);
+  return s + nav;
 }
 const FORM = [FX - 4, PY + 150, FW + 8, 432];
 const CLOSED = [FX, PY + 150, FW, 96];
@@ -476,7 +448,7 @@ export const scenes = {
     steps: [
       { caption: "Klik Salin domain kurang. Muncul Tersalin. Tempel di tab Security.", dur: 3.8, focus: CSP_AREA, mark: at(iz.pos.salinCsp, IZ1), at: mid(at(iz.pos.salinCsp, IZ1)),
         click: true, press: "salinCsp", show: ["copied"], lens: { src: [0, iz.pos.csp[2][1] - IZ1 - 8, 399, iz.pos.cspMsg[1] + 32 - iz.pos.csp[2][1]] } },
-      { caption: "Buka tab Security, tempel, lalu Simpan (dua animasi berikutnya).", dur: 3.2, focus: [TABROW, [1183, 44, 257, 48]], mark: [TAB.Security, SIMPAN],
+      { caption: "Buka tab Security, tempel, lalu Simpan (dua animasi berikutnya).", dur: 3.2, focus: [TABROW, [1183, 44, 257, 48]], mark: [TAB.Security, ED.simpanBox],
         lens: { src: [0, 46, 330, 46] } },
       { caption: "Kembali ke Bantuan, klik Periksa ulang: Diperiksa ulang, Sudah diizinkan.", dur: 4.2, focus: [CSP_AREA, helpLens(izF.pos.rows["Izin domain di tab Security"], IZF, 2)],
         mark: at(iz.pos.periksa, IZ1), at: mid(at(iz.pos.periksa, IZ1)),
@@ -514,11 +486,11 @@ export const scenes = {
     cursorStart: [1300, 400],
     base: [editorSecurity({ at: "image", images: 1 })],
     els: {
-      simpan: rect(SIMPAN[0], SIMPAN[1], SIMPAN[2], SIMPAN[3], { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong)
+      simpan: svSimpan()
     },
     steps: [
-      { caption: "Simpan ada di kanan atas editor Scalev, di kiri Simpan & Terbitkan.", dur: 3.4, focus: [1183, 44, 257, 48], mark: SIMPAN, lens: { src: [1150, 46, 290, 44] } },
-      { caption: "Klik Simpan supaya domain yang kamu tempel tersimpan.", dur: 3.2, mark: SIMPAN, at: mid(SIMPAN), click: true, press: "simpan", lens: { src: [1150, 46, 290, 44] } }
+      { caption: "Simpan ada di kanan atas editor Scalev, di kiri Simpan & Terbitkan.", dur: 3.4, focus: [1183, 44, 257, 48], mark: ED.simpanBox, lens: { src: [1150, 46, 290, 44] } },
+      { caption: "Klik Simpan supaya domain yang kamu tempel tersimpan.", dur: 3.2, mark: ED.simpanBox, at: mid(ED.simpanBox), click: true, press: "simpan", lens: { src: [1150, 46, 290, 44] } }
     ]
   },
 
@@ -605,25 +577,25 @@ export const scenes = {
       { caption: "Lewat tanggal berakhir: tenggang 7 hari. Fitur masih jalan, segera perpanjang.", dur: 3.8, focus: [tlBox(2), grow(RN_ERR.box, 6), grow(CHIP, 4)],
         mark: [{ box: RN_ERR.box }, { box: tlBox(2), r: 8 }],
         hide: ["warn"], show: ["err"], lens: { src: [72, 100, 327, 154], at: [480, 330] } },
-      { caption: "Lewat tenggang: RSVP, ucapan, dan Dashboard pasangan berhenti.", dur: 3.6, focus: [tlBox(3), [0, 154, 399, 130], grow(CHIP, 4)],
+      { caption: "Lewat tenggang: RSVP, ucapan, dan Dashboard pasangan berhenti.", dur: 3.6, focus: [tlBox(3), GATE_AREA, grow(CHIP, 4)],
         mark: [{ box: GATE_MSG }, { box: tlBox(3), r: 8 }], hide: ["err"],
-        show: ["expired", "pilih"], lens: { src: [0, 154, 399, 130], zoom: 1.6, at: [480, 330] } },
-      { caption: "Klik Pilih paket, lalu bayar. RSVP dan ucapan jalan lagi.", dur: 4, focus: [0, 154, 399, 130], mark: GATE_EXP_BTN, at: mid(GATE_EXP_BTN), click: true,
-        press: "pilih", show: ["acct"], lens: { src: [0, 154, 399, 130], zoom: 1.6, at: [480, 440] } }
+        show: ["expired", "pilih"], lens: { src: GATE_AREA, zoom: 1.6, at: [480, 330] } },
+      { caption: "Klik Pilih paket, lalu bayar. RSVP dan ucapan jalan lagi.", dur: 4, focus: GATE_AREA, mark: GATE_EXP_BTN, at: mid(GATE_EXP_BTN), click: true,
+        press: "pilih", show: ["acct"], lens: { src: GATE_AREA, zoom: 1.6, at: [480, 440] } }
     ]
   },
 
   "bantuan-masa-aktif-tamu": {
     title: "Halaman tamu saat masa aktif habis",
     cursorStart: [PX + 340, PY + 700],
-    base: [phoneDesk(guestPhone(false), { screen: "#fdf6ee" })],
+    base: [phoneDesk(guestPhone(false), { screen: CREAM })],
     els: {
       closed: { svg: clipped(PX, PY, 390, 844, guestPhone(true)), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Selama paket aktif, tamu bisa mengisi kehadiran dan Ucapan & doa.", dur: 3.4, focus: FORM, mark: { box: FORM, r: 12 },
+      { caption: "Selama paket aktif, tamu bisa mengisi kehadiran dan Ucapan & doa.", dur: 3.4, focus: [PX, PY, 390, 844], mark: { box: FORM, r: 12 },
         lens: { src: [FX - 8, PY + 229, FW + 16, 161], zoom: 1.4, at: [625, 230] } },
-      { caption: "Lewat tenggang, halaman tetap tampil. Form menulis Ucapan & RSVP sudah ditutup.", dur: 4, focus: grow(CLOSED, 8), mark: { box: CLOSED, r: 12 }, show: ["closed"],
+      { caption: "Lewat tenggang, halaman tetap tampil. Form menulis Ucapan & RSVP sudah ditutup.", dur: 4, mark: { box: CLOSED, r: 12 }, show: ["closed"],
         lens: { src: grow(CLOSED, 8), zoom: 1.4, at: [625, 90] } }
     ]
   },
