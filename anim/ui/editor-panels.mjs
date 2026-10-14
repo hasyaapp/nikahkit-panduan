@@ -167,8 +167,9 @@ export const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda. Undangan b
 export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ ...o, open: "Mempelai", fill: fillMempelai(nick) }).svg;
 
 // ---- Template panel ------------------------------------------------------------------------------------------------
-// Templates as cards show them (build/templates.json name + description, clamped to two lines as measured in Chromium).
-const TPL = {
+// Templates as cards show them (build/templates.json name + description, clamped to two lines as measured in Chromium):
+// TPL[id] = [name, [description line 1, line 2]].
+export const TPL = {
   dasar: ["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], folio: ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"]],
   galeri: ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"]], "modern-estetik": ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"]],
   "cute-gemoy": ["Cute Gemoy", ["Krem, foto polaroid", "berjepit, bunga kering…"]], "tradisional-elegan": ["Tradisional Elegan", ["Hitam & emas, bingkai", "lengkung, judul huruf…"]],
