@@ -54,7 +54,6 @@
 <rect x="231" y="649" width="30" height="30" rx="5" fill="none" stroke="#e0e4e9" stroke-width="2"/><rect x="282" y="657.1" width="738" height="12" rx="6" fill="#dde2e8"/><line x1="230" y1="698" x2="1210" y2="698" stroke="#e0e4e9" stroke-width="1"/>
 <rect x="231" y="717" width="30" height="30" rx="5" fill="none" stroke="#e0e4e9" stroke-width="2"/><rect x="282" y="725.1" width="458" height="12" rx="6" fill="#dde2e8"/><line x1="230" y1="766" x2="1210" y2="766" stroke="#e0e4e9" stroke-width="1"/>
 <rect x="231" y="785" width="30" height="30" rx="5" fill="none" stroke="#e0e4e9" stroke-width="2"/><rect x="282" y="793.1" width="483" height="12" rx="6" fill="#dde2e8"/><line x1="230" y1="834" x2="1210" y2="834" stroke="#e0e4e9" stroke-width="1"/>
-<g class="fz0"><use href="#db"/></g>
 <use href="#ed-k0"/>
 <use href="#ed-k1"/>
 <use href="#ed-k2"/>
@@ -65,6 +64,7 @@
 <use href="#ed-k7"/>
 <use href="#ed-k8"/>
 <use href="#ed-k9"/>
+<g class="fz0"><use href="#db"/><use href="#ed-k0"/><use href="#ed-k1"/><use href="#ed-k2"/><use href="#ed-k3"/><use href="#ed-k4"/><use href="#ed-k5"/><use href="#ed-k6"/><use href="#ed-k7"/><use href="#ed-k8"/><use href="#ed-k9"/></g>
 
 </g>
 <g class="om0_0"><rect x="142.66666666666666" y="104" width="674.6666666666666" height="133.33333333333331" rx="8" fill="none" stroke="#b8460d" stroke-width="2.5"/><circle cx="142.66666666666666" cy="104" r="10" fill="#b8460d"/><text x="142.66666666666666" y="108" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g>
