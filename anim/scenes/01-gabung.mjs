@@ -635,7 +635,7 @@ export const scenes = {
         { caption: "Buka halaman Cara pasang NikahKit di Chrome komputer.", focus: [TOOLBAR, [140, CT + 40, 1160, 140]], at: mid(urlBox(PURL)), mark: { box: urlBox(PURL), r: 3 }, lens: { src: [150, 46, 480, 36], at: [120, 200] }, dur: 3 },
         { caption: "Klik Unduh NikahKit. Chrome mengunduh ZIP NikahKit, sekitar 120 KB.", focus: [[990, CT + 50, 310, 120]], at: mid(DL), click: true, show: ["dlIcon"], mark: { box: DL, r: 16 }, lens: { src: [1004, CT + 55, 290, 110] }, dur: 3.4 },
         { caption: "Buka folder Unduhan: klik ikon unduhan di kanan atas Chrome.", focus: [[1030, 41, 410, 135]], at: DLI, click: true, show: ["bubble"], mark: { box: DLI_BOX, r: 14 }, lens: { src: [1040, 44, 380, 126] } },
-        { caption: "Klik ikon folder di sebelah nama file. Folder Unduhan terbuka.", focus: [[1030, 41, 410, 135], XWIN], at: FOLDER, click: true, show: ["files"], mark: FOLDER_BOX, lens: { src: [1060, 96, 330, 64] }, dur: 3.4 },
+        { caption: "Klik ikon folder di sebelah nama file. Folder Unduhan terbuka.", at: FOLDER, click: true, show: ["files"], mark: FOLDER_BOX, lens: { src: [1060, 96, 330, 64] }, dur: 3.4 },
         { caption: "Ekstrak ZIP (Windows): klik kanan file ZIP.", focus: [XWIN], at: [IX + 32, IY + 36], click: true, hide: ["bubble"], show: ["menu"], mark: SEL(IX, IY), lens: { src: [IX - 30, IY - 16, 340, 224] } },
         { caption: "Pilih Extract All... (di Windows Indonesia: Ekstrak Semua...).", at: mid(MENU_ROW), click: true, hide: ["menu"], show: ["extract"], mark: MENU_ROW, note: "Extract All..." },
         { caption: "Klik Extract. Muncul folder bernama sama dengan ZIP.", at: mid(EXTRACT), click: true, hide: ["extract"], show: ["outer"], mark: EXTRACT, note: "Extract" },
@@ -740,7 +740,7 @@ export const scenes = {
         { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, 230] } },
         { caption: "Klik Masuk dengan Google. Memeriksa login..., lalu jendela Google terbuka.", focus: [[0, CT + 160, 400, 120]], at: mid(g.at.google), click: true,
           show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [0, CT + 160, 330, 120] }, dur: 4 },
-        { caption: "Pilih akun Google: klik akunmu. Jendela Google menutup sendiri.", focus: [inn.box], at: mid(ACCT), click: true, hide: ["google", "chk", "out"], show: ["inn"],
+        { caption: "Pilih akun Google: klik akunmu. Jendela Google menutup sendiri.", focus: "none", at: mid(ACCT), click: true, hide: ["google", "chk", "out"], show: ["inn"],
           mark: ACCT, note: "Rina WO", dur: 3.6 },
         { caption: "Lihat jendela NikahKit: email Google-mu, Keluar, kartu Paket dan Bisnis.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X, inn.Y + 50, 440, 200] }, dur: 3.6 },
         { caption: "Di bawah kartu tertulis Sudah masuk. Kembali ke editor Scalev.", mark: inn.at.msg, lens: { src: [inn.X, inn.at.msg[1] - 12, 440, 62] }, dur: 3.4 }
