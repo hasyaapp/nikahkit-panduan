@@ -576,8 +576,8 @@ export const scenes = {
         { caption: "Di Dokumen, klik sekali folder NikahKit (berisi manifest.json).", focus: [[PX, PY, PW, PH]], at: [PX + 280, PY + 137], click: true, show: ["rowSel"], mark: { box: ROW, r: 5 }, lens: { src: [PX + 190, PY + 56, 330, 104] }, dur: 3.6 },
         { caption: "Klik Select. Chrome memasang NikahKit dari folder itu.", focus: [CARD], at: mid(SELECT), click: true, hide: ["picker", "rowSel"], show: ["card"], mark: { box: SELECT, r: 6 }, note: "Select" },
         { caption: "Kartu NikahKit muncul dengan sakelar biru menyala.", focus: [CARD], mark: { box: [384 + 353, CT + 203 + 175, 36, 18], r: 9 }, lens: { src: [384, CT + 362, 400, 56] }, dur: 3.4 },
-        { caption: "Sematkan (opsional): klik ikon puzzle di kanan atas Chrome.", focus: [MENUR], at: PUZ, click: true, show: ["menu"], mark: { box: [PUZ[0] - 13, 50, 26, 26], r: 13 }, lens: { src: [1036, 88, 348, 114] } },
-        { caption: "Klik ikon pin di samping NikahKit. Ikonnya tampil di toolbar.", at: PINAT, click: true, show: ["pinOn"], mark: { box: [PINAT[0] - 12, 140, 24, 24], r: 12 }, lens: { src: [1036, 88, 348, 114] }, dur: 3.4 }
+        { caption: "Sematkan (opsional): klik ikon puzzle di kanan atas Chrome.", focus: [MENUR], at: PUZ, click: true, show: ["menu"], mark: { box: [PUZ[0] - 13, 50, 26, 26], r: 13 }, lens: { src: [1040, 90, 340, 106], at: [300, 300] } },
+        { caption: "Klik ikon pin di samping NikahKit. Ikonnya tampil di toolbar.", at: PINAT, click: true, show: ["pinOn"], mark: { box: [PINAT[0] - 12, 140, 24, 24], r: 12 }, lens: { src: [1040, 90, 340, 106], at: [300, 300] }, dur: 3.4 }
       ]
     };
   })(),
