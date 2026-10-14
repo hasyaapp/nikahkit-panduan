@@ -6,19 +6,16 @@
 // Landing page and form: server/pages/src/landing/index.html + server/pages/shared/order-form.js at 390 px (mobile CSS).
 // Dashboard pasangan: /tmp/ref/dash-gate-hp.png.
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw } from "../lib.mjs";
-import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialogHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkBadge, nkAcc, nkH3, phoneDesk } from "../ui/kit.mjs";
+import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialogHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkAcc, nkH3, phoneDesk } from "../ui/kit.mjs";
+import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_W, HAPUS_W, HAPUS_X, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 const shell = (o = {}) => [scalevEditor(0, 0, o)];
 // Over a scrolled list (x 72..399): the Scalev bars and the panel head, redrawn above it.
 const cover = (o, title, h = {}) => clipped(72, 0, 328, 153, scalevEditor(0, 0, o), nkHead(0, 0, title, h));
-// Simpan & Terbitkan in the toolbar.
-const PUB_BOX = [1283, 50, 151, 34], PUB = [1358, 67];
 const bodyClip = (...s) => clipped(72, 153, 327, 747, ...s);
 const bodyBg = rect(72, 153, 327, 747, { fill: C.white });
 const svgIcon = (body, cx, cy, size, color) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
-// Inbox count on the header icon (.nk-inbox__count: top 2, right 0 of the 36px icon button at 218..254).
-const inboxCount = (n) => rect(238, 106, 16, 16, { r: 8, fill: C.danger }) + text(246, 118, n, { size: 10, weight: 600, fill: C.white, anchor: "middle" });
 // Step helpers: a mark ({ box, r }) and the screen regions steps focus on.
 const M = (x, y, w, hh, r = 4) => ({ box: [x, y, w, hh], r });
 const F = { left: [0, 92, 399, 808], panel: [72, 92, 327, 808], rail: [0, 92, 72, 808], tabs: [0, 44, 399, 48], top: [1180, 44, 260, 48], preview: [727, 106, 390, 784] };
@@ -43,7 +40,6 @@ function kindSeg(active) {
   });
   return s + line(x + half, y + 1, x + half, y + h - 1, { stroke: C.field });
 }
-const badgeAt = (right, y, label, tone) => { const w = tw(label, 10, 500) + 12; const t = { ok: [C.okSoft, C.ok], todo: [C.warnSoft, C.warnStrong], off: [C.mutedBg, C.text], plain: ["none", C.strong] }[tone]; return nkBadge(right - w, y, label, { fill: t[0], fg: t[1] }); };
 // Profil merek box (details.nk-box), closed: 50 px.
 const brandClosed = (y, ready = true) => rect(88.5, y + 0.5, 278, 49, { r: 4, fill: C.white, stroke: C.line }) + text(101, y + 30, "Profil merek", { size: 14, weight: 500 }) +
   badgeAt(354, y + 16, ready ? "Terisi" : "Belum diisi", ready ? "ok" : "plain");
@@ -358,18 +354,6 @@ const shareDlg = nkDialogHead(0, 0, "Bagikan") + nkLabel(16, 181, "Nama tamu") +
   nkHint(16, 815, "PIN hanya tampil di jendela NikahKit.");
 const bukaDash = nkBtn(16, 659, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" });
 
-// Pesanan masuk dialog (orders.jsx; editor-pesanan.png for the boxes).
-function orderRow(y, couple, meta, badge) {
-  return text(28, y + 26, couple, { size: 14, weight: 600 }) + text(28, y + 42, meta, { size: 10, fill: C.text }) + badge + icon("trash", 357, y + 28, 18, C.text);
-}
-const ROW1 = 190, ROW2 = 247;
-const ROW_A = ["Rani & Dimas", "Basic + QR check-in tamu · 14 Okt, 10.20"], ROW_B = ["Ayu & Fajar", "Premium · 2 Okt, 09.00"];
-// .nk-box summary row (closed or open).
-const boxRow = (y, l, open = false) => rect(16.5, y + 0.5, 365, 49, { r: 4, fill: C.white, stroke: C.line }) + icon(open ? "chevron-down" : "chevron-right", 38, y + 25, 18, C.strong) + text(59, y + 30, l, { size: 14, weight: 500 });
-const ordersTop = nkDialogHead(0, 0, "Pesanan masuk") + nkHint(16, 181, "Klik nama untuk mengisi semua kolom sesuai paketnya.");
-const ordersDlg = ordersTop + rect(16.5, 189.5, 365, 113, { r: 4, fill: C.white, stroke: C.line }) + line(17, 246.5, 381, 246.5) +
-  orderRow(ROW1, ...ROW_A, badgeAt(331, ROW1 + 19, "Baru", "todo")) + orderRow(ROW2, ...ROW_B, badgeAt(331, ROW2 + 19, "Sudah diisi", "ok")) + boxRow(319, "Tempel data pesanan") + boxRow(377, "Link form klien (opsional)");
-
 // ---- Flow diagram and checklist ----------------------------------------------------------------------------------
 // The 11 steps of alur-dengan-klien.mdx, snaking over 4 rows of 3.
 const FLOW = [
@@ -526,29 +510,10 @@ const FY0 = FK.card - 20, FDY = Math.max(0, K1.pos.next + 52 + 40 - 844 - FY0);
 const lpRing = (y, stroke) => rect(40, y - 1.5, 310, 51, { r: 9.5, stroke, sw: 3 });
 const lpFocus = (y) => body(rect(42, y + 1.5, 304, 45, { r: 7, fill: LP.paper }) + rect(42.25, y + 0.75, 305.5, 46.5, { r: 8, stroke: LP.cocoa, sw: 1.5 }) + lpRing(y, "rgba(184,70,13,.28)"));
 
-// Pesanan masuk: Tempel data pesanan open (OrderPaste), Link form klien open, one order deleted.
-const pasteOpen = (filled) => rect(16, 315, 366, 300, { fill: C.white }) + rect(16.5, 319.5, 365, 214, { r: 4, fill: C.white, stroke: filled ? C.line : C.line }) +
-  icon("chevron-down", 38, 344, 18, C.strong) + text(59, 349, "Tempel data pesanan", { size: 14, weight: 500 }) +
-  rect(28.5, 381.5, 341, 95, { r: 4, fill: C.white, stroke: filled ? C.primary : C.field, sw: filled ? 2 : 1 }) +
-  (filled ? para(38, 401, ["Desain: Dasar", " ", "*Pemesan*", "Nama: Rani Kusuma"], { size: 14, fill: C.strong, lh: 20 })
-    : para(38, 401, ["Tempel pesan WhatsApp dari form data", "undangan"], { size: 14, fill: C.faint, lh: 20 })) +
-  group({ opacity: filled ? 1 : 0.5 }, nkBtn(28, 488, "Isi undangan")) + boxRow(545, "Link form klien (opsional)");
+// Tempel data pesanan: the client's WhatsApp message (with the #data-undangan line) over the dimmed panel.
 const WA_MSG = ["*Pemesan*", "Nama: Rani Kusuma", "WhatsApp: 0812 3456 7890", " ", "Data untuk mengisi undangan otomatis", "(jangan diubah):", '#data-undangan {"v":1, ...}'];
 const waBubble = rect(0, 92, 400, 808, { fill: "rgba(15,22,30,.42)" }) + shadow(24, 300, 352, 200, 10, 2) + rect(24, 300, 352, 200, { r: 10, fill: C.waSoft }) +
   para(40, 326, WA_MSG, { size: 14, fill: C.waText, lh: 24 }) + text(362, 488, "10.20", { size: 11, fill: C.waSub, anchor: "end" });
-const LINK = "https://nikahin.myscalev.com/order?k=AB12CD34";
-const linkOpen = rect(16.5, 377.5, 365, 201, { r: 4, fill: C.white, stroke: C.line }) + icon("chevron-down", 38, 402, 18, C.strong) + text(59, 407, "Link form klien (opsional)", { size: 14, weight: 500 }) +
-  para(28, 447, ["Kirim ke klien bila ingin mereka mengisi sendiri.", "Isian mereka muncul di daftar ini."], { size: 12, fill: C.faint, lh: 16 }) +
-  rect(28, 476, 341, 52, { r: 4, fill: C.mutedBg }) + text(38, 498, "https://nikahin.myscalev.com/order?", { size: 12, mono: true }) + text(38, 516, "k=AB12CD34", { size: 12, mono: true });
-const salinBtn = nkBtn(28, 534, "Salin link form", { variant: "quiet", icon: "copy" });
-const SALIN_W = tw("Salin link form", 12, 500) + 44;
-// Hapus: the trash becomes a red Hapus? button (nk-btn--danger) and the badge moves left of it.
-const HAPUS_W = tw("Hapus?", 12, 500) + 24, HAPUS_X = 375 - HAPUS_W;
-const hapusRow = rect(17, ROW2 + 1, 364, 55, { fill: C.primarySoft }) + text(28, ROW2 + 26, ROW_B[0], { size: 14, weight: 600 }) + text(28, ROW2 + 42, ROW_B[1], { size: 10, fill: C.text }) +
-  badgeAt(HAPUS_X - 8, ROW2 + 19, "Sudah diisi", "ok");
-const hapusBtn = nkBtn(HAPUS_X, ROW2 + 10, "Hapus?", { variant: "danger", w: HAPUS_W });
-const afterDelete = rect(16, 186, 366, 400, { fill: C.white }) + rect(16.5, 189.5, 365, 56, { r: 4, fill: C.white, stroke: C.line }) + orderRow(ROW1, ...ROW_A, badgeAt(331, ROW1 + 19, "Baru", "todo")) +
-  boxRow(262, "Tempel data pesanan") + boxRow(320, "Link form klien (opsional)");
 
 // Marketing card install (Dashboard pasangan / Landing page): dialog + Pasang.
 const CARD_X = { dashboard: 88, landing: 234 }, CARD_AT = { dashboard: [155, 360], landing: [301, 360] };
@@ -563,7 +528,7 @@ const DLG_O = [720, 450];
 const NK_TAB = M(224, 52, 92, 32), MARKETING = M(227.5, 169, 139.5, 38);
 const tabStep = (caption, dur = 2.8) => ({ caption, dur, focus: [F.tabs, F.left], mark: NK_TAB, lens: { src: [100, 46, 222, 46] } });
 const toastBox = (lines) => { const hh = Math.max(52, lines.length * 18 + 20); return [84, 888 - hh, 302, hh]; };
-const pubStep = (caption) => ({ caption, at: PUB, click: true, focus: F.top, mark: M(...PUB_BOX), lens: { src: [1180, 44, 260, 50] }, dur: 3.4 });
+const pubStep = (caption) => ({ caption, at: ED.terbitkan, click: true, focus: F.top, mark: M(...ED.terbitkanBox), lens: { src: [1180, 44, 260, 50] }, dur: 3.4 });
 
 // ---- Scenes ------------------------------------------------------------------------------------------------------
 const kontenPanel = nkHead(0, 0, "Konten") + kontenBody;
