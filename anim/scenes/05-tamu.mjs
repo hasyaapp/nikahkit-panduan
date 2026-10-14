@@ -6,8 +6,8 @@
 // editor-akun.png, scalev-pages.png, scalev-bukutamu.png, dash-gate-hp.png, dash-hari-h-hp.png (14 Okt 2026).
 // Not captured, drawn generic: the guest cover's desktop column, the WhatsApp chat, the spreadsheet with its save
 // dialog, the OS file picker and Chrome's confirm and download bubble.
-// Pattern: base = the state most steps discuss (its focus is drawn in detail); other states are full-screen els built
-// with focusEl() (skeleton with detail only where that state's step looks).
+// Pattern: base = the state most steps discuss; other states are full-screen `skel` elements (skeleton outside the
+// step's focus, detail inside it), so each step's focus covers whatever state is on screen during that step.
 import {
   C, CHROME_TOP as T, PHONE, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, nkRail, nkHead, nkAcc, nkDialogHead, nkBtn, nkLabel, nkHint,
   nkSwitch, nkH3, nkLogo, icon, iconX, rect, text, para, line, circle, clipped, shadow, skeleton, phoneDesk, tw, esc
@@ -17,8 +17,6 @@ const PAGE = "rani-dimas", PUBLIC = `https://tokomu.myscalev.com/${PAGE}`, WID =
 const SERIF = "Georgia,'Times New Roman',serif";
 const MAROON = "#8b2c23", CREAM = "#fdf6ee";
 const scalevTab = (active = true) => ({ title: "Scalev", fav: favScalev, active });
-// A whole state as an element: skeleton everywhere, the real drawing inside rects.
-const focusEl = (svg, rects) => skeleton(svg) + rects.map(([x, y, w, h]) => clipped(x, y, w, h, svg)).join("");
 // Grow a box by p on every side (lens sources around a marked element).
 const pad = ([x, y, w, h], p, q = p) => [x - p, y - q, w + 2 * p, h + 2 * q];
 
@@ -142,7 +140,7 @@ const shareScrolled = (dy, mode, devices) => rect(0, 154, 399, 746, { fill: C.wh
 function guestTab() {
   const cx = 720;
   let s = chrome(0, 0, 1440, 900, { tabs: [scalevTab(false), { title: "Rani & Dimas", active: true }], url: `tokomu.myscalev.com/${PAGE}?to=Budi+Santoso` }) +
-    rect(0, T, 1440, 900 - T, { fill: "#f1e6d8" }) + rect(cx - 240, T, 480, 900 - T, { fill: CREAM }) + rect(cx - 240, T, 480, 16, { fill: MAROON });
+    rect(0, T, 1440, 900 - T, { fill: "#f6efe7" }) + rect(cx - 240, T, 480, 900 - T, { fill: CREAM }) + rect(cx - 240, T, 480, 16, { fill: MAROON });
   for (let i = 0; i < 11; i++) s += circle(cx - 218 + i * 44, T + 14, 16, { fill: MAROON });
   return s + text(cx, 336, "The Wedding of", { size: 18, fill: "#4a3a30", anchor: "middle", italic: true, font: SERIF }) +
     text(cx, 398, "Rani & Dimas", { size: 54, fill: MAROON, anchor: "middle", italic: true, font: SERIF }) +
@@ -531,11 +529,10 @@ export const scenes = {
     base: [...editorBase(), shareTop(0), shareBtns(0), accessHead(539, false), coupleAll(657)],
     els: {
       pre: { svg: nkRail(0, 0, "Konten") + skeleton(rect(72, 92, 327, 808, { fill: C.white }) + kontenPanel()), enter: "fade" },
-      nameClear: { svg: rect(18, 241, 362, 32, { fill: C.white }), enter: "fade" },
-      nameTyped: text(27, 262, "Budi Santoso", { size: 14, fill: C.strong }),
-      urlNew: { svg: urlBox(311, [`${PUBLIC}?`, "to=Budi+Santoso"]), enter: "fade", delay: 0.9 },
-      nameSk: skeleton(text(27, 262, "Budi Santoso", { size: 14, fill: C.strong }) + urlBox(311, [`${PUBLIC}?`, "to=Budi+Santoso"])),
-      guest: { svg: focusEl(guestTab(), [[124, 46, 1184, 34], [480, 300, 480, 320]]), enter: "fade", delay: 0.2 },
+      nameClear: { svg: rect(18, 241, 362, 32, { fill: C.white }), skel: true, enter: "fade" },
+      nameTyped: { svg: text(27, 262, "Budi Santoso", { size: 14, fill: C.strong }), skel: true },
+      urlNew: { svg: urlBox(311, [`${PUBLIC}?`, "to=Budi+Santoso"]), skel: true, enter: "fade", delay: 0.9 },
+      guest: { svg: guestTab(), skel: true, enter: "fade", delay: 0.2 },
       copied: { svg: nkHint(16, 515, "Tersalin."), enter: "fade" },
       copied2: { svg: nkHint(16, 515, "Tersalin."), enter: "fade" }
     },
@@ -543,7 +540,7 @@ export const scenes = {
       { caption: "Di editor NikahKit, klik Bagikan di bawah rel kiri. Panel Bagikan terbuka.", focus: PANEL, mark: { box: BAGIKAN, r: 0 }, note: "Bagikan", at: center(BAGIKAN), click: true, hide: ["pre"] },
       { caption: "Ada Perubahan belum disimpan di Scalev? Klik Simpan di Scalev dulu.", focus: [[0, 153, 399, 70], [1183, 44, 257, 48]], mark: [NOTE, SIMPAN], lens: { src: [0, 160, 399, 56] }, dur: 3.4 },
       { caption: "Kolom Nama tamu berisi Nama Tamu. Ganti dengan nama tamumu.", focus: [0, 215, 399, 155], mark: nameBox(0), lens: { src: [0, 218, 399, 150] }, at: [300, 257], click: true, show: ["nameClear", "nameTyped", "urlNew"], type: [{ id: "nameTyped", n: 12, box: [27, 246, tw("Budi Santoso", 14) + 4, 22] }], dur: 3.8 },
-      { caption: "Klik Lihat sebagai tamu. Di tab baru, nama tamu tampil di sampul.", focus: [0, 365, 399, 56], mark: shareBox("lihat", 0), note: { text: "Lihat sebagai tamu", at: [24, 300] }, at: center(shareBox("lihat", 0)), click: true, hide: ["nameTyped", "urlNew"], show: ["nameSk", "guest"], dur: 4 },
+      { caption: "Klik Lihat sebagai tamu. Di tab baru, nama tamu tampil di sampul.", focus: [[124, 46, 1184, 34], [480, 300, 480, 320]], mark: shareBox("lihat", 0), note: { text: "Lihat sebagai tamu", at: [24, 300] }, at: center(shareBox("lihat", 0)), click: true, show: ["guest"], dur: 4 },
       { caption: "Kembali ke editor. Klik Salin tautan tamu, muncul Tersalin.", focus: [0, 413, 399, 112], mark: shareBox("salin", 0), lens: { src: [0, 413, 399, 112] }, at: center(shareBox("salin", 0)), click: true, hide: ["guest"], show: ["copied"], dur: 3.4 },
       { caption: "Butuh tautan tanpa nama tamu? Klik Salin tautan umum.", focus: [0, 453, 399, 72], mark: shareBox("umum", 0), lens: { src: [0, 453, 399, 72] }, at: center(shareBox("umum", 0)), click: true, hide: ["copied"], show: ["copied2"], dur: 3.2 },
       { caption: "Di bawah ada Untuk pengantin: Kirim undangan dan Buka Dashboard.", focus: [0, 655, 399, 142], mark: [16, 681, 366, 80], lens: { src: [0, 655, 399, 137] }, at: [330, 743], hide: ["copied2"], dur: 3.6 }
@@ -555,17 +552,17 @@ export const scenes = {
     base: [...editorBase(), shareAll(null)],
     els: {
       swOn: { svg: nkSwitch(...switchBox(ACC_Y).slice(0, 2), true), enter: "fade" },
-      accLink: { svg: focusEl(accessOn(ON_Y, "link"), [[0, ON_Y - 4, 399, 96]]), enter: "rise", delay: 0.1 },
+      accLink: { svg: accessOn(ON_Y, "link"), skel: true, enter: "rise", delay: 0.1 },
       menu: { svg: selectMenu(18, 607, 300, ["Tautan pribadi", "+ Kunci perangkat", "+ PIN untuk HP baru"], 1), enter: "pop", origin: [200, 621] },
-      accDevice: { svg: focusEl(accessOn(ON_Y, "device", 1), [[0, ON_Y - 4, 399, 164]]), enter: "fade" },
+      accDevice: { svg: accessOn(ON_Y, "device", 1), skel: true, enter: "fade" },
       menu2: { svg: selectMenu(18, 612, 120, ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], 1), enter: "pop", origin: [80, 713] },
-      accDevice2: { svg: focusEl(accessOn(ON_Y, "device", 2), [[0, ON_Y - 4, 399, 164]]), enter: "fade" }
+      accDevice2: { svg: accessOn(ON_Y, "device", 2), skel: true, enter: "fade" }
     },
     steps: [
       { caption: "Di panel Bagikan, gulir ke bagian Undangan khusus.", focus: [0, ACC_Y, 399, 108], mark: [16, ACC_Y + 2, 366, 96], lens: { src: [0, ACC_Y - 4, 399, 108] }, dur: 3 },
-      { caption: "Klik sakelar Undangan khusus sampai menyala. Keamanan muncul.", mark: { box: switchBox(ACC_Y), r: 10 }, lens: { src: [0, ACC_Y + 20, 399, 150] }, at: center(switchBox(ACC_Y)), click: true, show: ["swOn", "accLink"], dur: 3.6 },
-      { caption: "Klik kotak Keamanan. Ada tiga mode.", focus: "none", mark: keamananBox(ON_Y), lens: { src: [0, 582, 399, 120] }, at: center(keamananBox(ON_Y)), click: true, show: ["menu"], dur: 3.2 },
-      { caption: "Pilih + Kunci perangkat. Muncul Perangkat per tamu.", mark: menuItemBox(18, 607, 300, 1), lens: { src: [0, 595, 399, 170] }, at: center(menuItemBox(18, 607, 300, 1)), click: true, hide: ["menu"], show: ["accDevice"], dur: 3.4 },
+      { caption: "Klik sakelar Undangan khusus sampai menyala. Keamanan muncul.", focus: [0, ACC_Y, 399, ON_Y + 92 - ACC_Y], mark: { box: switchBox(ACC_Y), r: 10 }, lens: { src: [0, ACC_Y + 20, 399, 150] }, at: center(switchBox(ACC_Y)), click: true, show: ["swOn", "accLink"], dur: 3.6 },
+      { caption: "Klik kotak Keamanan. Ada tiga mode.", focus: [0, ON_Y - 4, 399, 96], mark: keamananBox(ON_Y), lens: { src: [0, 582, 399, 120] }, at: center(keamananBox(ON_Y)), click: true, show: ["menu"], dur: 3.2 },
+      { caption: "Pilih + Kunci perangkat. Muncul Perangkat per tamu.", focus: [0, ON_Y - 4, 399, 164], mark: menuItemBox(18, 607, 300, 1), lens: { src: [0, 595, 399, 170] }, at: center(menuItemBox(18, 607, 300, 1)), click: true, hide: ["menu"], show: ["accDevice"], dur: 3.4 },
       { caption: "Klik Perangkat per tamu. Pilihannya 1 sampai 10.", mark: devicesBox(ON_Y), lens: { src: [10, 606, 140, 290] }, at: center(devicesBox(ON_Y)), click: true, show: ["menu2"], dur: 3.2 },
       { caption: "Pilih 2.", mark: menuItemBox(18, 612, 120, 1), lens: { src: [0, 666, 399, 86] }, at: center(menuItemBox(18, 612, 120, 1)), click: true, hide: ["menu2"], show: ["accDevice2"], dur: 2.6 }
     ]
@@ -596,10 +593,10 @@ export const scenes = {
   "tamu-undangan-khusus-uji": {
     title: "Membuat tautan tamu dan menguji undangan khusus",
     base: [...editorBase(), shareScrolled(200, "device", 2)],
-    els: { gate: { svg: focusEl(gateTab(), [[124, 46, 1184, 34], [480, 395, 480, 180]]), enter: "fade", delay: 0.2 } },
+    els: { gate: { svg: gateTab(), skel: true, enter: "fade", delay: 0.2 } },
     steps: [
       { caption: "Di Untuk pengantin, klik Kirim undangan. Buat tautan per tamu di Dashboard.", focus: [0, 650, 399, 150], mark: [16, 691, 366, 36], lens: { src: [0, 660, 399, 112] }, at: [199, 709], dur: 3.8 },
-      { caption: "Uji di jendela penyamaran: tanpa tautan tamu, hanya layar ini yang tampil.", focus: "none", mark: GATE_CARD, lens: { src: [500, 480, 440, 90], at: [266, 440] }, show: ["gate"], dur: 4 }
+      { caption: "Uji di jendela penyamaran: tanpa tautan tamu, hanya layar ini yang tampil.", focus: [[124, 46, 1184, 34], [480, 395, 480, 180]], mark: GATE_CARD, lens: { src: [500, 480, 440, 90], at: [266, 440] }, show: ["gate"], dur: 4 }
     ]
   },
 
@@ -621,17 +618,17 @@ export const scenes = {
     title: "Membuat PIN dan menyalin pesan untuk pengantin",
     base: [...editorBase(), shareAll(null), SHADE, pinWindow(false)],
     els: {
-      winB: { svg: focusEl(pinWindow(true), [PIN_CARD_B, MSG_BOX]), enter: "fade" },
+      winB: { svg: pinWindow(true), skel: true, enter: "fade" },
       copiedMsg: { svg: copiedBar("Pesan tersalin."), enter: "fade" },
-      wa: { svg: focusEl(phoneDesk(waChat()), [pad(WA_BUBBLE, 8)]), enter: "fade", delay: 0.1 },
+      wa: { svg: phoneDesk(waChat()), skel: true, enter: "fade", delay: 0.1 },
       copiedPin: { svg: copiedBar("PIN tersalin."), enter: "fade" }
     },
     steps: [
       { caption: "Jendela NikahKit terbuka. Baca status PIN: Undangan ini belum punya PIN.", focus: PIN_CARD_A, mark: { box: PIN_CARD_A, r: 8 }, lens: { src: [PL, PIN_CARD_A[1] + 8, PW, 108] }, dur: 3.4 },
-      { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", mark: BUAT_PIN, lens: { src: [PL, PIN_CARD_B[1], PW, 164] }, at: center(BUAT_PIN), click: true, show: ["winB"], dur: 3.6 },
-      { caption: "Klik ikon Salin pesan untuk pengantin. Muncul Pesan tersalin.", focus: "none", mark: COPY_MSG, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_MSG), click: true, show: ["copiedMsg"], dur: 3.6 },
-      { caption: "Tempel di WhatsApp pengantin: undangan, tautan kelola, dan PIN.", mark: { box: WA_BUBBLE, r: 8 }, lens: { src: pad(WA_BUBBLE, 6) }, at: [PHONE.x + 160, PHONE.y + PHONE.h - 33], show: ["wa"], dur: 4.2 },
-      { caption: "Hanya perlu PIN saja? Klik ikon Salin PIN. Muncul PIN tersalin.", mark: COPY_PIN, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_PIN), click: true, hide: ["wa", "copiedMsg"], show: ["copiedPin"], dur: 3.6 }
+      { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", focus: [PIN_CARD_B, MSG_BOX], mark: BUAT_PIN, lens: { src: [PL, PIN_CARD_B[1], PW, 164] }, at: center(BUAT_PIN), click: true, show: ["winB"], dur: 3.6 },
+      { caption: "Klik ikon Salin pesan untuk pengantin. Muncul Pesan tersalin.", focus: [PIN_CARD_B, MSG_BOX], mark: COPY_MSG, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_MSG), click: true, show: ["copiedMsg"], dur: 3.6 },
+      { caption: "Tempel di WhatsApp pengantin: undangan, tautan kelola, dan PIN.", focus: pad(WA_BUBBLE, 8), mark: { box: WA_BUBBLE, r: 8 }, lens: { src: pad(WA_BUBBLE, 6) }, at: [PHONE.x + 160, PHONE.y + PHONE.h - 33], hide: ["copiedMsg"], show: ["wa"], dur: 4.2 },
+      { caption: "Hanya perlu PIN saja? Klik ikon Salin PIN. Muncul PIN tersalin.", focus: [PIN_CARD_B, MSG_BOX], mark: COPY_PIN, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_PIN), click: true, hide: ["wa"], show: ["copiedPin"], dur: 3.6 }
     ]
   },
 
@@ -639,11 +636,11 @@ export const scenes = {
     title: "Membuka Buku Tamu di Scalev",
     base: [appShell(), detail()],
     els: {
-      pre: { svg: focusEl(appShell("Landing Pages") + landingPages(), [[0, 230, 256, 72]]), enter: "fade" },
-      list: { svg: focusEl(appShell() + listView(), [menuBox("Buku Tamu"), [BX - 8, 0, BW2 + 16, 440]]), enter: "fade" }
+      pre: { svg: appShell("Landing Pages") + landingPages(), skel: true, enter: "fade" },
+      list: { svg: appShell() + listView(), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Di sidebar Scalev, klik menu Buku Tamu.", focus: "none", mark: menuBox("Buku Tamu"), lens: { src: [0, 226, 256, 80] }, at: svMenuAt("Buku Tamu"), click: true, hide: ["pre"], show: ["list"] },
+      { caption: "Di sidebar Scalev, klik menu Buku Tamu.", focus: [menuBox("Buku Tamu"), [BX - 8, 0, BW2 + 16, 440]], mark: menuBox("Buku Tamu"), lens: { src: [0, 226, 256, 80] }, at: svMenuAt("Buku Tamu"), click: true, hide: ["pre"], show: ["list"] },
       { caption: "Daftar undanganmu tampil. Klik kartu undangan.", focus: MAIN, mark: { box: CARD0, r: 8 }, lens: { src: [BX, CARD0[1] - 22, 420, 102] }, at: CARD0_AT, click: true, hide: ["list"] },
       { caption: "Di atas ada ringkasan kehadiran, per sesi dan per pihak.", focus: pad(SUM, 8), mark: { box: SUM, r: 8 }, lens: { src: [BX, DY.sum, 400, 104] }, dur: 3.4 },
       { caption: "Pilih tab: Ucapan, RSVP, atau Tautan personal.", focus: pad(TABS, 8), mark: TABS, lens: { src: pad(TABS, 10, 14) }, at: center(TABS), dur: 3.2 }
@@ -655,15 +652,15 @@ export const scenes = {
     base: [appShell(), detail()],
     els: {
       filter: { svg: selectMenu(SEL[0], DY.tools + 40, 235, ["Semua", "Baru sejak terakhir dibuka", "Disembunyikan", "Belum dibalas", "Diubah/dicatat pemilik"], 2), enter: "pop", origin: [SEL[0] + 117, DY.tools + 38] },
-      d1: { svg: focusEl(detail({ hidden: true }), [[BX, DY.items, BW2, 186]]), enter: "fade" },
-      d2: { svg: focusEl(detail({ hidden: true, picked: true }), [[BX, DY.tools - 8, BW2, 126], [BX, DY.items + 66 + 93, BW2, 93]]), enter: "fade" },
+      d1: { svg: detail({ hidden: true }), skel: true, enter: "fade" },
+      d2: { svg: detail({ hidden: true, picked: true }), skel: true, enter: "fade" },
       dl: { svg: dlBubble, enter: "pop", origin: [1220, 8], delay: 0.1 }
     },
     steps: [
-      { caption: "Cari, atau pilih saringan di kotak sebelahnya.", focus: [BX - 8, DY.tools - 8, BW2 + 16, 54], mark: SEL, lens: { src: [SEL[0] - 4, DY.tools + 36, 243, 150] }, at: center(SEL), click: true, show: ["filter"], dur: 3.6 },
+      { caption: "Cari, atau pilih saringan di kotak sebelahnya.", focus: [BX - 8, DY.tools - 8, BW2 + 16, 54], mark: SEL, lens: { src: [SEL[0] - 4, DY.tools - 4, 243, 194] }, at: center(SEL), click: true, show: ["filter"], dur: 3.6 },
       { caption: "Tiap ucapan punya Balas, Ubah teks, Sembunyikan, dan Hapus.", focus: [BX - 8, DY.items, BW2 + 16, 93], mark: [actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], lens: { src: pad([actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], 10, 12) }, at: center(actBox(1, DY.items)), hide: ["filter"], dur: 3 },
-      { caption: "Klik Sembunyikan. Ucapan berlabel Disembunyikan, hilang dari undangan.", focus: "none", mark: actBox(2, DY.items), lens: { src: [BX, DY.items + 4, 400, 86] }, at: center(actBox(2, DY.items)), click: true, show: ["d1"], dur: 3.6 },
-      { caption: "Aksi sekaligus: centang kotak di kiri baris. Bar aksi muncul.", mark: { box: [BX + 17, DY.items + 93 + 14, 16, 16], r: 3 }, lens: { src: [BX, DY.tools + 46, 440, 62], at: [262, 500] }, at: [BX + 25, DY.items + 93 + 22], click: true, show: ["d2"], dur: 3.6 },
+      { caption: "Klik Sembunyikan. Ucapan berlabel Disembunyikan, hilang dari undangan.", focus: [BX - 8, DY.items, BW2 + 16, 186], mark: actBox(2, DY.items), lens: { src: [BX, DY.items + 4, 400, 86] }, at: center(actBox(2, DY.items)), click: true, show: ["d1"], dur: 3.6 },
+      { caption: "Aksi sekaligus: centang kotak di kiri baris. Bar aksi muncul.", focus: [BX - 8, DY.tools - 8, BW2 + 16, DY.items + 260 - DY.tools], mark: { box: [BX + 17, DY.items + 93 + 14, 16, 16], r: 3 }, lens: { src: [BX, DY.tools + 44, 440, 180], zoom: 1.5, at: [480, 330] }, at: [BX + 25, DY.items + 93 + 22], click: true, show: ["d2"], dur: 3.6 },
       { caption: "Klik Unduh daftar tamu (CSV). File tersimpan di folder unduhan.", mark: CSV, lens: { src: DL }, at: center(CSV), click: true, show: ["dl"], dur: 3.6 }
     ]
   },
@@ -684,19 +681,19 @@ export const scenes = {
     base: [appShell(), detail({ tab: "invites", invites: "preview" })],
     els: {
       // Earlier states sit on top of later ones; each step hides the top one.
-      inv: { svg: focusEl(detail({ tab: "invites" }), [[BX - 8, DY.tabs - 8, BW2 + 16, 124]]), enter: "fade" },
-      d0: { svg: focusEl(detail(), [[BX - 8, 92, BW2 + 16, 190], pad(TABS, 8)]), enter: "fade" },
-      list: { svg: focusEl(appShell() + listView(), [pad(CARD0, 8)]), enter: "fade" },
+      inv: { svg: detail({ tab: "invites" }), skel: true, enter: "fade" },
+      d0: { svg: detail(), skel: true, enter: "fade" },
+      list: { svg: appShell() + listView(), skel: true, enter: "fade" },
       picker: { svg: picker, enter: "pop", origin: [720, 400] },
-      done: { svg: focusEl(detail({ tab: "invites", invites: "done", msg: "3 tamu baru, 0 diperbarui." }), [pad(MSG_BT, 8), [BX - 8, 600, BW2 + 16, 215]]), enter: "fade", delay: 0.1 }
+      done: { svg: detail({ tab: "invites", invites: "done", msg: "3 tamu baru, 0 diperbarui." }), skel: true, enter: "fade", delay: 0.1 }
     },
     steps: [
-      { caption: "Di Buku Tamu, klik kartu undangan.", focus: PREVIEW, mark: { box: CARD0, r: 8 }, lens: { src: [BX, CARD0[1] - 22, 420, 102] }, at: CARD0_AT, click: true, hide: ["list"], dur: 3 },
-      { caption: "Klik tab Tautan personal.", mark: tabBox(2), lens: { src: pad(TABS, 10, 14) }, at: center(tabBox(2)), click: true, hide: ["d0"] },
+      { caption: "Di Buku Tamu, klik kartu undangan.", focus: [[BX - 8, 92, BW2 + 16, 190], pad(TABS, 8)], mark: { box: CARD0, r: 8 }, lens: { src: [BX, CARD0[1] - 22, 420, 102] }, at: CARD0_AT, click: true, hide: ["list"], dur: 3 },
+      { caption: "Klik tab Tautan personal.", focus: [BX - 8, DY.tabs - 8, BW2 + 16, 124], mark: tabBox(2), lens: { src: pad(TABS, 10, 14) }, at: center(tabBox(2)), click: true, hide: ["d0"] },
       { caption: "Klik Impor daftar tamu (CSV). Jendela pilih file terbuka.", mark: IMPORT, note: IMPORT_LABEL, at: center(IMPORT), click: true, show: ["picker"] },
-      { caption: "Klik dua kali file CSV-mu. Pratinjau impor muncul.", mark: { box: PICK_FILE, r: 5 }, lens: { src: [540, 236, 300, 104] }, at: [680, 259], click: true, hide: ["inv"] },
-      { caption: "Cek pratinjau: 3 tamu siap, 1 baris dilewati beserta alasannya.", mark: { box: PREVIEW, r: 8 }, lens: { src: [PREVIEW[0], PREVIEW[1], 420, 176], at: [300, 20] }, at: [BX + 640, PREVIEW[1] + 120], hide: ["picker"], dur: 3.8 },
-      { caption: "Klik Impor 3 tamu. Tamu baru tampil berlabel Belum dibuka.", mark: IMPOR3, lens: { src: [BX, 604, 420, 207] }, at: center(IMPOR3), click: true, show: ["done"], dur: 3.8 },
+      { caption: "Klik dua kali file CSV-mu. Pratinjau impor muncul.", focus: [BX - 8, DY.tabs - 8, BW2 + 16, 392], mark: { box: PICK_FILE, r: 5 }, lens: { src: [540, 236, 300, 104] }, at: [680, 259], click: true, hide: ["inv"] },
+      { caption: "Cek pratinjau: 3 tamu siap, 1 baris dilewati beserta alasannya.", focus: pad(PREVIEW, 8), mark: { box: PREVIEW, r: 8 }, lens: { src: [PREVIEW[0], PREVIEW[1], 420, 176], at: [300, 20] }, at: [BX + 640, PREVIEW[1] + 120], hide: ["picker"], dur: 3.8 },
+      { caption: "Klik Impor 3 tamu. Tamu baru tampil berlabel Belum dibuka.", focus: [pad(MSG_BT, 8), [BX - 8, 600, BW2 + 16, 215]], mark: IMPOR3, lens: { src: [BX, 604, 420, 207] }, at: center(IMPOR3), click: true, show: ["done"], dur: 3.8 },
       { caption: "Lihat hasil: di atas muncul 3 tamu baru, 0 diperbarui.", mark: MSG_BT, lens: { src: [BX, 66, 400, 50] }, dur: 3.4 }
     ]
   },
@@ -706,27 +703,27 @@ export const scenes = {
     base: [appShell(), detail({ staff: "code" })],
     els: {
       // Earlier states sit on top of later ones; each step hides the top one.
-      form: { svg: focusEl(detail({ staff: "form" }), [[BX - 8, SB.y, BW2 + 16, 260]]), enter: "fade" },
-      open: { svg: focusEl(detail({ staff: "open" }), [[BX - 8, DY.staff - 8, BW2 + 16, 136]]), enter: "fade" },
-      d0: { svg: focusEl(detail(), [[BX - 8, 92, BW2 + 16, 190], pad(STAFF, 8)]), enter: "fade" },
-      list: { svg: focusEl(appShell() + listView(), [pad(CARD0, 8)]), enter: "fade" },
+      form: { svg: detail({ staff: "form" }), skel: true, enter: "fade" },
+      open: { svg: detail({ staff: "open" }), skel: true, enter: "fade" },
+      d0: { svg: detail(), skel: true, enter: "fade" },
+      list: { svg: appShell() + listView(), skel: true, enter: "fade" },
       name: text(NAME_IN[0] + 13, NAME_IN[1] + 24, "Rina", { size: 14, fill: C.strong }),
-      phone: { svg: focusEl(phoneDesk(phoneGate(), { screen: C.waWash }), [GATE_CARDP]), enter: "fade" },
+      phone: { svg: phoneDesk(phoneGate(), { screen: C.waWash }), skel: true, enter: "fade" },
       masuk: { svg: masukBtn(), enter: "fade" },
       dots: text(GATE_IN[0] + 14, GATE_IN[1] + 28, "••••••••", { size: 16, fill: C.waText }),
-      hariH: { svg: focusEl(phoneDesk(phoneHariH()), [[GX, GY, 390, 220], [GX, GY + 774, 390, 70]]), enter: "fade", delay: 0.15 },
+      hariH: { svg: phoneDesk(phoneHariH()), skel: true, enter: "fade", delay: 0.15 },
       confirm: { svg: confirmDlg, enter: "pop", origin: [720, 12] }
     },
     steps: [
-      { caption: "Di Buku Tamu, klik kartu undangan.", focus: [BX - 8, SB.y + 16, BW2 + 16, 240], mark: { box: CARD0, r: 8 }, lens: { src: [BX, CARD0[1] - 22, 420, 102] }, at: CARD0_AT, click: true, hide: ["list"], dur: 3 },
-      { caption: "Klik Staff penerima tamu di bawah ringkasan kehadiran.", mark: { box: STAFF, r: 8 }, lens: { src: [BX, DY.staff - 4, 360, 60] }, at: [BX + 110, DY.staff + 26], click: true, hide: ["d0"] },
-      { caption: "Klik + Tambah staff. Kolom Nama staff muncul.", mark: TAMBAH, lens: { src: [BX, SB.y + 20, 420, 150] }, at: center(TAMBAH), click: true, hide: ["open"] },
+      { caption: "Di Buku Tamu, klik kartu undangan.", focus: [BX - 8, 92, BW2 + 16, 252], mark: { box: CARD0, r: 8 }, lens: { src: [BX, CARD0[1] - 22, 420, 102] }, at: CARD0_AT, click: true, hide: ["list"], dur: 3 },
+      { caption: "Klik Staff penerima tamu di bawah ringkasan kehadiran.", focus: [BX - 8, DY.staff - 8, BW2 + 16, 136], mark: { box: STAFF, r: 8 }, lens: { src: [BX, DY.staff - 4, 360, 60] }, at: [BX + 110, DY.staff + 26], click: true, hide: ["d0"] },
+      { caption: "Klik + Tambah staff. Kolom Nama staff muncul.", focus: [BX - 8, DY.staff - 8, BW2 + 16, 310], mark: TAMBAH, lens: { src: [BX, SB.y + 20, 420, 150] }, at: center(TAMBAH), click: true, hide: ["open"] },
       { caption: "Ketik nama staff, misalnya Rina.", mark: NAME_IN, lens: { src: [BX + 17, NAME_IN[1] - 28, 400, 76] }, at: [NAME_IN[0] + 180, NAME_IN[1] + 19], show: ["name"], type: [{ id: "name", n: 4, box: [NAME_IN[0] + 13, NAME_IN[1] + 8, tw("Rina", 14) + 4, 22] }], dur: 2.8 },
-      { caption: "Klik Buat kode. Muncul Kode untuk Rina, 8 karakter.", mark: BUAT_KODE, lens: { src: [BX + 17, SB.y + 24, 420, 120] }, at: center(BUAT_KODE), click: true, hide: ["name", "form"], dur: 3.4 },
+      { caption: "Klik Buat kode. Muncul Kode untuk Rina, 8 karakter.", focus: [BX - 8, SB.y + 16, BW2 + 16, 240], mark: BUAT_KODE, lens: { src: [BX + 17, SB.y + 24, 420, 120] }, at: center(BUAT_KODE), click: true, hide: ["name", "form"], dur: 3.4 },
       { caption: "Kode hanya tampil sekali. Kirim lewat WA, Salin pesan, atau Salin kode.", mark: CODE_BAR, lens: { src: [CODE_BOX[0], CODE_BOX[1], 420, 120] }, at: center(CODE_BAR), dur: 3.8 },
-      { caption: "Staff membuka tautan di HP, lalu mengisi PIN atau kode staff.", mark: { box: GATE_IN, r: 8 }, lens: { src: [GX + 16, GY + 370, 358, 132] }, at: [GATE_IN[0] + 260, GATE_IN[1] + 22], show: ["phone", "masuk", "dots"], type: [{ id: "dots", n: 8, box: [GATE_IN[0] + 14, GATE_IN[1] + 11, 80, 24] }], dur: 3.6 },
-      { caption: "Klik Masuk. Staff langsung masuk ke Hari-H, hanya untuk check-in.", mark: pill(MASUK), lens: { src: [GX, GY, 390, 128] }, at: center(MASUK), click: true, press: "masuk", show: ["hariH"], dur: 3.8 },
-      { caption: "Selesai acara? Klik Cabut, lalu OK. Kode langsung tidak berlaku.", mark: [{ box: CABUT }, pill(CONFIRM_OK)], lens: { src: [CF, 12, 450, 132] }, at: center(CABUT), click: true, hide: ["phone", "masuk", "dots", "hariH"], show: ["confirm"], dur: 4 }
+      { caption: "Staff membuka tautan di HP, lalu mengisi PIN atau kode staff.", focus: GATE_CARDP, mark: { box: GATE_IN, r: 8 }, lens: { src: [GX + 16, GY + 370, 358, 132] }, at: [GATE_IN[0] + 260, GATE_IN[1] + 22], show: ["phone", "masuk", "dots"], type: [{ id: "dots", n: 8, box: [GATE_IN[0] + 14, GATE_IN[1] + 11, 80, 24] }], dur: 3.6 },
+      { caption: "Klik Masuk. Staff langsung masuk ke Hari-H, hanya untuk check-in.", focus: [[GX, GY, 390, 220], [GX, GY + 774, 390, 70]], mark: pill(MASUK), lens: { src: [GX, GY, 390, 128] }, at: center(MASUK), click: true, press: "masuk", hide: ["masuk", "dots"], show: ["hariH"], dur: 3.8 },
+      { caption: "Selesai acara? Klik Cabut, lalu OK. Kode langsung tidak berlaku.", focus: [BX - 8, SB.y + 16, BW2 + 16, 240], mark: [{ box: CABUT }, pill(CONFIRM_OK)], lens: { src: [CF, 12, 450, 132] }, at: center(CABUT), click: true, hide: ["phone", "hariH"], show: ["confirm"], dur: 4 }
     ]
   }
 };
