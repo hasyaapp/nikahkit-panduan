@@ -115,15 +115,15 @@ export const EVS = [["Akad Nikah", "14/02/2027, 08.00", "", "Masjid Al-Ikhlas", 
   ["Resepsi", "14/02/2027, 11.00", "14/02/2027, 14.00", "Gedung Sejahtera", "Jl. Melati 10, Jakarta", "https://maps.google.com/?q=Kebayoran+Baru", "Parkir di basement"],
   ["Ngunduh Mantu", "21/02/2027, 10.00", "21/02/2027, 13.00", "Rumah Bpk. Budi", "Jl. Mawar 5, Depok", "https://maps.google.com/?q=Depok", "Acara keluarga"]];
 export const fillAcara = (list) => (c) => {
-  c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Acuan tanggal sampul, Simpan Tanggal,", "Hitung Mundur, dan kalender. Tanpa", "tanggal: acara pertama yang bertanggal."] });
+  c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Tanggalnya dipakai sampul, Simpan", "Tanggal, Hitung Mundur, dan kalender."] });
   list.forEach((e, i) => item(c, e[0], (f) => f.field("Nama acara", e[0]).field("Mulai", e[1], { icon: "calendar" })
     .field("Selesai (opsional)", e[2] || "hh/bb/tttt, --.--", { icon: "calendar", placeholder: !e[2] }).field("Nama tempat atau gedung", e[3])
     .area("Alamat lengkap", [e[4]]).field("Tautan peta", e[5]).area("Catatan (opsional)", [e[6]]), i === 0, i === list.length - 1));
   c.at["Tambah acara"] = c.y;
-  c.add(quietBlock(I, c.y, IW, "Tambah acara", "plus"), 48).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]);
+  c.add(quietBlock(I, c.y, IW, "Tambah acara", "plus"), 48).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]).lead("Hitung mundur memakai Acara utama.");
 };
 export const fillSampul = (c) => c.add(hintL(I, c.y, ["Nama dan tanggal diambil dari", "Mempelai dan Acara."]), 44).photo("Foto sampul", 6).photo("Foto slideshow (opsional, maks. 4)", 2, "Tambah foto");
-export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi kalimat pembuka, salam,", "kata pengantar, dan salam penutup.", "Tetap bisa diubah."] })
+export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi pembuka, salam, pengantar, dan", "penutup. Tetap bisa diubah."] })
   .field("Kalimat pembuka (opsional)", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", { hint: ["Mis. basmalah. Kosongkan bila tidak", "dipakai."] })
   .field("Salam", "Assalamu'alaikum Warahmatullahi Wabarakatuh").area("Kata pengantar", ["Dengan memohon rahmat dan rida", "Allah SWT, kami bermaksud", "menyelenggarakan pernikahan", "putra-putri kami. Merupakan", "kebahagiaan bagi kami apabila"], 5);
 // RSVP & Ucapan (sample: allowMaybe off, maxGuests 2, the four "Tanyakan juga" switches on), down to the QR switch.
@@ -139,7 +139,7 @@ export const fillRsvp = (c) => {
     .toggle("Pilihan \"Masih ragu\"", false, ["Mati: tamu hanya memilih Hadir atau Tidak", "hadir."]).h3("Tanyakan juga")
     .toggle("Tamu dari pihak mana", true).toggle("Acara yang dihadiri", true, ["Butuh minimal 2 acara."]).toggle("Perkiraan jam datang", true)
     .toggle("Minta nomor WhatsApp tamu", true, ["Tamu mengisi nomornya sendiri di form (boleh", "kosong). Nomor tampil di Dashboard."]).lead("Jawaban tampil di Dashboard.")
-    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Hanya berlaku bila Undangan khusus", "menyala (di Bagikan). Tamu yang", "menjawab Hadir melihat QR ini di kartu", "terima kasih RSVP; penerima tamu", "memindainya di halaman Check-in."]);
+    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Untuk Undangan khusus (di Bagikan):", "tamu yang Hadir mendapat QR check-in."]);
 };
 const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
 export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { placeholder: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
@@ -153,16 +153,16 @@ export const fillDress = (c) => { c.field("Judul", "Dress Code", { placeholder: 
 export const fillGifts = (c) => {
   c.field("Judul", "Tanda Kasih", { placeholder: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
     .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat terbuka setelah tamu", "menekan tombol."]);
-  [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Logo tampil otomatis untuk bank dan", "e-wallet yang dikenal (BCA, BNI, BRI,", "BSI, Mandiri, DANA, OVO, ...). Nama", "lain tampil sebagai teks."] })
+  [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Bank dan e-wallet yang dikenal", "tampil dengan logo."] })
     .field("Nomor rekening", n).field("Nama pemilik rekening", h).photo("Gambar QRIS (opsional)", null, "Pilih foto"), i === 0, i === 1));
   c.add(quietBlock(I, c.y, IW, "Tambah rekening", "plus"), 48).h3("Kirim kado (opsional)").field("Nama penerima", "Rani Ayu").area("Alamat", ["Jl. Melati 10, Jakarta 12110"], 3)
     .field("Tautan peta alamat (opsional)", "https://maps.google.com/?q=Kebayoran+Baru").toggle("Tampilkan peta alamat", true, ["Butuh tautan Google Maps dan alamat."]).field("WhatsApp konfirmasi", "081234567890");
 };
 export const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { placeholder: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
   .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3);
-export const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda. Undangan baru mengambil", "nama dan WhatsApp dari Profil merek,", "atau dari bisnis Scalev bila profil kosong.", "Kosongkan kolom untuk menyembunyikan", "barisnya."]), 92)
+export const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda dari Profil merek. Kolom", "kosong tidak tampil."]), 44)
   .toggle(["Hak cipta (© tahun dan nama", "mempelai)"], true).photo("Logo (opsional)", null, "Pilih foto")
-  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit. Tanpa {{Brand}}", "di Kredit: tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true });
+  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit, atau", "tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true });
 // Rail on Konten + the whole Konten panel (head and body) with Mempelai open, nickname `nick`; o goes to kList.
 export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ ...o, open: "Mempelai", fill: fillMempelai(nick) }).svg;
 

@@ -4,7 +4,7 @@
 import { C, rect, text, line, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
 import { ED, nkHead, nkRail, nkBtn, nkInput, nkAcc, nkBadgeBox, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
 import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
-import { ACCOUNT, P, PW, I, IW, hintL, typeIn, col, itemBar, itemBox, quietBlock, panelBg, panelBody, lid, LOCKED, kList, kListAt,
+import { ACCOUNT, P, PW, I, IW, hintL, typeIn, col, itemBar, itemBox, panelBg, panelBody, lid, LOCKED, kList, kListAt,
   fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillRsvp, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
   seg, htmlNote, chips, ALL_N, cards, library, GAL } from "../ui/editor-panels.mjs";
 
@@ -243,17 +243,10 @@ export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-tambah-acara": (() => {
     const DY = 560;
-    // Panel scrolled to Acara & Tanggal (Mempelai closed above it), one event left in the list.
-    const c = col(I, 223, IW).field("Zona waktu", "WIB", { select: true })
-      .field("Acara utama", "Akad Nikah", { select: true, hint: ["Acuan tanggal sampul, Simpan Tanggal,", "Hitung Mundur, dan kalender. Tanpa", "tanggal: acara pertama yang bertanggal."] });
-    const it1 = c.y;
-    const f1 = col(I + 10, it1 + 48, IW - 20).field("Nama acara", "Akad Nikah").field("Mulai", "14/02/2027, 08.00", { icon: "calendar" })
-      .field("Selesai (opsional)", "hh/bb/tttt, --.--", { icon: "calendar", placeholder: true }).field("Nama tempat atau gedung", "Masjid Al-Ikhlas")
-      .area("Alamat lengkap", ["Jl. Melati 1, Jakarta"]).field("Tautan peta", "https://maps.google.com/?q=Kebayoran+Baru").area("Catatan (opsional)", ["Khusus keluarga inti"]);
-    const end1 = f1.y - 2, btnY = end1 + 8;
-    const after = col(I, btnY + 48, IW).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]).lead("Hitung mundur memakai Acara utama.");
-    const scrolled = rect(72, 153, 327, 747 + DY, { fill: C.white }) + nkAcc(P, 111, PW, "Mempelai", { badge: "Terisi" }) + nkAcc(P, 169, PW, "Acara & Tanggal", { badge: "Terisi", h: 1400 }) + c.svg +
-      itemBox(it1, end1 - it1) + itemBar(it1, "Akad Nikah", true, true) + f1.svg + quietBlock(I, btnY, IW, "Tambah acara", "plus") + after.svg;
+    // Panel scrolled to Acara & Tanggal (Mempelai closed above it), one event left in the list (fillAcara).
+    const c = col(I, 223, IW); fillAcara(EVS.slice(0, 1))(c);
+    const btnY = c.at["Tambah acara"];
+    const scrolled = rect(72, 153, 327, 747 + DY, { fill: C.white }) + nkAcc(P, 111, PW, "Mempelai", { badge: "Terisi" }) + nkAcc(P, 169, PW, "Acara & Tanggal", { badge: "Terisi", h: 1400 }) + c.svg;
     // Second event, after scrolling (world y = scrolled y - DY).
     const y2 = btnY - DY, nameY = y2 + 48, startY = nameY + 68, endY = startY + 68;
     const lower = (y) => col(I + 10, y, IW - 20).field("Nama tempat atau gedung", "").area("Alamat lengkap", []).field("Tautan peta", "https://...", { placeholder: true }).svg;
