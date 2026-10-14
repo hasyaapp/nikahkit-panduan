@@ -1,7 +1,7 @@
 // The NikahKit Bantuan dialog (nikahkit/src/ui/help.jsx), drawn in the editor's panel column (x 0..398), one copy for
 // every scene. Owner: 08-bantuan. Layout follows the DOM flow (padding 16, margins from styles.js/base.css); sizes from
 // /tmp/ref/editor-bantuan.png + editor-metrics.json.
-import { C, rect, text, line, circle, para, group, clipped, iconX, tw, wrap } from "../lib.mjs";
+import { C, rect, text, line, circle, para, group, clipped, iconX, wrap } from "../lib.mjs";
 import { nkBtn, nkBadge, nkBadgeBox, nkNote, nkH3 } from "./kit.mjs";
 
 // Check rows in help.jsx order.

@@ -248,7 +248,9 @@ const ROWS = [
   [[[B("Terlalu banyak permintaan. Coba lagi nanti.")]], [["Terlalu sering mencoba"], ["dalam waktu singkat."]], [["Tunggu beberapa menit."]]]
 ];
 const MATCH2 = [COLX[0] - 1, ROW_T[2] + 13, 98, 19]; // "Sesi berakhir" (bold 14 px, pinned to 96 px)
-const ROW3 = [321, ROW_T[2], 767, 65];
+// Row 3 for focus and lenses: from 502 (below the Langkah text that stays drawn under the table, so no edge cuts it)
+// to the row's end at 556.
+const ROW3 = [321, ROW_T[2] + 11, 767, 54];
 const ARTI = [COLX[1] - 4, ROW_T[2] + 12, 84, 22];
 const TODO = [COLX[2] - 4, ROW_T[2] + 12, 160, 42];
 const galatTable = (() => {
@@ -533,9 +535,9 @@ export const scenes = {
       { caption: "Ketik beberapa kata awal, misalnya Sesi berakhir. Chrome lompat ke hasilnya.", dur: 3.8, focus: [FB_BOX, STEP3], mark: [MATCH1, [FB.x + 12, FB.y + 10, 250, 28]],
         type: [{ id: "query", n: 13, box: [FB.x + 16, FB.y + 12, tw("Sesi berakhir", 14) + 6, 24] }], show: ["n1", "steps"], lens: { src: [376, STEP_T[2] - 6, 680, 110], zoom: 1.5 } },
       { caption: "Tekan Enter untuk lompat ke hasil berikutnya: baris di tabel pesan.", dur: 3.4, focus: [FB_BOX, ROW3], mark: [MATCH2, [FB.x + 200, FB.y + 10, 62, 28]],
-        hide: ["n1"], show: ["n2", "table"], lens: { src: [321, ROW_T[2] - 4, 560, 73] } },
-      { caption: "Baca kolom Artinya. Di sini: Login habis.", dur: 3.2, focus: ROW3, mark: ARTI, hide: ["find", "query", "n2"], show: ["findSk"], lens: { src: [600, ROW_T[2] - 4, 490, 73] } },
-      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", dur: 3.8, mark: TODO, lens: { src: [600, ROW_T[2] - 4, 490, 73] } }
+        hide: ["n1"], show: ["n2", "table"], lens: { src: [321, ROW3[1], 560, 30] } },
+      { caption: "Baca kolom Artinya. Di sini: Login habis.", dur: 3.2, focus: ROW3, mark: ARTI, hide: ["find", "query", "n2"], show: ["findSk"], lens: { src: [600, ROW3[1], 490, ROW3[3]] } },
+      { caption: "Kerjakan kolom Yang harus dilakukan: klik Masuk dengan Google lagi.", dur: 3.8, mark: TODO, lens: { src: [600, ROW3[1], 490, ROW3[3]] } }
     ]
   },
 
