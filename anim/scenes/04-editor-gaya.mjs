@@ -23,13 +23,12 @@ const toolBox = (cy) => [4, cy - 22, 64, 44];
 // ---- small drawing helpers -------------------------------------------------------------------------------------------
 const raw = (body, cx, cy, size, color, fill = false) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="${fill ? color : "none"}" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
 const scrollbar = (y = 157, h = 360) => rect(387, y, 6, h, { r: 3, fill: "#c4c8ce" });
-const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
 
 // Editor shell: Scalev editor + NikahKit rail (active menu) + panel header.
 const shell = (rail, title, o = {}) => scalevEditor(0, 0, { rail, ...o }) + (title ? nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line }) : "");
 // Switching menus: the rail tabs with another one active, and an empty panel with its header.
 const railTabs = (rail) => clipped(0, 92, 72, 350, nkRail(0, 0, rail));
-const panelOpen = (title) => white(72, 92, 327, 808) + nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line });
+const panelOpen = (title) => rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line });
 // The Scalev bars above the panel, drawn over a scrolled panel so its content stays inside the panel.
 const barMask = () => clipped(72, 0, 327, 92, scalevEditor(0, 0));
 
@@ -108,7 +107,7 @@ const MEDIA_Y = 239, MS = 89; // grid top, tile size (3 columns, gap 6)
 const tile = (i, k) => { const x = PX + (i % 3) * (MS + 6), y = MEDIA_Y + Math.floor(i / 3) * (MS + 6); return photo(x, y, MS, MS, k); };
 const mediaGrid = (ks) => clipped(PX, MEDIA_Y, PW, 900 - MEDIA_Y, ks.map((k, i) => tile(i, k)).join(""));
 const OLD = [0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2];
-const mediaBody = (hint, ks, o = {}) => white(72, 154, 314, 746) + nkBtn(PX, BY, "Unggah foto", { w: PW, icon: "upload", size: 14 }) +
+const mediaBody = (hint, ks, o = {}) => rect(72, 154, 314, 746, { fill: C.white }) + nkBtn(PX, BY, "Unggah foto", { w: PW, icon: "upload", size: 14 }) +
   (o.busy ? rect(PX, BY, PW, 36, { r: 4, fill: "rgba(255,255,255,.5)" }) : "") + text(PX, BY + 54, hint, { size: 12, fill: o.hintFill ?? C.faint }) + mediaGrid(ks) + scrollbar(157, 300);
 // The system file window (generic: traffic lights, folder, four photos, Buka), in the grey gap between panel and preview.
 const FILES = [["akad-1.jpg", 4], ["akad-2.jpg", 1], ["resepsi.jpg", 8], ["lamaran.jpg", 3]];
@@ -183,7 +182,7 @@ const TERAKOTA = { bg: "#F6EFE7", surface: "#FFFBF6", heading: "#5A2E1F", text: 
 const SAGE = { bg: "#F1F3EC", surface: "#FBFCF8", heading: "#2F3D2C", text: "#3B4438", accent: "#5B7553", on: "#FFFFFF" };
 // State A: Custom not in use (lead line, colours of the chosen palette), without the sub-tabs.
 function warnaA(p = KENCANA, sel = 0) {
-  let s = white(72, BY + 38, 314, 1400) + nkH3(PX, 235, "Custom") + para(PX, 259, ["Mulai dari palet yang dipilih; ubah salah satu warna", "untuk memakai Custom."], { size: 12, fill: C.faint, lh: 16 });
+  let s = rect(72, BY + 38, 314, 1400, { fill: C.white }) + nkH3(PX, 235, "Custom") + para(PX, 259, ["Mulai dari palet yang dipilih; ubah salah satu warna", "untuk memakai Custom."], { size: 12, fill: C.faint, lh: 16 });
   ROLES.forEach((r, i) => (s += colorRow(291 + i * 60, r, p[r[2]].toUpperCase())));
   return s + palettes(PAL_Y, sel);
 }
@@ -191,7 +190,7 @@ function warnaA(p = KENCANA, sel = 0) {
 const resetBox = (y) => rect(PX + 0.5, y + 0.5, PW - 1, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }) + text(PX + 11, y + 29, "Gaya diubah.", { size: 12, fill: C.strong }) +
   quiet(PX + PW - 11 - 86, y + 9, "Kembalikan", { w: 86, h: 32 });
 function warnaB() {
-  let s = white(72, 154, 314, 746) + subtabs(0, [0]) + resetBox(223) + nkH3(PX, 297, "Custom") + changed(PX + 50, 297, "dipakai");
+  let s = rect(72, 154, 314, 746, { fill: C.white }) + subtabs(0, [0]) + resetBox(223) + nkH3(PX, 297, "Custom") + changed(PX + 50, 297, "dipakai");
   ROLES.forEach((r, i) => (s += colorRow(309 + i * 60, r, r[2] === "accent" ? GOLD : KENCANA[r[2]].toUpperCase())));
   s += nkNote(PX, 609, PW, ["Kurang kontras: Aksen di Latar, Aksen di", "Kartu."], { tone: "warn" }) + quiet(PX, 677, "Kembali ke palet bawaan");
   return s + palettes(738, -1);
@@ -227,7 +226,7 @@ const FONT_LINK = "https://fonts.google.com/specimen/Playfair+Display";
 // Huruf panel (panels-style.jsx TypePanel), without the sub-tabs. o: big (Besar), bold (Ketebalan teks Tebal),
 // pair (index), font ("check" while weights are probed, "done" after). Returns [svg, positions].
 function huruf(o = {}) {
-  let y = BY + 54, s = white(72, BY + 38, 314, 1600); const pos = {};
+  let y = BY + 54, s = rect(72, BY + 38, 314, 1600, { fill: C.white }); const pos = {};
   const p = PAIRS[o.pair ?? 0], hf = o.font === "done" ? PLAYFAIR : p[3];
   if (o.big || o.bold || o.font) { s += resetBox(y); y += 62; }
   s += nkH3(PX, y + 12, "Ukuran teks") + (o.big ? changed(PX + 76, y + 12) : ""); y += 24;
@@ -251,12 +250,12 @@ function huruf(o = {}) {
   return [s, pos];
 }
 // Gaya panel top (header + sub-tabs) drawn over a scrolled pane.
-const gayaTop = (active, dots = [], sb = 300) => nkHead(0, 0, "Gaya") + line(72, 153, 399, 153, { stroke: C.line }) + white(72, 154, 327, BY + 46 - 154) + subtabs(active, dots) + scrollbar(157, sb);
+const gayaTop = (active, dots = [], sb = 300) => nkHead(0, 0, "Gaya") + line(72, 153, 399, 153, { stroke: C.line }) + rect(72, 154, 327, BY + 46 - 154, { fill: C.white }) + subtabs(active, dots) + scrollbar(157, sb);
 const hurufTabs = (dots) => gayaTop(1, dots);
 // Bentuk tab (Bentuk sudut + Gerak saat digulir); Kencana defaults: Lengkung (2), Halus (1).
 function bentuk(shape = 2, motion = 1) {
   const diff = shape !== 2 || motion !== 1;
-  let y = BY + 54, s = white(72, 154, 314, 746) + subtabs(2, diff ? [2] : []) + (diff ? resetBox(y) : ""); y += diff ? 62 : 0;
+  let y = BY + 54, s = rect(72, 154, 314, 746, { fill: C.white }) + subtabs(2, diff ? [2] : []) + (diff ? resetBox(y) : ""); y += diff ? 62 : 0;
   s += nkH3(PX, y + 12, "Bentuk") + (shape !== 2 ? changed(PX + 50, y + 12) : ""); y += 24;
   s += segIcons(PX, y, PW, ["Lembut", "Tegas", "Lengkung"].map((label, i) => ({ label, svg: SHAPE_ICON[i] })), shape); y += 58;
   s += nkH3(PX, y + 12, "Gerak") + (motion !== 1 ? changed(PX + 44, y + 12) : ""); y += 24;
@@ -271,7 +270,7 @@ const SEG = (row, diff) => BY + 54 + (diff ? 62 : 0) + 24 + row * 82 + 19;
 // Musik (panels-structure.jsx AudioPanel); the panel does not scroll here, so the body is 294 wide.
 const AW = 294;
 function musik(o = {}) {
-  let y = BY, s = white(72, 154, 327, 746);
+  let y = BY, s = rect(72, 154, 327, 746, { fill: C.white });
   s += text(PX, y + 12, "Tautan lagu", { size: 12, weight: 500 }) + nkInput(PX, y + 20, AW, o.link ? (o.linkVal ? "https://youtu.be/AbCdEf12345" : "") : "https://youtu.be/...", { placeholder: !o.linkVal, focus: o.focusLink }) +
     text(PX, y + 76, "YouTube, atau .mp3 dari hosting lain.", { size: 12, fill: C.faint });
   y += 92;
@@ -301,7 +300,7 @@ const SECS = ["Sampul", "Salam Pembuka", "Ayat / Kutipan", "Profil Mempelai", "K
 const ROW0 = 197, rowY = (i) => ROW0 + i * 50;
 function secRow(i, name, o = {}) {
   const y = rowY(i);
-  let s = white(PX, y, PW, 50) + line(PX, y + 49.5, PX + PW, y + 49.5, { stroke: C.line });
+  let s = rect(PX, y, PW, 50, { fill: C.white }) + line(PX, y + 49.5, PX + PW, y + 49.5, { stroke: C.line });
   const small = o.locked ? (o.locked === "first" ? "Selalu pertama" : "Selalu terakhir") : o.off ? "Disembunyikan" : "";
   s += small ? text(95, y + 22, name, { size: 14 }) + text(95, y + 39, small, { size: 12, fill: C.faint }) : text(95, y + 30, name, { size: 14 });
   if (o.locked) return s + icon("lock", 353, y + 25, 14, C.faint);
@@ -311,7 +310,7 @@ const rowOpts = (i, n, last) => (i === 0 ? { locked: "first" } : i === last ? { 
 // Whole list for an order (o.off: hidden section, o.button: Kembalikan urutan template, o.dock: Menu bawah on).
 function lapList(order, o = {}) {
   const last = order.length - 1, pos = {};
-  let s = white(72, 154, 327, 1500) + text(PX, BY + 12, "Bagian kosong tidak tampil.", { size: 12, fill: C.faint }) +
+  let s = rect(72, 154, 327, 1500, { fill: C.white }) + text(PX, BY + 12, "Bagian kosong tidak tampil.", { size: 12, fill: C.faint }) +
     order.map((n, i) => secRow(i, n, n === o.off ? { off: true } : rowOpts(i, n, last))).join("");
   let y = rowY(order.length) + 12;
   if (o.button) { pos.btn = y; s += quiet(PX, y, "Kembalikan urutan template"); y += 48; }
@@ -360,14 +359,14 @@ const typed = (id, x, y, s) => ({ id, n: s.length, box: [x, y, tw(s, 14) + 4, 22
 const tooltip = (x, y, s) => rect(x, y, tw(s, 12) + 16, 24, { r: 3, fill: "#f8f8f8", stroke: "#bdbdbd" }) + text(x + 8, y + 16, s, { size: 12, fill: C.strong });
 
 const accTitles = (y0) => KGROUPS.map((g, i) => nkAcc(PX, y0 + i * 58, PW, g, { badge: i < 3 ? "Terisi" : undefined })).join("");
-const kontenClosed = () => white(72, 154, 327, 746) + kontenTop() + accTitles(GROUPS_Y) + scrollbar(157, 300);
+const kontenClosed = () => rect(72, 154, 327, 746, { fill: C.white }) + kontenTop() + accTitles(GROUPS_Y) + scrollbar(157, 300);
 // Mempelai Pria fields (Urungkan / Kosongkan); nick = the Nama panggilan value.
 const priaCol = (nick) => column([{ h3: "Mempelai Pria" }, { label: "Nama panggilan", value: nick, hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", value: "Dimas Pratama, S.T." },
   { label: "Profesi atau bio singkat (opsional)", value: "Arsitek" }, { label: "Anak ke- (opsional)", value: "Putra pertama" }, { label: "Nama ayah", value: "Bapak Hasan" },
   { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Aminah" }, { toggle: "Ibu sudah wafat (Almh.)", on: false }], ACC_X, 169, ACC_W);
-const priaPanel = (nick) => white(72, 154, 327, 746) + accFrame(154, 900) + priaCol(nick)[0] + scrollbar(380, 200);
+const priaPanel = (nick) => rect(72, 154, 327, 746, { fill: C.white }) + accFrame(154, 900) + priaCol(nick)[0] + scrollbar(380, 200);
 const NICK_Y = priaCol("Dimas")[1]["Nama panggilan"] + 20;
-const nickFix = (nick) => white(ACC_X + 1, NICK_Y + 1, ACC_W - 2, 34) + text(ACC_X + 10, NICK_Y + 23, nick, { size: 14 }) + cover({ names: `Rani & ${nick}` });
+const nickFix = (nick) => rect(ACC_X + 1, NICK_Y + 1, ACC_W - 2, 34, { fill: C.white }) + text(ACC_X + 10, NICK_Y + 23, nick, { size: 14 }) + cover({ names: `Rani & ${nick}` });
 
 // ---- other windows (generic drawings at 1440 wide) ---------------------------------------------------------------------
 // YouTube watch page with the Bagikan dialog open (YouTube's Indonesian labels).
@@ -424,7 +423,7 @@ const SCENES = {
       winSel: { svg: fileWindow(true), enter: "fade", delay: 1.0 },
       busy1: { svg: mediaBody("Mengunggah 1 dari 4...", OLD, { busy: true }), enter: "fade" },
       up1: { svg: tile(0, 4), enter: "pop", delay: 0.8 },
-      busy2: { svg: white(PX, BY + 40, PW, 20) + text(PX, BY + 54, "Mengunggah 2 dari 4...", { size: 12, fill: C.faint }), enter: "fade", delay: 0.9 },
+      busy2: { svg: rect(PX, BY + 40, PW, 20, { fill: C.white }) + text(PX, BY + 54, "Mengunggah 2 dari 4...", { size: 12, fill: C.faint }), enter: "fade", delay: 0.9 },
       up2: { svg: tile(0, 1) + tile(1, 4), enter: "pop", delay: 1.7 },
       done: { svg: mediaBody("Atau seret ke sini.", [3, 8, 1, 4, ...OLD]), enter: "fade" }
     },
@@ -447,12 +446,12 @@ const SCENES = {
       { label: "Anak ke- (opsional)", value: "Putri kedua" }, { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" },
       { toggle: "Ibu sudah wafat (Almh.)", on: true }, { photo: "Foto" }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." },
       { h3: "Mempelai Pria" }, { label: "Nama panggilan", key: "pria", value: "Dimas" }], ACC_X, accY + 58, ACC_W);
-    const open = white(72, 154, 314, 1800) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi" }) + nkAcc(PX, accY, PW, "Mempelai", { badge: "Terisi", open: true }) +
+    const open = rect(72, 154, 314, 1800, { fill: C.white }) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi" }) + nkAcc(PX, accY, PW, "Mempelai", { badge: "Terisi", open: true }) +
       line(88, accY + 49.5, 367, accY + 49.5, { stroke: C.line }) + accFrame(accY, p.end + 20) + col;
     const dy = p.photo - FOTO_AT;
     const [col2, p2] = column([{ photo: "Foto", url: 6 }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." }, { h3: "Mempelai Pria" },
       { label: "Nama panggilan", value: "Dimas", hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", value: "Dimas Pratama, S.T." }, { label: "Profesi atau bio singkat (opsional)", value: "Arsitek" }], ACC_X, FOTO_AT, ACC_W);
-    const picked = white(72, 154, 314, 746) + accFrame(154, 900) + col2;
+    const picked = rect(72, 154, 314, 746, { fill: C.white }) + accFrame(154, 900) + col2;
     // Pilih foto dialog (App.jsx MediaDialog), panel-wide.
     const DX = 16, DW = 352, gy = 297, gs = (DW - 12) / 3;
     const dthumb = (i) => photo(DX + (i % 3) * (gs + 6), gy + Math.floor(i / 3) * (gs + 6), gs, gs, i);
@@ -466,7 +465,7 @@ const SCENES = {
     const [atasW] = segW(ACC_W - 20, FOCUS.map((f) => f[0]), 1);
     return {
       title: "Memasang foto lewat tombol Pilih foto",
-      base: [shell("Konten", "Konten"), white(72, 154, 327, 746), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), cover()],
+      base: [shell("Konten", "Konten"), rect(72, 154, 327, 746, { fill: C.white }), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), cover()],
       els: {
         open: { svg: open, enter: "fade" },
         hdr: clipped(72, 0, 327, 154, scalevEditor(0, 0, { rail: "Konten" })) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }),
@@ -506,7 +505,7 @@ const SCENES = {
         tabs: { svg: railTabs("Audio"), enter: "fade" },
         musik: { svg: panelOpen("Musik") + A, enter: "fade" },
         b: { svg: B, enter: "fade", delay: 0.3 },
-        clear: { svg: white(PX + 1, BY + 21, AW - 2, 34) + rect(PX + 0.5, BY + 20.5, AW - 1, 35, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
+        clear: { svg: rect(PX + 1, BY + 21, AW - 2, 34, { fill: C.white }) + rect(PX + 0.5, BY + 20.5, AW - 1, 35, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
         link: { svg: text(PX + 10, BY + 43, "https://youtu.be/AbCdEf12345", { size: 14 }), enter: "fade" },
         c: { svg: Cc, enter: "fade" },
         start: { svg: text(PX + 10, BY + 135, "1:05", { size: 14 }), enter: "fade" },
@@ -719,7 +718,7 @@ const SCENES = {
       els: {
         tabs: { svg: railTabs("Konten"), enter: "fade" },
         konten: { svg: panelOpen("Konten") + accFrame(154, 900) + kcol + scrollbar(420, 200) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
-        clr: { svg: white(ACC_X + 3, nY + 3, ACC_W - 6, 30), enter: "fade" },
+        clr: { svg: rect(ACC_X + 3, nY + 3, ACC_W - 6, 30, { fill: C.white }), enter: "fade" },
         nama: { svg: text(ACC_X + 10, nY + 23, "Rania", { size: 14 }), enter: "fade" },
         busy: { svg: footStatus("Menulis...", C.changed), enter: "fade", delay: 0.4 },
         saved: { svg: footStatus("Tersimpan", C.ok), enter: "fade", delay: 1.9 },
@@ -755,7 +754,7 @@ const SCENES = {
   "editor-klik-inspect": (() => {
     const insTool = (on) => rect(0, 700, 71, 50, { fill: C.page }) + icon("crosshair", 36, 717, 18, on ? C.action : C.text) + text(36, 740, on ? "Inspect aktif" : "Inspect", { size: 10, fill: on ? C.action : C.text, anchor: "middle" });
     const sY = GROUPS_Y + 50;
-    const form = white(72, 154, 327, 746) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi", open: true }) + line(88, sY - 0.5, 367, sY - 0.5, { stroke: C.line }) + accFrame(sY, 900) +
+    const form = rect(72, 154, 327, 746, { fill: C.white }) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi", open: true }) + line(88, sY - 0.5, 367, sY - 0.5, { stroke: C.line }) + accFrame(sY, 900) +
       para(ACC_X, sY + 24, ["Nama dan tanggal diambil dari Mempelai dan", "Acara."], { size: 12, fill: C.faint, lh: 16 }) +
       text(ACC_X, sY + 76, "Foto sampul", { size: 12, weight: 500 }) + photo(ACC_X, sY + 86, 64, 64, 2) + quiet(ACC_X, sY + 158, "Ganti foto", { icon: "image" }) +
       text(ACC_X, sY + 218, "Foto slideshow (opsional, maks. 4)", { size: 12, weight: 500 }) + scrollbar(157, 300);
@@ -837,10 +836,10 @@ const SCENES = {
     const banner = [72, 154, 327, 150], fixedTop = [72, 154, 327, 172], bannerLens = { src: [80, 160, 300, 145] };
     return {
       title: "NikahKit dijeda karena kode diubah manual",
-      base: [shell("Konten", "Konten", { saving: "Dijeda" }), white(72, 154, 327, 746), driftBanner(), rest, scrollbar(157, 300), cover()],
+      base: [shell("Konten", "Konten", { saving: "Dijeda" }), rect(72, 154, 327, 746, { fill: C.white }), driftBanner(), rest, scrollbar(157, 300), cover()],
       els: {
         code: { svg: clipped(0, 0, 399, 92, scalevEditor(0, 0, { tab: "Code" })) + codeView(), enter: "fade" },
-        fixed: { svg: white(72, 154, 327, 746) + text(PX, BY + 12, "Bahasa undangan", { size: 12, weight: 500 }) + nkInput(PX, BY + 20, PW, "Indonesia", { select: true }) +
+        fixed: { svg: rect(72, 154, 327, 746, { fill: C.white }) + text(PX, BY + 12, "Bahasa undangan", { size: 12, weight: 500 }) + nkInput(PX, BY + 20, PW, "Indonesia", { select: true }) +
           text(PX, BY + 88, "Urutan dan tampilan bagian di Lapisan.", { size: 12, fill: C.faint }) +
           ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video", "Rangkaian Acara", "Dress Code"].map((g, i) => nkAcc(PX, BY + 104 + i * 58, PW, g, { badge: "Terisi" })).join("") +
           scrollbar(157, 300) + footStatus("Tersimpan", C.ok), enter: "fade" }
