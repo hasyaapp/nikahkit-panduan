@@ -17,7 +17,7 @@ import {
 import { I, IW, kontenPanel, kListAt, fillRsvp, lid } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvMempelai, pvCover, MAROON, SERIF, CREAM } from "../ui/invitation.mjs";
 import {
-  CHROME_TOP as T, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, svSimpan, nkInput, nkHint, nkSwitch, nkH3, nkLogo, dim, phoneDesk
+  CHROME_TOP as T, ED, chrome, crDownload, favScalev, scalevEditor, scalevApp, svMenuAt, svSimpan, nkInput, nkHint, nkSwitch, nkH3, nkLogo, dim, phoneDesk
 } from "../ui/kit.mjs";
 
 const PAGE = "rani-dimas", PUBLIC = `https://tokomu.myscalev.com/${PAGE}`, WID = "365671";
@@ -360,10 +360,9 @@ const confirmDlg = shadow(CF, 12, 450, 132, 12, 3) + rect(CF, 12, 450, 132, { r:
   para(CF + 24, 48, ["Cabut kode Rina? Kode itu langsung tidak bisa dipakai", "check-in."], { size: 14, fill: C.crText, lh: 20 }) +
   rect(CF + 268.5, 108.5, 79, 31, { r: 16, fill: C.white, stroke: "#c4c7c5" }) + text(CF + 308, 129, "Batal", { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" }) +
   rect(...CONFIRM_OK, { r: 16, fill: C.crBlue }) + text(CF + 393, 129, "OK", { size: 13, weight: 500, fill: C.white, anchor: "middle" });
-// Chrome download bubble (top right, under the toolbar).
-const DL = [1020, 8, 400, 72];
-const dlBubble = shadow(...DL, 8, 2) + rect(...DL, { r: 8, fill: C.white }) + iconX("file-text", DL[0] + 32, DL[1] + 36, 22, C.crSub) +
-  text(DL[0] + 56, DL[1] + 41, "daftar-tamu-365671-2026-10-14.csv", { size: 13, weight: 500, fill: C.crText });
+// Chrome's download bubble (kit crDownload, 360x76) at the top right, where it hangs under the toolbar.
+const DL = [1440 - 360 - 16, 8, 360, 76];
+const dlBubble = crDownload(DL[0], DL[1], "daftar-tamu-365671-2026-10-14.csv", { sub: "Selesai" });
 // OS file picker centred on the screen (generic: sidebar, file list).
 const PICK_FILE = [552, 244, 516, 30];
 const picker = shadow(360, 180, 720, 440, 10, 4) + rect(360, 180, 720, 440, { r: 10, fill: C.white }) + rect(360, 180, 180, 440, { r: 10, fill: "#f2f2f4" }) + rect(530, 180, 10, 440, { fill: "#f2f2f4" }) +
@@ -544,14 +543,14 @@ export const scenes = {
       filter: { svg: selectMenu(SEL[0], DY.tools + 40, 235, ["Semua", "Baru sejak terakhir dibuka", "Disembunyikan", "Belum dibalas", "Diubah/dicatat pemilik"], 2), enter: "pop", origin: [SEL[0] + 117, DY.tools + 38] },
       d1: { svg: detail({ hidden: true }), skel: true, enter: "fade" },
       d2: { svg: detail({ hidden: true, picked: true }), skel: true, enter: "fade" },
-      dl: { svg: dlBubble, enter: "pop", origin: [1220, 8], delay: 0.1 }
+      dl: { svg: dlBubble, enter: "pop", origin: [DL[0] + 180, DL[1]], delay: 0.1 }
     },
     steps: [
       { caption: "Cari, atau pilih saringan di kotak sebelahnya.", focus: [BX - 8, DY.tools - 8, BW2 + 16, 54], mark: SEL, lens: { src: [SEL[0], DY.tools + 40, 235, 138] }, at: mid(SEL), click: true, show: ["filter"], dur: 3.6 },
       { caption: "Tiap ucapan punya Balas, Ubah teks, Sembunyikan, dan Hapus.", focus: [BX - 8, DY.items, BW2 + 16, 93], mark: [actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], lens: { src: grow([actBox(0, DY.items)[0], DY.items + 10, ACTS_W, 28], 12) }, at: mid(actBox(1, DY.items)), hide: ["filter"], dur: 3 },
       { caption: "Klik Sembunyikan. Ucapan berlabel Disembunyikan, hilang dari undangan.", focus: [BX - 8, DY.items, BW2 + 16, 186], mark: actBox(2, DY.items), lens: { src: [BX, DY.items + 4, 520, 86] }, at: mid(actBox(2, DY.items)), click: true, show: ["d1"], dur: 3.6 },
       { caption: "Aksi sekaligus: centang kotak di kiri baris. Bar aksi muncul.", focus: [BX - 8, DY.tools - 8, BW2 + 16, DY.items + 260 - DY.tools], mark: { box: [BX + 17, DY.items + 93 + 14, 16, 16], r: 3 }, lens: { src: [BX - 4, DY.tools + 46, 400, 62] }, at: [BX + 25, DY.items + 93 + 22], click: true, show: ["d2"], dur: 3.6 },
-      { caption: "Klik Unduh daftar tamu (CSV). File tersimpan di folder unduhan.", mark: CSV, lens: { src: DL }, at: mid(CSV), click: true, show: ["dl"], dur: 3.6 }
+      { caption: "Klik Unduh daftar tamu (CSV). File tersimpan di folder unduhan.", mark: CSV, lens: { src: [DL[0] - 6, DL[1] - 6, DL[2] + 12, DL[3] + 6] }, at: mid(CSV), click: true, show: ["dl"], dur: 3.6 }
     ]
   },
 
