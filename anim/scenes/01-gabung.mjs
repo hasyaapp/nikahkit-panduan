@@ -389,7 +389,6 @@ const payPage = () => {
     rect(...PAY_BTN, { r: 6, fill: C.primary }) + text(cx, CT + 529, "Bayar ke Nikahin", { size: 15, weight: 700, fill: C.white, anchor: "middle" }) +
     text(cx, CT + 572, "Pembayaran diproses dengan aman dan terenkripsi", { ...sm, anchor: "middle" });
 };
-const payDone = rect(...PAY_BTN, { r: 6, fill: C.ok }) + iconX("check", ...mid(PAY_BTN), 22, C.white, 3);
 const TABS_PAY = [{ ...TAB_ED, active: false }, { title: "nikahin.myscalev.com", active: true, fav: favScalev }];
 // The pay tab: its own Chrome top + the invoice page.
 const payTab = () => crTop({ tabs: TABS_PAY, url: "nikahin.myscalev.com/pay/…" }) + payPage();
@@ -792,7 +791,6 @@ export const scenes = {
         table: { svg: t.svg, enter: "pop", origin: mid(t.box) },
         d1: { svg: d1.svg, enter: "fade" },
         pay: { svg: payTab(), enter: "fade", skel: true },
-        payDone: { svg: payDone, enter: "pop", origin: mid(PAY_BTN) },
         tabs2: { svg: tabs2, skel: true },
         d2: { svg: d2.svg, enter: "fade" },
         open: { svg: nkOpen(CT), enter: "fade" }
@@ -801,9 +799,10 @@ export const scenes = {
         { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", focus: [t.box], at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table"], mark: d0.at.choose, note: "Pilih paket" },
         { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", focus: [PAY_CARD], at: mid(t.btns[1]), click: true, hide: ["table", "dim"], show: ["pay"],
           mark: t.btns[1], note: "Pilih", dur: 3.6 },
-        { caption: "Pilih QRIS atau Virtual Account, lalu bayar sebelum batas waktu.", focus: [PAY_CARD], at: mid(PAY_BTN), click: true, show: ["payDone"], mark: { box: PAY_BTN, r: 6 },
-          lens: { src: [PAY.x, CT + 206, PAY.w, 150] }, dur: 3.6 },
-        { caption: "Kembali ke tab editor Scalev. Di kartu Paket ada tombol Cek pembayaran.", focus: [[0, 0, W, 41], d1.box], at: mid(TAB1), click: true, hide: ["pay", "payDone"], show: ["tabs2", "dim", "d1"],
+        { caption: "Pilih QRIS atau Virtual Account. Bayar sebelum batas waktu.", focus: [PAY_CARD], at: [PAY.x + 120, CT + 284],
+          mark: { box: [PAY.x + 24, CT + 266, PAY.w - 48, 196], r: 6 }, lens: { src: [PAY.x + 12, CT + 206, PAY.w - 24, 100], at: [162, 452] }, dur: 3.6 },
+        { caption: "Klik Bayar ke Nikahin, lalu ikuti petunjuknya sampai selesai.", at: mid(PAY_BTN), click: true, mark: { box: PAY_BTN, r: 6 }, note: "Bayar ke Nikahin", dur: 3 },
+        { caption: "Kembali ke tab editor Scalev. Di kartu Paket ada tombol Cek pembayaran.", focus: [[0, 0, W, 41], d1.box], at: mid(TAB1), click: true, hide: ["pay"], show: ["tabs2", "dim", "d1"],
           mark: { box: TAB1, r: 9 }, lens: { src: [70, 0, 520, 41] }, dur: 3.6 },
         { caption: "Klik Cek pembayaran. Kartu Paket berubah, muncul Langganan aktif.", focus: [d2.box], at: mid(d1.at.paid), click: true, hide: ["d1"], show: ["d2"], mark: d1.at.paid,
           note: "Cek pembayaran", dur: 3.8 },
