@@ -44,9 +44,10 @@ assert.ok(run.includes(`width="${+(textWidth("Hadir 8", 10, 700) + textWidth(" Â
 assert.ok(sk.includes('fill="#eceff3"') && sk.includes('fill="#ffffff"') && sk.includes("rgba(214,219,226,0.42)"), "dark fill greyed, white kept, alpha kept");
 // A tinted near-white (green badge, cream page) keeps its lightness and loses its hue: one grey family.
 assert.equal(skeleton('<rect fill="#e8f9ef"/><rect fill="#f6f9fc"/><rect fill="rgba(255,250,240,.5)"/>'), '<rect fill="#f5f5f5"/><rect fill="#f6f9fc"/><rect fill="rgba(250,250,250,0.5)"/>', "tints neutralised, neutral greys kept");
-// text() runs: a run sets only what it names (an underlined run keeps the line's weight), the skeleton is one bar.
-const rs = skeleton(text(0, 20, ["Urutan di ", { t: "Lapisan", u: true }, " ", { t: "365671", w: 700 }], { size: 12, weight: 500 }));
-assert.ok(rs.includes(`width="${+(textWidth("Urutan di ", 12, 500) + textWidth("Lapisan", 12, 500) + textWidth(" ", 12, 500) + textWidth("365671", 12, 700)).toFixed(1)}"`), "runs: one bar, each run at its own weight " + rs);
+// text() runs: a run sets only what it names (an underlined run keeps the line's weight), the skeleton is one bar
+// with each run measured at its own weight and size.
+const rs = skeleton(text(0, 20, ["Urutan di ", { t: "Lapisan", u: true }, " ", { t: "365671", w: 700, size: 10 }], { size: 12, weight: 500 }));
+assert.ok(rs.includes(`width="${+(textWidth("Urutan di ", 12, 500) + textWidth("Lapisan", 12, 500) + textWidth(" ", 12, 500) + textWidth("365671", 10, 700)).toFixed(1)}"`), "runs: one bar, each run at its own weight and size " + rs);
 // wrap: a word longer than the width (a URL) is split so every line fits; nothing is lost.
 const url = "Kelola: https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas";
 const wl = wrap(url, 200, 14);

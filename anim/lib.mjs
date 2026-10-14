@@ -53,9 +53,9 @@ export const C = {
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const attrs = (o) => Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== false).map(([k, v]) => ` ${k}="${esc(v)}"`).join("");
 export const rect = (x, y, w, h, o = {}) => `<rect${attrs({ x, y, width: w, height: h, rx: o.r ?? 0, fill: o.fill ?? "none", stroke: o.stroke, "stroke-width": o.stroke ? o.sw ?? 1 : undefined, "stroke-dasharray": o.dash, opacity: o.opacity })}/>`;
-// s: a string, or the runs of one line in mixed styles: each a string (styled like the line) or { t, w?, fill?, u? }
-// (a bold run, an underlined link); a run sets only what it names. Runs keep their spaces (xml:space).
-const run = (p) => (typeof p === "string" ? esc(p) : `<tspan${attrs({ "font-weight": p.w, fill: p.fill, "text-decoration": p.u ? "underline" : undefined })}>${esc(p.t)}</tspan>`);
+// s: a string, or the runs of one line in mixed styles: each a string (styled like the line) or { t, w?, fill?, u?, size? }
+// (a bold run, an underlined link, a smaller count); a run sets only what it names. Runs keep their spaces (xml:space).
+const run = (p) => (typeof p === "string" ? esc(p) : `<tspan${attrs({ "font-weight": p.w, fill: p.fill, "font-size": p.size, "text-decoration": p.u ? "underline" : undefined })}>${esc(p.t)}</tspan>`);
 export const text = (x, y, s, o = {}) => `<text${attrs({ x, y, "font-size": o.size ?? 14, "font-weight": o.weight, fill: o.fill ?? C.strong, "text-anchor": o.anchor, "font-family": o.mono ? "'Roboto Mono',ui-monospace,Menlo,monospace" : o.font, "font-style": o.italic ? "italic" : undefined, "text-decoration": o.underline ? "underline" : undefined, "xml:space": Array.isArray(s) ? "preserve" : undefined })}>${Array.isArray(s) ? s.map(run).join("") : esc(s)}</text>`;
 export const line = (x1, y1, x2, y2, o = {}) => `<line${attrs({ x1, y1, x2, y2, stroke: o.stroke ?? C.line, "stroke-width": o.sw ?? 1, "stroke-linecap": o.cap })}/>`;
 export const circle = (cx, cy, r, o = {}) => `<circle${attrs({ cx, cy, r, fill: o.fill ?? "none", stroke: o.stroke, "stroke-width": o.stroke ? o.sw ?? 1 : undefined })}/>`;
@@ -168,7 +168,7 @@ function skColor(kind, v) {
 const attr = (a, k) => new RegExp(`(?:^|\\s)${k}="([^"]*)"`).exec(a)?.[1];
 const unesc = (s) => s.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
 // One bar per line. A tspan with an x starts a line (para()); other tspans (a bold run) and bare text continue the
-// line they are on, each run measured at its own weight.
+// line they are on, each run measured at its own weight and size.
 function textBars(attrs, body) {
   const x0 = +(attr(attrs, "x") ?? 0), y0 = +(attr(attrs, "y") ?? 0), size = +(attr(attrs, "font-size") ?? 14), weight = +(attr(attrs, "font-weight") ?? 400), anchor = attr(attrs, "text-anchor");
   const metrics = { mono: /mono/i.test(attr(attrs, "font-family") ?? ""), spacing: +(attr(attrs, "letter-spacing") ?? 0) };
@@ -176,17 +176,17 @@ function textBars(attrs, body) {
   const lines = [{ x: x0, y: y0, runs: [] }];
   let y = y0;
   for (const [, a, inner, bare] of body.matchAll(/<tspan\b([^>]*)>([\s\S]*?)<\/tspan>|([^<]+)/g)) {
-    if (bare !== undefined) { lines.at(-1).runs.push([unesc(bare), weight]); continue; }
+    if (bare !== undefined) { lines.at(-1).runs.push([unesc(bare), weight, size]); continue; }
     y += +(attr(a, "dy") ?? 0);
     if (attr(a, "x") !== undefined) lines.push({ x: +attr(a, "x"), y, runs: [] });
-    lines.at(-1).runs.push([unesc(inner), +(attr(a, "font-weight") ?? weight)]);
+    lines.at(-1).runs.push([unesc(inner), +(attr(a, "font-weight") ?? weight), +(attr(a, "font-size") ?? size)]);
   }
   return lines.map(({ x, y: ly, runs }) => {
     const s = runs.map(([t]) => t).join("");
     if (!s.trim()) return "";
     const lead = s.length - s.trimStart().length, tail = s.trimEnd().length;
     let at = 0; // trim the line's outer whitespace, then sum the runs
-    const width = runs.reduce((sum, [t, wt]) => { const from = Math.max(lead - at, 0), to = Math.min(tail - at, t.length); at += t.length; return to > from ? sum + textWidth(t.slice(from, to), size, wt, metrics) : sum; }, 0);
+    const width = runs.reduce((sum, [t, wt, sz]) => { const from = Math.max(lead - at, 0), to = Math.min(tail - at, t.length); at += t.length; return to > from ? sum + textWidth(t.slice(from, to), sz, wt, metrics) : sum; }, 0);
     const w = pinned ? +pinned : +width.toFixed(1), h = Math.max(3, +(size * 0.5).toFixed(1)), bx = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
     return `<rect x="${+bx.toFixed(1)}" y="${+(ly - size * 0.62).toFixed(1)}" width="${w}" height="${h}" rx="${h / 2}" fill="${SK.bar}"/>`;
   }).join("");
@@ -196,232 +196,280 @@ export const skeleton = (svg) => String(svg)
   .replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, a, b) => textBars(a, b));
 
 // ---- Compiler -------------------------------------------------------------------------------------------------------
+// compile(scene) runs in phases: validate the scene, time the steps, give each element its visibility windows and
+// motion (typing, scroll, press), cut the focus zones, place each step's marks, lenses and notes, move the pointer,
+// write the caption bar, then assemble one SVG.
 const POINTER = `<path d="M0 0 L0 20 L5.5 15 L9.5 24 L13 22.5 L9 13.8 L16.5 13.8 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>`;
 const KEYS = new Set(["caption", "dur", "focus", "mark", "lens", "note", "at", "click", "press", "show", "hide", "type", "scroll", "hover"]);
+const REDUCE = `@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}`;
+const MOVE = 0.6; // shortest time (s) the pointer takes to reach a step's `at`
 const rectsOf = (f) => (f === "all" || f === "none" ? [] : Array.isArray(f[0]) ? f : [f]);
 const marksOf = (m) => (!m ? [] : Array.isArray(m) && Array.isArray(m[0]) ? m.map((b) => ({ box: b })) : Array.isArray(m) && typeof m[0] === "object" ? m : [Array.isArray(m) ? { box: m } : m]);
 const overlap = (a, b, pad = 0) => a[0] < b[0] + b[2] + pad && b[0] < a[0] + a[2] + pad && a[1] < b[1] + b[3] + pad && b[1] < a[1] + a[3] + pad;
 const hits = (p, b) => p[0] >= b[0] - 2 && p[0] <= b[0] + b[2] + 2 && p[1] >= b[1] - 2 && p[1] <= b[1] + b[3] + 2; // click point on a mark box
+const toStage = (p) => [+(p[0] * FIT).toFixed(1), +(p[1] * FIT).toFixed(1)], boxStage = (b) => [b[0] * FIT, b[1] * FIT, b[2] * FIT, b[3] * FIT];
 // Where the segment from the centre of rect r towards point p leaves r.
 function edge(r, p) {
-  const cx = r[0] + r[2] / 2, cy = r[1] + r[3] / 2, dx = p[0] - cx, dy = p[1] - cy;
+  const [cx, cy] = mid(r), dx = p[0] - cx, dy = p[1] - cy;
   const k = Math.min(dx ? r[2] / 2 / Math.abs(dx) : Infinity, dy ? r[3] / 2 / Math.abs(dy) : Infinity);
   return [cx + dx * k, cy + dy * k];
 }
-export function compile(scene) {
-  const steps = scene.steps;
-  if (!steps?.length) throw new Error(`${scene.title}: tanpa langkah`);
-  if (scene.world) throw new Error(`${scene.title}: "world" dihapus; kanvas selalu satu layar ${WORLD.w}x${WORLD.h}`);
-  if (!Array.isArray(scene.base)) throw new Error(`${scene.title}: base harus daftar svg layar penuh`);
-  if (steps[0].focus === undefined) throw new Error(`${scene.title}: langkah 1 harus punya focus`);
-  const els = Object.fromEntries(Object.entries(scene.els ?? {}).map(([id, v]) => [id, typeof v === "string" ? { svg: v } : { ...v }]));
-  for (const id of Object.keys(els)) if (!/^[A-Za-z][\w-]*$/.test(id)) throw new Error(`${scene.title}: id "${id}" harus diawali huruf`);
-  const durs = steps.map((s) => s.dur ?? 3.2), total = +(durs.reduce((a, b) => a + b, 0) + 1.6).toFixed(2);
-  const start = durs.map((_, i) => +durs.slice(0, i).reduce((a, b) => a + b, 0).toFixed(3)), end = durs.map((d, i) => start[i] + d);
-  const pct = (t) => +Math.max(0, Math.min(100, (100 * t) / total)).toFixed(3);
-  const css = [], defs = [];
-  const S = FIT, toStage = (p) => [+(p[0] * S).toFixed(1), +(p[1] * S).toFixed(1)], boxStage = (b) => [b[0] * S, b[1] * S, b[2] * S, b[3] * S];
-  const capLines = steps.map((s) => wrap(s.caption ?? "", W - 80, 16, 500));
-  const CAP = 24 + 22 * Math.max(...capLines.map((l) => l.length)), H = VH + CAP;
-  // Timing: the pointer reaches `at` at hit[i]; on a click step everything the step changes happens at the click.
-  const MOVE = 0.6;
-  const hit = durs.map((d, i) => start[i] + Math.max(MOVE, d * 0.35));
-  const act = steps.map((s, i) => (s.click && s.at ? hit[i] + 0.1 : start[i]));
-  // One opacity window per [from, to] (seconds; null = from the start / to the end), looping like the rest.
-  const fadeRule = (sel, k, w, on = "opacity:1", offS = "opacity:0", enter = 0.26, exit = 0.16) => {
-    const startsOn = w[0][0] === null, endsOn = w.at(-1)[1] === null, kf = [`0%{${startsOn ? on : offS}}`];
-    for (const [a, b] of w) {
-      if (a !== null) kf.push(`${pct(a)}%{${offS};animation-timing-function:${EASE_OUT}}`, `${pct(a + enter)}%{${on}}`);
-      if (b !== null) kf.push(`${pct(b)}%{${on};animation-timing-function:${EASE_OUT}}`, `${pct(b + exit)}%{${offS}}`);
-    }
-    kf.push(`${pct(total - 0.45)}%{${endsOn ? on : offS}}`, `100%{${startsOn ? on : offS}}`);
-    return `${sel}{${endsOn ? on : offS};animation:${k} ${total}s infinite}@keyframes ${k}{${dedupe(kf)}}`;
-  };
-  // Element visibility windows.
-  const win = {};
-  const need = (i, kind, id) => { if (!els[id]) throw new Error(`${scene.title}: langkah ${i + 1} ${kind} "${id}" tidak ada`); };
-  let focus = steps[0].focus;
-  const focusOf = steps.map((s) => (focus = s.focus ?? focus));
+function dedupe(kf) { const m = new Map(); for (const k of kf) m.set(k.slice(0, k.indexOf("{")), k); return [...m.values()].join(""); }
+
+function validate(scene) {
+  const { steps, title } = scene;
+  if (!steps?.length) throw new Error(`${title}: tanpa langkah`);
+  if (scene.world) throw new Error(`${title}: "world" dihapus; kanvas selalu satu layar ${WORLD.w}x${WORLD.h}`);
+  if (!Array.isArray(scene.base)) throw new Error(`${title}: base harus daftar svg layar penuh`);
+  if (steps[0].focus === undefined) throw new Error(`${title}: langkah 1 harus punya focus`);
+  const els = scene.els ?? {};
+  for (const id of Object.keys(els)) if (!/^[A-Za-z][\w-]*$/.test(id)) throw new Error(`${title}: id "${id}" harus diawali huruf`);
   steps.forEach((s, i) => {
-    for (const k of Object.keys(s)) if (!KEYS.has(k)) throw new Error(`${scene.title}: langkah ${i + 1} kunci "${k}" tidak dikenal`);
-    for (const id of s.show ?? []) { need(i, "show", id); (win[id] ??= []).push([act[i] + (els[id].delay ?? 0), null]); }
-    for (const id of s.hide ?? []) {
-      need(i, "hide", id);
-      const w = win[id]; if (w && w.at(-1)[1] === null) w.at(-1)[1] = act[i]; else (win[id] ??= []).push([null, act[i]]);
-    }
-    for (const t of s.type ?? []) need(i, "type", t.id ?? t);
-    if (s.press) need(i, "press", s.press);
-    if (s.hover) { need(i, "hover", s.hover); (win[s.hover] ??= []).push([start[i] + durs[i] * 0.3, end[i]]); }
-    if (s.scroll) need(i, "scroll", s.scroll.id);
-    if (s.lens && !Array.isArray(s.lens.src)) throw new Error(`${scene.title}: langkah ${i + 1} lens butuh src [x, y, w, h]`);
+    const step = `${title}: langkah ${i + 1}`, need = (kind, id) => { if (!Object.hasOwn(els, id)) throw new Error(`${step} ${kind} "${id}" tidak ada`); };
+    for (const k of Object.keys(s)) if (!KEYS.has(k)) throw new Error(`${step} kunci "${k}" tidak dikenal`);
+    for (const id of s.show ?? []) need("show", id);
+    for (const id of s.hide ?? []) need("hide", id);
+    for (const t of s.type ?? []) need("type", t.id ?? t);
+    if (s.press) need("press", s.press);
+    if (s.hover) need("hover", s.hover);
+    if (s.scroll) need("scroll", s.scroll.id);
+    if (s.lens && !Array.isArray(s.lens.src)) throw new Error(`${step} lens butuh src [x, y, w, h]`);
     // Every click lands on a marked element: the pointer target must sit inside one of the step's mark boxes.
-    if (s.click && s.at && !marksOf(s.mark).some(({ box }) => hits(s.at, box)))
-      throw new Error(`${scene.title}: langkah ${i + 1} klik di [${s.at}] tidak berada di dalam mark`);
+    if (s.click && s.at && !marksOf(s.mark).some(({ box }) => hits(s.at, box))) throw new Error(`${step} klik di [${s.at}] tidak berada di dalam mark`);
+    if (!s.caption || s.caption.length > 80) throw new Error(`${step} caption kosong atau lebih dari 80 huruf`);
   });
-  const off = (el) => ({ fade: "opacity:0", pop: "opacity:0;transform:scale(.96)", slide: "opacity:0;transform:translateY(24px)" })[el.enter ?? "rise"] ?? "opacity:0;transform:translateY(8px)";
-  const onState = (el) => ((el.enter ?? "rise") === "fade" ? "opacity:1" : "opacity:1;transform:none");
-  // Element rules use classes, so a copy of an element (inside a lens) animates exactly like the element itself.
+}
+
+// Step timing (s): a step runs [start, end); the pointer reaches its `at` at hit; act is when the step changes the
+// screen (the click on a click step, else its start); from rest the loop holds its last frame, then restarts at total.
+// fade() writes one looping opacity rule for [from, to] windows (null = from the start / to the end).
+function timeline(steps) {
+  const durs = steps.map((s) => s.dur ?? 3.2), total = +(durs.reduce((a, b) => a + b, 0) + 1.6).toFixed(2), rest = total - 0.45;
+  const start = durs.map((_, i) => +durs.slice(0, i).reduce((a, b) => a + b, 0).toFixed(3)), end = durs.map((d, i) => start[i] + d);
+  const hit = durs.map((d, i) => start[i] + Math.max(MOVE, d * 0.35)), act = steps.map((s, i) => (s.click && s.at ? hit[i] + 0.1 : start[i]));
+  const pct = (t) => +Math.max(0, Math.min(100, (100 * t) / total)).toFixed(3);
+  const fade = (sel, k, w, { on = "opacity:1", off = "opacity:0", enter = 0.26, exit = 0.16, base = "" } = {}) => {
+    const startsOn = w[0][0] === null, endsOn = w.at(-1)[1] === null, kf = [`0%{${startsOn ? on : off}}`];
+    for (const [a, b] of w) {
+      if (a !== null) kf.push(`${pct(a)}%{${off};animation-timing-function:${EASE_OUT}}`, `${pct(a + enter)}%{${on}}`);
+      if (b !== null) kf.push(`${pct(b)}%{${on};animation-timing-function:${EASE_OUT}}`, `${pct(b + exit)}%{${off}}`);
+    }
+    kf.push(`${pct(rest)}%{${endsOn ? on : off}}`, `100%{${startsOn ? on : off}}`);
+    return `${sel}{${base}${endsOn ? on : off};animation:${k} ${total}s infinite}@keyframes ${k}{${dedupe(kf)}}`;
+  };
+  return { durs, start, end, hit, act, total, rest, pct, fade };
+}
+
+// Visibility windows per element: shown / hidden at its step's act (a shown element waits its delay), hovered from
+// 30% of its step to the step's end.
+function windows(steps, els, t) {
+  const win = {};
+  steps.forEach((s, i) => {
+    for (const id of s.show ?? []) (win[id] ??= []).push([t.act[i] + (els[id].delay ?? 0), null]);
+    for (const id of s.hide ?? []) { const w = win[id]; if (w && w.at(-1)[1] === null) w.at(-1)[1] = t.act[i]; else (win[id] ??= []).push([null, t.act[i]]); }
+    if (s.hover) (win[s.hover] ??= []).push([t.start[i] + t.durs[i] * 0.3, t.end[i]]);
+  });
+  return win;
+}
+
+// Element motion. Visibility uses class rules, so a copy of an element (inside a lens) animates exactly like the
+// element. Typing: a clip reveal in character steps from the click (or 0.35 s into the step), with a caret over its
+// box. Scroll: the content translates. Press: a dip to .97 at the click. Returns each element's markup inside those
+// wrappers (typing, then scroll, then press), the carets, css and defs.
+const HIDDEN = { fade: "opacity:0", pop: "opacity:0;transform:scale(.96)", slide: "opacity:0;transform:translateY(24px)", rise: "opacity:0;transform:translateY(8px)" };
+function animate(steps, els, win, t) {
+  const css = [], defs = [], svg = Object.fromEntries(Object.entries(els).map(([id, el]) => [id, el.svg])), caret = {};
   Object.entries(els).forEach(([id, el], k) => {
     if (!win[id]) return;
-    const origin = el.origin ? `transform-origin:${el.origin[0]}px ${el.origin[1]}px;` : "transform-box:fill-box;transform-origin:center;";
-    css.push(fadeRule(`.e-${id}`, `v${k}`, win[id], onState(el), off(el)).replace(`.e-${id}{`, `.e-${id}{${origin}`));
+    const base = el.origin ? `transform-origin:${el.origin[0]}px ${el.origin[1]}px;` : "transform-box:fill-box;transform-origin:center;", enter = el.enter ?? "rise";
+    css.push(t.fade(`.e-${id}`, `v${k}`, win[id], { on: enter === "fade" ? "opacity:1" : "opacity:1;transform:none", off: HIDDEN[enter] ?? HIDDEN.rise, base }));
   });
-  // Typing: clip reveal in character steps + caret, starting at the click (or 0.35 s into the step).
-  steps.forEach((s, i) => (s.type ?? []).forEach((t, j) => {
-    const id = t.id ?? t, n = t.n ?? 16, cid = `ty${i}_${j}`, t0 = s.click && s.at ? act[i] : start[i] + 0.35, t1 = Math.min(start[i] + durs[i] * 0.85, t0 + n * 0.07);
-    const [bx, by, bw, bh] = t.box ?? [-2000, -2000, 8000, 8000]; // box: [x, y, w, h] of the typed text (adds a caret)
+  steps.forEach((s, i) => (s.type ?? []).forEach((ty, j) => {
+    const id = ty.id ?? ty, n = ty.n ?? 16, cid = `ty${i}_${j}`, t0 = s.click && s.at ? t.act[i] : t.start[i] + 0.35, t1 = Math.min(t.start[i] + t.durs[i] * 0.85, t0 + n * 0.07);
+    const [bx, by, bw, bh] = ty.box ?? [-2000, -2000, 8000, 8000]; // box: [x, y, w, h] of the typed text (adds a caret)
     defs.push(`<clipPath id="${cid}"><rect class="${cid}" x="${bx}" y="${by}" width="${bw}" height="${bh}"/></clipPath>`);
-    css.push(`.${cid}{transform-box:fill-box;transform-origin:left center;animation:${cid} ${total}s infinite}@keyframes ${cid}{0%,${pct(t0)}%{transform:scaleX(0);animation-timing-function:steps(${n},end)}${pct(t1)}%,${pct(total - 0.45)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
-    if (t.box) els[id].caret = { box: t.box, t0, t1 };
-    els[id].svg = `<g clip-path="url(#${cid})">${els[id].svg}</g>`;
+    css.push(`.${cid}{transform-box:fill-box;transform-origin:left center;animation:${cid} ${t.total}s infinite}@keyframes ${cid}{0%,${t.pct(t0)}%{transform:scaleX(0);animation-timing-function:steps(${n},end)}${t.pct(t1)}%,${t.pct(t.rest)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
+    if (ty.box) caret[id] = { box: ty.box, t0, t1 };
+    svg[id] = `<g clip-path="url(#${cid})">${svg[id]}</g>`;
   }));
-  // Scroll: translate inner content.
   const scrolls = {};
-  steps.forEach((s, i) => { if (s.scroll) (scrolls[s.scroll.id] ??= []).push([start[i] + 0.3, start[i] + Math.min(1.2, durs[i] * 0.6), s.scroll.dy]); });
+  steps.forEach((s, i) => { if (s.scroll) (scrolls[s.scroll.id] ??= []).push([t.start[i] + 0.3, t.start[i] + Math.min(1.2, t.durs[i] * 0.6), s.scroll.dy]); });
   Object.entries(scrolls).forEach(([id, list], k) => {
     let y = 0; const kf = ["0%{transform:translateY(0)}"];
-    for (const [a, b, dy] of list) { kf.push(`${pct(a)}%{transform:translateY(${y}px);animation-timing-function:${EASE_IN_OUT}}`); y -= dy; kf.push(`${pct(b)}%{transform:translateY(${y}px)}`); }
-    kf.push(`${pct(total - 0.45)}%{transform:translateY(${y}px)}`, "100%{transform:translateY(0)}");
-    css.push(`.sc-${id}{transform:translateY(${y}px);animation:sc${k} ${total}s infinite}@keyframes sc${k}{${dedupe(kf)}}`);
-    els[id].svg = `<g class="sc-${id}">${els[id].svg}</g>`;
+    for (const [a, b, dy] of list) { kf.push(`${t.pct(a)}%{transform:translateY(${y}px);animation-timing-function:${EASE_IN_OUT}}`); y -= dy; kf.push(`${t.pct(b)}%{transform:translateY(${y}px)}`); }
+    kf.push(`${t.pct(t.rest)}%{transform:translateY(${y}px)}`, "100%{transform:translateY(0)}");
+    css.push(`.sc-${id}{transform:translateY(${y}px);animation:sc${k} ${t.total}s infinite}@keyframes sc${k}{${dedupe(kf)}}`);
+    svg[id] = `<g class="sc-${id}">${svg[id]}</g>`;
   });
-  // Press: buttons dip to .97 when the pointer clicks.
   steps.forEach((s, i) => {
     if (!s.press) return;
-    const t = hit[i], id = s.press;
-    els[id].svg = `<g class="pr${i}">${els[id].svg}</g>`;
-    css.push(`.pr${i}{transform-box:fill-box;transform-origin:center;animation:pr${i} ${total}s infinite}@keyframes pr${i}{0%,${pct(t)}%{transform:none;animation-timing-function:${EASE_OUT}}${pct(t + 0.08)}%{transform:scale(.97)}${pct(t + 0.24)}%,100%{transform:none}}`);
+    const h = t.hit[i];
+    svg[s.press] = `<g class="pr${i}">${svg[s.press]}</g>`;
+    css.push(`.pr${i}{transform-box:fill-box;transform-origin:center;animation:pr${i} ${t.total}s infinite}@keyframes pr${i}{0%,${t.pct(h)}%{transform:none;animation-timing-function:${EASE_OUT}}${t.pct(h + 0.08)}%{transform:scale(.97)}${t.pct(h + 0.24)}%,100%{transform:none}}`);
   });
-  const carets = Object.values(els).filter((e) => e.caret).map((e, k) => {
-    const [x, y, w, h] = e.caret.box;
-    css.push(`.ca${k}{opacity:0;animation:ca${k} ${total}s infinite}@keyframes ca${k}{0%,${pct(e.caret.t0)}%{opacity:0;transform:translateX(0)}${pct(e.caret.t0) + 0.001}%{opacity:1;transform:translateX(0);animation-timing-function:steps(${Math.max(2, Math.round((e.caret.t1 - e.caret.t0) / 0.07))},end)}${pct(e.caret.t1)}%{opacity:1;transform:translateX(${w}px)}${pct(e.caret.t1 + 0.5)}%{opacity:0;transform:translateX(${w}px)}100%{opacity:0;transform:translateX(${w}px)}}`);
-    return { svg: `<rect class="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`, t: [e.caret.t0, e.caret.t1 + 0.5] };
+  const carets = Object.keys(els).filter((id) => caret[id]).map((id, k) => {
+    const { box: [x, y, w, h], t0, t1 } = caret[id];
+    css.push(`.ca${k}{opacity:0;animation:ca${k} ${t.total}s infinite}@keyframes ca${k}{0%,${t.pct(t0)}%{opacity:0;transform:translateX(0)}${t.pct(t0) + 0.001}%{opacity:1;transform:translateX(0);animation-timing-function:steps(${Math.max(2, Math.round((t1 - t0) / 0.07))},end)}${t.pct(t1)}%{opacity:1;transform:translateX(${w}px)}${t.pct(t1 + 0.5)}%{opacity:0;transform:translateX(${w}px)}100%{opacity:0;transform:translateX(${w}px)}}`);
+    return `<rect class="ca${k}" x="${x}" y="${y + 2}" width="1.5" height="${h - 4}" fill="${C.strong}"/>`;
+  }).join("");
+  return { svg, carets, css, defs };
+}
+
+// Detail zones over the skeleton: one per run of steps with the same focus, changing at the click on a click step
+// (like show/hide), plus each clicked element from its step's start, so the target is detailed before the click.
+function focusZones(steps, focusOf, t) {
+  const runs = [];
+  focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
+  const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: t.act[r.from] > 0 ? t.act[r.from] : null, b: r.to === steps.length - 1 ? null : t.act[r.to + 1] }));
+  steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box).filter((b) => hits(s.at, b)), a: i === 0 ? null : t.start[i], b: t.act[i] + 0.3 }); });
+  return zones;
+}
+
+// Stage position of a lens or note of w x h: `place` if given, else beside its target, then beside the first mark,
+// clamped to the stage: the first spot clear of all it must avoid (12 px from the target), else one clear of the
+// marks and the target, else the first.
+function placeBox(w, h, target, marks, avoid, place) {
+  if (place) return place;
+  const gap = 44, fits = (p) => p[0] >= 12 && p[1] >= 12 && p[0] + w <= W - 12 && p[1] + h <= VH - 12;
+  const around = (r) => { const c = mid(r); return [[r[0] + r[2] + gap, c[1] - h / 2], [r[0] - gap - w, c[1] - h / 2], [c[0] - w / 2, r[1] + r[3] + gap], [c[0] - w / 2, r[1] - gap - h]]; };
+  const cands = [...around(target), ...(marks[0] && marks[0].box !== target ? around(marks[0].box) : [])]
+    .map(([x, y]) => [Math.min(Math.max(x, 12), W - 12 - w), Math.min(Math.max(y, 12), VH - 12 - h)]);
+  const at = (p) => [p[0], p[1], w, h];
+  const free = (p) => fits(p) && !avoid.some((a, k) => overlap(at(p), a, k ? 0 : 12));
+  const clear = (p) => fits(p) && !marks.some((m) => overlap(at(p), m.box)) && !overlap(at(p), target, 12);
+  return cands.find(free) ?? cands.find(clear) ?? cands[0];
+}
+// Straight arrow from a box to the nearest edge of its target, the head on that edge.
+function arrowTo(box, target) {
+  const p = edge(box, mid(target)), q = edge(target, mid(box)), ang = Math.atan2(q[1] - p[1], q[0] - p[0]), L = 11, A = 0.45;
+  const head = [[q[0], q[1]], [q[0] - L * Math.cos(ang - A), q[1] - L * Math.sin(ang - A)], [q[0] - L * Math.cos(ang + A), q[1] - L * Math.sin(ang + A)]];
+  const back = [q[0] - (L - 2) * Math.cos(ang), q[1] - (L - 2) * Math.sin(ang)];
+  return line(p[0], p[1], back[0], back[1], { stroke: C.accent, sw: 2.5, cap: "round" }) + `<path d="M${head.map((v) => v.map((n) => +n.toFixed(1)).join(" ")).join(" L")} Z" fill="${C.accent}"/>`;
+}
+// A mark's ring with the step number on its top-left corner, kept fully on the stage for rings at the stage edge.
+const ring = (m, n) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
+  return rect(m.box[0], m.box[1], m.box[2], m.box[3], { r: m.r, stroke: C.accent, sw: 2.5 }) + circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(n), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); };
+
+// Marks, lens and note of step i on the stage (constant size, aligned to world pixels). lensWorld(a, b): the detailed
+// world a lens shows during [a, b].
+function stepOverlays(scene, i, t, focus, lensWorld) {
+  const s = scene.steps[i], css = [], defs = [], svg = [], clicks = !!(s.click && s.at), err = `${scene.title}: langkah ${i + 1} lens/note`;
+  const w = [[t.start[i] + 0.15, i === scene.steps.length - 1 ? null : t.end[i]]];
+  const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * FIT + 4, hit: clicks && hits(s.at, m.box) }; });
+  const lens = s.lens && { src: s.lens.src, zoom: (s.lens.zoom ?? 2) * FIT }, note = typeof s.note === "string" ? { text: s.note } : s.note;
+  const srcSt = lens && boxStage(lens.src);
+  // On a click step a lens whose source does not hold the click point shows the result: it appears at the click.
+  const after = !!(lens && clicks && !hits(s.at, lens.src));
+  // What the arrow points at: for a lens, the first mark over its source (else the source itself); for a note, the
+  // first mark. So an arrow always joins a lens to what it magnifies.
+  const aim = lens ? marks.find((m) => (!after || !m.hit) && overlap(m.box, srcSt)) : marks[0];
+  const size = lens ? [lens.src[2] * lens.zoom, lens.src[3] * lens.zoom] : note ? [tw(note.text, 15, 600) + 32, 36] : null;
+  let inner = "", arrow = "";
+  if (size) {
+    if (size[0] > W - 24 || size[1] > VH - 24) throw new Error(`${err} lebih besar dari panggung`);
+    const target = aim?.box ?? srcSt ?? [0, 0, 0, 0], avoid = [target, ...marks.map((m) => m.box), ...rectsOf(focus).map(boxStage)];
+    if (s.at) avoid.push([...toStage(s.at).map((v) => v - 12), 24, 24]);
+    const box = [...placeBox(size[0], size[1], target, marks, avoid, s.lens?.at ?? note?.at).slice(0, 2), ...size];
+    if (marks.some((m) => overlap(box, m.box))) throw new Error(`${err} menutupi mark`);
+    if (lens) {
+      const [sx, sy, sw, sh] = lens.src;
+      defs.push(`<clipPath id="ln${i}"><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"/></clipPath>`, `<clipPath id="lc${i}"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}" rx="10"/></clipPath>`);
+      inner = rect(box[0] - 1, box[1] + 3, box[2] + 2, box[3], { r: 11, fill: "rgba(16,24,40,.14)" }) + rect(box[0], box[1], box[2], box[3], { r: 10, fill: scene.bg ?? C.white }) +
+        `<g clip-path="url(#lc${i})"><g transform="translate(${+box[0].toFixed(2)} ${+box[1].toFixed(2)}) scale(${+lens.zoom.toFixed(4)}) translate(${-sx} ${-sy})"><g clip-path="url(#ln${i})">${lensWorld(t.start[i], t.end[i])}</g></g></g>` +
+        rect(box[0], box[1], box[2], box[3], { r: 10, stroke: C.accent, sw: 2.5 });
+    } else inner = rect(box[0], box[1], box[2], box[3], { r: 18, fill: C.accent }) + text(box[0] + box[2] / 2, box[1] + 23, note.text, { size: 15, weight: 600, fill: C.white, anchor: "middle" });
+    if (aim || lens) arrow = arrowTo(box, target);
+  }
+  // A lens or note stays for the whole step (a result lens from the click). On a click step the ring around the click
+  // point leaves just after the click, so it never floats over a screen the click has changed; the step's other marks
+  // point at the result, so they appear at the click. The arrow goes with the ring it points at, else with the lens.
+  if (inner) { css.push(t.fade(`.ov${i}`, `ov${i}`, after ? [[t.act[i], w[0][1]]] : w, { enter: 0.22, exit: 0.14 })); svg.push(`<g class="ov${i}">${aim ? "" : arrow}${inner}</g>`); }
+  const groups = clicks ? [[marks.filter((m) => m.hit), [[t.start[i] + 0.15, t.act[i] + 0.35]]], [marks.filter((m) => !m.hit), [[t.act[i], w[0][1]]]]] : [[marks, w]];
+  groups.forEach(([ms, mw], g) => {
+    if (!ms.length) return;
+    css.push(t.fade(`.om${i}_${g}`, `om${i}_${g}`, mw, { enter: 0.22, exit: 0.2 }));
+    svg.push(`<g class="om${i}_${g}">${aim && ms.includes(aim) ? arrow : ""}${ms.map((m) => ring(m, i + 1)).join("")}</g>`);
   });
+  return { css, defs, svg };
+}
+
+// Pointer in stage space (constant size): from its rest point to each step's `at` by hit, back to rest at the end.
+function pointer(scene, t) {
+  const home = scene.cursorStart ? toStage(scene.cursorStart) : [W - 60, VH - 50], pts = [];
+  let cur = home;
+  scene.steps.forEach((s, i) => { pts.push([t.pct(t.start[i]), cur]); if (s.at) { cur = toStage(s.at); pts.push([t.pct(t.hit[i]), cur]); } });
+  pts.push([t.pct(t.rest), cur], [100, home]);
+  return `#cur{animation:cur ${t.total}s infinite}@keyframes cur{${dedupe(pts.map(([p, [x, y]]) => `${p}%{transform:translate(${x}px,${y}px);animation-timing-function:${EASE_IN_OUT}}`))}}`;
+}
+// A ripple at the stage point of each click.
+function ripples(steps, t) {
+  const css = [], svg = [];
+  steps.forEach((s, i) => {
+    if (!s.click || !s.at) return;
+    const h = t.hit[i], [x, y] = toStage(s.at);
+    svg.push(`<circle id="r${i}" cx="${x}" cy="${y}" r="16" fill="rgba(184,70,13,.18)" stroke="${C.accent}" stroke-width="2.5"/>`);
+    css.push(`#r${i}{opacity:0;transform-origin:${x}px ${y}px;animation:r${i} ${t.total}s infinite}@keyframes r${i}{0%,${t.pct(h)}%{opacity:0;transform:scale(.4);animation-timing-function:${EASE_OUT}}${t.pct(h + 0.05)}%{opacity:1}${t.pct(h + 0.55)}%{opacity:0;transform:scale(1.5)}100%{opacity:0}}`);
+  });
+  return { css, svg: svg.join("") };
+}
+// Caption bar below the stage (CAP high): each step's caption and number, fading with the step, and the progress bar.
+function captionBar(steps, t, capLines, CAP) {
+  const H = VH + CAP, css = [];
+  const caps = capLines.map((ls, i) => `<g id="c${i}">${para(64, VH + CAP / 2 + 6 - 11 * (ls.length - 1), ls, { size: 16, fill: C.white, weight: 500, lh: 22 })}</g>`).join("");
+  steps.forEach((s, i) => {
+    const a = t.start[i], last = i === steps.length - 1, e = last ? t.rest : t.end[i];
+    css.push(`#c${i},#n${i}{opacity:${last ? 1 : 0};animation:c${i} ${t.total}s infinite}@keyframes c${i}{${dedupe([`0%{opacity:${i === 0 ? 1 : 0}}`, i ? `${t.pct(a)}%{opacity:0}` : "", i ? `${t.pct(a + 0.2)}%{opacity:1}` : "", `${t.pct(e)}%{opacity:1}`, `${t.pct(e + 0.2)}%{opacity:0}`, i === 0 ? `${t.pct(t.total - 0.05)}%{opacity:0}` : "", `100%{opacity:${i === 0 ? 1 : 0}}`].filter(Boolean))}}`);
+  });
+  const nums = steps.map((_, i) => `<g id="n${i}">${circle(32, VH + CAP / 2, 15, { fill: C.accent })}${text(32, VH + CAP / 2 + 5, String(i + 1), { size: 14, fill: C.white, anchor: "middle", weight: 700 })}</g>`).join("");
+  const bar = `<rect x="0" y="${H - CAP}" width="${W}" height="3" fill="rgba(255,255,255,.18)"/><rect id="prog" x="0" y="${H - CAP}" width="${W}" height="3" fill="${C.accent}"/>`;
+  css.push(`#prog{transform-origin:0 0;transform:scaleX(1);animation:prog ${t.total}s linear infinite}@keyframes prog{0%{transform:scaleX(0)}${t.pct(t.rest)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
+  return { css, svg: `${rect(0, H - CAP, W, CAP, { fill: C.cocoa })}${bar}\n${nums}${caps}` };
+}
+
+export function compile(scene) {
+  validate(scene);
+  const { steps } = scene, t = timeline(steps);
+  const els = Object.fromEntries(Object.entries(scene.els ?? {}).map(([id, v]) => [id, typeof v === "string" ? { svg: v } : v]));
+  let focus = steps[0].focus;
+  const focusOf = steps.map((s) => (focus = s.focus ?? focus));
+  const win = windows(steps, els, t), anim = animate(steps, els, win, t), ids = Object.keys(els);
   // Every element is drawn once (in defs, with its animation class) and placed by <use>: its class rules animate each
   // instance the same, so the screen, the focus zones and the lenses share one copy. The world is drawn twice, in
   // declaration order: as skeleton (base and `skel: true` elements greyed, other elements detailed), and fully detailed
   // inside each focus zone, which is opaque, so no skeleton shows through detailed text.
-  const ids = Object.keys(els);
-  defs.push(...ids.map((id) => `<g id="ed-${id}" class="e-${id}">${els[id].svg}</g>`), `<g id="carets">${carets.map((c) => c.svg).join("")}</g>`);
+  const css = [...anim.css], defs = [...anim.defs, ...ids.map((id) => `<g id="ed-${id}" class="e-${id}">${anim.svg[id]}</g>`), `<g id="carets">${anim.carets}</g>`];
   const during = (a, b) => (w) => !w || w.some(([x, y]) => (x ?? -1) < b && (y ?? Infinity) > a);
-  const uses = (keep) => ids.filter((id) => keep(win[id])).map((id) => `<use href="#ed-${id}"/>`).join("");
-  // Detail zones over the skeleton: one per run of steps with the same focus, changing at the click on a click step
-  // (like show/hide), plus each clicked element from its step's start, so the target is detailed before the click.
-  const runs = [];
-  focusOf.forEach((f, i) => { const key = JSON.stringify(f); if (runs.length && runs.at(-1).key === key) runs.at(-1).to = i; else runs.push({ key, f, from: i, to: i }); });
-  const zones = runs.filter((r) => r.f !== "none").map((r) => ({ rects: rectsOf(r.f), a: act[r.from] > 0 ? act[r.from] : null, b: r.to === steps.length - 1 ? null : act[r.to + 1] }));
-  steps.forEach((s, i) => { if (s.click && s.at) zones.push({ rects: marksOf(s.mark).map((m) => m.box).filter((b) => hits(s.at, b)), a: i === 0 ? null : start[i], b: act[i] + 0.3 }); });
+  const world = (a, b) => `<use href="#db"/>${ids.filter((id) => during(a, b)(win[id])).map((id) => `<use href="#ed-${id}"/>`).join("")}`;
+  const zones = focusZones(steps, focusOf, t);
   zones.forEach((z, k) => {
     if (z.rects.length) defs.push(`<clipPath id="fz${k}">${z.rects.map((x) => `<rect x="${x[0]}" y="${x[1]}" width="${x[2]}" height="${x[3]}"/>`).join("")}</clipPath>`);
-    css.push(fadeRule(`.fz${k}`, `fz${k}`, [[z.a, z.b]], "opacity:1", "opacity:0", 0.3, 0.3));
+    css.push(t.fade(`.fz${k}`, `fz${k}`, [[z.a, z.b]], { enter: 0.3, exit: 0.3 }));
   });
-  const zoneLayers = zones.map((z, k) => `<g class="fz${k}"${z.rects.length ? ` clip-path="url(#fz${k})"` : ""}><use href="#db"/>${uses(during(z.a ?? 0, z.b ?? total))}</g>`);
-  // Marks, notes and lenses on the stage (constant size, aligned to world pixels).
-  const overlays = [];
-  steps.forEach((s, i) => {
-    const w = [[start[i] + 0.15, i === steps.length - 1 ? null : end[i]]];
-    const marks = marksOf(s.mark).map((m) => { const [x, y, bw, bh] = boxStage(m.box); return { box: [x - 4, y - 4, bw + 8, bh + 8], r: (m.r ?? 4) * S + 4, hit: !!(s.click && s.at && hits(s.at, m.box)) }; });
-    const lensOf = s.lens && { src: s.lens.src, zoom: s.lens.zoom ?? 2 }, note = typeof s.note === "string" ? { text: s.note } : s.note;
-    const srcSt = lensOf && boxStage(lensOf.src);
-    // On a click step a lens whose source does not hold the click point shows the result: it appears at the click.
-    const after = !!(lensOf && s.click && s.at && !hits(s.at, lensOf.src));
-    // What the arrow points at: for a lens, the first mark over its source (else the source itself); for a note, the
-    // first mark. So an arrow always joins a lens to what it magnifies.
-    const aim = lensOf ? marks.find((m) => (!after || !m.hit) && overlap(m.box, srcSt)) : marks[0];
-    let box = null, inner = "", arrow = "";
-    if (lensOf) { const z = lensOf.zoom * S; box = [0, 0, lensOf.src[2] * z, lensOf.src[3] * z]; }
-    else if (note) box = [0, 0, tw(note.text, 15, 600) + 32, 36];
-    if (box) {
-      const target = aim?.box ?? srcSt ?? [0, 0, 0, 0], avoid = [target, ...marks.map((m) => m.box), ...rectsOf(focusOf[i]).map(boxStage)];
-      if (s.at) avoid.push([...toStage(s.at).map((v) => v - 12), 24, 24]);
-      const place = s.lens?.at ?? note?.at; // stage point; otherwise beside its target (then the first mark), clear of marks, focus and pointer
-      const fits = (p) => p[0] >= 12 && p[1] >= 12 && p[0] + box[2] <= W - 12 && p[1] + box[3] <= VH - 12, gap = 44;
-      const around = (t) => { const c = [t[0] + t[2] / 2, t[1] + t[3] / 2]; return [[t[0] + t[2] + gap, c[1] - box[3] / 2], [t[0] - gap - box[2], c[1] - box[3] / 2], [c[0] - box[2] / 2, t[1] + t[3] + gap], [c[0] - box[2] / 2, t[1] - gap - box[3]]]; };
-      const cands = [...around(target), ...(marks[0] && marks[0].box !== target ? around(marks[0].box) : [])]
-        .map(([x, y]) => [Math.min(Math.max(x, 12), W - 12 - box[2]), Math.min(Math.max(y, 12), VH - 12 - box[3])]);
-      const at = (p) => [p[0], p[1], box[2], box[3]];
-      const free = (p) => fits(p) && !avoid.some((a, k) => overlap(at(p), a, k ? 0 : 12));
-      const clear = (p) => fits(p) && !marks.some((m) => overlap(at(p), m.box)) && !overlap(at(p), target, 12);
-      const pos = place ?? cands.find(free) ?? cands.find(clear) ?? cands[0];
-      if (box[2] > W - 24 || box[3] > VH - 24) throw new Error(`${scene.title}: langkah ${i + 1} lens/note lebih besar dari panggung`);
-      box = [pos[0], pos[1], box[2], box[3]];
-      if (marks.some((mk) => overlap(box, mk.box))) throw new Error(`${scene.title}: langkah ${i + 1} lens/note menutupi mark`);
-      if (lensOf) {
-        const [sx, sy, sw, sh] = lensOf.src, z = lensOf.zoom * S, k = `ln${i}`, keep = during(start[i], end[i]);
-        defs.push(`<clipPath id="${k}"><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}"/></clipPath>`);
-        inner = rect(box[0] - 1, box[1] + 3, box[2] + 2, box[3], { r: 11, fill: "rgba(16,24,40,.14)" }) + rect(box[0], box[1], box[2], box[3], { r: 10, fill: scene.bg ?? C.white }) +
-          `<g clip-path="url(#lc${i})"><g transform="translate(${+box[0].toFixed(2)} ${+box[1].toFixed(2)}) scale(${+z.toFixed(4)}) translate(${-sx} ${-sy})"><g clip-path="url(#${k})"><use href="#db"/>${uses(keep)}${carets.length ? '<use href="#carets"/>' : ""}</g></g></g>` +
-          rect(box[0], box[1], box[2], box[3], { r: 10, stroke: C.accent, sw: 2.5 });
-        defs.push(`<clipPath id="lc${i}"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}" rx="10"/></clipPath>`);
-      } else inner = rect(box[0], box[1], box[2], box[3], { r: 18, fill: C.accent }) + text(box[0] + box[2] / 2, box[1] + 23, note.text, { size: 15, weight: 600, fill: C.white, anchor: "middle" });
-      if (aim || lensOf) { // straight arrow from the lens or note to the nearest edge of what it points at
-        const t = target, b = [box[0] + box[2] / 2, box[1] + box[3] / 2], tcc = [t[0] + t[2] / 2, t[1] + t[3] / 2];
-        const p = edge(box, tcc), q = edge(t, b), ang = Math.atan2(q[1] - p[1], q[0] - p[0]), L = 11, A = 0.45;
-        const head = [[q[0], q[1]], [q[0] - L * Math.cos(ang - A), q[1] - L * Math.sin(ang - A)], [q[0] - L * Math.cos(ang + A), q[1] - L * Math.sin(ang + A)]];
-        const back = [q[0] - (L - 2) * Math.cos(ang), q[1] - (L - 2) * Math.sin(ang)];
-        arrow = line(p[0], p[1], back[0], back[1], { stroke: C.accent, sw: 2.5, cap: "round" }) + `<path d="M${head.map((v) => v.map((n) => +n.toFixed(1)).join(" ")).join(" L")} Z" fill="${C.accent}"/>`;
-      }
-    }
-    // Step number on the ring's top-left corner, kept fully on the stage for rings at the stage edge (rail, tab row).
-    const ring = (m) => { const bx = Math.max(11, m.box[0]), by = Math.max(11, m.box[1]);
-      return rect(m.box[0], m.box[1], m.box[2], m.box[3], { r: m.r, stroke: C.accent, sw: 2.5 }) +
-        circle(bx, by, 10, { fill: C.accent }) + text(bx, by + 4, String(i + 1), { size: 12, weight: 700, fill: C.white, anchor: "middle" }); };
-    // A lens or note stays for the whole step (a result lens from the click). On a click step the ring around the click
-    // point leaves just after the click, so it never floats over a screen the click has changed; the step's other marks
-    // point at the result, so they appear at the click. The arrow goes with the ring it points at, else with the lens.
-    if (inner) { css.push(fadeRule(`.ov${i}`, `ov${i}`, after ? [[act[i], w[0][1]]] : w, "opacity:1", "opacity:0", 0.22, 0.14)); overlays.push(`<g class="ov${i}">${aim ? "" : arrow}${inner}</g>`); }
-    const groups = s.click && s.at ? [[marks.filter((m) => m.hit), [[start[i] + 0.15, act[i] + 0.35]]], [marks.filter((m) => !m.hit), [[act[i], w[0][1]]]]] : [[marks, w]];
-    groups.forEach(([ms, mw], g) => {
-      if (!ms.length) return;
-      css.push(fadeRule(`.om${i}_${g}`, `om${i}_${g}`, mw, "opacity:1", "opacity:0", 0.22, 0.2));
-      overlays.push(`<g class="om${i}_${g}">${aim && ms.includes(aim) ? arrow : ""}${ms.map(ring).join("")}</g>`);
-    });
-  });
-  // Pointer in stage space (constant size).
-  const rest = scene.cursorStart ? toStage(scene.cursorStart) : [W - 60, VH - 50];
-  const pts = []; let cur = rest;
-  steps.forEach((s, i) => { pts.push([pct(start[i]), cur]); if (s.at) { cur = toStage(s.at); pts.push([pct(hit[i]), cur]); } });
-  pts.push([pct(total - 0.45), cur], [100, rest]);
-  const usesCursor = steps.some((s) => s.at);
-  if (usesCursor) css.push(`#cur{animation:cur ${total}s infinite}@keyframes cur{${dedupe(pts.map(([p, [x, y]]) => `${p}%{transform:translate(${x}px,${y}px);animation-timing-function:${EASE_IN_OUT}}`))}}`);
-  // Clicks: ripple at the stage point.
-  const ripples = [];
-  steps.forEach((s, i) => {
-    if (!s.click || !s.at) return;
-    const t = hit[i], [x, y] = toStage(s.at);
-    ripples.push(`<circle id="r${i}" cx="${x}" cy="${y}" r="16" fill="rgba(184,70,13,.18)" stroke="${C.accent}" stroke-width="2.5"/>`);
-    css.push(`#r${i}{opacity:0;transform-origin:${x}px ${y}px;animation:r${i} ${total}s infinite}@keyframes r${i}{0%,${pct(t)}%{opacity:0;transform:scale(.4);animation-timing-function:${EASE_OUT}}${pct(t + 0.05)}%{opacity:1}${pct(t + 0.55)}%{opacity:0;transform:scale(1.5)}100%{opacity:0}}`);
-  });
-  // Captions, step numbers, progress.
-  const caps = capLines.map((ls, i) => `<g id="c${i}">${para(64, VH + CAP / 2 + 6 - 11 * (ls.length - 1), ls, { size: 16, fill: C.white, weight: 500, lh: 22 })}</g>`).join("");
-  steps.forEach((s, i) => {
-    if (!s.caption || s.caption.length > 80) throw new Error(`${scene.title}: langkah ${i + 1} caption kosong atau lebih dari 80 huruf`);
-    const a = start[i], last = i === steps.length - 1, e = last ? total - 0.45 : end[i];
-    css.push(`#c${i},#n${i}{opacity:${last ? 1 : 0};animation:c${i} ${total}s infinite}@keyframes c${i}{${dedupe([`0%{opacity:${i === 0 ? 1 : 0}}`, i ? `${pct(a)}%{opacity:0}` : "", i ? `${pct(a + 0.2)}%{opacity:1}` : "", `${pct(e)}%{opacity:1}`, `${pct(e + 0.2)}%{opacity:0}`, i === 0 ? `${pct(total - 0.05)}%{opacity:0}` : "", `100%{opacity:${i === 0 ? 1 : 0}}`].filter(Boolean))}}`);
-  });
-  const nums = steps.map((_, i) => `<g id="n${i}">${circle(32, VH + CAP / 2, 15, { fill: C.accent })}${text(32, VH + CAP / 2 + 5, String(i + 1), { size: 14, fill: C.white, anchor: "middle", weight: 700 })}</g>`).join("");
-  const bar = `<rect x="0" y="${H - CAP}" width="${W}" height="3" fill="rgba(255,255,255,.18)"/><rect id="prog" x="0" y="${H - CAP}" width="${W}" height="3" fill="${C.accent}"/>`;
-  css.push(`#prog{transform-origin:0 0;transform:scaleX(1);animation:prog ${total}s linear infinite}@keyframes prog{0%{transform:scaleX(0)}${pct(total - 0.45)}%{transform:scaleX(1)}100%{transform:scaleX(1)}}`);
-  const reduce = `@media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}`;
+  const overlays = steps.map((_, i) => stepOverlays(scene, i, t, focusOf[i], (a, b) => world(a, b) + (anim.carets ? '<use href="#carets"/>' : "")));
+  for (const o of overlays) { css.push(...o.css); defs.push(...o.defs); }
+  const usesCursor = steps.some((s) => s.at), rip = ripples(steps, t);
+  if (usesCursor) css.push(pointer(scene, t));
+  css.push(...rip.css);
+  const capLines = steps.map((s) => wrap(s.caption, W - 80, 16, 500)), CAP = 24 + 22 * Math.max(...capLines.map((l) => l.length)), H = VH + CAP;
+  const bar = captionBar(steps, t, capLines, CAP);
+  css.push(...bar.css);
   const base = scene.base.join("\n"), bg = rect(0, 0, WORLD.w, WORLD.h, { fill: scene.bg ?? C.white });
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="ttl dsc" font-family='${FONT}' data-total="${total}" data-steps="${start.join(",")}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="ttl dsc" font-family='${FONT}' data-total="${t.total}" data-steps="${t.start.join(",")}">
 <title id="ttl">${esc(scene.title)}</title>
 <desc id="dsc">${esc(scene.desc ?? steps.map((s, i) => `${i + 1}. ${s.caption}`).join(" "))}</desc>
 <style>${css.join("\n")}
-${reduce}</style>
+${REDUCE}</style>
 <defs>${defs.join("")}<g id="db">${bg}${base}</g><clipPath id="stage"><rect x="0" y="0" width="${W}" height="${VH}"/></clipPath></defs>
-<g clip-path="url(#stage)"><g id="world" transform="scale(${+S.toFixed(4)})">
+<g clip-path="url(#stage)"><g id="world" transform="scale(${+FIT.toFixed(4)})">
 ${skeleton(bg + base)}
-${ids.map((id) => (els[id].skel ? `<g class="e-${id}">${skeleton(els[id].svg)}</g>` : `<use href="#ed-${id}"/>`)).join("\n")}
-${zoneLayers.join("\n")}
-${carets.length ? '<use href="#carets"/>' : ""}
+${ids.map((id) => (els[id].skel ? `<g class="e-${id}">${skeleton(anim.svg[id])}</g>` : `<use href="#ed-${id}"/>`)).join("\n")}
+${zones.map((z, k) => `<g class="fz${k}"${z.rects.length ? ` clip-path="url(#fz${k})"` : ""}>${world(z.a ?? 0, z.b ?? t.total)}</g>`).join("\n")}
+${anim.carets ? '<use href="#carets"/>' : ""}
 </g>
-${overlays.join("\n")}
+${overlays.flatMap((o) => o.svg).join("\n")}
 </g>
-${ripples.join("")}
+${rip.svg}
 ${usesCursor ? `<g id="cur">${POINTER}</g>` : ""}
-${rect(0, H - CAP, W, CAP, { fill: C.cocoa })}${bar}
-${nums}${caps}
+${bar.svg}
 </svg>`;
 }
-function dedupe(kf) { const m = new Map(); for (const k of kf) m.set(k.slice(0, k.indexOf("{")), k); return [...m.values()].join(""); }
