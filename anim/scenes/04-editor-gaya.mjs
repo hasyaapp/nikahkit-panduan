@@ -625,7 +625,8 @@ const SCENES = {
           mark: nkBtnBox(PX + 11, BY + 333, "Coba putar dari 1:05", { icon: "play" }), lens: { src: [PX - 4, BY + 156, AW + 8, 226] }, dur: 3.8 },
         { caption: "Putar saat undangan dibuka dan Ulang terus sudah menyala. Biarkan.", at: [PX + AW - 18, t1 + 20],
           mark: [{ box: [PX + AW - 36, t1 + 10, 36, 20], r: 10 }, { box: [PX + AW - 36, t1 + 58, 36, 20], r: 10 }], lens: { src: [PX - 4, t1, AW + 8, 100] }, dur: 3.6 },
-        { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", focus: [1180, 44, 260, 48], at: [1234, 67], click: true, mark: [SIMPAN, TERBIT], lens: { src: [1150, 40, 290, 56] }, dur: 3.8 }
+        { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", focus: [1180, 44, 260, 48], at: [1234, 67], click: true,
+          mark: [SIMPAN[0], SIMPAN[1], TERBIT[0] + TERBIT[2] - SIMPAN[0], SIMPAN[3]], lens: { src: [1150, 40, 290, 56] }, dur: 3.8 }
       ]
     };
   })(),
@@ -917,7 +918,7 @@ const SCENES = {
           mark: toolBox(773), note: "Kosongkan", dur: 3.4 },
         { caption: "Baca jendela Kosongkan halaman?: Ucapan dan RSVP aman. Bisa diurungkan.", focus: dlgTop, at: [260, BY + 30], mark: [16, BY, 367, 56], lens: { src: [8, 100, 390, 190] }, dur: 4 },
         { caption: "Klik Kosongkan halaman untuk lanjut, atau Batal (Esc) untuk mundur.", at: [90, 255], click: true, hide: ["dlg"], show: ["emptyPanel", "emptyPrev"],
-          mark: [nkBtnBox(16, 237, "Kosongkan halaman", { icon: "eraser" }), nkBtnBox(batalX, 237, "Batal")], note: "Kosongkan halaman atau Batal", dur: 3.8 },
+          mark: [16, 237, nkBtnBox(batalX, 237, "Batal")[0] + nkBtnBox(batalX, 237, "Batal")[2] - 16, 36], note: "Kosongkan halaman atau Batal", dur: 3.8 },
         { caption: "Menu Template terbuka, pratinjau kosong. Muncul pesan Halaman dikosongkan.", focus: [[72, 92, 327, 160], toast, PREVF], show: ["toast"],
           mark: [84, 836, 303, 52], lens: { src: [76, 826, 320, 72], at: [12, 430] }, dur: 3.6 },
         { caption: "Berubah pikiran? Klik Urungkan di pesan itu. Undangan kembali utuh.", focus: [toast, PREVF], at: [343, 862], click: true, hide: ["toast", "emptyPrev"],
