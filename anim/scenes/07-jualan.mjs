@@ -12,7 +12,7 @@ import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, 
 import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkH3, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
 import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
-import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F } from "../ui/marketing.mjs";
+import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvMempelai } from "../ui/invitation.mjs";
 
@@ -244,6 +244,7 @@ const mkBody = (on, extra = "", cardY = MKY) => panelBody(panelBg(), seg("market
 const mkPanel = (on, extra, cardY) => head("Template", { inbox: false }) + mkBody(on, extra, cardY);
 
 const SCROLL = PKG_F - 248; // the brand form scrolled so the first package shows
+const BIZ = { name: "Rina WO", wa: "0812 3456 7890" }; // an empty Profil merek starts from the Scalev business
 
 // ---- Gaya of an open Landing page (panels-style.jsx LandingStylePanel; styles.js .nk-pal, .nk-color) ---------------
 // On a Landing page the rail opens Template, Gaya and Media; the invitation menus, Bagikan and Kosongkan stay locked.
@@ -528,13 +529,8 @@ export const scenes = {
     els: Object.fromEntries(Object.entries({
       rail: { svg: nkRail(0, 0, "Template"), enter: "fade" },
       tpl: { svg: tplPanel(), enter: "fade" },
-      mk: { svg: panelBody(panelBg(), seg("marketing"), brandOpen()), enter: "fade" },
-      nameFocus: { svg: nkInput(101, 300, 253, "", { focus: true }), enter: "fade" },
-      nameBlur: { svg: nkInput(101, 300, 253, ""), enter: "fade" },
-      nameV: text(112, 323, "Rina WO", { size: 14 }),
-      waFocus: { svg: nkInput(101, 368, 253, "", { focus: true }), enter: "fade" },
-      waV: text(112, 391, "0812 3456 7890", { size: 14 }),
-      body2: { svg: rect(72, 153, 327, 1200, { fill: C.white }) + seg("marketing") + brandOpen({ name: "Rina WO", wa: "0812 3456 7890" }), enter: "fade" },
+      mk: { svg: panelBody(panelBg(), seg("marketing"), brandOpen(BIZ)), enter: "fade" },
+      body2: { svg: rect(72, 153, 327, 1200, { fill: C.white }) + seg("marketing") + brandOpen(BIZ), enter: "fade" },
       pkFocus: { svg: nkInput(111, PKG_F - SCROLL, 233, "", { focus: true }), enter: "fade" },
       pkBlur: { svg: nkInput(111, PKG_F - SCROLL, 233, ""), enter: "fade" },
       pkName: text(122, PKG_F + 23 - SCROLL, "Basic", { size: 14 }),
@@ -549,13 +545,11 @@ export const scenes = {
       { caption: "Klik Template di rel kiri.", at: [36, 130], click: true, show: ["rail", "tpl"], focus: F.left, mark: M(0, 104, 71, 52, 0), lens: { src: [0, 96, 220, 64] }, dur: 3 },
       { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", at: SEG.marketing, click: true, show: ["mk"], focus: F.panel, mark: MARKETING,
         lens: { src: [80, 161, 295, 54] }, dur: 3.4 },
-      { caption: "Klik Nama bisnis, lalu ketik nama bisnismu.", at: [228, 318], click: true, show: ["nameFocus", "nameV"], type: [{ id: "nameV", n: 7, box: [112, 303, 70, 30] }],
-        mark: M(101, 300, 253, 36), lens: { src: [92, 276, 282, 68] }, dur: 3.2 },
-      { caption: "Klik Nomor WhatsApp, lalu ketik nomornya, misalnya 0812 3456 7890.", at: [228, 386], click: true, show: ["nameBlur", "waFocus", "waV"],
-        type: [{ id: "waV", n: 14, box: [112, 371, 110, 30] }], mark: M(101, 368, 253, 36), lens: { src: [92, 344, 282, 100] }, dur: 3.4 },
-      { caption: "Logo (opsional): tempel alamat gambar https, atau kosongkan.", mark: M(101, 436, 253, 80, 6), lens: { src: [92, 430, 282, 92] }, dur: 3 },
+      { caption: "Cek Nama bisnis: sudah terisi dari bisnis Scalev. Ubah bila perlu.", mark: M(101, 300, 253, 36), lens: { src: [92, 276, 282, 68] }, dur: 3.2 },
+      { caption: "Cek Nomor WhatsApp: juga terisi dari bisnis Scalev.", mark: M(101, 368, 253, 36), lens: { src: [92, 344, 282, 88] }, dur: 3 },
+      { caption: "Logo (opsional): klik Pilih foto untuk memilih gambar dari Media.", mark: M(...LOGO_BTN), lens: { src: [92, 430, 282, 72] }, dur: 3.2 },
       { caption: "Gulir ke paket pertama, lalu isi Nama paket.", at: [228, PKG_F + 18 - SCROLL], click: true, show: ["body2", "cover", "pkFocus", "pkName"],
-        hide: ["nameFocus", "nameBlur", "nameV", "waFocus", "waV"], scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [122, PKG_F + 3 - SCROLL, 36, 30] }],
+        scroll: { id: "body2", dy: SCROLL }, type: [{ id: "pkName", n: 5, box: [122, PKG_F + 3 - SCROLL, 36, 30] }],
         mark: M(111, PKG_F - SCROLL, 233, 36), lens: { src: [96, 196, 268, 92] }, dur: 3.6 },
       { caption: "Isi Harga (Rp) dan Isi paket. Tambah paket untuk paket kedua dan ketiga.", at: [228, PKG_F + 86 - SCROLL], click: true, show: ["pkBlur", "prFocus", "pkPrice"],
         type: [{ id: "pkPrice", n: 7, box: [122, PKG_F + 71 - SCROLL, 50, 30] }], mark: [M(111, PKG_F + 68 - SCROLL, 233, 36), M(101, TAMBAH_Y - SCROLL, 253, 36)],

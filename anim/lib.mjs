@@ -118,13 +118,13 @@ export function wrap(s, width, size = 14, weight = 400, measure = tw) {
   }
   return lines;
 }
-// Text cut to n lines of a width with an ellipsis, as CSS text-overflow (n = 1) and line-clamp do: the last line holds
-// the rest of the text, cut where it no longer fits.
+// Text cut with an ellipsis as CSS does it: n = 1 is text-overflow on one unwrapped line (cut at a character), n > 1
+// is line-clamp (whole words on n lines, the last one cut to fit its ellipsis). Breaks where a Mac breaks.
 export function clamp(s, width, n = 1, size = 14, weight = 400) {
-  const ls = wrap(s, width, size, weight, textWidth);
-  if (ls.length <= n) return ls;
-  let last = ls.slice(n - 1).join(" ");
-  while (last.length > 1 && textWidth(last + "…", size, weight) > width) last = last.slice(0, -1);
+  const fits = (t) => textWidth(t, size, weight) <= width, ls = n === 1 ? [String(s)] : wrap(s, width, size, weight, textWidth);
+  if (ls.length <= n && fits(ls.at(-1))) return ls;
+  let last = ls[n - 1];
+  while (last.length > 1 && !fits(last + "…")) last = last.slice(0, -1);
   return [...ls.slice(0, n - 1), last.trimEnd() + "…"];
 }
 // Clip children to a rect (scrolling panels, truncated text) or to any shape markup (clipShape: an arch path, a rounded
