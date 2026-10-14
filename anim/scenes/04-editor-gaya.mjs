@@ -1,30 +1,27 @@
 // Editor scenes for the Media, Musik, Gaya, Lapisan, preview click, Urungkan/Kosongkan and Dijeda pages.
-// Every scene is the whole real 1440x900 Scalev editor (lib scalevEditor), panel and preview together. Panel geometry
+// Every scene is the whole real 1440x900 Scalev editor (ui/kit scalevEditor), panel and preview together. Panel geometry
 // from /tmp/ref/editor-*.png and editor-metrics.json (update note left out: content starts at y 169). Labels follow
 // nikahkit/src/ui/App.jsx, panels-style.jsx, panels-structure.jsx, fields.jsx, panel-content.jsx, fields.js, model.js,
 // store.js and canvas/canvas.js (preview toolbar: #223548 bar, Isi / ↑ / ↓ / Sembunyikan, 30px buttons, 3px blue frame).
-// The YouTube, Google Fonts and file windows are generic drawings (not measured), laid out at 1440 wide.
+// The YouTube, Google Fonts and file windows and the Kencana invitation preview are generic drawings (not measured),
+// laid out at 1440 wide.
 import { C, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, skeleton } from "../lib.mjs";
-import { ED, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3, scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome } from "../ui/kit.mjs";
+import { ED, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3, nkToast, nkToastBoxes, scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome } from "../ui/kit.mjs";
+import { kencana } from "../ui/invitation.mjs";
+import { templatePanel } from "../ui/editor-panels.mjs";
 
 const SC = ED.screen; // preview screen 727,106 390x784
 const PX = 88, PW = 279, BY = 169; // panel body content box (scrolling panels keep 279 next to the scrollbar)
-const SERIF = "Tinos,'Times New Roman',Georgia,serif";
-const SCRIPT = "MonteCarlo,'Great Vibes','Snell Roundhand','Apple Chancery',cursive";
-const KENCANA = { bg: "#FFF7E9", surface: "#FFFDF8", heading: "#8E2818", text: "#10001E", muted: "#6B5A55", accent: "#8E2818", on: "#FFFFFF" };
+const { photo, cover, stack, pal: KENCANA, SERIF, SCRIPT } = kencana; // the Kencana invitation page (ui/invitation)
 const GOLD = "#E0B84A";
-// Focus areas: rail + panel, rail, panel, preview screen, rail tools, rail foot.
-const LEFT = [0, 92, 399, 808], RAILF = [0, 92, 72, 808], PANELF = [72, 92, 327, 808], PREVF = [SC.x, SC.y, SC.w, SC.h], TOOLS = [0, 554, 72, 297], FOOT = [0, 851, 72, 49];
+// Focus areas: rail + panel, panel, preview screen, rail tools, rail foot.
+const LEFT = [0, 92, 399, 808], PANELF = [72, 92, 327, 808], PREVF = [SC.x, SC.y, SC.w, SC.h], TOOLS = [0, 554, 72, 297], FOOT = [0, 851, 72, 49];
 // Rail tab bounds (nkRail: 56 px rows from y 104) and tool bounds, for marks.
 const railBox = (n) => [0, 104 + ["Template", "Gaya", "Audio", "Media", "Lapisan", "Konten"].indexOf(n) * 56, 72, 52];
 const toolBox = (cy) => [4, cy - 22, 64, 44];
-const SIMPAN = [1193, 50, 82, 34], TERBIT = [1283, 50, 151, 34];
 
 // ---- small drawing helpers -------------------------------------------------------------------------------------------
-const hid = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return (h >>> 0).toString(36); };
 const raw = (body, cx, cy, size, color, fill = false) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="${fill ? color : "none"}" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
-const clipPath = (d, ...kids) => { const id = `a4c${hid(d)}`; return `<defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
-const rrPath = (x, y, w, h, r) => (r ? `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1 -${r} ${r}h-${w - 2 * r}a${r} ${r} 0 0 1 -${r} -${r}v-${h - 2 * r}a${r} ${r} 0 0 1 ${r} -${r}z` : `M${x} ${y}h${w}v${h}h-${w}z`);
 const scrollbar = (y = 157, h = 360) => rect(387, y, 6, h, { r: 3, fill: "#c4c8ce" });
 const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
 
@@ -36,55 +33,7 @@ const panelOpen = (title) => white(72, 92, 327, 808) + nkHead(0, 0, title) + lin
 // The Scalev bars above the panel, drawn over a scrolled panel so its content stays inside the panel.
 const barMask = () => clipped(72, 0, 327, 92, scalevEditor(0, 0));
 
-// Photos drawn as flat shapes (no screenshots): sky, hills, sun; k picks the colours.
-const TONES = [["#d9c7b0", "#a8875f", "#7d5f3f"], ["#cfdbe0", "#8aa596", "#5d7a66"], ["#ead1c6", "#c48f7f", "#8e5a4c"], ["#d6d3e6", "#9a92b8", "#6a6290"], ["#e8dcc0", "#c2a25c", "#8b6d2f"], ["#d3e1e8", "#7f9eb0", "#4f6f82"], ["#efe1d9", "#b9a093", "#7b6257"], ["#dfe6d2", "#a3b47e", "#6d7f4a"], ["#f0d8c8", "#d49a76", "#9b5e3c"]];
-function photo(x, y, w, h, k = 0) {
-  const [sky, hill, near] = TONES[k % TONES.length];
-  return clipped(x, y, w, h, rect(x, y, w, h, { fill: sky }), circle(x + w * (0.25 + (k % 3) * 0.2), y + h * 0.3, Math.min(w, h) * 0.1, { fill: "rgba(255,255,255,.7)" }),
-    `<path d="M${x} ${y + h * 0.62} Q${x + w * 0.3} ${y + h * 0.42} ${x + w * 0.55} ${y + h * 0.58} T${x + w} ${y + h * 0.5} V${y + h} H${x} Z" fill="${hill}"/>`,
-    `<path d="M${x} ${y + h * 0.8} Q${x + w * 0.5} ${y + h * 0.66} ${x + w} ${y + h * 0.82} V${y + h} H${x} Z" fill="${near}"/>`);
-}
-// The cover photo: a couple in a field (simple shapes).
-function couple(x, y, w, h) {
-  const cx = x + w / 2;
-  return rect(x, y, w, h, { fill: "#e3e1da" }) + rect(x, y + h * 0.55, w, h * 0.45, { fill: "#c9ad73" }) + rect(x, y + h * 0.55, w, 6, { fill: "#b39457" }) +
-    `<path d="M${cx - 6} ${y + h * 0.38} L${cx - 34} ${y + h} H${cx + 22} L${cx + 6} ${y + h * 0.4} Z" fill="#f7f6f2"/>` +
-    `<path d="M${cx + 4} ${y + h * 0.36} L${cx + 2} ${y + h} H${cx + 30} L${cx + 26} ${y + h * 0.38} Z" fill="#3a3f47"/>` +
-    circle(cx - 2, y + h * 0.31, 9, { fill: "#d9b192" }) + circle(cx + 16, y + h * 0.29, 9, { fill: "#c79f80" }) +
-    `<ellipse cx="${cx - 14}" cy="${y + h * 0.5}" rx="34" ry="46" fill="rgba(255,255,255,.45)"/>`;
-}
-const cloud = (cx, cy, col) => circle(cx - 18, cy + 2, 11, { fill: col }) + circle(cx + 18, cy + 2, 11, { fill: col }) + circle(cx, cy - 6, 16, { fill: col }) +
-  rect(cx - 40, cy + 4, 80, 10, { r: 5, fill: col }) + circle(cx, cy - 4, 6, { fill: "rgba(255,255,255,.35)" });
-const gate = (x, y, col, flip) => { const d = flip ? `M${x} ${y} L${x + 58} ${y + 18} V${y + 112} L${x} ${y + 128} Z` : `M${x} ${y + 18} L${x + 58} ${y} V${y + 128} L${x} ${y + 112} Z`;
-  return `<path d="${d}" fill="none" stroke="${col}" stroke-width="3"/>` + circle(x + 29, y + 50, 13, { stroke: col, sw: 2 }) + circle(x + 29, y + 86, 13, { stroke: col, sw: 2 }) + line(x + 29, y + 26, x + 29, y + 118, { stroke: col, sw: 1.5 }); };
-
-// Kencana cover (template "kencana": cream paper, maroon bands, arch photo, script names). o: pal, scale, shape,
-// nameFont, nameSize, top (screen y of the page top, for scrolled pages).
-function cover(o = {}) {
-  const p = { ...KENCANA, ...o.pal }, s = o.scale ?? 1, top = o.top ?? SC.y, x0 = SC.x, cx = SC.x + SC.w / 2, shape = o.shape ?? "arch";
-  const Y = (v) => top + v;
-  let g = rect(x0, top, SC.w, 784, { fill: p.bg }) + rect(x0, top, SC.w, 18, { fill: p.accent }) + rect(x0, Y(764), SC.w, 20, { fill: p.accent });
-  for (let i = 0; i < 15; i++) g += circle(x0 + 6 + i * 27, Y(18), 15, { fill: p.accent }) + circle(x0 + 6 + i * 27, Y(766), 13, { fill: p.accent });
-  g += circle(x0 + 20, Y(68), 12, { fill: "#f2c9c4" }) + circle(x0 + 34, Y(70), 9, { fill: "#f5d8d3" });
-  g += cloud(x0 + 70, Y(126), p.accent) + cloud(x0 + 320, Y(126), p.accent) + gate(x0 + 66, Y(152), p.accent) + gate(x0 + 266, Y(152), p.accent, true);
-  const fx = cx - 70, fy = Y(105), fw = 140, fh = 189;
-  const d = shape === "arch" ? `M${fx} ${fy + fh} V${fy + 70} a70 70 0 0 1 140 0 V${fy + fh} Z` : rrPath(fx, fy, fw, fh, shape === "soft" ? 18 : 0);
-  g += clipPath(d, couple(fx, fy, fw, fh)) + `<path d="${d}" fill="none" stroke="${p.accent}" stroke-width="2"/>`;
-  g += text(cx, Y(327), "The Wedding Of", { size: Math.round(18 * s), fill: p.text, anchor: "middle", font: SERIF });
-  g += text(cx, Y(399), o.names ?? "Rani & Dimas", { size: Math.round((o.nameSize ?? 50) * s), fill: p.heading, anchor: "middle", font: o.nameFont ?? SCRIPT });
-  g += text(cx, Y(451), "Minggu, 14 Februari 2027", { size: Math.round(15 * s), weight: 700, fill: p.text, anchor: "middle", font: SERIF }) +
-    text(cx, Y(472), "#RaniDimas", { size: Math.round(13 * s), fill: p.text, anchor: "middle", font: SERIF }) +
-    text(cx, Y(507), "Kepada Yth. Bapak/Ibu/Saudara/i", { size: Math.round(13 * s), weight: 700, fill: p.text, anchor: "middle", font: SERIF }) +
-    text(cx, Y(531), "Tamu Undangan", { size: Math.round(18 * s), fill: p.heading, anchor: "middle", font: SERIF });
-  const bw = Math.round(171 * s), bh = Math.round(48 * s);
-  g += rect(cx - bw / 2, Y(567), bw, bh, { r: shape === "arch" ? bh / 2 : shape === "soft" ? 12 : 2, fill: p.accent }) + icon("mail", cx - bw / 2 + 34, Y(567) + bh / 2, 16, p.on) +
-    text(cx + 12, Y(567) + bh / 2 + 5, "Buka Undangan", { size: Math.round(15 * s), fill: p.on, anchor: "middle", font: SERIF });
-  g += [0, 1, 2].map((i) => circle(cx - 40 + i * 22, Y(720), 30 + i * 8, { stroke: "#f0d9d3", sw: 2 })).join("");
-  if (o.disc !== false) g += circle(x0 + 338, Y(659), 27, { fill: "#141414" }) + circle(x0 + 338, Y(659), 11, { fill: C.white }) + `<path d="M${x0 + 335} ${Y(654)} l8 5 l-8 5 z" fill="#141414"/>`;
-  return clipped(x0, top, SC.w, 784, g);
-}
 const screen = (...kids) => clipped(SC.x, SC.y, SC.w, SC.h, ...kids);
-const coverScreen = (o) => screen(cover(o));
 
 // ---- panel widgets not in lib ----------------------------------------------------------------------------------------
 // Gaya sub-tabs (nk-seg nk-subtabs) with dividers and the "diubah" dot.
@@ -116,9 +65,6 @@ function segIcons(x, y, w, items, active) {
 }
 const changed = (x, y, label = "diubah") => circle(x + 3, y - 4, 3, { fill: C.changed }) + text(x + 10, y, label, { size: 10, weight: 500, fill: C.warnStrong });
 const quiet = (x, y, label, o = {}) => nkBtn(x, y, label, { variant: "quiet", ...o });
-// Toast (styles.js .nk-toast): right of the rail, bottom of the panel, dark strong colour, Urungkan link.
-const nkToast = (label) => shadow(84, 836, 303, 52, 4) + rect(84, 836, 303, 52, { r: 4, fill: C.strong }) + text(96, 867, label, { size: 14, fill: C.white }) +
-  text(375, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" });
 
 // Form column (panel-content.jsx Field/Switch/Photo). Items: {label, value, hint, focus, placeholder} | {toggle, on} |
 // {h3} | {photo: label, url, alt, focus}. Returns [svg, positions by key].
@@ -155,29 +101,6 @@ function column(items, x, y, w) {
 const DOT = (cy, cx = 12) => `<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="${cx}" cy="${cy}" r="2.5" fill="currentColor"/>`;
 const FOCUS = [["Atas", DOT(8)], ["Tengah", DOT(12)], ["Bawah", DOT(16)], ["Kiri", DOT(12, 8.5)], ["Kanan", DOT(12, 15.5)]];
 const focusSeg = (x, y, w, active) => segIcons(x, y, w, FOCUS.map(([label, svg]) => ({ label, svg: svg.replace("currentColor", active === FOCUS.findIndex((f) => f[0] === label) ? C.action : C.text) })), active);
-
-// Template panel (panels-style.jsx TemplatePanel): kind tabs, search box, category chips with counts, template cards
-// (positions measured in Chromium with the real styles: search 219, chips 263/297, cards 337).
-const MEGAPHONE = '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>';
-const GRID = '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>';
-const CHIPS = [["Semua", "62", 88, 263, 79], ["Adat", "32", 173, 263, 67], ["Floral", "15", 246, 263, 70], ["Elegan", "6", 88, 297, 72], ["Minimalis", "5", 166, 297, 86], ["Ceria", "4", 258, 297, 63]];
-function templatePanel() {
-  let s = rect(PX + 0.5, BY + 0.5, PW - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + rect(PX + 1, BY + 1, PW / 2 - 1, 36, { fill: C.primarySoft }) + line(PX + PW / 2, BY + 1, PX + PW / 2, BY + 37, { stroke: C.field }) +
-    raw(GRID, PX + 48, BY + 19, 18, C.action) + text(PX + 62, BY + 23, "Template", { size: 12, weight: 600, fill: C.action }) + raw(MEGAPHONE, PX + PW * 0.75, BY + 19, 18, C.text) +
-    clipped(PX, 219, PW, 36, nkInput(PX, 219, PW, "Cari: Jawa, bunga, atau tulis keinginan klien…", { placeholder: true }));
-  CHIPS.forEach(([c, n, x, y, w], i) => (s += rect(x + 0.5, y + 0.5, w - 1, 27, { r: 14, fill: i ? C.white : C.primarySoft, stroke: i ? C.field : C.primary }) +
-    text(x + 11, y + 18, c, { size: 12, fill: i ? C.strong : C.action }) + text(x + w - 11, y + 18, n, { size: 12, fill: C.text, anchor: "end" })));
-  const cards = [["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"], "#4b4b4b"], ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"], "#2f3238"],
-    ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"], "#f4f2ee"], ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"], "#ebe6dc"]];
-  cards.forEach(([n, d, bg], i) => {
-    const x = PX + (i % 2) * 146, y = 337 + Math.floor(i / 2) * 241;
-    s += rect(x + 0.5, y + 0.5, 132, 165, { r: 8, fill: "#f6f6f6", stroke: C.line }) + rect(x + 5, y + 5, 72, 156, { r: 5, fill: bg }) +
-      photo(x + 12, y + 30, 58, 60, i + 2) + rect(x + 18, y + 104, 46, 4, { r: 2, fill: i < 2 ? "rgba(255,255,255,.7)" : "#8a8a8a" }) + rect(x + 26, y + 114, 30, 3, { r: 1.5, fill: i < 2 ? "rgba(255,255,255,.5)" : "#b5b5b5" }) +
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((k) => rect(x + 82 + (k % 2) * 23, y + 8 + Math.floor(k / 2) * 30, 20, 26, { r: 2, fill: k % 3 ? "#ffffff" : "#d9d4cc" })).join("") +
-      text(x, y + 188, n, { size: 14, weight: 500 }) + para(x, y + 209, d, { size: 12, fill: C.faint, lh: 16 });
-  });
-  return s;
-}
 
 // =====================================================================================================================
 // Media: unggah banyak foto
@@ -358,7 +281,7 @@ function musik(o = {}) {
     s += rect(PX + 0.5, y + 0.5, AW - 1, 217, { r: 8, fill: C.page, stroke: C.line });
     s += o.playing ? rect(PX + 1, y + 1, AW - 2, 164, { fill: "#0f0f0f" }) + rect(PX + 12, y + 150, AW - 24, 3, { r: 1.5, fill: "rgba(255,255,255,.3)" }) + rect(PX + 12, y + 150, 64, 3, { r: 1.5, fill: "#ff0033" }) + circle(PX + 76, y + 151.5, 5, { fill: "#ff0033" }) +
       [0, 1, 2, 3, 4].map((i) => rect(PX + AW / 2 - 22 + i * 10, y + 70 - [10, 22, 16, 28, 12][i] / 2, 6, [10, 22, 16, 28, 12][i], { r: 2, fill: "rgba(255,255,255,.8)" })).join("")
-      : clipped(PX + 1, y + 1, AW - 2, 164, couple(PX + 1, y - 10, AW - 2, 190), rect(PX + 1, y + 1, AW - 2, 164, { fill: "rgba(34,53,72,.35)" })) +
+      : clipped(PX + 1, y + 1, AW - 2, 164, photo(PX + 1, y + 1, AW - 2, 164, 6), rect(PX + 1, y + 1, AW - 2, 164, { fill: "rgba(34,53,72,.35)" })) +
         rect(PX + AW / 2 - 30, y + 62, 60, 42, { r: 12, fill: "rgba(0,0,0,.6)" }) + `<path d="M${PX + AW / 2 - 7} ${y + 73} l18 10 l-18 10 z" fill="#fff"/>`;
     const label = o.playing ? "Hentikan" : `Coba putar dari ${o.start ? "1:05" : "0:00"}`;
     s += nkBtn(PX + 11, y + 173, label, { icon: o.playing ? "close" : "play" });
@@ -396,32 +319,10 @@ function lapList(order, o = {}) {
   return [s, pos];
 }
 const swap = (a, i) => { const b = a.slice(); [b[i], b[i + 1]] = [b[i + 1], b[i]]; return b; };
-// Preview, scrolled to the gallery: Galeri Foto, Video, Rangkaian Acara blocks of the Kencana page.
-const secTitle = (y, t) => text(SC.x + SC.w / 2, y, t, { size: 40, fill: KENCANA.heading, anchor: "middle", font: SCRIPT });
-const galeriSec = (y) => rect(SC.x, y, SC.w, 300, { fill: KENCANA.bg }) + secTitle(y + 62, "Galeri Foto") +
-  [0, 1, 2, 3].map((k) => photo(SC.x + 30 + (k % 2) * 170, y + 88 + Math.floor(k / 2) * 100, 160, 92, k + 4)).join("");
-const videoSec = (y) => rect(SC.x, y, SC.w, 280, { fill: KENCANA.bg }) + secTitle(y + 62, "Video") + rect(SC.x + 30, y + 88, 330, 168, { r: 6, fill: "#1f1a17" }) +
-  rect(SC.x + 165, y + 151, 60, 42, { r: 12, fill: "rgba(255,255,255,.18)" }) + `<path d="M${SC.x + 188} ${y + 162} l18 10 l-18 10 z" fill="#fff"/>`;
-const acaraSec = (y) => rect(SC.x, y, SC.w, 300, { fill: KENCANA.bg }) + secTitle(y + 62, "Rangkaian Acara") + rect(SC.x + 30.5, y + 88.5, 329, 170, { r: 12, fill: KENCANA.surface, stroke: "#ead8cf" }) +
-  text(SC.x + SC.w / 2, y + 128, "Akad Nikah", { size: 22, weight: 700, fill: KENCANA.heading, anchor: "middle", font: SERIF }) +
-  text(SC.x + SC.w / 2, y + 160, "Minggu, 14 Februari 2027", { size: 15, fill: KENCANA.text, anchor: "middle", font: SERIF }) +
-  text(SC.x + SC.w / 2, y + 184, "08.00 WIB", { size: 15, fill: KENCANA.text, anchor: "middle", font: SERIF }) +
-  rect(SC.x + 125, y + 206, 140, 36, { r: 18, fill: KENCANA.accent }) + text(SC.x + SC.w / 2, y + 229, "Lihat Lokasi", { size: 14, fill: C.white, anchor: "middle", font: SERIF });
-const dressSec = (y) => rect(SC.x, y, SC.w, 300, { fill: KENCANA.bg }) + secTitle(y + 62, "Dress Code");
-const stack = (list) => { let y = SC.y; return screen(rect(SC.x, SC.y, SC.w, SC.h, { fill: KENCANA.bg }), ...list.map((f) => { const s = f(y); y += f === videoSec ? 280 : 300; return s; })); };
 
 // =====================================================================================================================
-// Klik di pratinjau: the page under the cover (Salam Pembuka, Ayat / Kutipan, Mempelai).
+// Klik di pratinjau: the page under the cover (kencana Salam Pembuka, Ayat / Kutipan, Mempelai).
 const PAGE_DY = 560; // scroll so Salam Pembuka sits at y 330
-const salamSec = (y) => rect(SC.x, y, SC.w, 420, { fill: KENCANA.bg }) + cloud(SC.x + SC.w / 2, y + 56, KENCANA.accent) +
-  text(SC.x + SC.w / 2, y + 128, "Assalamu'alaikum Warahmatullahi", { size: 17, weight: 700, fill: KENCANA.heading, anchor: "middle", font: SERIF }) +
-  text(SC.x + SC.w / 2, y + 152, "Wabarakatuh", { size: 17, weight: 700, fill: KENCANA.heading, anchor: "middle", font: SERIF }) +
-  para(SC.x + SC.w / 2, y + 200, ["Dengan memohon rahmat dan ridho Allah SWT,", "kami bermaksud melangsungkan pernikahan.", "Merupakan kehormatan bagi kami apabila", "Bapak/Ibu/Saudara/i berkenan hadir dan", "memberikan doa restu."], { size: 15, fill: KENCANA.text, anchor: "middle", lh: 26 }).replace(/<text /, `<text font-family="${SERIF}" `);
-const ayatSec = (y) => rect(SC.x, y, SC.w, 330, { fill: KENCANA.bg }) + rect(SC.x + 30.5, y + 30.5, 329, 260, { r: 12, fill: KENCANA.surface, stroke: "#ead8cf" }) +
-  para(SC.x + SC.w / 2, y + 92, ["Dan di antara tanda-tanda kekuasaan-Nya", "ialah Dia menciptakan untukmu pasangan", "hidup dari jenismu sendiri, supaya kamu", "merasa tenteram kepadanya."], { size: 15, fill: KENCANA.text, anchor: "middle", lh: 26 }).replace(/<text /, `<text font-family="${SERIF}" font-style="italic" `) +
-  text(SC.x + SC.w / 2, y + 230, "QS. Ar-Rum: 21", { size: 15, weight: 700, fill: KENCANA.heading, anchor: "middle", font: SERIF });
-const mempelaiSec = (y) => rect(SC.x, y, SC.w, 500, { fill: KENCANA.bg }) + text(SC.x + SC.w / 2, y + 70, "Mempelai", { size: 48, fill: KENCANA.heading, anchor: "middle", font: SCRIPT }) +
-  clipPath(`M${SC.x + 105} ${y + 340} V${y + 180} a90 90 0 0 1 180 0 V${y + 340} Z`, photo(SC.x + 105, y + 90, 180, 250, 2)) + `<path d="M${SC.x + 105} ${y + 340} V${y + 180} a90 90 0 0 1 180 0 V${y + 340} Z" fill="none" stroke="${KENCANA.accent}" stroke-width="2"/>`;
 // Preview toolbar (canvas.js): dark bar, 3px padding, 2px gaps, 30px buttons with 10px side padding, 12px/500 white.
 // Returns [svg, button centres, button boxes, bar box].
 function toolbar(right, top, actions, hover) {
@@ -466,7 +367,7 @@ const priaCol = (nick) => column([{ h3: "Mempelai Pria" }, { label: "Nama panggi
   { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Aminah" }, { toggle: "Ibu sudah wafat (Almh.)", on: false }], ACC_X, 169, ACC_W);
 const priaPanel = (nick) => white(72, 154, 327, 746) + accFrame(154, 900) + priaCol(nick)[0] + scrollbar(380, 200);
 const NICK_Y = priaCol("Dimas")[1]["Nama panggilan"] + 20;
-const nickFix = (nick) => white(ACC_X + 1, NICK_Y + 1, ACC_W - 2, 34) + text(ACC_X + 10, NICK_Y + 23, nick, { size: 14 }) + coverScreen({ names: `Rani & ${nick}` });
+const nickFix = (nick) => white(ACC_X + 1, NICK_Y + 1, ACC_W - 2, 34) + text(ACC_X + 10, NICK_Y + 23, nick, { size: 14 }) + cover({ names: `Rani & ${nick}` });
 
 // ---- other windows (generic drawings at 1440 wide) ---------------------------------------------------------------------
 // YouTube watch page with the Bagikan dialog open (YouTube's Indonesian labels).
@@ -503,13 +404,11 @@ function googleFonts(spec) {
     ["Regular 400", "Italic 400", "Bold 700"].map((n, i) => { const y = 540 + i * 110; return line(32, y, 1408, y, { stroke: "#dadce0" }) + text(32, y + 28, n, { size: 14, fill: "#5f6368" }) + text(32, y + 84, "Rani & Dimas", { size: 44, fill: "#202124", font: PLAYFAIR }); }).join("");
 }
 const gfSel = rect(162, 57, tw(GF_URL, 14) + 8, 22, { r: 3, fill: "#c2dbff" }) + text(166, 68, GF_URL, { size: 14, fill: C.crText });
-// Guest page "Menu bawah" (undangan/widgets/dock.js): accent bar 10 px above the bottom, 56 px links, 11 px labels.
-const dockBar = () => rect(765, 816, 314, 64, { r: 18, fill: KENCANA.accent }) + ["heart", "calendar", "image", "message-circle", "gift"].map((ic, i) => icon(ic, 802 + i * 60, 838, 20, C.white) +
-  text(802 + i * 60, 864, ["Mempelai", "Acara", "Galeri", "Ucapan", "Hadiah"][i], { size: 11, weight: 500, fill: "rgba(255,255,255,.85)", anchor: "middle" })).join("");
 
 // Marks shared by several scenes.
 const FOOT_MARK = [10, 859, 52, 34]; // save status dot + label in the rail foot
-const URUNG_BOX = [309, 852, 68, 22]; // Urungkan in the toast
+const TOAST = nkToastBoxes("Halaman dikosongkan.").toast, URUNG_BOX = nkToastBoxes("Halaman dikosongkan.").undo; // one-line toast, Urungkan button
+const URUNG_AT = [URUNG_BOX[0] + URUNG_BOX[2] / 2, URUNG_BOX[1] + URUNG_BOX[3] / 2];
 const NAMES = [763, 464, 318, 56]; // couple names on the cover
 const segW = (w, labels, active) => { const need = 20 + tw(labels[active], 12, 600) + 6 + 16, aw = Math.max(w / labels.length, need); return [(w - aw) / (labels.length - 1), aw]; };
 
@@ -517,7 +416,7 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Media A: unggah banyak foto
   "editor-media-unggah": {
     title: "Mengunggah banyak foto lewat menu Media",
-    base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
+    base: [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), cover()],
     els: {
       tabs: { svg: railTabs("Media"), enter: "fade" },
       media: { svg: panelOpen("Media") + mediaBody("Atau seret ke sini.", OLD), enter: "fade" },
@@ -533,9 +432,9 @@ const SCENES = {
       { caption: "Buka menu Media: klik Media di rel kiri.", focus: LEFT, at: ED.rail.Media, click: true, show: ["tabs", "media"], mark: railBox("Media"), lens: { src: [0, 96, 384, 116], at: [300, 40] } },
       { caption: "Klik Unggah foto, lalu pilih beberapa foto (tahan Ctrl atau Cmd).", focus: [[72, 154, 327, 84], [FW.x, FW.y, FW.w, FW.h]], at: [PX + PW / 2, BY + 18], click: true, show: ["win", "winSel"],
         mark: [PX, BY, PW, 36], lens: { src: [80, 161, 295, 70] }, dur: 3.8 },
-      { caption: "Klik Buka, lalu tunggu. Foto diunggah satu per satu: Mengunggah 1 dari 4...", focus: [[72, 154, 327, 200], [FW.x, FW.y, FW.w, FW.h]], at: BUKA, click: true,
+      { caption: "Klik Buka, lalu tunggu. Foto diunggah satu per satu: Mengunggah 1 dari 4...", focus: [[72, 154, 327, 178], [FW.x, FW.y, FW.w, FW.h]], at: BUKA, click: true,
         hide: ["win", "winSel"], show: ["busy1", "up1", "busy2", "up2"], mark: [{ box: [PX, 211, 150, 16], r: 2 }, { box: BUKA_BOX, r: 6 }], lens: { src: [80, 161, 295, 70], at: [12, 420] }, dur: 4 },
-      { caption: "Selesai: semua foto baru tampil paling depan di grid Media.", focus: [72, 154, 327, 330], at: [PX + 140, MEDIA_Y + 45], hide: ["busy1", "up1", "busy2", "up2"], show: ["done"],
+      { caption: "Selesai: semua foto baru tampil paling depan di grid Media.", focus: [72, 154, 327, 272], at: [PX + 140, MEDIA_Y + 45], hide: ["busy1", "up1", "busy2", "up2"], show: ["done"],
         mark: { box: [PX, MEDIA_Y, PW, 2 * MS + 6], r: 0 }, note: "4 foto baru paling depan", dur: 3.4 }
     ]
   },
@@ -567,7 +466,7 @@ const SCENES = {
     const [atasW] = segW(ACC_W - 20, FOCUS.map((f) => f[0]), 1);
     return {
       title: "Memasang foto lewat tombol Pilih foto",
-      base: [shell("Konten", "Konten"), white(72, 154, 327, 746), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), coverScreen()],
+      base: [shell("Konten", "Konten"), white(72, 154, 327, 746), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), cover()],
       els: {
         open: { svg: open, enter: "fade" },
         hdr: clipped(72, 0, 327, 154, scalevEditor(0, 0, { rail: "Konten" })) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }),
@@ -595,7 +494,7 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Musik
   "editor-musik-youtube": (() => {
     const [A] = musik(), [B] = musik({ link: true, linkVal: true, focusLink: true }), [Cc] = musik({ link: true, linkVal: true, start: true, focusStart: true }), [D, t1] = musik({ link: true, linkVal: true, start: true, startVal: true, playing: true });
-    const base = [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()];
+    const base = [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), cover()];
     return {
       title: "Memasang musik dari YouTube",
       base,
@@ -626,7 +525,7 @@ const SCENES = {
         { caption: "Putar saat undangan dibuka dan Ulang terus sudah menyala. Biarkan.", at: [PX + AW - 18, t1 + 20],
           mark: [{ box: [PX + AW - 36, t1 + 10, 36, 20], r: 10 }, { box: [PX + AW - 36, t1 + 58, 36, 20], r: 10 }], lens: { src: [PX - 4, t1, AW + 8, 92] }, dur: 3.6 },
         { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", focus: [1180, 44, 260, 48], at: [1234, 67], click: true,
-          mark: [SIMPAN[0], SIMPAN[1], TERBIT[0] + TERBIT[2] - SIMPAN[0], SIMPAN[3]], lens: { src: [1180, 46, 260, 42] }, dur: 3.8 }
+          mark: [ED.simpanBox[0], ED.simpanBox[1], ED.terbitkanBox[0] + ED.terbitkanBox[2] - ED.simpanBox[0], ED.simpanBox[3]], lens: { src: [1180, 46, 260, 42] }, dur: 3.8 }
       ]
     };
   })(),
@@ -636,20 +535,20 @@ const SCENES = {
     const DY = 300, tRow = palRowY(0) - DY; // Terakota row after scrolling
     return {
       title: "Memilih palet warna siap pakai",
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
+      base: [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), cover()],
       els: {
         tabs: { svg: railTabs("Gaya"), enter: "fade" },
         pane: { svg: warnaA(), enter: "fade" },
         terra: { svg: `<g transform="translate(0 -${DY})">${warnaA(TERAKOTA, 1)}</g>`, enter: "fade" },
         top: { svg: gayaTop(0, [], 380), enter: "fade" },
         bar: { svg: barMask(), enter: "fade" },
-        pv: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade" }
+        pv: { svg: cover({ pal: TERAKOTA }), enter: "fade" }
       },
       steps: [
         { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", focus: LEFT, at: ED.rail.Gaya, click: true, show: ["tabs", "pane", "top", "bar"], mark: railBox("Gaya"), lens: { src: [0, 96, 384, 118], at: [300, 40] } },
         { caption: "Gulir ke daftar palet. Paling atas palet bawaan, berlabel Bawaan Kencana.", focus: PANELF, at: [250, 470], scroll: { id: "pane", dy: DY },
           mark: [PX, PAL_Y + 24 - DY, PW, 54], lens: { src: [80, PAL_Y - DY - 6, 302, 230] }, dur: 3.6 },
-        { caption: "Klik satu palet, misalnya Terakota. Pratinjau langsung berganti warna.", focus: [[72, tRow - 60, 327, 170], PREVF], at: [230, tRow + 22], click: true, show: ["terra", "pv"],
+        { caption: "Klik satu palet, misalnya Terakota. Pratinjau langsung berganti warna.", focus: [[72, tRow - 40, 327, 136], PREVF], at: [230, tRow + 22], click: true, show: ["terra", "pv"],
           mark: [PX, tRow, PW, 44], lens: { src: [80, tRow - 40, 302, 138] }, dur: 3.8 }
       ]
     };
@@ -658,19 +557,19 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Gaya B: Custom
   "editor-gaya-warna": {
     title: "Mengatur warna sendiri di Custom",
-    base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
+    base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), cover()],
     els: {
       pick: { svg: picker("#8E2818"), enter: "pop", origin: [115, PICK.y + PICK.h] },
       b: { svg: warnaB() + scrollbar(157, 330), enter: "fade" },
-      gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }
+      gold: { svg: cover({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }
     },
     steps: [
       { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", focus: PANELF, at: [300, 440], mark: [PX, 291, PW, 294], lens: { src: [80, 218, 302, 372] }, dur: 3.6 },
       { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, show: ["pick"], mark: [97, 544, 36, 28], lens: { src: [80, 284, 302, 308], at: [290, 150] }, dur: 3.4 },
-      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", focus: [[72, 154, 327, 460], PREVF], at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b", "gold"],
+      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", focus: [[72, 154, 327, 450], PREVF], at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b", "gold"],
         mark: [PICK.x + 12, PICK.y + 12, PICK.w - 24, 104], lens: { src: [80, 545, 302, 60], at: [12, 420] }, dur: 3.8 },
       { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", focus: PANELF, at: [300, 637], mark: [PX, 609, PW, 56], lens: { src: [80, 605, 302, 116] }, dur: 3.6 },
-      { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", focus: [[72, 220, 327, 110], [72, 600, 327, 130], PREVF], at: [160, 695], click: true, hide: ["b", "gold"],
+      { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", focus: [[72, 224, 327, 62], [72, 600, 327, 130], PREVF], at: [160, 695], click: true, hide: ["b", "gold"],
         mark: nkBtnBox(PX, 677, "Kembali ke palet bawaan"), lens: { src: [80, 214, 302, 70], at: [12, 250] }, dur: 3.6 }
     ]
   },
@@ -683,7 +582,7 @@ const SCENES = {
       rect(PX + 1, wy + 36, PW - 2, 32, { fill: C.crBlue }) + text(PX + 12, wy + 57, "Tebal (700)", { size: 14, fill: C.white });
     return {
       title: "Mengatur ukuran teks, pasangan font, dan ketebalan",
-      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
+      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), cover()],
       els: {
         h0: { svg: H0 + hurufTabs([]), enter: "fade" },
         pane: { svg: H1, enter: "fade" },
@@ -692,14 +591,14 @@ const SCENES = {
         paneB: { svg: HB, enter: "fade", delay: 1.0 },
         tabs: { svg: hurufTabs([1]), enter: "fade" },
         bar: { svg: barMask(), enter: "fade" },
-        big: { svg: coverScreen({ scale: 1.15 }), enter: "fade" },
-        pair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" }
+        big: { svg: cover({ scale: 1.15 }), enter: "fade" },
+        pair: { svg: cover({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" }
       },
       steps: [
         { caption: "Di menu Gaya, klik tab Huruf.", focus: PANELF, at: [227, 188], click: true, show: ["h0"], mark: [PX + PW / 3, BY, PW / 3, 38], lens: { src: [80, 160, 302, 128] } },
-        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", focus: [[72, 154, 327, 210], PREVF], at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs", "bar", "big"],
+        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", focus: [[72, 154, 327, 200], PREVF], at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs", "bar", "big"],
           mark: [PX + (2 * PW) / 3, P0.scale, PW / 3, 38], lens: { src: [80, 281, 302, 69], at: [12, 262] }, dur: 3.6 },
-        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", focus: [[72, 290, 327, 260], PREVF], at: [230, 470], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "pair"],
+        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", focus: [[72, 296, 327, 232], PREVF], at: [230, 470], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "pair"],
           mark: [PX, 416, PW, 108], lens: { src: [80, 412, 302, 116], at: [12, 24] }, dur: 4.2 },
         { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", focus: PANELF, at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"],
           mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 302, 160] }, dur: 4.2 }
@@ -710,7 +609,7 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Gaya D: font dari Google Fonts
   "editor-gaya-font": (() => {
     const [H0, P0] = huruf(), [HC, PC] = huruf({ font: "check" }), [HD, PD] = huruf({ font: "done" });
-    const SDY = 250, base = [shell("Gaya", "Gaya"), subtabs(1), H0, coverScreen()];
+    const SDY = 250, base = [shell("Gaya", "Gaya"), subtabs(1), H0, cover()];
     return {
       title: "Memakai font sendiri dari Google Fonts",
       base,
@@ -746,11 +645,11 @@ const SCENES = {
     const [lembutW] = segW(PW, ["Lembut", "Tegas", "Lengkung"], 2);
     return {
       title: "Mengatur bentuk sudut dan gerak saat digulir",
-      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
+      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), cover()],
       els: {
         b0: { svg: bentuk(), enter: "fade" },
         b1: { svg: bentuk(0), enter: "fade" },
-        soft: { svg: coverScreen({ shape: "soft" }), enter: "fade" },
+        soft: { svg: cover({ shape: "soft" }), enter: "fade" },
         b2: { svg: bentuk(0, 2), enter: "fade" }
       },
       steps: [
@@ -773,7 +672,7 @@ const SCENES = {
     const rowLens = { src: [80, rowY(6) + 1, 302, 148], at: [12, 60] };
     return {
       title: "Mengatur urutan dan menyembunyikan bagian di Lapisan",
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), stack([galeriSec, videoSec, acaraSec])],
+      base: [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), stack(["galeri", "video", "acara"])],
       els: {
         tabs: { svg: railTabs("Lapisan"), enter: "fade" },
         lap: { svg: panelOpen("Lapisan") + L0, enter: "fade" },
@@ -781,8 +680,8 @@ const SCENES = {
         r: { svg: up(R), enter: "fade" }, r2: { svg: up(R2), enter: "fade" },
         lhdr: { svg: nkHead(0, 0, "Lapisan") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
         bar: { svg: barMask(), enter: "fade" },
-        p1: P([videoSec, galeriSec, acaraSec]), p2: P([videoSec, acaraSec, galeriSec]), p3: P([acaraSec, galeriSec, dressSec]), p4: P([videoSec, acaraSec, galeriSec]), p0: P([galeriSec, videoSec, acaraSec]),
-        dock: dockBar()
+        p1: P(["video", "galeri", "acara"]), p2: P(["video", "acara", "galeri"]), p3: P(["acara", "galeri", "dress"]), p4: P(["video", "acara", "galeri"]), p0: P(["galeri", "video", "acara"]),
+        dock: kencana.dock()
       },
       steps: [
         { caption: "Klik Lapisan di rel kiri. Daftar bagian tampil sesuai urutan undangan.", focus: LEFT, at: ED.rail.Lapisan, click: true, show: ["tabs", "lap", "lhdr", "bar"],
@@ -793,7 +692,7 @@ const SCENES = {
         { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, hide: ["l2", "p2"], show: ["l4", "p4"], mark: { box: [324, rowY(7) + 15, 36, 20], r: 10 }, lens: rowLens, dur: 3.6 },
         { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", focus: foot, at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, hide: ["l3", "p3"], show: ["r", "p0"],
           mark: nkBtnBox(PX, Q2.btn - DY, "Kembalikan urutan template"), lens: { src: [80, Q2.btn - DY - 61, 302, 105], at: [12, 100] }, dur: 4 },
-        { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", focus: [foot[0], [SC.x, 790, SC.w, 100]], at: [PX + PW - 18, QR.dock - DY + 20], click: true, hide: ["dock", "l4", "p4"], show: ["r2"],
+        { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", at: [PX + PW - 18, QR.dock - DY + 20], click: true, hide: ["dock", "l4", "p4"], show: ["r2"],
           mark: { box: [PX + PW - 36, QR.dock - DY + 10, 36, 20], r: 10 }, lens: { src: [80, QR.dock - DY - 61, 302, 105], at: [12, 100] }, dur: 3.6 }
       ]
     };
@@ -809,12 +708,14 @@ const SCENES = {
     const salamTop = SC.y + 784 - PAGE_DY;
     const [tbCover] = toolbar(SC.x + SC.w, SC.y + 6, ["Isi"]);
     const [tb, at, tbBox, tbBar] = toolbar(SC.x + SC.w, salamTop + 6, ["Isi", "↑", "↓", "Sembunyikan"]);
-    const sections = salamSec(SC.y + 784) + ayatSec(SC.y + 1204) + mempelaiSec(SC.y + 1534);
+    const sections = kencana.salam(SC.y + 784) + kencana.ayat(SC.y + 1204) + kencana.mempelai(SC.y + 1534);
     const top = 0 - PAGE_DY;
-    const panelTop = [72, 92, 327, 140], nickLens = { src: [ACC_X - 8, nY - 24, ACC_W + 16, 70], at: [12, 170] };
+    const panelTop = [72, 92, 327, 130], nickLens = { src: [ACC_X - 8, nY - 24, ACC_W + 16, 70], at: [12, 170] };
+    // The toast label wraps next to Urungkan (styles.js .nk-toast: flex, gap 10).
+    const SALAM = ["Salam Pembuka", "disembunyikan."], undo = nkToastBoxes(SALAM).undo, undoAt = [undo[0] + undo[2] / 2, undo[1] + undo[3] / 2];
     return {
       title: "Klik di pratinjau: form terbuka di kolom yang tepat",
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
+      base: [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), cover()],
       els: {
         tabs: { svg: railTabs("Konten"), enter: "fade" },
         konten: { svg: panelOpen("Konten") + accFrame(154, 900) + kcol + scrollbar(420, 200) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
@@ -829,8 +730,8 @@ const SCENES = {
         page: { svg: cover({ top: SC.y, names: "Rania & Dimas" }) + frame(SC.y, SC.h, 3) + tbCover + sections, enter: "fade" },
         mask: { svg: clipped(400, 0, 1040, SC.y, scalevEditor(0, 0, { rail: "Konten" })) + rect(400, SC.y + SC.h, 1040, 900 - SC.y - SC.h, { fill: C.svPreview }), enter: "fade" },
         pageS: { svg: screen(`<g transform="translate(0 ${top})">${cover({ top: SC.y, names: "Rania & Dimas" }) + sections}</g>`) + frame(salamTop, 420, 3) + tb, enter: "fade" },
-        gone: { svg: screen(rect(SC.x, salamTop, SC.w, 900, { fill: KENCANA.bg }), ayatSec(salamTop), mempelaiSec(salamTop + 330)), enter: "fade" },
-        toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" }
+        gone: { svg: screen(rect(SC.x, salamTop, SC.w, 900, { fill: KENCANA.bg }), kencana.ayat(salamTop), kencana.mempelai(salamTop + 330)), enter: "fade" },
+        toast: { svg: nkToast(SALAM), enter: "slide" }
       },
       steps: [
         { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", focus: TOOLS, at: ED.tool.Klik, mark: toolBox(725), lens: { src: [0, 566, 72, 232], zoom: 3 }, dur: 3.2 },
@@ -842,10 +743,10 @@ const SCENES = {
           hide: ["selCover"], show: ["clr", "nama", "busy", "saved", "page", "mask"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], mark: [NICK, FOOT_MARK], lens: nickLens, dur: 4.2 },
         { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", focus: PREVF, at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["pageS"],
           mark: [SC.x, salamTop, SC.w, 420], lens: { src: [SC.x + SC.w - 250, salamTop + 1, 250, 78], at: [140, 190] }, dur: 3.8 },
-        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", focus: [[72, 820, 327, 80], PREVF], at: at.Sembunyikan, click: true, show: ["gone", "toast"], mark: tbBox.Sembunyikan,
+        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", focus: [nkToastBoxes(SALAM).toast, PREVF], at: at.Sembunyikan, click: true, show: ["gone", "toast"], mark: tbBox.Sembunyikan,
           note: "Sembunyikan", dur: 4 },
-        { caption: "Muncul Salam Pembuka disembunyikan. Klik Urungkan untuk menampilkannya lagi.", at: [343, 862], click: true, hide: ["toast", "gone"],
-          mark: URUNG_BOX, note: "Urungkan", dur: 3.6 }
+        { caption: "Muncul Salam Pembuka disembunyikan. Klik Urungkan untuk menampilkannya lagi.", focus: PREVF, at: undoAt, click: true, hide: ["toast", "gone"],
+          mark: undo, note: "Urungkan", dur: 3.6 }
       ]
     };
   })(),
@@ -861,7 +762,7 @@ const SCENES = {
     const toolLens = { src: [0, 694, 72, 56], zoom: 3 };
     return {
       title: "Memakai Inspect bila Klik aktif tidak tersedia",
-      base: [shell("Konten", "Konten"), insTool(false), kontenClosed(), coverScreen()],
+      base: [shell("Konten", "Konten"), insTool(false), kontenClosed(), cover()],
       els: {
         on: { svg: insTool(true), enter: "fade" },
         form: { svg: form, enter: "fade" },
@@ -879,17 +780,18 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Urungkan dan Ulangi
   "editor-urungkan-ulangi": (() => {
     const NICK = [ACC_X, NICK_Y, ACC_W, 36], UNDO = [8, 621, 24, 24], REDO = [40, 621, 24, 24];
-    const focus = [[0, 600, 72, 60], [ACC_X - 8, NICK_Y - 30, ACC_W + 16, 80], PREVF], nickLens = { src: [ACC_X - 8, NICK_Y - 26, ACC_W + 16, 70], at: [12, 230] };
+    const focus = [[0, 612, 72, 42], [ACC_X - 8, NICK_Y - 26, ACC_W + 16, 70], PREVF], nickLens = { src: [ACC_X - 8, NICK_Y - 26, ACC_W + 16, 70], at: [12, 230] };
+    const tips = [[8, 652, tw("Urungkan (Ctrl+Z)", 12) + 16, 24], [40, 684, tw("Ulangi (Ctrl+Shift+Z)", 12) + 16, 24]];
     return {
       title: "Mengurungkan dan mengulangi perubahan",
-      base: [shell("Konten", "Konten"), priaPanel("Dimaz"), coverScreen({ names: "Rani & Dimaz" })],
+      base: [shell("Konten", "Konten"), priaPanel("Dimaz"), cover({ names: "Rani & Dimaz" })],
       els: {
         tipU: { svg: tooltip(8, 652, "Urungkan (Ctrl+Z)") + tooltip(40, 684, "Ulangi (Ctrl+Shift+Z)"), enter: "fade", delay: 0.6 },
         fix: { svg: nickFix("Dimas") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.text), enter: "fade" },
         redo: { svg: nickFix("Dimaz") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.off), enter: "fade" }
       },
       steps: [
-        { caption: "Di bawah Bagikan ada dua panah: kiri Urungkan, kanan Ulangi.", focus: [0, 554, 260, 170], at: ED.tool.Urungkan, show: ["tipU"], mark: [UNDO[0], UNDO[1], REDO[0] + REDO[2] - UNDO[0], 24],
+        { caption: "Di bawah Bagikan ada dua panah: kiri Urungkan, kanan Ulangi.", focus: [[0, 612, 72, 42], ...tips], at: ED.tool.Urungkan, show: ["tipU"], mark: [UNDO[0], UNDO[1], REDO[0] + REDO[2] - UNDO[0], 24],
           note: "Urungkan dan Ulangi", dur: 3.8 },
         { caption: "Klik panah kiri. Perubahan terakhir batal: nama kembali Dimas.", focus, at: ED.tool.Urungkan, click: true, hide: ["tipU"], show: ["fix"], mark: [NICK, UNDO], lens: nickLens, dur: 3.6 },
         { caption: "Kebablasan? Klik panah kanan untuk mengulangi perubahan tadi.", at: ED.tool.Ulangi, click: true, show: ["redo"], mark: [NICK, REDO], lens: nickLens, dur: 3.6 }
@@ -902,14 +804,14 @@ const SCENES = {
     const batalX = 16 + tw("Kosongkan halaman", 12, 500) + 52;
     const dlg = nkDialogHead(0, 0, "Kosongkan halaman?") + nkNote(16, BY, 367, ["Isi undangan dihapus. Ucapan dan RSVP aman. Bisa", "diurungkan."], { tone: "warn" }) +
       nkBtn(16, 237, "Kosongkan halaman", { variant: "danger", icon: "eraser" }) + quiet(batalX, 237, "Batal");
-    const dlgTop = [0, 92, 399, 200], toast = [72, 820, 327, 80];
+    const dlgTop = [0, 92, 399, 182];
     return {
       title: "Mengosongkan halaman dan mengurungkannya",
-      base: [shell("Konten", "Konten"), priaPanel("Dimas"), coverScreen()],
+      base: [shell("Konten", "Konten"), priaPanel("Dimas"), cover()],
       els: {
         red: { svg: rect(0, 752, 71, 46, { fill: C.page }) + icon("eraser", 36, 765, 18, C.danger) + text(36, 788, "Kosongkan", { size: 10, fill: C.danger, anchor: "middle" }), enter: "fade" },
         dlg: { svg: dlg, enter: "pop", origin: [36, 773], delay: 0.3 },
-        emptyPanel: { svg: railTabs("Template") + panelOpen("Template") + templatePanel() + scrollbar(157, 360), enter: "fade" },
+        emptyPanel: { svg: railTabs("Template") + panelOpen("Template") + templatePanel(null) + scrollbar(157, 360), enter: "fade" },
         emptyPrev: { svg: rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white }), enter: "fade" },
         toast: { svg: nkToast("Halaman dikosongkan."), enter: "slide", delay: 0.4 }
       },
@@ -919,9 +821,9 @@ const SCENES = {
         { caption: "Baca jendela Kosongkan halaman?: Ucapan dan RSVP aman. Bisa diurungkan.", focus: dlgTop, at: [260, BY + 30], mark: [16, BY, 367, 56], lens: { src: [8, 100, 390, 190] }, dur: 4 },
         { caption: "Klik Kosongkan halaman untuk lanjut, atau Batal (Esc) untuk mundur.", at: [90, 255], click: true, hide: ["dlg"], show: ["emptyPanel", "emptyPrev"],
           mark: [16, 237, nkBtnBox(batalX, 237, "Batal")[0] + nkBtnBox(batalX, 237, "Batal")[2] - 16, 36], note: "Kosongkan halaman atau Batal", dur: 3.8 },
-        { caption: "Menu Template terbuka, pratinjau kosong. Muncul pesan Halaman dikosongkan.", focus: [[72, 92, 327, 160], toast, PREVF], show: ["toast"],
-          mark: [84, 836, 303, 52], lens: { src: [76, 826, 320, 72], at: [12, 430] }, dur: 3.6 },
-        { caption: "Berubah pikiran? Klik Urungkan di pesan itu. Undangan kembali utuh.", focus: [toast, PREVF], at: [343, 862], click: true, hide: ["toast", "emptyPrev"],
+        { caption: "Menu Template terbuka, pratinjau kosong. Muncul pesan Halaman dikosongkan.", focus: [[72, 92, 327, 166], TOAST, PREVF], show: ["toast"],
+          mark: TOAST, lens: { src: TOAST, at: [12, 430] }, dur: 3.6 },
+        { caption: "Berubah pikiran? Klik Urungkan di pesan itu. Undangan kembali utuh.", focus: PREVF, at: URUNG_AT, click: true, hide: ["toast", "emptyPrev"],
           mark: URUNG_BOX, note: "Urungkan", dur: 3.6 }
       ]
     };
@@ -932,10 +834,10 @@ const SCENES = {
     const [kcol] = column([{ label: "Bahasa undangan", value: "Indonesia", select: true }], PX, BY + 138, PW);
     const rest = kcol + text(PX, BY + 226, "Urutan dan tampilan bagian di Lapisan.", { size: 12, fill: C.faint }) +
       ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video"].map((g, i) => nkAcc(PX, BY + 242 + i * 58, PW, g, { badge: "Terisi" })).join("");
-    const banner = [72, 154, 327, 150], bannerLens = { src: [80, 160, 300, 145] };
+    const banner = [72, 154, 327, 150], fixedTop = [72, 154, 327, 172], bannerLens = { src: [80, 160, 300, 145] };
     return {
       title: "NikahKit dijeda karena kode diubah manual",
-      base: [shell("Konten", "Konten", { saving: "Dijeda" }), white(72, 154, 327, 746), driftBanner(), rest, scrollbar(157, 300), coverScreen()],
+      base: [shell("Konten", "Konten", { saving: "Dijeda" }), white(72, 154, 327, 746), driftBanner(), rest, scrollbar(157, 300), cover()],
       els: {
         code: { svg: clipped(0, 0, 399, 92, scalevEditor(0, 0, { tab: "Code" })) + codeView(), enter: "fade" },
         fixed: { svg: white(72, 154, 327, 746) + text(PX, BY + 12, "Bahasa undangan", { size: 12, weight: 500 }) + nkInput(PX, BY + 20, PW, "Indonesia", { select: true }) +
@@ -949,9 +851,9 @@ const SCENES = {
           mark: nkBtnBox(PX + 12, BY + 36, "Lihat di kode", { icon: "code-xml" }), lens: { src: [0, 96, 399, 120], at: [290, 60] }, dur: 3.8 },
         { caption: "Putuskan: tidak penting? Lanjut. Penting? Salin dulu, atau Ctrl+Z di Code.", at: [250, 204], mark: { box: [40, 193, 359, 22], r: 0 }, lens: { src: [0, 100, 399, 116], at: [290, 60] }, dur: 4 },
         { caption: "Kembali ke tab NikahKit di strip atas editor Scalev.", focus: [0, 44, 399, 48], at: ED.tab.NikahKit, click: true, hide: ["code"], mark: [228, 54, 84, 28], lens: { src: [0, 44, 340, 48] }, dur: 3.4 },
-        { caption: "Klik Timpa dengan NikahKit. Perubahan manual dibuang, bisa diurungkan.", focus: [[72, 154, 327, 200], FOOT], at: [180, BY + 98], click: true, show: ["fixed"],
+        { caption: "Klik Timpa dengan NikahKit. Perubahan manual dibuang, bisa diurungkan.", focus: [fixedTop, FOOT], at: [180, BY + 98], click: true, show: ["fixed"],
           mark: nkBtnBox(PX + 12, BY + 80, "Timpa dengan NikahKit"), note: "Timpa dengan NikahKit", dur: 3.6 },
-        { caption: "Kotak kuning hilang, kaki rel kembali Tersimpan. Lalu Simpan di Scalev.", focus: [FOOT, banner, [1180, 44, 260, 48]], at: [36, 878], mark: [FOOT_MARK, SIMPAN],
+        { caption: "Kotak kuning hilang, kaki rel kembali Tersimpan. Lalu Simpan di Scalev.", focus: [FOOT, fixedTop, [1180, 44, 260, 48]], at: [36, 878], mark: [FOOT_MARK, ED.simpanBox],
           lens: { src: [0, 846, 72, 54], zoom: 3 }, dur: 3.6 }
       ]
     };
