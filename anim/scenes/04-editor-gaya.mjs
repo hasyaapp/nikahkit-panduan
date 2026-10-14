@@ -1,32 +1,40 @@
 // Editor scenes for the Media, Musik, Gaya, Lapisan, preview click, Urungkan/Kosongkan and Dijeda pages.
-// World = the real 1440x900 Scalev editor (lib scalevEditor). Panel geometry from /tmp/ref/editor-*.png and
-// editor-metrics.json (update note left out: content starts at y 169). Labels follow nikahkit/src/ui/App.jsx,
-// panels-style.jsx, panels-structure.jsx, fields.jsx, panel-content.jsx, fields.js, model.js, store.js and
-// canvas/canvas.js (preview toolbar: #223548 bar, Isi / ↑ / ↓ / Sembunyikan, 30px buttons, 3px blue frame).
-import { C, ED, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, nkBtn, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3,
-  scalevEditor, nkRail, nkHead, nkDialogHead, ring, note, chrome, favChrome } from "../lib.mjs";
+// Every scene is the whole real 1440x900 Scalev editor (lib scalevEditor), panel and preview together. Panel geometry
+// from /tmp/ref/editor-*.png and editor-metrics.json (update note left out: content starts at y 169). Labels follow
+// nikahkit/src/ui/App.jsx, panels-style.jsx, panels-structure.jsx, fields.jsx, panel-content.jsx, fields.js, model.js,
+// store.js and canvas/canvas.js (preview toolbar: #223548 bar, Isi / ↑ / ↓ / Sembunyikan, 30px buttons, 3px blue frame).
+// The YouTube, Google Fonts and file windows are generic drawings (not measured), laid out at 1440 wide.
+import { C, ED, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3,
+  scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome } from "../lib.mjs";
 
-// Worlds (static crops; the stage takes their shape). PANEL: rail + panel (1.03); PREV: the preview screen (1.04).
-const PANEL = { x: 0, y: 92, w: 400, h: 808 }, PREV = { x: 717, y: 96, w: 410, h: 804 };
 const SC = ED.screen; // preview screen 727,106 390x784
 const PX = 88, PW = 279, BY = 169; // panel body content box (scrolling panels keep 279 next to the scrollbar)
 const SERIF = "Tinos,'Times New Roman',Georgia,serif";
 const SCRIPT = "MonteCarlo,'Great Vibes','Snell Roundhand','Apple Chancery',cursive";
 const KENCANA = { bg: "#FFF7E9", surface: "#FFFDF8", heading: "#8E2818", text: "#10001E", muted: "#6B5A55", accent: "#8E2818", on: "#FFFFFF" };
 const GOLD = "#E0B84A";
+// Focus areas: rail + panel, rail, panel, preview screen, rail tools, rail foot.
+const LEFT = [0, 92, 399, 808], RAILF = [0, 92, 72, 808], PANELF = [72, 92, 327, 808], PREVF = [SC.x, SC.y, SC.w, SC.h], TOOLS = [0, 554, 72, 297], FOOT = [0, 851, 72, 49];
+// Rail tab bounds (nkRail: 56 px rows from y 104) and tool bounds, for marks.
+const railBox = (n) => [0, 104 + ["Template", "Gaya", "Audio", "Media", "Lapisan", "Konten"].indexOf(n) * 56, 72, 52];
+const toolBox = (cy) => [4, cy - 22, 64, 44];
+const SIMPAN = [1193, 50, 82, 34], TERBIT = [1283, 50, 151, 34];
 
 // ---- small drawing helpers -------------------------------------------------------------------------------------------
-let uid = 0;
+const hid = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return (h >>> 0).toString(36); };
 const raw = (body, cx, cy, size, color, fill = false) => `<g transform="translate(${cx - size / 2} ${cy - size / 2}) scale(${size / 24})" fill="${fill ? color : "none"}" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
-const clipPath = (d, ...kids) => { const id = `a4c${uid++}`; return `<defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+const clipPath = (d, ...kids) => { const id = `a4c${hid(d)}`; return `<defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
 const rrPath = (x, y, w, h, r) => (r ? `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1 -${r} ${r}h-${w - 2 * r}a${r} ${r} 0 0 1 -${r} -${r}v-${h - 2 * r}a${r} ${r} 0 0 1 ${r} -${r}z` : `M${x} ${y}h${w}v${h}h-${w}z`);
 const scrollbar = (y = 157, h = 360) => rect(387, y, 6, h, { r: 3, fill: "#c4c8ce" });
 const white = (x, y, w, h) => rect(x, y, w, h, { fill: C.white });
 
 // Editor shell: Scalev editor + NikahKit rail (active menu) + panel header.
 const shell = (rail, title, o = {}) => scalevEditor(0, 0, { rail, ...o }) + (title ? nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line }) : "");
-// Rail + header + empty panel body as an overlay (switching menus).
-const railPanel = (rail, title, o = {}) => nkRail(0, 0, rail, o) + white(72, 92, 327, 808) + nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line });
+// Switching menus: the rail tabs with another one active, and an empty panel with its header.
+const railTabs = (rail) => clipped(0, 92, 72, 350, nkRail(0, 0, rail));
+const panelOpen = (title) => white(72, 92, 327, 808) + nkHead(0, 0, title) + line(72, 153, 399, 153, { stroke: C.line });
+// The Scalev bars above the panel, drawn over a scrolled panel so its content stays inside the panel.
+const barMask = () => clipped(72, 0, 327, 92, scalevEditor(0, 0));
 
 // Photos drawn as flat shapes (no screenshots): sky, hills, sun; k picks the colours.
 const TONES = [["#d9c7b0", "#a8875f", "#7d5f3f"], ["#cfdbe0", "#8aa596", "#5d7a66"], ["#ead1c6", "#c48f7f", "#8e5a4c"], ["#d6d3e6", "#9a92b8", "#6a6290"], ["#e8dcc0", "#c2a25c", "#8b6d2f"], ["#d3e1e8", "#7f9eb0", "#4f6f82"], ["#efe1d9", "#b9a093", "#7b6257"], ["#dfe6d2", "#a3b47e", "#6d7f4a"], ["#f0d8c8", "#d49a76", "#9b5e3c"]];
@@ -179,20 +187,21 @@ const mediaGrid = (ks) => clipped(PX, MEDIA_Y, PW, 900 - MEDIA_Y, ks.map((k, i) 
 const OLD = [0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2, 3, 4, 5, 6, 7, 8, 0, 1, 2];
 const mediaBody = (hint, ks, o = {}) => white(72, 154, 314, 746) + nkBtn(PX, BY, "Unggah foto", { w: PW, icon: "upload", size: 14 }) +
   (o.busy ? rect(PX, BY, PW, 36, { r: 4, fill: "rgba(255,255,255,.5)" }) : "") + text(PX, BY + 54, hint, { size: 12, fill: o.hintFill ?? C.faint }) + mediaGrid(ks) + scrollbar(157, 300);
-// A file window over the preview (generic, no app chrome labels).
+// The system file window (generic: traffic lights, folder, four photos, Buka), in the grey gap between panel and preview.
 const FILES = [["akad-1.jpg", 4], ["akad-2.jpg", 1], ["resepsi.jpg", 8], ["lamaran.jpg", 3]];
-const FW = { x: 394, y: 300, w: 330, h: 270 }; // over the grey gap left of the preview
-const BUKA = [FW.x + FW.w - 52, FW.y + FW.h - 30];
+const FW = { x: 403, y: 290, w: 320, h: 370 };
+const BUKA_BOX = [FW.x + FW.w - 96, FW.y + FW.h - 40, 80, 28], BUKA = [BUKA_BOX[0] + 40, BUKA_BOX[1] + 14];
 function fileWindow(sel) {
   const { x, y, w, h } = FW;
-  let s = shadow(x, y, w, h, 10, 3) + rect(x, y, w, h, { r: 10, fill: C.white, stroke: "#d0d4da" }) + rect(x, y, w, 30, { r: 10, fill: "#eceef1" }) + rect(x, y + 20, w, 10, { fill: "#eceef1" }) +
-    circle(x + 16, y + 15, 5, { fill: "#ff5f57" }) + circle(x + 32, y + 15, 5, { fill: "#febc2e" }) + circle(x + 48, y + 15, 5, { fill: "#28c840" }) + iconX("folder", x + 80, y + 15, 14, C.text);
+  let s = shadow(x, y, w, h, 10, 3) + rect(x, y, w, h, { r: 10, fill: C.white, stroke: "#d0d4da" }) + rect(x, y, w, 36, { r: 10, fill: "#eceef1" }) + rect(x, y + 26, w, 10, { fill: "#eceef1" }) +
+    circle(x + 18, y + 18, 6, { fill: "#ff5f57" }) + circle(x + 38, y + 18, 6, { fill: "#febc2e" }) + circle(x + 58, y + 18, 6, { fill: "#28c840" }) + iconX("folder", x + 90, y + 18, 16, C.text) +
+    text(x + 106, y + 23, "Foto Rani & Dimas", { size: 13, weight: 500, fill: C.crText });
   FILES.forEach(([n, k], i) => {
-    const fx = x + 22 + (i % 2) * 150, fy = y + 46 + Math.floor(i / 2) * 92;
-    if (sel) s += rect(fx - 6, fy - 4, 138, 86, { r: 6, fill: C.crBlueSoft });
-    s += photo(fx + 33, fy, 60, 54, k) + text(fx + 63, fy + 72, n, { size: 13, fill: C.crText, anchor: "middle" });
+    const fx = x + 20 + (i % 2) * 154, fy = y + 56 + Math.floor(i / 2) * 124;
+    if (sel) s += rect(fx, fy - 8, 108, 128, { r: 8, fill: C.crBlueSoft });
+    s += photo(fx + 14, fy, 80, 80, k) + text(fx + 54, fy + 104, n, { size: 13, fill: C.crText, anchor: "middle" });
   });
-  return s + line(x, y + h - 52, x + w, y + h - 52, { stroke: "#e3e5e8" }) + rect(BUKA[0] - 36, BUKA[1] - 14, 72, 28, { r: 6, fill: sel ? C.crBlue : "#c4c7c5" }) +
+  return s + line(x, y + h - 56, x + w, y + h - 56, { stroke: "#e3e5e8" }) + rect(...BUKA_BOX, { r: 6, fill: sel ? C.crBlue : "#c4c7c5" }) +
     text(BUKA[0], BUKA[1] + 5, "Buka", { size: 13, weight: 500, fill: C.white, anchor: "middle" });
 }
 
@@ -296,7 +305,7 @@ const FONT_LINK = "https://fonts.google.com/specimen/Playfair+Display";
 // pair (index), font ("check" while weights are probed, "done" after). Returns [svg, positions].
 function huruf(o = {}) {
   let y = BY + 54, s = white(72, BY + 38, 314, 1600); const pos = {};
-  const p = PAIRS[o.pair ?? 0], hf = o.font ? PLAYFAIR : p[3];
+  const p = PAIRS[o.pair ?? 0], hf = o.font === "done" ? PLAYFAIR : p[3];
   if (o.big || o.bold || o.font) { s += resetBox(y); y += 62; }
   s += nkH3(PX, y + 12, "Ukuran teks") + (o.big ? changed(PX + 76, y + 12) : ""); y += 24;
   pos.scale = y; s += segIcons(PX, y, PW, [{ label: "Kecil", svg: TYPE, size: 14 }, { label: "Normal", svg: TYPE }, { label: "Besar", svg: TYPE, size: 24 }], o.big ? 2 : 1); y += 58;
@@ -309,11 +318,11 @@ function huruf(o = {}) {
   s += para(PX, y + 12, ["Pilih font di Google Fonts, salin link halaman", "fontnya, lalu tempel di sini."], { size: 12, fill: C.faint, lh: 16 }); y += 44;
   pos.gf = y; s += nkBtn(PX, y, "Buka Google Fonts", { variant: "ghost", w: PW, icon: "external-link" }); y += 48;
   pos.font = y;
-  s += o.font ? text(PX, y + 12, "Font judul dan nama: ", { size: 12, weight: 500 }) + text(PX + 123, y + 12, "Playfair Display", { size: 12, weight: 700, font: PLAYFAIR }) : text(PX, y + 12, "Font judul dan nama", { size: 12, weight: 500 });
+  s += o.font === "done" ? text(PX, y + 12, "Font judul dan nama: ", { size: 12, weight: 500 }) + text(PX + 123, y + 12, "Playfair Display", { size: 12, weight: 700, font: PLAYFAIR }) : text(PX, y + 12, "Font judul dan nama", { size: 12, weight: 500 });
   s += o.font ? nkInput(PX, y + 20, PW, "", {}) + clipped(PX + 10, y + 20, PW - 20, 36, text(PX + 10, y + 43, FONT_LINK, { size: 14 })) : nkInput(PX, y + 20, PW, "Tempel link Google Fonts", { placeholder: true });
   y += 56; if (o.font === "check") { s += text(PX, y + 20, "Memeriksa ketebalan yang tersedia…", { size: 12, fill: C.faint }); y += 20; } y += 12;
   s += text(PX, y + 12, "Font teks", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, "Tempel link Google Fonts", { placeholder: true }); y += 68;
-  if (o.font) { s += sample(y, PLAYFAIR, p[4], 24); y += 86; pos.back = y; s += quiet(PX, y, "Kembali ke pasangan bawaan"); y += 48; }
+  if (o.font) { s += sample(y, hf, p[4], 24); y += 86; pos.back = y; s += quiet(PX, y, "Kembali ke pasangan bawaan"); y += 48; }
   s += nkH3(PX, y + 20, "Pasangan font"); y += 32; pos.pairs = y;
   PAIRS.forEach((q, i) => (s += pairCard(y + i * 116, q, i === (o.font ? -1 : o.pair ?? 0), i === 0)));
   return [s, pos];
@@ -414,16 +423,17 @@ const ayatSec = (y) => rect(SC.x, y, SC.w, 330, { fill: KENCANA.bg }) + rect(SC.
 const mempelaiSec = (y) => rect(SC.x, y, SC.w, 500, { fill: KENCANA.bg }) + text(SC.x + SC.w / 2, y + 70, "Mempelai", { size: 48, fill: KENCANA.heading, anchor: "middle", font: SCRIPT }) +
   clipPath(`M${SC.x + 105} ${y + 340} V${y + 180} a90 90 0 0 1 180 0 V${y + 340} Z`, photo(SC.x + 105, y + 90, 180, 250, 2)) + `<path d="M${SC.x + 105} ${y + 340} V${y + 180} a90 90 0 0 1 180 0 V${y + 340} Z" fill="none" stroke="${KENCANA.accent}" stroke-width="2"/>`;
 // Preview toolbar (canvas.js): dark bar, 3px padding, 2px gaps, 30px buttons with 10px side padding, 12px/500 white.
+// Returns [svg, button centres, button boxes, bar box].
 function toolbar(right, top, actions, hover) {
   const bw = actions.map((a) => Math.max(32, tw(a, 12, 500) + 20)), w = 6 + bw.reduce((a, b) => a + b, 0) + 2 * (actions.length - 1);
-  let x = right - w - 6, s = rect(x, top + 3, w, 36, { r: 6, fill: "rgba(0,0,0,.18)" }) + rect(x, top, w, 36, { r: 6, fill: C.strong }); const at = {};
+  let x = right - w - 6, s = rect(x, top + 3, w, 36, { r: 6, fill: "rgba(0,0,0,.18)" }) + rect(x, top, w, 36, { r: 6, fill: C.strong }); const at = {}, box = {};
   let bx = x + 3;
   actions.forEach((a, i) => {
     if (a === hover) s += rect(bx, top + 3, bw[i], 30, { r: 4, fill: C.primary });
     s += a === "↑" || a === "↓" ? text(bx + bw[i] / 2, top + 23, a, { size: 14, weight: 500, fill: C.white, anchor: "middle" }) : text(bx + bw[i] / 2, top + 22, a, { size: 12, weight: 500, fill: C.white, anchor: "middle" });
-    at[a] = [bx + bw[i] / 2, top + 18]; bx += bw[i] + 2;
+    at[a] = [bx + bw[i] / 2, top + 18]; box[a] = [bx, top + 3, bw[i], 30]; bx += bw[i] + 2;
   });
-  return [s, at];
+  return [s, at, box, [x, top, w, 36]];
 }
 const frame = (y, h, sw) => rect(SC.x + sw / 2, Math.max(SC.y, y) + sw / 2, SC.w - sw, h - sw, { r: 2, stroke: C.primary, sw });
 const hoverTag = (x, y, label) => { const w = tw(label, 12, 500) + 16; return rect(x, y, w, 22, { r: 4, fill: C.primary }) + rect(x, y + 12, w, 10, { fill: C.primary }) + text(x + 8, y + 15, label, { size: 12, weight: 500, fill: C.white }); };
@@ -458,15 +468,60 @@ const priaPanel = (nick) => white(72, 154, 327, 746) + accFrame(154, 900) + pria
 const NICK_Y = priaCol("Dimas")[1]["Nama panggilan"] + 20;
 const nickFix = (nick) => white(ACC_X + 1, NICK_Y + 1, ACC_W - 2, 34) + text(ACC_X + 10, NICK_Y + 23, nick, { size: 14 }) + coverScreen({ names: `Rani & ${nick}` });
 
+// ---- other windows (generic drawings at 1440 wide) ---------------------------------------------------------------------
+// YouTube watch page with the Bagikan dialog open (YouTube's Indonesian labels).
+const YT_DLG = [460, 300, 520, 330], YT_TOAST = [24, 820, 248, 48], SALIN_BOX = [870, 478, 72, 36];
+const favYT = (cx, cy) => rect(cx - 8, cy - 6, 16, 12, { r: 3, fill: "#ff0033" }) + `<path d="M${cx - 2.5} ${cy - 3} l6 3 l-6 3 z" fill="#fff"/>`;
+function youtube() {
+  let s = chrome(0, 0, 1440, 900, { tabs: [{ title: "Lagu pengiring - YouTube", active: true, fav: favYT }], url: "youtube.com/watch?v=AbCdEf12345" }) +
+    [104, 112, 120].map((y) => line(28, y, 46, y, { stroke: "#0f0f0f", sw: 2 })).join("") + rect(68, 102, 30, 21, { r: 6, fill: "#ff0033" }) + `<path d="M79 107 l9 5.5 l-9 5.5 z" fill="#fff"/>` +
+    text(104, 119, "YouTube", { size: 18, weight: 700, fill: "#0f0f0f" }) + rect(440.5, 93.5, 500, 39, { r: 20, stroke: "#d3d3d3" }) + iconX("search", 972, 113, 18, "#0f0f0f") + circle(1400, 113, 16, { fill: "#c9b6a6" }) +
+    rect(24, 165, 1012, 569, { r: 12, fill: "#0f0f0f" }) + rect(36, 716, 988, 3, { r: 1.5, fill: "rgba(255,255,255,.3)" }) + rect(36, 716, 300, 3, { r: 1.5, fill: "#ff0033" }) +
+    text(24, 772, "Lagu pengiring untuk Rani & Dimas", { size: 20, weight: 700, fill: "#0f0f0f" }) + circle(44, 816, 20, { fill: "#d9c7b0" }) +
+    text(76, 812, "Musik Pernikahan", { size: 16, weight: 500, fill: "#0f0f0f" }) + text(76, 830, "12 rb subscriber", { size: 12, fill: "#606060" }) +
+    rect(252, 798, 104, 36, { r: 18, fill: "#0f0f0f" }) + text(304, 821, "Subscribe", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
+    rect(736, 798, 128, 36, { r: 18, fill: "#f2f2f2" }) + rect(876, 798, 112, 36, { r: 18, fill: "#f2f2f2" }) + icon("share-2", 900, 816, 16, "#0f0f0f") + text(916, 821, "Bagikan", { size: 14, weight: 500, fill: "#0f0f0f" });
+  for (let i = 0; i < 7; i++) { const y = 165 + i * 104; s += rect(1060, y, 168, 94, { r: 8, fill: "#e5e5e5" }) + rect(1240, y + 6, 160, 10, { r: 5, fill: "#d6d6d6" }) + rect(1240, y + 26, 110, 8, { r: 4, fill: "#e5e5e5" }) + rect(1240, y + 42, 80, 8, { r: 4, fill: "#e5e5e5" }); }
+  const [dx, dy, dw, dh] = YT_DLG;
+  s += rect(0, 85, 1440, 815, { fill: "rgba(0,0,0,.5)" }) + rect(dx, dy, dw, dh, { r: 12, fill: C.white }) + text(dx + 24, dy + 40, "Bagikan", { size: 16, weight: 700, fill: "#0f0f0f" }) + iconX("x", dx + dw - 28, dy + 34, 18, "#0f0f0f") +
+    [["Sematkan", "#f2f2f2"], ["WhatsApp", "#25d366"], ["Facebook", "#1877f2"], ["X", "#0f0f0f"], ["Email", "#8a8a8a"]].map(([n, c], i) => circle(dx + 54 + i * 86, dy + 95, 28, { fill: c }) + text(dx + 54 + i * 86, dy + 146, n, { size: 12, fill: "#0f0f0f", anchor: "middle" })).join("") +
+    rect(dx + 24.5, dy + 170.5, dw - 49, 51, { r: 12, fill: "#f9f9f9", stroke: "#d3d3d3" }) + text(dx + 40, dy + 201, "https://youtu.be/AbCdEf12345", { size: 14, fill: "#0f0f0f" }) +
+    rect(...SALIN_BOX, { r: 18, fill: "#065fd4" }) + text(SALIN_BOX[0] + 36, SALIN_BOX[1] + 23, "Salin", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) + line(dx, dy + 245, dx + dw, dy + 245, { stroke: "#e5e5e5" }) +
+    rect(dx + 24.5, dy + 268.5, 17, 17, { r: 3, stroke: "#606060", sw: 2 }) + text(dx + 52, dy + 282, "Mulai pada", { size: 14, fill: "#0f0f0f" }) + text(dx + 136, dy + 282, "1:05", { size: 14, fill: "#606060" });
+  return s;
+}
+// Google Fonts: the font list, or one font's page (with the address bar selected: gfSel).
+const GF_URL = "fonts.google.com/specimen/Playfair+Display", GF_ROW0 = [32, 245, 1376, 96], OMNI = [124, 46, 1184, 34];
+const GF_FONTS = [["Playfair Display", PLAYFAIR], ["Lora", ff("Lora")], ["Great Vibes", ff("Great Vibes", "cursive")], ["Montserrat", ff("Montserrat", "sans-serif")], ["Cormorant Garamond", ff("Cormorant Garamond")], ["Dancing Script", ff("Dancing Script", "cursive")]];
+function googleFonts(spec) {
+  let s = chrome(0, 0, 1440, 900, { tabs: [{ title: spec ? "Playfair Display - Google Fonts" : "Google Fonts", active: true, fav: favChrome }], url: spec ? GF_URL : "fonts.google.com" }) +
+    text(32, 126, "Google Fonts", { size: 22, fill: "#202124" }) + line(0, 149.5, 1440, 149.5, { stroke: "#dadce0" });
+  if (!spec) return s + rect(32, 173, 1376, 48, { r: 24, fill: "#f1f3f4" }) + iconX("search", 60, 197, 18, "#5f6368") +
+    GF_FONTS.map(([n, font], i) => { const y = 245 + i * 108; return rect(32.5, y + 0.5, 1375, 95, { r: 12, stroke: "#dadce0" }) + text(56, y + 28, n, { size: 14, fill: "#5f6368" }) + text(56, y + 78, "Rani & Dimas", { size: 36, fill: "#202124", font }); }).join("");
+  return s + text(32, 306, "Playfair Display", { size: 48, fill: "#202124", font: PLAYFAIR }) + rect(1232, 268, 176, 44, { r: 22, fill: C.crBlue }) +
+    text(32, 470, "Rani & Dimas", { size: 110, fill: "#202124", font: PLAYFAIR }) +
+    ["Regular 400", "Italic 400", "Bold 700"].map((n, i) => { const y = 540 + i * 110; return line(32, y, 1408, y, { stroke: "#dadce0" }) + text(32, y + 28, n, { size: 14, fill: "#5f6368" }) + text(32, y + 84, "Rani & Dimas", { size: 44, fill: "#202124", font: PLAYFAIR }); }).join("");
+}
+const gfSel = rect(162, 57, tw(GF_URL, 14) + 8, 22, { r: 3, fill: "#c2dbff" }) + text(166, 68, GF_URL, { size: 14, fill: C.crText });
+// Guest page "Menu bawah" (undangan/widgets/dock.js): accent bar 10 px above the bottom, 56 px links, 11 px labels.
+const dockBar = () => rect(765, 816, 314, 64, { r: 18, fill: KENCANA.accent }) + ["heart", "calendar", "image", "message-circle", "gift"].map((ic, i) => icon(ic, 802 + i * 60, 838, 20, C.white) +
+  text(802 + i * 60, 864, ["Mempelai", "Acara", "Galeri", "Ucapan", "Hadiah"][i], { size: 11, weight: 500, fill: "rgba(255,255,255,.85)", anchor: "middle" })).join("");
+
+// Marks shared by several scenes.
+const FOOT_MARK = [10, 859, 52, 34]; // save status dot + label in the rail foot
+const URUNG_BOX = [309, 852, 68, 22]; // Urungkan in the toast
+const NAMES = [763, 464, 318, 56]; // couple names on the cover
+const segW = (w, labels, active) => { const need = 20 + tw(labels[active], 12, 600) + 6 + 16, aw = Math.max(w / labels.length, need); return [(w - aw) / (labels.length - 1), aw]; };
+
 const SCENES = {
   // ------------------------------------------------------------------------------------------- Media A: unggah banyak foto
   "editor-media-unggah": {
     title: "Mengunggah banyak foto lewat menu Media",
-    world: { x: 0, y: 92, w: 727, h: 808 }, // rail + panel + the file window (the preview does not change)
     base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
     els: {
-      media: { svg: railPanel("Media", "Media") + mediaBody("Atau seret ke sini.", OLD), enter: "fade" },
-      win: { svg: fileWindow(false), enter: "pop", origin: [FW.x, FW.y] },
+      tabs: { svg: railTabs("Media"), enter: "fade" },
+      media: { svg: panelOpen("Media") + mediaBody("Atau seret ke sini.", OLD), enter: "fade" },
+      win: { svg: fileWindow(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },
       winSel: { svg: fileWindow(true), enter: "fade", delay: 1.0 },
       busy1: { svg: mediaBody("Mengunggah 1 dari 4...", OLD, { busy: true }), enter: "fade" },
       up1: { svg: tile(0, 4), enter: "pop", delay: 0.8 },
@@ -475,10 +530,13 @@ const SCENES = {
       done: { svg: mediaBody("Atau seret ke sini.", [3, 8, 1, 4, ...OLD]), enter: "fade" }
     },
     steps: [
-      { caption: "Buka menu Media: klik Media di rel kiri.", at: ED.rail.Media, click: true, show: ["media"] },
-      { caption: "Klik Unggah foto, lalu pilih beberapa foto (tahan Ctrl atau Cmd).", at: [PX + PW / 2, BY + 18], click: true, show: ["win", "winSel"], dur: 3.8 },
-      { caption: "Klik Buka, lalu tunggu. Foto diunggah satu per satu: Mengunggah 1 dari 4...", at: BUKA, click: true, hide: ["win", "winSel"], show: ["busy1", "up1", "busy2", "up2"], dur: 4 },
-      { caption: "Selesai: semua foto baru tampil paling depan di grid Media.", at: [PX + 140, MEDIA_Y + 45], hide: ["busy1", "up1", "busy2", "up2"], show: ["done"], dur: 3.4 }
+      { caption: "Buka menu Media: klik Media di rel kiri.", focus: LEFT, at: ED.rail.Media, click: true, show: ["tabs", "media"], mark: railBox("Media"), lens: { src: [0, 96, 390, 240], at: [300, 40] } },
+      { caption: "Klik Unggah foto, lalu pilih beberapa foto (tahan Ctrl atau Cmd).", focus: [[72, 154, 327, 84], [FW.x, FW.y, FW.w, FW.h]], at: [PX + PW / 2, BY + 18], click: true, show: ["win", "winSel"],
+        mark: [PX, BY, PW, 36], lens: { src: [80, 160, 300, 80] }, dur: 3.8 },
+      { caption: "Klik Buka, lalu tunggu. Foto diunggah satu per satu: Mengunggah 1 dari 4...", focus: [[72, 154, 327, 200], [FW.x, FW.y, FW.w, FW.h]], at: BUKA, click: true,
+        hide: ["win", "winSel"], show: ["busy1", "up1", "busy2", "up2"], mark: [{ box: [PX, 211, 150, 16], r: 2 }, { box: BUKA_BOX, r: 6 }], lens: { src: [80, 160, 300, 120], at: [12, 420] }, dur: 4 },
+      { caption: "Selesai: semua foto baru tampil paling depan di grid Media.", focus: [72, 154, 327, 330], at: [PX + 140, MEDIA_Y + 45], hide: ["busy1", "up1", "busy2", "up2"], show: ["done"],
+        mark: { box: [PX, MEDIA_Y, PW, 2 * MS + 6], r: 0 }, note: "4 foto baru paling depan", dur: 3.4 }
     ]
   },
 
@@ -506,27 +564,30 @@ const SCENES = {
     const pakai = (on) => `<g opacity="${on ? 1 : 0.5}">${nkBtn(DX, 852, "Pakai foto", { w: 367, size: 14 })}</g>`;
     const selX = DX + 2 * (gs + 6), selY = gy + (gs + 6);
     const ALT = "Rani tersenyum di taman";
+    const [atasW] = segW(ACC_W - 20, FOCUS.map((f) => f[0]), 1);
     return {
       title: "Memasang foto lewat tombol Pilih foto",
-      world: PANEL,
       base: [shell("Konten", "Konten"), white(72, 154, 327, 746), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), coverScreen()],
       els: {
         open: { svg: open, enter: "fade" },
         hdr: clipped(72, 0, 327, 154, scalevEditor(0, 0, { rail: "Konten" })) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }),
         dlg: { svg: dlg + pakai(false), enter: "pop", origin: [150, FOTO_AT + 38] },
         sel: { svg: rect(selX + 1, selY + 1, gs - 2, gs - 2, { r: 4, stroke: C.primary, sw: 2 }) + circle(selX + gs - 12, selY + 12, 8, { fill: C.action }) + iconX("check", selX + gs - 12, selY + 12, 10, C.white, 3) + pakai(true), enter: "fade" },
-        picked: { svg: nkRail(0, 0, "Konten") + picked, enter: "fade" },
+        picked: { svg: picked, enter: "fade" },
         alt: { svg: text(ACC_X + 20, p2.alt + 23, ALT, { size: 14 }), enter: "fade" },
         altFocus: { svg: rect(ACC_X + 10.5, p2.alt + 0.5, ACC_W - 21, 35, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
         top: { svg: rect(ACC_X + 10.5, p2.alt + 0.5, ACC_W - 21, 35, { r: 4, stroke: C.white, sw: 3 }) + rect(ACC_X + 10.5, p2.alt + 0.5, ACC_W - 21, 35, { r: 4, stroke: C.field }) + rect(ACC_X + 10, p2.focus, ACC_W - 20, 38, { fill: C.page }) + focusSeg(ACC_X + 10, p2.focus, ACC_W - 20, 0), enter: "fade" }
       },
       steps: [
-        { caption: "Di Konten, klik kelompok yang punya foto, misalnya Mempelai.", at: [200, accY + 25], click: true, show: ["open", "hdr"] },
-        { caption: "Gulir ke Foto, lalu klik Pilih foto. Jendela Pilih foto terbuka.", at: [150, FOTO_AT + 38], scroll: { id: "open", dy }, click: true, show: ["dlg"], dur: 3.6 },
-        { caption: "Klik satu foto di grid. Foto itu diberi tanda terpilih.", show: ["sel"], at: [selX + gs / 2, selY + gs / 2], click: true, dur: 3.4 },
-        { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], dur: 3.6 },
-        { caption: "Klik Deskripsi foto, lalu tulis kalimat pendek tentang isi foto.", at: [230, p2.alt + 18], click: true, show: ["alt", "altFocus"], type: [typed("alt", ACC_X + 20, p2.alt + 8, ALT)], dur: 3.8 },
-        { caption: "Wajah terpotong di undangan? Di Titik fokus, klik Atas.", at: [ACC_X + 10 + (ACC_W - 20) / 10, p2.focus + 19], click: true, show: ["top"], dur: 3.6 }
+        { caption: "Di Konten, klik kelompok yang punya foto, misalnya Mempelai.", focus: PANELF, at: [200, accY + 25], click: true, show: ["open", "hdr"], mark: [PX, accY, PW, 50], lens: { src: [80, GROUPS_Y - 10, 310, 180] } },
+        { caption: "Gulir ke Foto, lalu klik Pilih foto. Jendela Pilih foto terbuka.", focus: LEFT, at: [150, FOTO_AT + 38], scroll: { id: "open", dy }, click: true, show: ["dlg"],
+          mark: nkBtnBox(ACC_X, FOTO_AT + 20, "Pilih foto", { icon: "image" }), lens: { src: [8, 100, 390, 190] }, dur: 3.6 },
+        { caption: "Klik satu foto di grid. Foto itu diberi tanda terpilih.", show: ["sel"], at: [selX + gs / 2, selY + gs / 2], click: true, mark: [selX, selY, gs, gs], note: "Foto terpilih", dur: 3.4 },
+        { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 100] }, dur: 3.6 },
+        { caption: "Klik Deskripsi foto, lalu tulis kalimat pendek tentang isi foto.", focus: PANELF, at: [230, p2.alt + 18], click: true, show: ["alt", "altFocus"], type: [typed("alt", ACC_X + 20, p2.alt + 8, ALT)],
+          mark: [ACC_X + 10, p2.alt, ACC_W - 20, 36], lens: { src: [ACC_X, p2.alt - 34, ACC_W, 78] }, dur: 3.8 },
+        { caption: "Wajah terpotong di undangan? Di Titik fokus, klik Atas.", at: [ACC_X + 10 + atasW / 2, p2.focus + 19], click: true, show: ["top"], mark: [ACC_X + 10, p2.focus, atasW, 38],
+          lens: { src: [ACC_X, p2.focus - 32, ACC_W, 78] }, dur: 3.6 }
       ]
     };
   })(),
@@ -534,114 +595,82 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Musik
   "editor-musik-youtube": (() => {
     const [A] = musik(), [B] = musik({ link: true, linkVal: true, focusLink: true }), [Cc] = musik({ link: true, linkVal: true, start: true, focusStart: true }), [D, t1] = musik({ link: true, linkVal: true, start: true, startVal: true, playing: true });
-    // YouTube watch page with the Bagikan dialog open (generic drawing, YouTube's Indonesian labels), laid out in the
-    // crop's 560 px so it reads at full size.
-    const SALIN = [452, 356];
-    const yt = rect(0, 0, 1440, 900, { fill: C.white }) + rect(24, 62, 30, 21, { r: 6, fill: "#ff0033" }) + `<path d="M35 67 l9 5.5 l-9 5.5 z" fill="#fff"/>` +
-      text(60, 80, "YouTube", { size: 18, weight: 700, fill: "#0f0f0f" }) + rect(170.5, 54.5, 360, 38, { r: 19, stroke: "#d3d3d3" }) +
-      rect(24, 116, 512, 288, { r: 12, fill: "#0f0f0f" }) + text(24, 440, "Lagu pengiring untuk Rani & Dimas", { size: 18, weight: 700, fill: "#0f0f0f" }) +
-      rect(24, 460, 96, 36, { r: 18, fill: "#f2f2f2" }) + icon("share-2", 46, 478, 16, "#0f0f0f") + text(60, 483, "Bagikan", { size: 14, weight: 500, fill: "#0f0f0f" }) +
-      rect(0, 0, 1440, 900, { fill: "rgba(0,0,0,.5)" }) + rect(40, 220, 480, 260, { r: 12, fill: C.white }) + text(64, 258, "Bagikan", { size: 16, weight: 700, fill: "#0f0f0f" }) +
-      iconX("x", 492, 252, 18, "#0f0f0f") + rect(64.5, 330.5, 432, 51, { r: 12, stroke: "#d3d3d3" }) + text(80, 362, "https://youtu.be/AbCdEf12345", { size: 14, fill: "#0f0f0f" }) +
-      rect(SALIN[0] - 36, SALIN[1] - 18, 72, 36, { r: 18, fill: "#065fd4" }) + text(SALIN[0], SALIN[1] + 5, "Salin", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
-      rect(64.5, 420.5, 17, 17, { r: 3, stroke: "#606060", sw: 2 }) + text(92, 434, "Mulai pada", { size: 14, fill: "#0f0f0f" }) + text(172, 434, "1:05", { size: 14, fill: "#606060" });
-    const editor = scalevEditor(0, 0, { rail: "Template" }) + nkHead(0, 0, "Template") + line(72, 153, 399, 153, { stroke: C.line }) + templatePanel() + scrollbar(157, 360) + coverScreen();
-    // Simpan / Simpan & Terbitkan sit at the far right of the editor; shown as a labelled inset of that corner.
-    const inset = shadow(290, 760, 260, 48, 6, 2) + `<g transform="translate(-890 716)">${clipped(1180, 44, 260, 48, scalevEditor(0, 0, { rail: "Audio" }))}</g>` +
-      rect(290.5, 760.5, 259, 47, { r: 6, stroke: C.accent, sw: 2 }) + note(300, 704, "Kanan atas editor Scalev", 420, 760);
+    const base = [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()];
     return {
       title: "Memasang musik dari YouTube",
-      world: { x: 0, y: 44, w: 560, h: 856 },
-      base: [yt],
+      base,
       els: {
-        copied: { svg: rect(24, 820, 248, 48, { r: 8, fill: "#0f0f0f" }) + text(44, 849, "Link disalin ke papan klip", { size: 14, fill: C.white }), enter: "slide" },
-        ed: { svg: editor, enter: "fade", delay: 2.0 },
-        musik: { svg: railPanel("Audio", "Musik") + A, enter: "fade" },
+        yt: youtube(),
+        copied: { svg: rect(...YT_TOAST, { r: 8, fill: "#0f0f0f" }) + text(44, 849, "Link disalin ke papan klip", { size: 14, fill: C.white }), enter: "slide" },
+        // Back to the editor before the next step (the editor screen again, over the YouTube tab).
+        ed: { svg: base.join("\n"), enter: "fade", delay: 2.0 },
+        tabs: { svg: railTabs("Audio"), enter: "fade" },
+        musik: { svg: panelOpen("Musik") + A, enter: "fade" },
         b: { svg: B, enter: "fade", delay: 0.3 },
         clear: { svg: white(PX + 1, BY + 21, AW - 2, 34) + rect(PX + 0.5, BY + 20.5, AW - 1, 35, { r: 4, stroke: C.primary, sw: 2 }), enter: "fade" },
         link: { svg: text(PX + 10, BY + 43, "https://youtu.be/AbCdEf12345", { size: 14 }), enter: "fade" },
         c: { svg: Cc, enter: "fade" },
         start: { svg: text(PX + 10, BY + 135, "1:05", { size: 14 }), enter: "fade" },
-        d: { svg: D, enter: "fade" },
-        sw: { svg: ring(PX + AW - 40, t1 + 6, 44, 76, { r: 14 }), enter: "fade" },
-        inset: { svg: inset, enter: "pop", origin: [420, 784] }
+        d: { svg: D, enter: "fade" }
       },
       steps: [
-        { caption: "Di YouTube, klik Bagikan, lalu Salin. Centang Mulai pada bila perlu.", at: SALIN, click: true, show: ["copied", "ed"], dur: 3.8 },
-        { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", at: ED.rail.Audio, click: true, show: ["musik"], dur: 3.4 },
-        { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", at: [240, BY + 38], click: true, show: ["b", "clear", "link"], dur: 3.6 },
-        { caption: "Isi Mulai dari, contoh 1:05 atau 65 (detik).", at: [200, BY + 130], click: true, show: ["c", "start"], type: [typed("start", PX + 10, BY + 119, "1:05")], dur: 3.4 },
-        { caption: "Klik Coba putar dari 1:05 untuk mendengar. Klik Hentikan untuk berhenti.", at: [180, BY + 351], click: true, show: ["d"], dur: 3.8 },
-        { caption: "Putar saat undangan dibuka dan Ulang terus sudah menyala. Biarkan.", at: [PX + AW - 18, t1 + 20], show: ["sw"], dur: 3.6 },
-        { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", at: [344, 783], press: "inset", hide: ["sw"], show: ["inset"], dur: 3.8 }
+        { caption: "Di YouTube, klik Bagikan, lalu Salin. Centang Mulai pada bila perlu.", focus: [YT_DLG, YT_TOAST], at: [906, 496], click: true, show: ["copied", "ed"],
+          mark: { box: SALIN_BOX, r: 18 }, lens: { src: [476, 462, 500, 136], at: [150, 16] }, dur: 3.8 },
+        { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", focus: LEFT, at: ED.rail.Audio, click: true, hide: ["yt", "copied", "ed"], show: ["tabs", "musik"],
+          mark: railBox("Audio"), lens: { src: [0, 96, 390, 240], at: [300, 40] }, dur: 3.4 },
+        { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.6 },
+        { caption: "Isi Mulai dari, contoh 1:05 atau 65 (detik).", at: [200, BY + 130], click: true, show: ["c", "start"], type: [typed("start", PX + 10, BY + 119, "1:05")],
+          mark: [PX, BY + 112, AW, 36], lens: { src: [80, BY + 86, 310, 90] }, dur: 3.4 },
+        { caption: "Klik Coba putar dari 1:05 untuk mendengar. Klik Hentikan untuk berhenti.", at: [180, BY + 351], click: true, show: ["d"],
+          mark: nkBtnBox(PX + 11, BY + 333, "Coba putar dari 1:05", { icon: "play" }), lens: { src: [PX - 4, BY + 156, AW + 8, 226] }, dur: 3.8 },
+        { caption: "Putar saat undangan dibuka dan Ulang terus sudah menyala. Biarkan.", at: [PX + AW - 18, t1 + 20],
+          mark: [{ box: [PX + AW - 36, t1 + 10, 36, 20], r: 10 }, { box: [PX + AW - 36, t1 + 58, 36, 20], r: 10 }], lens: { src: [PX - 4, t1, AW + 8, 100] }, dur: 3.6 },
+        { caption: "Klik Simpan atau Simpan & Terbitkan di kanan atas editor Scalev.", focus: [1180, 44, 260, 48], at: [1234, 67], click: true, mark: [SIMPAN, TERBIT], lens: { src: [1150, 40, 290, 56] }, dur: 3.8 }
       ]
     };
   })(),
 
   // ------------------------------------------------------------------------------------------- Gaya A: palet siap pakai
   "editor-gaya-palet": (() => {
-    const DY = 300, tY = palRowY(0) - DY + 22; // Terakota row centre after scrolling
+    const DY = 300, tRow = palRowY(0) - DY; // Terakota row after scrolling
     return {
       title: "Memilih palet warna siap pakai",
-      world: PANEL,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
       els: {
-        gaya: { svg: railPanel("Gaya", "Gaya"), enter: "fade" },
+        tabs: { svg: railTabs("Gaya"), enter: "fade" },
         pane: { svg: warnaA(), enter: "fade" },
         terra: { svg: `<g transform="translate(0 -${DY})">${warnaA(TERAKOTA, 1)}</g>`, enter: "fade" },
-        tabs: { svg: gayaTop(0, [], 380), enter: "fade" }
+        top: { svg: gayaTop(0, [], 380), enter: "fade" },
+        bar: { svg: barMask(), enter: "fade" },
+        pv: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade" }
       },
       steps: [
-        { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", at: ED.rail.Gaya, click: true, show: ["gaya", "pane", "tabs"] },
-        { caption: "Gulir ke daftar palet. Paling atas palet bawaan, berlabel Bawaan Kencana.", at: [250, 470], scroll: { id: "pane", dy: DY }, dur: 3.6 },
-        { caption: "Klik satu palet, misalnya Terakota. Palet itu diberi garis biru.", at: [230, tY], click: true, show: ["terra"], dur: 3.8 }
+        { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", focus: LEFT, at: ED.rail.Gaya, click: true, show: ["tabs", "pane", "top", "bar"], mark: railBox("Gaya"), lens: { src: [0, 96, 390, 240], at: [300, 40] } },
+        { caption: "Gulir ke daftar palet. Paling atas palet bawaan, berlabel Bawaan Kencana.", focus: PANELF, at: [250, 470], scroll: { id: "pane", dy: DY },
+          mark: [PX, PAL_Y + 24 - DY, PW, 54], lens: { src: [80, PAL_Y - DY - 6, 310, 230] }, dur: 3.6 },
+        { caption: "Klik satu palet, misalnya Terakota. Pratinjau langsung berganti warna.", focus: [[72, tRow - 60, 327, 170], PREVF], at: [230, tRow + 22], click: true, show: ["terra", "pv"],
+          mark: [PX, tRow, PW, 44], lens: { src: [80, tRow - 48, 310, 150] }, dur: 3.8 }
       ]
     };
   })(),
-  "editor-gaya-palet-pratinjau": {
-    title: "Pratinjau berganti warna saat palet diklik",
-    world: PREV,
-    base: [shell("Gaya", "Gaya"), coverScreen()],
-    els: {
-      terra: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade" },
-      sage: { svg: coverScreen({ pal: SAGE }), enter: "fade" }
-    },
-    steps: [
-      { caption: "Sebelum: pratinjau memakai palet bawaan Merah Kencana.", dur: 2.8 },
-      { caption: "Klik Terakota: pratinjau langsung berganti warna.", show: ["terra"], dur: 3.2 },
-      { caption: "Coba palet lain, misalnya Sage, sampai cocok.", hide: ["terra"], show: ["sage"], dur: 3.2 }
-    ]
-  },
 
   // ------------------------------------------------------------------------------------------- Gaya B: Custom
   "editor-gaya-warna": {
     title: "Mengatur warna sendiri di Custom",
-    world: PANEL,
     base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
     els: {
-      rows: { svg: ring(PX, 291, PW, 294, { r: 8 }), enter: "fade" },
       pick: { svg: picker("#8E2818"), enter: "pop", origin: [115, PICK.y + PICK.h] },
       b: { svg: warnaB() + scrollbar(157, 330), enter: "fade" },
-      warn: { svg: ring(PX, 609, PW, 56, { r: 8 }), enter: "fade" },
-      back: { svg: subtabs(0) + warnaA() + scrollbar(157, 380), enter: "fade" }
+      gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }
     },
     steps: [
-      { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", at: [300, 440], show: ["rows"], dur: 3.6 },
-      { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, hide: ["rows"], show: ["pick"], dur: 3.4 },
-      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b"], dur: 3.8 },
-      { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", at: [300, 637], show: ["warn"], dur: 3.6 },
-      { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", at: [160, 695], click: true, hide: ["warn"], show: ["back"], dur: 3.6 }
-    ]
-  },
-  "editor-gaya-warna-pratinjau": {
-    title: "Pratinjau mengikuti warna Custom",
-    world: PREV,
-    base: [shell("Gaya", "Gaya"), coverScreen()],
-    els: { gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }, back: { svg: coverScreen(), enter: "fade" } },
-    steps: [
-      { caption: "Sebelum: Aksen memakai merah dari palet Merah Kencana.", dur: 2.8 },
-      { caption: "Aksen diganti emas: sampul, tombol, dan ikon ikut berubah.", show: ["gold"], dur: 3.2 },
-      { caption: "Setelah Kembali ke palet bawaan, warna awal kembali.", show: ["back"], dur: 3.2 }
+      { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", focus: PANELF, at: [300, 440], mark: [PX, 291, PW, 294], lens: { src: [80, 218, 310, 372] }, dur: 3.6 },
+      { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, show: ["pick"], mark: [97, 544, 36, 28], lens: { src: [92, 316, 300, 290], at: [290, 150] }, dur: 3.4 },
+      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", focus: [[72, 154, 327, 460], PREVF], at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b", "gold"],
+        mark: [PICK.x + 12, PICK.y + 12, PICK.w - 24, 104], lens: { src: [80, 543, 310, 66], at: [12, 420] }, dur: 3.8 },
+      { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", focus: PANELF, at: [300, 637], mark: [PX, 609, PW, 56], lens: { src: [80, 600, 310, 110] }, dur: 3.6 },
+      { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", focus: [[72, 220, 327, 110], [72, 600, 327, 130], PREVF], at: [160, 695], click: true, hide: ["b", "gold"],
+        mark: nkBtnBox(PX, 677, "Kembali ke palet bawaan"), lens: { src: [80, 222, 310, 106], at: [12, 250] }, dur: 3.6 }
     ]
   },
 
@@ -653,229 +682,171 @@ const SCENES = {
       rect(PX + 1, wy + 36, PW - 2, 32, { fill: C.crBlue }) + text(PX + 12, wy + 57, "Tebal (700)", { size: 14, fill: C.white });
     return {
       title: "Mengatur ukuran teks, pasangan font, dan ketebalan",
-      world: PANEL,
-      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA()],
+      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
       els: {
         h0: { svg: H0 + hurufTabs([]), enter: "fade" },
         pane: { svg: H1, enter: "fade" },
         paneP: { svg: `<g transform="translate(0 -${DY})">${HP}</g>`, enter: "fade" },
         wpop: { svg: wpop, enter: "pop", origin: [PX + PW / 2, wy] },
         paneB: { svg: HB, enter: "fade", delay: 1.0 },
-        tabs: { svg: hurufTabs([1]), enter: "fade" }
+        tabs: { svg: hurufTabs([1]), enter: "fade" },
+        bar: { svg: barMask(), enter: "fade" },
+        big: { svg: coverScreen({ scale: 1.15 }), enter: "fade" },
+        pair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" }
       },
       steps: [
-        { caption: "Di menu Gaya, klik tab Huruf.", at: [227, 188], click: true, show: ["h0"] },
-        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs"], dur: 3.6 },
-        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", at: [230, 300 + 116 + 54], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP"], dur: 4.2 },
-        { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"], dur: 4.2 }
+        { caption: "Di menu Gaya, klik tab Huruf.", focus: PANELF, at: [227, 188], click: true, show: ["h0"], mark: [PX + PW / 3, BY, PW / 3, 38], lens: { src: [80, 160, 310, 160] } },
+        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", focus: [[72, 154, 327, 210], PREVF], at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs", "bar", "big"],
+          mark: [PX + (2 * PW) / 3, P0.scale, PW / 3, 38], lens: { src: [80, 211, 310, 140], at: [12, 262] }, dur: 3.6 },
+        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", focus: [[72, 290, 327, 260], PREVF], at: [230, 470], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "pair"],
+          mark: [PX, 416, PW, 108], lens: { src: [80, 410, 310, 120], at: [12, 24] }, dur: 4.2 },
+        { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", focus: PANELF, at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"],
+          mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 310, 170] }, dur: 4.2 }
       ]
     };
   })(),
-  "editor-gaya-huruf-pratinjau": {
-    title: "Pratinjau dengan ukuran teks dan pasangan font baru",
-    world: PREV,
-    base: [shell("Gaya", "Gaya"), coverScreen()],
-    els: { big: { svg: coverScreen({ scale: 1.15 }), enter: "fade" }, pair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" } },
-    steps: [
-      { caption: "Sebelum: Ukuran teks Normal, pasangan font Walnut.", dur: 2.8 },
-      { caption: "Ukuran teks Besar: semua tulisan di undangan membesar.", show: ["big"], dur: 3.2 },
-      { caption: "Pasangan font Romantis: nama mempelai memakai Great Vibes.", show: ["pair"], dur: 3.2 }
-    ]
-  },
 
   // ------------------------------------------------------------------------------------------- Gaya D: font dari Google Fonts
-  "editor-gaya-font-google": (() => {
-    const gx = 420, gy = 310;
-    const gfWin = (url, title, body) => shadow(gx, gy, 630, 560, 10, 3) + chrome(gx, gy, 630, 560, { tabs: [{ title, active: true, fav: favChrome, w: 220 }], url }) + body;
-    const fontRow = (y, name, font) => rect(gx + 24.5, y + 0.5, 581, 79, { r: 8, stroke: "#dadce0" }) + text(gx + 44, y + 26, name, { size: 13, fill: "#5f6368" }) + text(gx + 44, y + 62, "Rani & Dimas", { size: 26, fill: "#202124", font });
-    const home = gfWin("fonts.google.com", "Google Fonts", text(gx + 24, gy + 130, "Google Fonts", { size: 22, fill: "#202124" }) + rect(gx + 24.5, gy + 150.5, 581, 40, { r: 20, fill: "#f1f3f4" }) +
-      fontRow(gy + 210, "Playfair Display", PLAYFAIR) + fontRow(gy + 300, "Lora", ff("Lora")) + fontRow(gy + 390, "Great Vibes", ff("Great Vibes", "cursive")));
-    const URL = "fonts.google.com/specimen/Playfair+Display";
-    const spec = gfWin(URL, "Playfair Display - Google Fonts", text(gx + 24, gy + 150, "Playfair Display", { size: 44, fill: "#202124", font: PLAYFAIR }) + text(gx + 24, gy + 250, "Rani & Dimas", { size: 56, fill: "#202124", font: PLAYFAIR }));
-    const sel = rect(gx + 162, gy + 53, tw(URL, 14) + 8, 22, { r: 3, fill: "#c2dbff" }) + text(gx + 166, gy + 68, URL, { size: 14, fill: C.crText });
-    return {
-      title: "Menyalin link font di Google Fonts",
-      world: { x: gx - 4, y: gy - 4, w: 638, h: 572 },
-      base: [rect(0, 0, 1440, 900, { fill: "#eef1f5" }), home],
-      els: { spec: { svg: spec, enter: "fade" }, sel: { svg: sel, enter: "fade" } },
-      steps: [
-        { caption: "Klik Buka Google Fonts di tab Huruf. Google Fonts terbuka di tab baru.", dur: 3 },
-        { caption: "Klik font yang kamu mau, misalnya Playfair Display.", at: [gx + 300, gy + 250], click: true, show: ["spec"], dur: 3.4 },
-        { caption: "Klik kolom alamat Chrome, lalu salin alamatnya (Ctrl+C, Mac: Cmd+C).", at: [gx + 300, gy + 64], click: true, show: ["sel"], dur: 3.6 }
-      ]
-    };
-  })(),
   "editor-gaya-font": (() => {
     const [H0, P0] = huruf(), [HC, PC] = huruf({ font: "check" }), [HD, PD] = huruf({ font: "done" });
-    const SDY = 150;
+    const SDY = 250, base = [shell("Gaya", "Gaya"), subtabs(1), H0, coverScreen()];
     return {
       title: "Memakai font sendiri dari Google Fonts",
-      world: PANEL,
-      base: [shell("Gaya", "Gaya"), subtabs(1), H0],
+      base,
       els: {
-        ring0: { svg: ring(PX, P0.gf, PW, 36, { r: 6 }), enter: "fade" },
+        gf: { svg: googleFonts(false), enter: "fade", delay: 1.6 },
+        spec: { svg: googleFonts(true), enter: "fade" },
+        sel: { svg: gfSel, enter: "fade", delay: 1.0 },
+        // Back to Scalev before the next step (the editor screen again, over the Google Fonts tab).
+        ed: { svg: base.join("\n"), enter: "fade", delay: 2.2 },
         chk: { svg: HC, enter: "fade" },
         done: { svg: HD, enter: "fade", delay: 1.0 },
-        back: { svg: H0, enter: "fade" },
         tabs1: { svg: hurufTabs([1]), enter: "fade" },
-        tabs0: { svg: hurufTabs([]), enter: "fade" }
+        bar: { svg: barMask(), enter: "fade" }
       },
       steps: [
-        { caption: "Di bagian Custom tab Huruf ada tombol Buka Google Fonts.", at: [PX + PW / 2, P0.gf + 18], show: ["ring0"], dur: 3.2 },
-        { caption: "Setelah menyalin link, tempel di Font judul dan nama.", at: [230, PC.font + 38], click: true, hide: ["ring0"], show: ["chk", "tabs1"], dur: 3.4 },
-        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], show: ["done"], dur: 3.8 },
-        { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["tabs1"], show: ["back", "tabs0"], dur: 3.8 }
+        { caption: "Klik Buka Google Fonts di tab Huruf. Google Fonts terbuka di tab baru.", focus: PANELF, at: [PX + PW / 2, P0.gf + 18], click: true, show: ["gf"],
+          mark: nkBtnBox(PX, P0.gf, "Buka Google Fonts", { w: PW, icon: "external-link" }), lens: { src: [80, P0.gf - 72, 310, 120] }, dur: 3.6 },
+        { caption: "Klik font, misalnya Playfair Display. Salin alamatnya dari kolom alamat.", focus: [[0, 41, 1440, 44], [24, 236, 1392, 260]], at: [600, 290], click: true, show: ["spec", "sel", "ed"],
+          mark: [{ box: OMNI, r: 17 }, { box: GF_ROW0, r: 12 }], lens: { src: [118, 44, 560, 40], at: [100, 92] }, dur: 4.2 },
+        { caption: "Kembali ke Scalev. Tempel link di Font judul dan nama.", focus: PANELF, at: [230, P0.font + 38], click: true, hide: ["gf", "spec", "sel", "ed"], show: ["chk", "tabs1", "bar"],
+          mark: [PX, P0.font + 20, PW, 36], lens: { src: [80, PC.font - 30, 310, 120] }, dur: 3.4 },
+        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
+          lens: { src: [80, PD.font - 10, 310, 120] }, dur: 3.8 },
+        { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["chk", "done", "tabs1", "bar"],
+          mark: nkBtnBox(PX, PD.back - SDY, "Kembali ke pasangan bawaan"), lens: { src: [80, PD.back - SDY - 100, 310, 150] }, dur: 3.8 }
       ]
     };
   })(),
 
   // ------------------------------------------------------------------------------------------- Gaya E: Bentuk dan Gerak
-  "editor-gaya-bentuk": {
-    title: "Mengatur bentuk sudut dan gerak saat digulir",
-    world: PANEL,
-    base: [shell("Gaya", "Gaya"), subtabs(0), warnaA()],
-    els: {
-      b0: { svg: bentuk(), enter: "fade" },
-      b1: { svg: bentuk(0), enter: "fade" },
-      b2: { svg: bentuk(0, 2), enter: "fade" }
-    },
-    steps: [
-      { caption: "Di menu Gaya, klik tab Bentuk.", at: [320, 188], click: true, show: ["b0"] },
-      { caption: "Klik Lembut: sudut tombol, kartu, dan bingkai foto jadi membulat.", at: [128, SEG(0, false)], click: true, show: ["b1"], dur: 3.8 },
-      { caption: "Di Gerak pilih Tanpa, Halus, atau Hidup. Hidup bergerak lebih jauh.", at: [PX + PW - 30, SEG(1, true)], click: true, show: ["b2"], dur: 3.8 }
-    ]
-  },
-  "editor-gaya-bentuk-pratinjau": {
-    title: "Pratinjau dengan bentuk sudut Lembut",
-    world: PREV,
-    base: [shell("Gaya", "Gaya"), coverScreen()],
-    els: { soft: { svg: coverScreen({ shape: "soft" }), enter: "fade" } },
-    steps: [
-      { caption: "Bawaan Kencana: Lengkung. Bingkai foto dan tombol melengkung.", dur: 3 },
-      { caption: "Setelah Lembut diklik: bingkai foto dan tombol bersudut membulat.", show: ["soft"], dur: 3.4 }
-    ]
-  },
+  "editor-gaya-bentuk": (() => {
+    const [lembutW] = segW(PW, ["Lembut", "Tegas", "Lengkung"], 2);
+    return {
+      title: "Mengatur bentuk sudut dan gerak saat digulir",
+      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
+      els: {
+        b0: { svg: bentuk(), enter: "fade" },
+        b1: { svg: bentuk(0), enter: "fade" },
+        soft: { svg: coverScreen({ shape: "soft" }), enter: "fade" },
+        b2: { svg: bentuk(0, 2), enter: "fade" }
+      },
+      steps: [
+        { caption: "Di menu Gaya, klik tab Bentuk.", focus: PANELF, at: [320, 188], click: true, show: ["b0"], mark: [PX + (2 * PW) / 3, BY, PW / 3, 38], lens: { src: [80, 160, 310, 190] } },
+        { caption: "Klik Lembut: sudut tombol, kartu, dan bingkai foto jadi membulat.", focus: [[72, 154, 327, 220], PREVF], at: [128, SEG(0, false)], click: true, show: ["b1", "soft"],
+          mark: [PX, SEG(0, false) - 19, lembutW, 38], lens: { src: [80, 211, 310, 150], at: [12, 262] }, dur: 3.8 },
+        { caption: "Di Gerak pilih Tanpa, Halus, atau Hidup. Hidup bergerak lebih jauh.", focus: PANELF, at: [PX + PW - 30, SEG(1, true)], click: true, show: ["b2"],
+          mark: [PX + (2 * PW) / 3, SEG(1, true) - 19, PW / 3, 38], lens: { src: [80, 360, 310, 110] }, dur: 3.8 }
+      ]
+    };
+  })(),
 
   // ------------------------------------------------------------------------------------------- Lapisan
   "editor-lapisan-urutan": (() => {
     const O1 = swap(SECS, 7), O2 = swap(O1, 8), DY = 570; // Video up; then Galeri Foto down
     const [L0] = lapList(SECS), [L1] = lapList(O1, { button: true }), [L2, Q2] = lapList(O2, { button: true }), [L3] = lapList(O2, { off: "Video", button: true });
     const [R, QR] = lapList(SECS), [R2] = lapList(SECS, { dock: false });
-    const up = (svg) => `<g transform="translate(0 -${DY})">${svg}</g>`;
+    const up = (svg) => `<g transform="translate(0 -${DY})">${svg}</g>`, P = (list) => ({ svg: stack(list), enter: "fade" });
+    const rows = [[72, rowY(6), 327, 150], PREVF], foot = [[72, Q2.btn - DY - 110, 327, 200], PREVF];
+    const rowLens = { src: [PX, rowY(6), PW, 150], at: [12, 60] };
     return {
       title: "Mengatur urutan dan menyembunyikan bagian di Lapisan",
-      world: PANEL,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), stack([galeriSec, videoSec, acaraSec])],
       els: {
-        lap: { svg: nkRail(0, 0, "Lapisan") + L0 + nkHead(0, 0, "Lapisan"), enter: "fade" },
+        tabs: { svg: railTabs("Lapisan"), enter: "fade" },
+        lap: { svg: panelOpen("Lapisan") + L0, enter: "fade" },
         l1: { svg: L1, enter: "fade" }, l2: { svg: L2, enter: "fade" }, l3: { svg: L3, enter: "fade" }, l4: { svg: L2, enter: "fade" },
         r: { svg: up(R), enter: "fade" }, r2: { svg: up(R2), enter: "fade" },
-        lhdr: { svg: nkHead(0, 0, "Lapisan") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" }
+        lhdr: { svg: nkHead(0, 0, "Lapisan") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
+        bar: { svg: barMask(), enter: "fade" },
+        p1: P([videoSec, galeriSec, acaraSec]), p2: P([videoSec, acaraSec, galeriSec]), p3: P([acaraSec, galeriSec, dressSec]), p4: P([videoSec, acaraSec, galeriSec]), p0: P([galeriSec, videoSec, acaraSec]),
+        dock: dockBar()
       },
       steps: [
-        { caption: "Klik Lapisan di rel kiri. Daftar bagian tampil sesuai urutan undangan.", at: ED.rail.Lapisan, click: true, show: ["lap", "lhdr"], dur: 3.4 },
-        { caption: "Klik panah naik di Video. Video naik satu langkah.", at: [270, rowY(8) + 25], click: true, show: ["l1"], dur: 3.6 },
-        { caption: "Klik panah turun di Galeri Foto. Galeri Foto turun satu langkah.", at: [304, rowY(8) + 25], click: true, show: ["l2"], dur: 3.6 },
-        { caption: "Matikan sakelar Video. Di bawah namanya tertulis Disembunyikan.", at: [342, rowY(7) + 25], click: true, show: ["l3"], dur: 3.6 },
-        { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, show: ["l4"], dur: 3.6 },
-        { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, show: ["r"], dur: 4 },
-        { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", at: [PX + PW - 18, QR.dock - DY + 20], click: true, show: ["r2"], dur: 3.6 }
-      ]
-    };
-  })(),
-  "editor-lapisan-pratinjau": (() => {
-    const P = (list) => ({ svg: stack(list), enter: "fade" });
-    return {
-      title: "Pratinjau mengikuti urutan di Lapisan",
-      world: PREV,
-      base: [shell("Lapisan", "Lapisan"), stack([galeriSec, videoSec, acaraSec])],
-      els: { p1: P([videoSec, galeriSec, acaraSec]), p2: P([videoSec, acaraSec, galeriSec]), p3: P([acaraSec, galeriSec, dressSec]), p4: P([videoSec, acaraSec, galeriSec]), p0: P([galeriSec, videoSec, acaraSec]) },
-      steps: [
-        { caption: "Urutan awal di pratinjau: Galeri Foto, Video, Rangkaian Acara.", dur: 2.8 },
-        { caption: "Panah naik di Video: Video kini di atas Galeri Foto.", show: ["p1"], dur: 3 },
-        { caption: "Panah turun di Galeri Foto: Rangkaian Acara kini di atasnya.", show: ["p2"], dur: 3 },
-        { caption: "Sakelar Video mati: Video hilang dari pratinjau.", show: ["p3"], dur: 3 },
-        { caption: "Sakelar dinyalakan lagi: Video tampil lagi.", show: ["p4"], dur: 3 },
-        { caption: "Kembalikan urutan template: urutan awal kembali.", show: ["p0"], dur: 3 }
+        { caption: "Klik Lapisan di rel kiri. Daftar bagian tampil sesuai urutan undangan.", focus: LEFT, at: ED.rail.Lapisan, click: true, show: ["tabs", "lap", "lhdr", "bar"],
+          mark: railBox("Lapisan"), lens: { src: [0, 96, 390, 240], at: [300, 40] }, dur: 3.4 },
+        { caption: "Klik panah naik di Video. Video naik, pratinjau ikut berubah.", focus: rows, at: [270, rowY(8) + 25], click: true, show: ["l1", "p1"], mark: [261, rowY(8) + 16, 18, 18], lens: rowLens, dur: 3.6 },
+        { caption: "Klik panah turun di Galeri Foto. Rangkaian Acara kini di atasnya.", at: [304, rowY(8) + 25], click: true, hide: ["lap"], show: ["l2", "p2"], mark: [295, rowY(8) + 16, 18, 18], lens: rowLens, dur: 3.6 },
+        { caption: "Matikan sakelar Video. Tertulis Disembunyikan, Video hilang dari pratinjau.", at: [342, rowY(7) + 25], click: true, hide: ["l1", "p1"], show: ["l3", "p3"], mark: { box: [324, rowY(7) + 15, 36, 20], r: 10 }, lens: rowLens, dur: 3.6 },
+        { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, hide: ["l2", "p2"], show: ["l4", "p4"], mark: { box: [324, rowY(7) + 15, 36, 20], r: 10 }, lens: rowLens, dur: 3.6 },
+        { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", focus: foot, at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, hide: ["l3", "p3"], show: ["r", "p0"],
+          mark: nkBtnBox(PX, Q2.btn - DY, "Kembalikan urutan template"), lens: { src: [80, Q2.btn - DY - 104, 310, 150], at: [12, 100] }, dur: 4 },
+        { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", focus: [foot[0], [SC.x, 790, SC.w, 100]], at: [PX + PW - 18, QR.dock - DY + 20], click: true, hide: ["dock", "l4", "p4"], show: ["r2"],
+          mark: { box: [PX + PW - 36, QR.dock - DY + 10, 36, 20], r: 10 }, lens: { src: [80, QR.dock - DY - 54, 310, 100], at: [12, 100] }, dur: 3.6 }
       ]
     };
   })(),
 
-  // ------------------------------------------------------------------------------------------- Klik di pratinjau (langkah 1-4)
+  // ------------------------------------------------------------------------------------------- Klik di pratinjau
   "editor-klik-aktif": (() => {
     const [kcol, p] = column([{ label: "Nama panggilan", value: "Rani", hint: "Tampil di sampul.", focus: true }, { label: "Nama lengkap dan gelar", value: "Rani Ayu, S.Psi." },
       { label: "Profesi atau bio singkat (opsional)", value: "Psikolog" }, { label: "Anak ke- (opsional)", value: "Putri kedua", hint: "Kosong: \"Putri dari\" / \"Putra dari\"." },
       { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" }, { toggle: "Ibu sudah wafat (Almh.)", on: true }], ACC_X, 161, ACC_W);
-    const nY = p["Nama panggilan"] + 20;
+    const nY = p["Nama panggilan"] + 20, NICK = [ACC_X, nY, ACC_W, 36];
+    const TAG = "Sampul · klik untuk mengisi";
+    const salamTop = SC.y + 784 - PAGE_DY;
+    const [tbCover] = toolbar(SC.x + SC.w, SC.y + 6, ["Isi"]);
+    const [tb, at, tbBox, tbBar] = toolbar(SC.x + SC.w, salamTop + 6, ["Isi", "↑", "↓", "Sembunyikan"]);
+    const sections = salamSec(SC.y + 784) + ayatSec(SC.y + 1204) + mempelaiSec(SC.y + 1534);
+    const top = 0 - PAGE_DY;
+    const panelTop = [72, 92, 327, 140], nickLens = { src: [ACC_X - 8, nY - 24, ACC_W + 16, 70], at: [12, 170] };
     return {
-      title: "Klik aktif, lalu form terbuka di kolom yang tepat",
-      world: PANEL,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
+      title: "Klik di pratinjau: form terbuka di kolom yang tepat",
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
       els: {
-        klik: { svg: ring(6, 703, 60, 44, { r: 8 }) + note(92, 709, "Klik aktif", 66, 725), enter: "fade" },
-        konten: { svg: railPanel("Konten", "Konten") + accFrame(154, 900) + kcol + scrollbar(420, 200) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
+        tabs: { svg: railTabs("Konten"), enter: "fade" },
+        konten: { svg: panelOpen("Konten") + accFrame(154, 900) + kcol + scrollbar(420, 200) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
         clr: { svg: white(ACC_X + 3, nY + 3, ACC_W - 6, 30), enter: "fade" },
         nama: { svg: text(ACC_X + 10, nY + 23, "Rania", { size: 14 }), enter: "fade" },
         busy: { svg: footStatus("Menulis...", C.changed), enter: "fade", delay: 0.4 },
-        saved: { svg: footStatus("Tersimpan", C.ok), enter: "fade", delay: 1.9 }
-      },
-      steps: [
-        { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", at: ED.tool.Klik, show: ["klik"], dur: 3.2 },
-        { caption: "Klik nama mempelai di pratinjau: Mempelai terbuka, kursor di Nama panggilan.", at: [200, nY + 18], hide: ["klik"], show: ["konten"], dur: 3.8 },
-        { caption: "Ketik isi baru. Kaki rel menunjukkan Menulis... lalu Tersimpan.", at: [ACC_X + 120, nY + 18], click: true, show: ["clr", "nama", "busy", "saved"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], dur: 4.2 }
-      ]
-    };
-  })(),
-  "editor-klik-pratinjau": (() => {
-    const [tbCover] = toolbar(SC.x + SC.w, SC.y + 6, ["Isi"]);
-    return {
-      title: "Menunjuk dan mengklik nama mempelai di pratinjau",
-      world: PREV,
-      base: [shell("Konten", "Konten"), coverScreen()],
-      els: {
-        hover: { svg: frame(SC.y, SC.h, 2) + hoverTag(SC.x, SC.y, "Sampul · klik untuk mengisi"), enter: "fade" },
+        saved: { svg: footStatus("Tersimpan", C.ok), enter: "fade", delay: 1.9 },
+        hover: { svg: frame(SC.y, SC.h, 2) + hoverTag(SC.x, SC.y, TAG), enter: "fade" },
         selCover: { svg: frame(SC.y, SC.h, 3) + tbCover, enter: "fade" },
-        pn: { svg: coverScreen({ names: "Rania & Dimas" }) + frame(SC.y, SC.h, 3) + tbCover, enter: "fade", delay: 0.6 }
-      },
-      steps: [
-        { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", at: [922, 505], show: ["hover"], dur: 3.4 },
-        { caption: "Klik namanya. Sampul terpilih dan form Mempelai terbuka di kiri.", at: [922, 505], click: true, hide: ["hover"], show: ["selCover"], dur: 3.6 },
-        { caption: "Setelah kamu mengetik di form, pratinjau ikut berubah.", at: [1000, 640], show: ["pn"], dur: 3.6 }
-      ]
-    };
-  })(),
-
-  // ------------------------------------------------------------------------------------------- Klik di pratinjau (langkah 5-7)
-  "editor-klik-toolbar": (() => {
-    const salamTop = SC.y + 784 - PAGE_DY;
-    const [tb, at] = toolbar(SC.x + SC.w, salamTop + 6, ["Isi", "↑", "↓", "Sembunyikan"]);
-    const page = cover({ top: SC.y }) + salamSec(SC.y + 784) + ayatSec(SC.y + 1204) + mempelaiSec(SC.y + 1534);
-    return {
-      title: "Memakai toolbar bagian di pratinjau",
-      world: PREV,
-      base: [shell("Konten", "Konten"), rect(SC.x - 1, SC.y - 1, SC.w + 2, SC.h + 2, { fill: "rgba(16,24,40,.06)" })],
-      els: {
-        page: { svg: page },
-        sel: { svg: frame(salamTop, 420, 3) + tb, enter: "fade" },
+        // The page after typing (new names, Sampul still selected); scrolled in step 5. The mask keeps the scrolled page
+        // inside the preview screen.
+        page: { svg: cover({ top: SC.y, names: "Rania & Dimas" }) + frame(SC.y, SC.h, 3) + tbCover + sections, enter: "fade" },
+        mask: { svg: clipped(400, 0, 1040, SC.y, scalevEditor(0, 0, { rail: "Konten" })) + rect(400, SC.y + SC.h, 1040, 900 - SC.y - SC.h, { fill: C.svPreview }), enter: "fade" },
+        pageS: { svg: screen(`<g transform="translate(0 ${top})">${cover({ top: SC.y, names: "Rania & Dimas" }) + sections}</g>`) + frame(salamTop, 420, 3) + tb, enter: "fade" },
         gone: { svg: screen(rect(SC.x, salamTop, SC.w, 900, { fill: KENCANA.bg }), ayatSec(salamTop), mempelaiSec(salamTop + 330)), enter: "fade" },
-        mask: rect(400, SC.y + SC.h, 1040, 900 - SC.y - SC.h, { fill: C.svPreview })
+        toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" }
       },
       steps: [
-        { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["sel"], dur: 3.8 },
-        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", at: at.Sembunyikan, click: true, hide: ["sel"], show: ["gone"], dur: 4 }
+        { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", focus: TOOLS, at: ED.tool.Klik, mark: toolBox(725), lens: { src: [0, 566, 72, 236], zoom: 3 }, dur: 3.2 },
+        { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", focus: PREVF, at: [922, 492], hover: "hover",
+          mark: [[SC.x, SC.y, tw(TAG, 12, 500) + 16, 22], NAMES], lens: { src: [SC.x - 4, SC.y - 4, 260, 44] }, dur: 3.4 },
+        { caption: "Klik namanya. Mempelai terbuka, kursor langsung di Nama panggilan.", focus: [panelTop, PREVF], at: [922, 492], click: true, show: ["tabs", "konten", "selCover"],
+          mark: [NICK, NAMES], lens: nickLens, dur: 3.6 },
+        { caption: "Ketik isi baru. Pratinjau ikut berubah, kaki rel Menulis... lalu Tersimpan.", focus: [panelTop, FOOT, PREVF], at: [ACC_X + 120, nY + 18], click: true,
+          hide: ["selCover"], show: ["clr", "nama", "busy", "saved", "page", "mask"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], mark: [NICK, FOOT_MARK], lens: nickLens, dur: 4.2 },
+        { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", focus: PREVF, at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["pageS"],
+          mark: [SC.x, salamTop, SC.w, 420], lens: { src: [SC.x + SC.w - 250, salamTop - 6, 250, 50], at: [140, 190] }, dur: 3.8 },
+        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", focus: [[72, 820, 327, 80], PREVF], at: at.Sembunyikan, click: true, show: ["gone", "toast"], mark: tbBox.Sembunyikan,
+          lens: { src: [SC.x + SC.w - 250, salamTop - 6, 250, 50], at: [140, 190] }, dur: 4 },
+        { caption: "Muncul Salam Pembuka disembunyikan. Klik Urungkan untuk menampilkannya lagi.", at: [343, 862], click: true, hide: ["toast", "gone"],
+          mark: URUNG_BOX, note: "Urungkan", dur: 3.6 }
       ]
     };
   })(),
-  "editor-klik-urungkan": {
-    title: "Mengurungkan Sembunyikan dari pesan di bawah panel",
-    world: PANEL,
-    base: [shell("Konten", "Konten"), kontenClosed()],
-    els: { toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" } },
-    steps: [
-      { caption: "Setelah Sembunyikan, muncul pesan Salam Pembuka disembunyikan.", at: [250, 640], show: ["toast"], dur: 3.2 },
-      { caption: "Klik Urungkan. Bagian tampil lagi. Pesan juga hilang sendiri.", at: [345, 862], click: true, hide: ["toast"], dur: 3.6 }
-    ]
-  },
 
   // ------------------------------------------------------------------------------------------- Klik di pratinjau: Inspect
   "editor-klik-inspect": (() => {
@@ -885,124 +856,105 @@ const SCENES = {
       para(ACC_X, sY + 24, ["Nama dan tanggal diambil dari Mempelai dan", "Acara."], { size: 12, fill: C.faint, lh: 16 }) +
       text(ACC_X, sY + 76, "Foto sampul", { size: 12, weight: 500 }) + photo(ACC_X, sY + 86, 64, 64, 2) + quiet(ACC_X, sY + 158, "Ganti foto", { icon: "image" }) +
       text(ACC_X, sY + 218, "Foto slideshow (opsional, maks. 4)", { size: 12, weight: 500 }) + scrollbar(157, 300);
+    const toolLens = { src: [0, 690, 72, 80], zoom: 3 };
     return {
       title: "Memakai Inspect bila Klik aktif tidak tersedia",
-      world: PANEL,
-      base: [shell("Konten", "Konten"), insTool(false), kontenClosed()],
+      base: [shell("Konten", "Konten"), insTool(false), kontenClosed(), coverScreen()],
       els: {
         on: { svg: insTool(true), enter: "fade" },
-        tip: { svg: note(96, 640, "Inspect aktif", 66, 725), enter: "fade" },
-        form: { svg: form, enter: "fade" }
+        form: { svg: form, enter: "fade" },
+        sel: { svg: rect(NAMES[0], NAMES[1], NAMES[2], NAMES[3], { fill: "rgba(30,136,229,.12)", stroke: "#1e88e5", sw: 2 }), enter: "fade" }
       },
       steps: [
-        { caption: "Klik Inspect di rel. Tulisannya berubah menjadi Inspect aktif.", at: [36, 725], click: true, show: ["on", "tip"], dur: 3.4 },
-        { caption: "Klik bagian undangan di pratinjau. Form bagian itu terbuka di Konten.", at: [250, 400], hide: ["tip"], show: ["form"], dur: 3.8 },
-        { caption: "Selesai? Klik Inspect aktif lagi untuk mematikan.", at: [36, 725], click: true, hide: ["on"], dur: 3.4 }
+        { caption: "Klik Inspect di rel. Tulisannya berubah menjadi Inspect aktif.", focus: TOOLS, at: [36, 725], click: true, show: ["on"], mark: toolBox(725), lens: toolLens, dur: 3.4 },
+        { caption: "Klik bagian di pratinjau. Formnya terbuka di Konten, tanpa toolbar.", focus: [[72, GROUPS_Y - 10, 327, 300], PREVF], at: [922, 492], click: true, show: ["sel", "form"],
+          mark: NAMES, lens: { src: [80, GROUPS_Y - 6, 310, 130], at: [12, 410] }, dur: 3.8 },
+        { caption: "Selesai? Klik Inspect aktif lagi untuk mematikan.", focus: TOOLS, at: [36, 725], click: true, hide: ["on"], mark: toolBox(725), lens: toolLens, dur: 3.4 }
       ]
     };
   })(),
-  "editor-klik-inspect-pratinjau": {
-    title: "Mengklik bagian di pratinjau dengan Inspect",
-    world: PREV,
-    base: [shell("Konten", "Konten"), coverScreen()],
-    els: { sel: { svg: rect(770, 360, 304, 56, { fill: "rgba(30,136,229,.12)", stroke: "#1e88e5", sw: 2 }), enter: "fade" } },
-    steps: [
-      { caption: "Dengan Inspect aktif, klik bagian undangan di pratinjau.", at: [922, 390], click: true, show: ["sel"], dur: 3.4 },
-      { caption: "Formnya terbuka di Konten. Kursor tidak masuk kolom, toolbar tidak muncul.", at: [1000, 600], dur: 3.6 }
-    ]
-  },
 
   // ------------------------------------------------------------------------------------------- Urungkan dan Ulangi
-  "editor-urungkan-ulangi": {
-    title: "Mengurungkan dan mengulangi perubahan",
-    world: PANEL,
-    base: [shell("Konten", "Konten"), priaPanel("Dimaz"), coverScreen({ names: "Rani & Dimaz" })],
-    els: {
-      tipU: { svg: tooltip(8, 652, "Urungkan (Ctrl+Z)") + tooltip(40, 684, "Ulangi (Ctrl+Shift+Z)"), enter: "fade", delay: 0.6 },
-      fix: { svg: nickFix("Dimas") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.text), enter: "fade" },
-      redo: { svg: nickFix("Dimaz") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.off), enter: "fade" }
-    },
-    steps: [
-      { caption: "Di bawah Bagikan ada dua panah: kiri Urungkan, kanan Ulangi.", at: ED.tool.Urungkan, show: ["tipU"], dur: 3.8 },
-      { caption: "Klik panah kiri. Perubahan terakhir batal: nama kembali Dimas.", at: ED.tool.Urungkan, click: true, hide: ["tipU"], show: ["fix"], dur: 3.6 },
-      { caption: "Kebablasan? Klik panah kanan untuk mengulangi perubahan tadi.", at: ED.tool.Ulangi, click: true, show: ["redo"], dur: 3.6 }
-    ]
-  },
-
-  // ------------------------------------------------------------------------------------------- Kosongkan (langkah 1-3)
-  "editor-kosongkan": (() => {
-    const dlg = nkDialogHead(0, 0, "Kosongkan halaman?") + nkNote(16, BY, 367, ["Isi undangan dihapus. Ucapan dan RSVP aman. Bisa", "diurungkan."], { tone: "warn" }) +
-      nkBtn(16, 237, "Kosongkan halaman", { variant: "danger", icon: "eraser" }) + quiet(16 + tw("Kosongkan halaman", 12, 500) + 52, 237, "Batal");
+  "editor-urungkan-ulangi": (() => {
+    const NICK = [ACC_X, NICK_Y, ACC_W, 36], UNDO = [8, 621, 24, 24], REDO = [40, 621, 24, 24];
+    const focus = [[0, 600, 72, 60], [ACC_X - 8, NICK_Y - 30, ACC_W + 16, 80], PREVF], nickLens = { src: [ACC_X - 8, NICK_Y - 28, ACC_W + 16, 76], at: [12, 230] };
     return {
-      title: "Mengosongkan halaman",
-      world: PANEL,
-      base: [shell("Konten", "Konten"), priaPanel("Dimas"), coverScreen()],
+      title: "Mengurungkan dan mengulangi perubahan",
+      base: [shell("Konten", "Konten"), priaPanel("Dimaz"), coverScreen({ names: "Rani & Dimaz" })],
       els: {
-        red: { svg: rect(0, 752, 71, 46, { fill: C.page }) + icon("eraser", 36, 765, 18, C.danger) + text(36, 788, "Kosongkan", { size: 10, fill: C.danger, anchor: "middle" }) + note(96, 700, "Kosongkan", 66, 770), enter: "fade" },
-        dlg: { svg: dlg, enter: "pop", origin: [36, 773] },
-        msg: { svg: ring(16, BY, 367, 56, { r: 6 }), enter: "fade" },
-        empty: { svg: railPanel("Template", "Template") + templatePanel() + scrollbar(157, 360) + rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white }), enter: "fade" }
+        tipU: { svg: tooltip(8, 652, "Urungkan (Ctrl+Z)") + tooltip(40, 684, "Ulangi (Ctrl+Shift+Z)"), enter: "fade", delay: 0.6 },
+        fix: { svg: nickFix("Dimas") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.text), enter: "fade" },
+        redo: { svg: nickFix("Dimaz") + rect(38, 622, 30, 24, { fill: C.page }) + icon("redo-2", 52, 633, 16, C.off), enter: "fade" }
       },
       steps: [
-        { caption: "Di rel kiri, klik Kosongkan (judul tombol: Kosongkan halaman).", at: ED.tool.Kosongkan, hover: "red", click: true, show: ["dlg"], dur: 3.4 },
-        { caption: "Baca jendela Kosongkan halaman?: Ucapan dan RSVP aman. Bisa diurungkan.", at: [260, BY + 30], show: ["msg"], dur: 4 },
-        { caption: "Klik Kosongkan halaman untuk lanjut, atau Batal (Esc) untuk mundur.", at: [90, 255], click: true, hide: ["dlg", "msg"], show: ["empty"], dur: 3.8 }
+        { caption: "Di bawah Bagikan ada dua panah: kiri Urungkan, kanan Ulangi.", focus: [0, 554, 260, 170], at: ED.tool.Urungkan, show: ["tipU"], mark: [UNDO[0], UNDO[1], REDO[0] + REDO[2] - UNDO[0], 24],
+          lens: { src: [0, 606, 200, 106] }, dur: 3.8 },
+        { caption: "Klik panah kiri. Perubahan terakhir batal: nama kembali Dimas.", focus, at: ED.tool.Urungkan, click: true, hide: ["tipU"], show: ["fix"], mark: [NICK, UNDO], lens: nickLens, dur: 3.6 },
+        { caption: "Kebablasan? Klik panah kanan untuk mengulangi perubahan tadi.", at: ED.tool.Ulangi, click: true, show: ["redo"], mark: [NICK, REDO], lens: nickLens, dur: 3.6 }
       ]
     };
   })(),
 
-  // ------------------------------------------------------------------------------------------- Kosongkan (langkah 4-5)
-  "editor-kosongkan-hasil": {
-    title: "Hasil Kosongkan dan cara mengurungkannya",
-    world: PANEL,
-    base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
-    els: { toast: { svg: nkToast("Halaman dikosongkan."), enter: "slide", delay: 0.4 } },
-    steps: [
-      { caption: "Menu Template terbuka. Di bawah muncul pesan Halaman dikosongkan.", at: [250, 640], show: ["toast"], dur: 3.6 },
-      { caption: "Berubah pikiran? Klik Urungkan di pesan itu.", at: [345, 862], click: true, hide: ["toast"], dur: 3.4 }
-    ]
-  },
-  "editor-kosongkan-pratinjau": {
-    title: "Pratinjau kosong, lalu kembali setelah Urungkan",
-    world: PREV,
-    base: [shell("Template", "Template"), rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white })],
-    els: { back: { svg: coverScreen(), enter: "fade" } },
-    steps: [
-      { caption: "Setelah Kosongkan, pratinjau kosong seperti halaman HTML Mode baru.", dur: 3.2 },
-      { caption: "Setelah Urungkan, undangan kembali utuh.", show: ["back"], dur: 3.2 }
-    ]
-  },
+  // ------------------------------------------------------------------------------------------- Kosongkan
+  "editor-kosongkan": (() => {
+    const batalX = 16 + tw("Kosongkan halaman", 12, 500) + 52;
+    const dlg = nkDialogHead(0, 0, "Kosongkan halaman?") + nkNote(16, BY, 367, ["Isi undangan dihapus. Ucapan dan RSVP aman. Bisa", "diurungkan."], { tone: "warn" }) +
+      nkBtn(16, 237, "Kosongkan halaman", { variant: "danger", icon: "eraser" }) + quiet(batalX, 237, "Batal");
+    const dlgTop = [0, 92, 399, 200], toast = [72, 820, 327, 80];
+    return {
+      title: "Mengosongkan halaman dan mengurungkannya",
+      base: [shell("Konten", "Konten"), priaPanel("Dimas"), coverScreen()],
+      els: {
+        red: { svg: rect(0, 752, 71, 46, { fill: C.page }) + icon("eraser", 36, 765, 18, C.danger) + text(36, 788, "Kosongkan", { size: 10, fill: C.danger, anchor: "middle" }), enter: "fade" },
+        dlg: { svg: dlg, enter: "pop", origin: [36, 773], delay: 0.3 },
+        emptyPanel: { svg: railTabs("Template") + panelOpen("Template") + templatePanel() + scrollbar(157, 360), enter: "fade" },
+        emptyPrev: { svg: rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white }), enter: "fade" },
+        toast: { svg: nkToast("Halaman dikosongkan."), enter: "slide", delay: 0.4 }
+      },
+      steps: [
+        { caption: "Di rel kiri, klik Kosongkan (judul tombol: Kosongkan halaman).", focus: [dlgTop, TOOLS], at: ED.tool.Kosongkan, hover: "red", click: true, show: ["dlg"],
+          mark: toolBox(773), note: "Kosongkan", dur: 3.4 },
+        { caption: "Baca jendela Kosongkan halaman?: Ucapan dan RSVP aman. Bisa diurungkan.", focus: dlgTop, at: [260, BY + 30], mark: [16, BY, 367, 56], lens: { src: [8, 100, 390, 190] }, dur: 4 },
+        { caption: "Klik Kosongkan halaman untuk lanjut, atau Batal (Esc) untuk mundur.", at: [90, 255], click: true, hide: ["dlg"], show: ["emptyPanel", "emptyPrev"],
+          mark: [nkBtnBox(16, 237, "Kosongkan halaman", { icon: "eraser" }), nkBtnBox(batalX, 237, "Batal")], note: "Kosongkan halaman atau Batal", dur: 3.8 },
+        { caption: "Menu Template terbuka, pratinjau kosong. Muncul pesan Halaman dikosongkan.", focus: [[72, 92, 327, 160], toast, PREVF], show: ["toast"],
+          mark: [84, 836, 303, 52], lens: { src: [76, 826, 320, 72], at: [12, 430] }, dur: 3.6 },
+        { caption: "Berubah pikiran? Klik Urungkan di pesan itu. Undangan kembali utuh.", focus: [toast, PREVF], at: [343, 862], click: true, hide: ["toast", "emptyPrev"],
+          mark: URUNG_BOX, note: "Urungkan", dur: 3.6 }
+      ]
+    };
+  })(),
 
   // ------------------------------------------------------------------------------------------- Dijeda
   "editor-dijeda-timpa": (() => {
     const [kcol] = column([{ label: "Bahasa undangan", value: "Indonesia", select: true }], PX, BY + 138, PW);
     const rest = kcol + text(PX, BY + 226, "Urutan dan tampilan bagian di Lapisan.", { size: 12, fill: C.faint }) +
       ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video"].map((g, i) => nkAcc(PX, BY + 242 + i * 58, PW, g, { badge: "Terisi" })).join("");
-    const banner = ring(PX, BY, PW, 126, { r: 8 });
+    const banner = [72, 154, 327, 150], bannerLens = { src: [80, 160, 300, 145] };
     return {
       title: "NikahKit dijeda karena kode diubah manual",
-      world: { x: 0, y: 44, w: 400, h: 856 }, // the Scalev tab strip, rail and panel
       base: [shell("Konten", "Konten", { saving: "Dijeda" }), white(72, 154, 327, 746), driftBanner(), rest, scrollbar(157, 300), coverScreen()],
       els: {
-        foot: { svg: ring(4, 856, 64, 40, { r: 8 }) + note(96, 866, "Dijeda", 68, 878) + banner, enter: "fade" },
         code: { svg: clipped(0, 0, 399, 92, scalevEditor(0, 0, { tab: "Code" })) + codeView(), enter: "fade" },
-        mark: { svg: ring(40, 193, 355, 22, { r: 4 }), enter: "fade" },
-        leftK: { svg: clipped(0, 0, 400, 900, shell("Konten", "Konten", { saving: "Dijeda" }) + white(72, 154, 327, 746) + driftBanner() + rest + scrollbar(157, 300)), enter: "fade" },
         fixed: { svg: white(72, 154, 327, 746) + text(PX, BY + 12, "Bahasa undangan", { size: 12, weight: 500 }) + nkInput(PX, BY + 20, PW, "Indonesia", { select: true }) +
           text(PX, BY + 88, "Urutan dan tampilan bagian di Lapisan.", { size: 12, fill: C.faint }) +
           ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video", "Rangkaian Acara", "Dress Code"].map((g, i) => nkAcc(PX, BY + 104 + i * 58, PW, g, { badge: "Terisi" })).join("") +
-          scrollbar(157, 300) + footStatus("Tersimpan", C.ok), enter: "fade" },
-        ok: { svg: ring(4, 856, 64, 40, { r: 8 }) + note(96, 860, "Tersimpan", 68, 878), enter: "fade" }
+          scrollbar(157, 300) + footStatus("Tersimpan", C.ok), enter: "fade" }
       },
       steps: [
-        { caption: "Kaki rel menunjukkan Dijeda. Baca kotak kuning di atas panel.", at: [36, 878], show: ["foot"], dur: 3.8 },
-        { caption: "Klik Lihat di kode. Tab Code terbuka, bagian yang diubah ditandai.", at: [150, BY + 54], click: true, hide: ["foot"], show: ["code"], dur: 3.8 },
-        { caption: "Putuskan: tidak penting? Lanjut. Penting? Salin dulu, atau Ctrl+Z di Code.", at: [250, 204], show: ["mark"], dur: 4 },
-        { caption: "Kembali ke tab NikahKit di strip atas editor Scalev.", at: ED.tab.NikahKit, click: true, hide: ["code", "mark"], show: ["leftK"], dur: 3.4 },
-        { caption: "Klik Timpa dengan NikahKit. Perubahan manual dibuang, bisa diurungkan.", at: [180, BY + 98], click: true, show: ["fixed"], dur: 3.6 },
-        { caption: "Kotak kuning hilang, kaki rel kembali Tersimpan. Lalu Simpan di Scalev.", at: [36, 878], show: ["ok"], dur: 3.6 }
+        { caption: "Kaki rel menunjukkan Dijeda. Baca kotak kuning di atas panel.", focus: [FOOT, banner], at: [36, 878], mark: [[PX, BY, PW, 126], FOOT_MARK], lens: bannerLens, dur: 3.8 },
+        { caption: "Klik Lihat di kode. Tab Code terbuka, bagian yang diubah ditandai.", focus: [0, 44, 399, 300], at: [150, BY + 54], click: true, show: ["code"],
+          mark: nkBtnBox(PX + 12, BY + 36, "Lihat di kode", { icon: "code-xml" }), lens: { src: [0, 92, 399, 160], at: [290, 60] }, dur: 3.8 },
+        { caption: "Putuskan: tidak penting? Lanjut. Penting? Salin dulu, atau Ctrl+Z di Code.", at: [250, 204], mark: { box: [40, 193, 359, 22], r: 0 }, lens: { src: [0, 100, 399, 200], at: [290, 60] }, dur: 4 },
+        { caption: "Kembali ke tab NikahKit di strip atas editor Scalev.", focus: [0, 44, 399, 48], at: ED.tab.NikahKit, click: true, hide: ["code"], mark: [228, 54, 84, 28], lens: { src: [0, 44, 340, 48] }, dur: 3.4 },
+        { caption: "Klik Timpa dengan NikahKit. Perubahan manual dibuang, bisa diurungkan.", focus: [[72, 154, 327, 200], FOOT], at: [180, BY + 98], click: true, show: ["fixed"],
+          mark: nkBtnBox(PX + 12, BY + 80, "Timpa dengan NikahKit"), lens: bannerLens, dur: 3.6 },
+        { caption: "Kotak kuning hilang, kaki rel kembali Tersimpan. Lalu Simpan di Scalev.", focus: [FOOT, banner, [1180, 44, 260, 48]], at: [36, 878], mark: [FOOT_MARK, SIMPAN],
+          lens: { src: [0, 846, 72, 54], zoom: 3 }, dur: 3.6 }
       ]
     };
   })()
 };
-export const scenes = SCENES;
+// Every element here is a state of the screen (lib `skel`): skeleton outside the step's focus, detail inside it.
+export const scenes = Object.fromEntries(Object.entries(SCENES).map(([name, s]) =>
+  [name, { ...s, els: Object.fromEntries(Object.entries(s.els).map(([id, e]) => [id, { ...(typeof e === "string" ? { svg: e } : e), skel: true }])) }]));
