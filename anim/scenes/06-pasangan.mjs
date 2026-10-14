@@ -7,9 +7,9 @@
 // checkin} dan nikahkit/ext/pin.html; ikon WhatsApp dan template pesan dibaca langsung dari sumbernya.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { C, WORLD, PHONE, rect, text, line, circle, para, tw, textWidth, wrap, icon, iconX, skeleton, clipped } from "../lib.mjs";
+import { C, WORLD, PHONE, rect, text, line, circle, para, group, tw, textWidth, wrap, clamp, icon, iconX, skeleton, clipped } from "../lib.mjs";
 import { BAGIKAN_TOOL, NO_NOTE, ACC_Y, COUPLE_Y, shareTop, shareBtns, accessHead, forCouple, pinBtn, pinHint, pinBox } from "../ui/bagikan.mjs";
-import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk } from "../ui/kit.mjs";
+import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk, onPhone } from "../ui/kit.mjs";
 
 // ---- Sumber asli ------------------------------------------------------------------------------------------------------
 const SRC = (p) => fs.readFileSync(fileURLToPath(new URL(`../../../server/pages/src/${p}`, import.meta.url)), "utf8");
@@ -45,16 +45,12 @@ const avc = (name) => { let h = 0; for (const c of String(name)) h = (h * 31 + c
 const iniR = (n) => n.trim().split(/\s+/).filter((p) => p !== "&").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
 const iniS = (n) => { const w = n.replace(/^(bapak|ibu|bpk\.?|kel\.?|keluarga)\s+/i, "").trim().split(/\s+/).filter((x) => x && x !== "&"); return ((w[0] || "?")[0] + (w[1] ? w[1][0] : "")).toUpperCase(); };
 
-// ---- Teks ------------------------------------------------------------------------------------------------------------
-const fit = (s, maxW, size = 14, weight = 400) => { if (tw(s, size, weight) <= maxW) return s; let t = s; while (t.length > 1 && tw(t + "…", size, weight) > maxW) t = t.slice(0, -1); return t.trimEnd() + "…"; };
-
 // ---- Layar HP (390x844, tanpa bingkai perangkat) ----------------------------------------------------------------------
 const PX = PHONE.x, PY = PHONE.y;
 const P = (x, y) => [PX + x, PY + y];
 const PB = (x, y, w, h) => [PX + x, PY + y, w, h]; // kotak di layar HP -> dunia
-const ph = (...k) => `<g transform="translate(${PX} ${PY})">${k.join("")}</g>`;
-// Isi layar sebagai elemen: dipotong ke layar HP (isi yang lebih tinggi dari 844 tidak keluar ke desktop).
-const scr = (...k) => clipped(PX, PY, 390, 844, ph(...k));
+// Isi berkoordinat HP: onPhone (kit) menggeser ke layar HP dan memotong di tepinya. Isi yang digulir (home, chatU) hanya
+// digeser (group translate), supaya potongan tidak ikut bergulir; MASKS menutup bagian di luar layar.
 // Penutup di atas dan bawah layar untuk isi yang bergulir (lib menggeser elemen utuh, potongan ikut bergeser):
 // warna desktop di tempat itu (bilah atas putih, latar desktop).
 const MASKS = skeleton(rect(PX - 4, 0, 398, PY, { fill: "#fff" }) + rect(PX - 4, PY + 844, 398, WORLD.h - PY - 844, { fill: "#eef1f5" }));
@@ -92,13 +88,13 @@ function chips(y, items, active, x0 = 20) {
 function row(y, o) {
   const x0 = o.x0 ?? 10, right = o.right ?? 365, [bg, fg] = avc(o.name), ax = x0 + 37, nx = x0 + 76;
   return (o.sel ? rect(x0, y, right + 15 - x0, 72, { r: 12, fill: T.hi }) : "") + circle(ax, y + 36, 24, { fill: bg }) + text(ax, y + 42, o.ini, { size: 17, fill: fg, anchor: "middle" }) +
-    text(nx, y + 31, fit(o.name, right - nx - (o.time ? 50 : 0), 16), { size: 16, fill: T.text }) + (o.time ? text(right, y + 31, o.time, { size: 12, weight: 500, fill: T.sub, anchor: "end" }) : "") +
+    text(nx, y + 31, clamp(o.name, right - nx - (o.time ? 50 : 0), 1, 16)[0], { size: 16, fill: T.text }) + (o.time ? text(right, y + 31, o.time, { size: 12, weight: 500, fill: T.sub, anchor: "end" }) : "") +
     l2(o.parts, right - nx)(nx, y + 54);
 }
 // Baris kedua: potongan { t, fill, w, icon } dalam satu baris teks (browser yang menyusun), dipangkas dengan … ke maxW.
 const l2 = (parts, maxW) => (x, y) => {
   const ic = parts[0].icon ? wa(parts[0].icon, x + 8, y - 5, 16, parts[0].iconFill ?? parts[0].fill ?? T.sub) : "", tx = x + (ic ? 19 : 0);
-  let left = fit(parts.map((p) => p.t).join(" "), x + maxW - tx, 14);
+  let left = clamp(parts.map((p) => p.t).join(" "), x + maxW - tx)[0];
   const runs = parts.map((p, i) => { const t = left.slice(0, p.t.length + (i ? 1 : 0)); left = left.slice(t.length); return { t, fill: p.fill ?? T.sub, w: p.w }; }).filter((r) => r.t);
   return ic + text(tx, y, runs, { size: 14, fill: T.sub });
 };
@@ -199,18 +195,18 @@ const DET = (() => {
   return {
     geo: { bTop, bh, bEnd, infoTop: bEnd + 24, replyTop, outY, outH },
     els: {
-      detail: { svg: scr(rect(0, 0, 390, 844, { fill: T.wall }), dayChip(195, 80, "12 Oktober 2026"), inBubble, chatBar("Dewi Lestari", iniR("Dewi Lestari"), "Hadir · 2 orang · 082198765432")), enter: "fade", skel: true },
-      infoA: { svg: scr(info(bEnd + 24)), skel: true },
-      composeA: { svg: scr(compose("Tulis balasan")), skel: true },
-      reply: scr(rect(0, 752, 390, 92, { fill: T.wall }), text(16, 772, "Balasan untuk Dewi Lestari", { size: 13, fill: T.sub }),
+      detail: { svg: onPhone(rect(0, 0, 390, 844, { fill: T.wall }), dayChip(195, 80, "12 Oktober 2026"), inBubble, chatBar("Dewi Lestari", iniR("Dewi Lestari"), "Hadir · 2 orang · 082198765432")), enter: "fade", skel: true },
+      infoA: { svg: onPhone(info(bEnd + 24)), skel: true },
+      composeA: { svg: onPhone(compose("Tulis balasan")), skel: true },
+      reply: onPhone(rect(0, 752, 390, 92, { fill: T.wall }), text(16, 772, "Balasan untuk Dewi Lestari", { size: 13, fill: T.sub }),
         rect(8, 786, 374, 52, { r: 26, fill: "rgba(0,0,0,.08)" }), rect(8, 784, 374, 52, { r: 26, fill: "#fff" }), wa("x", 313, 811, 24, T.text), circle(357, 811, 20, { fill: T.accent }), wa("send", 357, 811, 24, "#fff")),
-      phReply: scr(text(29, 816, "Tulis ucapan terima kasih...", { size: 15, fill: T.grey })),
-      typed: scr(text(29, 816, "Terima kasih doanya, Dewi!", { size: 15, fill: T.text })),
-      out: { svg: scr(rect(0, replyTop, 390, 900, { fill: T.wall }), dayChip(195, replyTop, "14 Oktober 2026"),
+      phReply: onPhone(text(29, 816, "Tulis ucapan terima kasih...", { size: 15, fill: T.grey })),
+      typed: onPhone(text(29, 816, "Terima kasih doanya, Dewi!", { size: 15, fill: T.text })),
+      out: { svg: onPhone(rect(0, replyTop, 390, 900, { fill: T.wall }), dayChip(195, replyTop, "14 Oktober 2026"),
         rect(374 - 228, outY, 228, outH, { r: 7.5, fill: T.soft }), rect(364, outY, 10, 10, { fill: T.soft }), tail(374, outY, "out", T.soft),
         text(374 - 219, outY + 21, "Terima kasih doanya, Dewi!", { size: 14.2, fill: T.text }), text(347, outY + outH - 8, "10.15", { size: 11, fill: T.sub, anchor: "end" }), wa("read", 359, outY + outH - 12, 16, T.link),
         info(infoB), compose("Ubah balasan")), skel: true },
-      saved: { svg: scr(waToast(195, 756, "Balasan berhasil disimpan.")), enter: "slide" }
+      saved: { svg: onPhone(waToast(195, 756, "Balasan berhasil disimpan.")), enter: "slide" }
     }
   };
 })();
@@ -538,18 +534,18 @@ const SCENES = {
     const input = { box: PB(36, 398, 318, 44), r: 8 }, btn = { box: PB(36, 458, 318, 40), r: 20 }, card = PB(16, 249, 358, 305);
     return {
       title: "Masuk ke Dashboard pasangan dengan PIN",
-      base: [phoneDesk(ph(rect(16, 249, 358, 305, { r: 24, fill: "#fff" }), text(195, 297, "Kelola undangan", { size: 22, fill: T.text, anchor: "middle" }),
+      base: [phoneDesk(onPhone(rect(16, 249, 358, 305, { r: 24, fill: "#fff" }), text(195, 297, "Kelola undangan", { size: 22, fill: T.text, anchor: "middle" }),
         para(195, 326, ["Kirim undangan, lihat RSVP dan ucapan, dan catat", "tamu di hari-H. Semuanya dari sini."], { size: 14, fill: T.sub, anchor: "middle", lh: 20 }),
         text(36, 388, "PIN atau kode staff", { size: 14, fill: T.sub }), rect(36.5, 398.5, 317, 43, { r: 8, fill: "#fff", stroke: T.border }),
         wa("lock", 73, 586, 14, T.sub), text(86, 591, "PIN hanya diingat selama tab ini terbuka.", { size: 13, fill: T.sub })), { screen: T.wash })],
       els: {
-        focus: ph(rect(37, 399, 316, 42, { r: 8, fill: "#fff", stroke: T.accent, sw: 2 })),
-        hint: ph(text(48, 425, "••••••", { size: 16, fill: T.sub })),
-        pin1: ph(dots()),
-        pin2: ph(rect(40, 402, 300, 36, { fill: "#fff" }), dots()),
-        btn: ph(rect(36, 458, 318, 40, { r: 20, fill: T.accent }), text(195, 483, "Masuk", { size: 15, weight: 500, fill: "#fff", anchor: "middle" })),
-        err: ph(text(195, 526, "PIN salah.", { size: 14, fill: T.danger, anchor: "middle" })),
-        home: { svg: scr(HOME_STATIC), enter: "fade", skel: true }
+        focus: onPhone(rect(37, 399, 316, 42, { r: 8, fill: "#fff", stroke: T.accent, sw: 2 })),
+        hint: onPhone(text(48, 425, "••••••", { size: 16, fill: T.sub })),
+        pin1: onPhone(dots()),
+        pin2: onPhone(rect(40, 402, 300, 36, { fill: "#fff" }), dots()),
+        btn: onPhone(rect(36, 458, 318, 40, { r: 20, fill: T.accent }), text(195, 483, "Masuk", { size: 15, weight: 500, fill: "#fff", anchor: "middle" })),
+        err: onPhone(text(195, 526, "PIN salah.", { size: 14, fill: T.danger, anchor: "middle" })),
+        home: { svg: onPhone(HOME_STATIC), enter: "fade", skel: true }
       },
       steps: [
         { caption: "Pengantin membuka link dashboard dari WA, lalu mengetuk kolom PIN.", focus: card, mark: input, lens: { src: PB(28, 370, 334, 80), zoom: 1.5 }, at: P(195, 420), click: true, show: ["focus"], dur: 3.4 },
@@ -570,9 +566,9 @@ const SCENES = {
     cursorStart: P(270, 240),
     base: [phoneDesk("", { screen: T.wash })],
     els: {
-      home: { svg: ph(homeContent()), skel: true },
-      chromeTop: { svg: ph(head("Beranda"), tabbar("beranda")), skel: true },
-      tamu: { svg: scr(tamuList()), enter: "fade", skel: true },
+      home: { svg: group({ transform: `translate(${PX} ${PY})` }, homeContent()), skel: true },
+      chromeTop: { svg: onPhone(head("Beranda"), tabbar("beranda")), skel: true },
+      tamu: { svg: onPhone(tamuList()), enter: "fade", skel: true },
       masks: MASKS
     },
     steps: [
@@ -595,27 +591,27 @@ const SCENES = {
     const checks = PB(CHAT_U.checks[0], CHAT_U.checks[1] - CHAT_DY, CHAT_U.checks[2], CHAT_U.checks[3]);
     return {
       title: "Mengirim undangan per tamu lewat WhatsApp",
-      base: [phoneDesk(ph(kirimTop([0, 0, 0]), text(195, 452, "Belum ada tamu", { size: 16, fill: T.text, anchor: "middle" }),
+      base: [phoneDesk(onPhone(kirimTop([0, 0, 0]), text(195, 452, "Belum ada tamu", { size: 16, fill: T.text, anchor: "middle" }),
         para(195, 478, ["Tekan tombol tambah untuk menempel daftar", "tamu dari WhatsApp, Excel, atau catatan."], { size: 14, fill: T.sub, anchor: "middle", lh: 20 }), fab(), tabbar("kirim")))],
       els: {
-        fab: ph(fab()),
-        drawer: { svg: scr(rect(0, 0, 390, 773, { fill: "#fff" }), wa("back", 36, 32), text(64, 38, "Tambah tamu", { size: 16, weight: 500, fill: T.text }),
+        fab: onPhone(fab()),
+        drawer: { svg: onPhone(rect(0, 0, 390, 773, { fill: "#fff" }), wa("back", 36, 32), text(64, 38, "Tambah tamu", { size: 16, weight: 500, fill: T.text }),
           text(20, 90, "Daftar tamu, satu per baris", { size: 14, fill: T.sub }), rect(20.5, 100.5, 349, 179, { r: 8, fill: "#fff", stroke: T.border }),
           para(20, 302, ["Format: nama - nomor WA - kategori - jumlah orang.", "Hanya nama yang wajib. Bisa ditempel langsung dari", "WhatsApp, Excel, atau catatan. File CSV: kolom", "nama, no wa, kategori, jumlah."], { size: 13, fill: T.sub, lh: 17 }),
           pillBtn(20, 390, 136, "Simpan daftar"), pillBtn(164, 390, 104, "Impor CSV", { soft: true })), skel: true },
-        ph1: { svg: scr(para(32, 126, ["Keluarga Besar Surya", "Bapak Andi & Ibu Rina - 081234567890", "Dewi Lestari - 082198765432 - Sahabat - 2"], { size: 16, fill: T.grey, lh: 24 })), skel: true },
-        paste: { svg: scr(rect(22, 102, 346, 176, { r: 7, fill: "#fff" }), rect(21, 101, 348, 178, { r: 8, stroke: T.accent, sw: 2 }),
+        ph1: { svg: onPhone(para(32, 126, ["Keluarga Besar Surya", "Bapak Andi & Ibu Rina - 081234567890", "Dewi Lestari - 082198765432 - Sahabat - 2"], { size: 16, fill: T.grey, lh: 24 })), skel: true },
+        paste: { svg: onPhone(rect(22, 102, 346, 176, { r: 7, fill: "#fff" }), rect(21, 101, 348, 178, { r: 8, stroke: T.accent, sw: 2 }),
           para(32, 126, ["Keluarga Besar Surya", "Bapak Andi & Ibu Rina - 081234567890", "Dewi Lestari - 082198765432 - Sahabat - 2"], { size: 16, fill: T.text, lh: 24 })), enter: "fade", skel: true },
-        list: { svg: scr(kirimTop([3, 3, 0]), SENT_ROWS(false), fab(), tabbar("kirim")), enter: "fade", skel: true },
-        ready: { svg: scr(waToast(195, 684, "3 tamu siap.")), enter: "slide" },
-        chat: { svg: scr(CHAT.svg), enter: "fade", skel: true },
-        chatU: { svg: ph(CHAT_U.svg), enter: "fade", skel: true },
-        stickOk: { svg: scr(CHAT_U.sticky), enter: "fade", skel: true },
-        broken: { svg: scr(`<g transform="translate(0 ${-NO_DY})">${CHAT_NO.svg}</g>`, CHAT_NO.sticky), enter: "fade", skel: true },
-        fixed: { svg: scr(`<g transform="translate(0 ${-CHAT_DY})">${CHAT_FIX.svg}</g>`, CHAT_FIX.sticky), enter: "fade", skel: true },
-        chatTop: { svg: scr(chatBar("Dewi Lestari", "", "+6282198765432", { av: false })), enter: "fade", skel: true },
-        opened: { svg: scr(waToast(195, 684, "WhatsApp dibuka untuk Dewi Lestari.")), enter: "slide" },
-        sent: { svg: scr(kirimTop([3, 2, 1]), SENT_ROWS(true), fab(), tabbar("kirim")), enter: "fade", skel: true },
+        list: { svg: onPhone(kirimTop([3, 3, 0]), SENT_ROWS(false), fab(), tabbar("kirim")), enter: "fade", skel: true },
+        ready: { svg: onPhone(waToast(195, 684, "3 tamu siap.")), enter: "slide" },
+        chat: { svg: onPhone(CHAT.svg), enter: "fade", skel: true },
+        chatU: { svg: group({ transform: `translate(${PX} ${PY})` }, CHAT_U.svg), enter: "fade", skel: true },
+        stickOk: { svg: onPhone(CHAT_U.sticky), enter: "fade", skel: true },
+        broken: { svg: onPhone(`<g transform="translate(0 ${-NO_DY})">${CHAT_NO.svg}</g>`, CHAT_NO.sticky), enter: "fade", skel: true },
+        fixed: { svg: onPhone(`<g transform="translate(0 ${-CHAT_DY})">${CHAT_FIX.svg}</g>`, CHAT_FIX.sticky), enter: "fade", skel: true },
+        chatTop: { svg: onPhone(chatBar("Dewi Lestari", "", "+6282198765432", { av: false })), enter: "fade", skel: true },
+        opened: { svg: onPhone(waToast(195, 684, "WhatsApp dibuka untuk Dewi Lestari.")), enter: "slide" },
+        sent: { svg: onPhone(kirimTop([3, 2, 1]), SENT_ROWS(true), fab(), tabbar("kirim")), enter: "fade", skel: true },
         masks: MASKS
       },
       steps: [
@@ -651,14 +647,14 @@ const SCENES = {
     const hadir = [GUESTS[0], GUESTS[3]], g = DET.geo, { detail, infoA, composeA } = DET.els;
     return {
       title: "Melihat daftar tamu dan detailnya",
-      base: [phoneDesk(ph(HOME_STATIC), { screen: T.wash })],
+      base: [phoneDesk(onPhone(HOME_STATIC), { screen: T.wash })],
       els: {
-        list: { svg: scr(tamuList()), enter: "fade", skel: true },
-        hadir: { svg: scr(tamuList({ active: 1, rows: hadir })), enter: "fade", skel: true },
-        res: { svg: scr(tamuList({ active: 1, rows: [GUESTS[0]], q: true })), enter: "fade", delay: 1.4, skel: true },
-        qbox: scr(searchOn(66)),
-        qtxt: scr(text(68, 91, "Dewi", { size: 14, fill: T.text })),
-        sel: { svg: scr(rect(10, TAMU_ROW0, 370, 72, { r: 12, fill: T.hi }), row(TAMU_ROW0, { ...GUESTS[0], ini: iniR(GUESTS[0].name) })), skel: true },
+        list: { svg: onPhone(tamuList()), enter: "fade", skel: true },
+        hadir: { svg: onPhone(tamuList({ active: 1, rows: hadir })), enter: "fade", skel: true },
+        res: { svg: onPhone(tamuList({ active: 1, rows: [GUESTS[0]], q: true })), enter: "fade", delay: 1.4, skel: true },
+        qbox: onPhone(searchOn(66)),
+        qtxt: onPhone(text(68, 91, "Dewi", { size: 14, fill: T.text })),
+        sel: { svg: onPhone(rect(10, TAMU_ROW0, 370, 72, { r: 12, fill: T.hi }), row(TAMU_ROW0, { ...GUESTS[0], ini: iniR(GUESTS[0].name) })), skel: true },
         detail, infoA, composeA
       },
       steps: [
@@ -683,15 +679,15 @@ const SCENES = {
     const pick = (i, picked) => ({ box: PB(22, ucapanRowY(i, picked) + 26, 20, 20), r: 5 });
     return {
       title: "Membalas ucapan dan memilih banyak ucapan",
-      base: [phoneDesk(ph(tamuList()))],
+      base: [phoneDesk(onPhone(tamuList()))],
       els: {
-        ucapan: { svg: scr(ucapanList()), enter: "fade", skel: true },
-        sel: { svg: scr(rect(54, ucapanRowY(0), 326, 72, { r: 12, fill: T.hi }), row(ucapanRowY(0), { x0: 54, name: UCAPAN[0][0], ini: iniR(UCAPAN[0][0]), time: UCAPAN[0][1], parts: [{ t: "Belum dibalas" }, { t: UCAPAN[0][2] }] })), skel: true },
+        ucapan: { svg: onPhone(ucapanList()), enter: "fade", skel: true },
+        sel: { svg: onPhone(rect(54, ucapanRowY(0), 326, 72, { r: 12, fill: T.hi }), row(ucapanRowY(0), { x0: 54, name: UCAPAN[0][0], ini: iniR(UCAPAN[0][0]), time: UCAPAN[0][1], parts: [{ t: "Belum dibalas" }, { t: UCAPAN[0][2] }] })), skel: true },
         ...DET.els,
-        menu: { svg: scr(menuBox(142, 56, 232, 221), ...menu.map(([ic, l, d], i) => menuItem(150, 64 + i * 41, ic, l, d))), enter: "pop", origin: P(362, 40) },
-        back: { svg: scr(ucapanList({ replied: true })), enter: "fade", skel: true },
-        pick1: { svg: scr(ucapanList({ replied: true, picked: [1] })), skel: true },
-        pick2: { svg: scr(ucapanList({ replied: true, picked: [1, 2] })), skel: true }
+        menu: { svg: onPhone(menuBox(142, 56, 232, 221), ...menu.map(([ic, l, d], i) => menuItem(150, 64 + i * 41, ic, l, d))), enter: "pop", origin: P(362, 40) },
+        back: { svg: onPhone(ucapanList({ replied: true })), enter: "fade", skel: true },
+        pick1: { svg: onPhone(ucapanList({ replied: true, picked: [1] })), skel: true },
+        pick2: { svg: onPhone(ucapanList({ replied: true, picked: [1, 2] })), skel: true }
       },
       steps: [
         { caption: "Buka tab Ucapan. Tiap baris bertanda Belum dibalas atau Sudah dibalas.", focus: [PB(0, 0, 390, 250), PB(0, 773, 390, 71)], mark: tabBox("ucapan"),
@@ -717,18 +713,18 @@ const SCENES = {
   // 7. Hari-H (checkin/index.html di dalam dashboard).
   "pasangan-hari-h": {
     title: "Check-in tamu di hari-H",
-    base: [phoneDesk(ph(HOME_STATIC), { screen: T.wash })],
+    base: [phoneDesk(onPhone(HOME_STATIC), { screen: T.wash })],
     els: {
-      scan: { svg: scr(rect(0, 0, 390, 844, { fill: T.wall }), pillBtn(16, 80, 358, "Buka kamera"), linkBox(132)), enter: "fade", skel: true },
-      cam: { svg: scr(rect(0, 64, 390, 709, { fill: T.wall }), camStage(), pillBtn(16, 448, 358, "Tutup kamera"), text(195, 501, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(517)), skel: true },
-      qr: { svg: scr(rect(110, 150, 170, 218, { r: 14, fill: "#2c3a43" }), rect(118, 160, 154, 198, { r: 8, fill: "#fdf6ee" }), qrCode(139, 200, 112)), enter: "rise" },
+      scan: { svg: onPhone(rect(0, 0, 390, 844, { fill: T.wall }), pillBtn(16, 80, 358, "Buka kamera"), linkBox(132)), enter: "fade", skel: true },
+      cam: { svg: onPhone(rect(0, 64, 390, 709, { fill: T.wall }), camStage(), pillBtn(16, 448, 358, "Tutup kamera"), text(195, 501, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(517)), skel: true },
+      qr: { svg: onPhone(rect(110, 150, 170, 218, { r: 14, fill: "#2c3a43" }), rect(118, 160, 154, 198, { r: 8, fill: "#fdf6ee" }), qrCode(139, 200, 112)), enter: "rise" },
       // Hasil scan = kartu di dalam jendela kamera; tombol dan kolom link tidak bergeser. Riwayat: satu baris per tamu.
-      ok: { svg: scr(camCard("ok"), recentBox(604, [[true]])), enter: "rise", skel: true },
-      warn: { svg: scr(camStage(), camCard("warn")), skel: true },
-      pasted: { svg: scr(rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, fit(SITE + "?to=Bapak+Andi+%26+Ibu+Rina&u=P4N8RW", 280, 16), { size: 16, fill: T.text })), enter: "fade" },
-      andi: { svg: scr(camStage(), camCard("ok", ANDI), rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, "https://…?to=Nama&u=KODE", { size: 16, fill: T.grey }), recentBox(604, [[true, ANDI], [true]])), skel: true },
-      closed: { svg: scr(rect(0, 64, 390, 709, { fill: T.wall }), resultBox("ok", ANDI), pillBtn(16, 292, 358, "Buka kamera"), text(195, 345, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(361), recentBox(448, [[true, ANDI], [true]])), enter: "fade", skel: true },
-      cover: { svg: scr(scanBar(), tabbar("harih")), enter: "fade", skel: true }
+      ok: { svg: onPhone(camCard("ok"), recentBox(604, [[true]])), enter: "rise", skel: true },
+      warn: { svg: onPhone(camStage(), camCard("warn")), skel: true },
+      pasted: { svg: onPhone(rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, clamp(SITE + "?to=Bapak+Andi+%26+Ibu+Rina&u=P4N8RW", 280, 1, 16)[0], { size: 16, fill: T.text })), enter: "fade" },
+      andi: { svg: onPhone(camStage(), camCard("ok", ANDI), rect(30, 543, 290, 46, { fill: "#fff" }), text(37, 572, "https://…?to=Nama&u=KODE", { size: 16, fill: T.grey }), recentBox(604, [[true, ANDI], [true]])), skel: true },
+      closed: { svg: onPhone(rect(0, 64, 390, 709, { fill: T.wall }), resultBox("ok", ANDI), pillBtn(16, 292, 358, "Buka kamera"), text(195, 345, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(361), recentBox(448, [[true, ANDI], [true]])), enter: "fade", skel: true },
+      cover: { svg: onPhone(scanBar(), tabbar("harih")), enter: "fade", skel: true }
     },
     steps: [
       { caption: "Buka tab Hari-H di HP penerima tamu.", focus: [PB(0, 0, 390, 220), PB(0, 773, 390, 71)], mark: tabBox("harih"), lens: { src: PB(196, 778, 186, 64), at: [20, 470] },
@@ -803,21 +799,21 @@ const SCENES = {
       text(20, 444, "Akses tamu", { size: 14, fill: T.sub }) + rect(16, 458, 358, 60, { r: 12, fill: "#fff" }) + wa("lock-open", 48, 488, 24, T.sub) + text(76, 493, "Buka untuk semua", { size: 15, fill: T.text }) +
       text(20, 552, "Akses dashboard", { size: 14, fill: T.sub }) + rect(16, 566, 358, 60, { r: 12, fill: "#fff" }) + wa("log-out", 48, 596, 24, T.danger) + text(76, 601, "Keluar", { size: 15, fill: T.danger }) + wa("chevron-right", 350, 596, 20, T.danger) +
       tabbar(null);
-    const chipState = (s) => scr(rect(300, 478, 66, 24, { fill: "#fff" }), text(354, 493, s, { size: 14, fill: T.sub, anchor: "end" }));
+    const chipState = (s) => onPhone(rect(300, 478, 66, 24, { fill: "#fff" }), text(354, 493, s, { size: 14, fill: T.sub, anchor: "end" }));
     const open = { box: PB(16, 458, 358, 60), r: 12 }, toastF = PB(60, 700, 270, 60);
     return {
       title: "Membuka Pengaturan undangan dan Buka untuk semua",
-      base: [phoneDesk(ph(HOME_STATIC), { screen: T.wash })],
+      base: [phoneDesk(onPhone(HOME_STATIC), { screen: T.wash })],
       els: {
-        menu: { svg: scr(menuBox(MX, MY, MW, 203), text(MX + 20, MY + 34, "Undangan Anda", { size: 16, weight: 500, fill: T.text }), text(MX + 20, MY + 52, SITE, { size: 13, fill: T.sub }),
+        menu: { svg: onPhone(menuBox(MX, MY, MW, 203), text(MX + 20, MY + 34, "Undangan Anda", { size: 16, weight: 500, fill: T.text }), text(MX + 20, MY + 52, SITE, { size: 13, fill: T.sub }),
           line(MX + 8, MY + 68.5, MX + MW - 8, MY + 68.5, { stroke: T.line }), menuItem(MX + 8, MY + 75, "pelacakan", "Pelacakan"), menuItem(MX + 8, MY + 115, "akun", "Pengaturan undangan"),
           menuItem(MX + 8, MY + 155, "keluar", "Keluar", true)), enter: "pop", origin: ME },
-        set: { svg: scr(settings()), enter: "fade", skel: true },
+        set: { svg: onPhone(settings()), enter: "fade", skel: true },
         off: chipState("Mati"),
         on: chipState("Aktif"),
         off2: chipState("Mati"),
-        tOn: { svg: scr(waToast(195, 756, "Terbuka untuk semua.")), enter: "slide" },
-        tOff: { svg: scr(waToast(195, 756, "Kembali khusus tamu.")), enter: "slide" }
+        tOn: { svg: onPhone(waToast(195, 756, "Terbuka untuk semua.")), enter: "slide" },
+        tOff: { svg: onPhone(waToast(195, 756, "Kembali khusus tamu.")), enter: "slide" }
       },
       steps: [
         { caption: "Di HP, ketuk lingkaran inisial di ujung kanan tab bawah.", focus: [PB(0, 773, 390, 71), PB(MX, MY, MW, 203)], mark: { box: PB(341, 793, 32, 32), r: 16 },
