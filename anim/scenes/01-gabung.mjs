@@ -8,10 +8,11 @@
 // nikahkit/src/ui/help.jsx. No extension version numbers: the banner and the ZIP names keep their place, the number is
 // left out. Not measured (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows,
 // Windows Explorer, the Chrome download bubble, folder picker, extension menu and prompt box.
+import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, esc } from "../lib.mjs";
 import {
-  C, CHROME_TOP, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, esc, nkBtn, nkBtnBox, nkInput, nkLabel,
-  nkHint, nkSeg, nkHead, nkDialogHead, nkAcc, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp, svMenuAt, favScalev, favChrome
-} from "../lib.mjs";
+  CHROME_TOP, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSeg, nkHead, nkDialogHead, nkAcc, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
+  svMenuAt, favScalev, favChrome
+} from "../ui/kit.mjs";
 import { securityPanel } from "./02-scalev.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815

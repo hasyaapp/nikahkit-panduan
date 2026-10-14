@@ -3,7 +3,8 @@
 // boxes follow /tmp/ref/editor-metrics.json (Template, Konten: cards 134x229, accordions 279x50, fields 253 wide); labels
 // from nikahkit/src/fields.js, model.js (SAMPLE, SAMPLE_CHECKS), ui/panel-content.jsx, ui/panels-style.jsx, ui/fields.jsx,
 // ui/App.jsx (MediaDialog, Toast), store.js.
-import { C, ED, esc, rect, text, line, circle, para, clipped, shadow, icon, iconX, tw, nkHead, nkRail, nkLabel, nkBtn, nkDialogHead, scalevEditor } from "../lib.mjs";
+import { C, esc, rect, text, line, circle, para, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
+import { ED, nkHead, nkRail, nkLabel, nkBtn, nkDialogHead, scalevEditor } from "../ui/kit.mjs";
 
 // Text with inline bold / underlined runs (link buttons, <b> in notes); parts: string | { t, w?, fill?, u? }.
 const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.faint}">${parts.map((p) => (typeof p === "string" ? esc(p) : `<tspan font-weight="${p.w ?? 700}" fill="${p.fill ?? C.strong}"${p.u ? ' text-decoration="underline"' : ""}>${esc(p.t)}</tspan>`)).join("")}</text>`;

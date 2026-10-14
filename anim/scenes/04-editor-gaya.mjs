@@ -4,8 +4,8 @@
 // nikahkit/src/ui/App.jsx, panels-style.jsx, panels-structure.jsx, fields.jsx, panel-content.jsx, fields.js, model.js,
 // store.js and canvas/canvas.js (preview toolbar: #223548 bar, Isi / ↑ / ↓ / Sembunyikan, 30px buttons, 3px blue frame).
 // The YouTube, Google Fonts and file windows are generic drawings (not measured), laid out at 1440 wide.
-import { C, ED, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3,
-  scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome, skeleton } from "../lib.mjs";
+import { C, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, skeleton } from "../lib.mjs";
+import { ED, nkBtn, nkBtnBox, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3, scalevEditor, nkRail, nkHead, nkDialogHead, chrome, favChrome } from "../ui/kit.mjs";
 
 const SC = ED.screen; // preview screen 727,106 390x784
 const PX = 88, PW = 279, BY = 169; // panel body content box (scrolling panels keep 279 next to the scrollbar)

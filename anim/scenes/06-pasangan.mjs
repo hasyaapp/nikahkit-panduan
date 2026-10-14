@@ -6,7 +6,8 @@
 // template pesan dibaca langsung dari sumbernya supaya tidak bergeser dari aslinya.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { C, WORLD, PHONE, rect, text, line, circle, para, tw as libTw, icon, iconX, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkH3, nkNote, nkLogo, nkHead, nkDialogHead, nkAcc, scalevEditor, dim, phoneDesk, skeleton, clipped } from "../lib.mjs";
+import { C, WORLD, PHONE, rect, text, line, circle, para, tw as libTw, icon, iconX, skeleton, clipped } from "../lib.mjs";
+import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkH3, nkNote, nkLogo, nkHead, nkDialogHead, nkAcc, scalevEditor, dim, phoneDesk } from "../ui/kit.mjs";
 
 // Lebar teks Roboto per huruf (em), lebih tepat dari tw() untuk menata baris daftar dan pil di layar dashboard.
 const CW = { " ": 0.248, a: 0.544, b: 0.561, c: 0.523, d: 0.563, e: 0.53, f: 0.347, g: 0.561, h: 0.551, i: 0.243, j: 0.239, k: 0.507, l: 0.243, m: 0.876, n: 0.552, o: 0.57, p: 0.561, q: 0.568, r: 0.338, s: 0.516, t: 0.327, u: 0.551,

@@ -5,8 +5,8 @@
 // measured from /tmp/ref/editor-marketing.png, editor-pesanan.png, editor-bagikan.png, editor-konten.png.
 // Landing page and form: server/pages/src/landing/index.html + server/pages/shared/order-form.js at 390 px (mobile CSS).
 // Dashboard pasangan: /tmp/ref/dash-gate-hp.png.
-import { C, ED, PHONE, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialogHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkBadge, nkAcc, nkH3,
-  icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, phoneDesk, tw } from "../lib.mjs";
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw } from "../lib.mjs";
+import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkDialogHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkSwitch, nkBadge, nkAcc, nkH3, phoneDesk } from "../ui/kit.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 const shell = (o = {}) => [scalevEditor(0, 0, o)];

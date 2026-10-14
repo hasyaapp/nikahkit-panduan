@@ -8,10 +8,10 @@
 // dialog, the OS file picker and Chrome's confirm and download bubble.
 // Pattern: base = the state most steps discuss; other states are full-screen `skel` elements (skeleton outside the
 // step's focus, detail inside it), so each step's focus covers whatever state is on screen during that step.
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, clipped, shadow, skeleton, tw, esc } from "../lib.mjs";
 import {
-  C, CHROME_TOP as T, PHONE, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, nkRail, nkHead, nkAcc, nkDialogHead, nkBtn, nkLabel, nkHint,
-  nkSwitch, nkH3, nkLogo, icon, iconX, rect, text, para, line, circle, clipped, shadow, skeleton, phoneDesk, tw, esc
-} from "../lib.mjs";
+  CHROME_TOP as T, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, nkRail, nkHead, nkAcc, nkDialogHead, nkBtn, nkLabel, nkHint, nkSwitch, nkH3, nkLogo, phoneDesk
+} from "../ui/kit.mjs";
 
 const PAGE = "rani-dimas", PUBLIC = `https://tokomu.myscalev.com/${PAGE}`, WID = "365671";
 const SERIF = "Georgia,'Times New Roman',serif";

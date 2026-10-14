@@ -4,8 +4,8 @@
 // Editor: /tmp/ref/editor-bantuan.png + editor-metrics.json, gaya dari ui/styles.js. docs.page: diukur di Chromium
 // 1440x900 (14 Okt 2026; konten = viewport + 85 px bilah Chrome). Tab Security Scalev: diukur 14 Okt (panel dari
 // 02-scalev.mjs). WhatsApp Web: tata letak umum, belum diukur.
-import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3,
-  chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, tw, esc, phoneDesk, PHONE } from "../lib.mjs";
+import { C, rect, text, line, circle, para, group, clipped, shadow, icon, iconX, tw, esc, PHONE } from "../lib.mjs";
+import { nkBtn, nkBtnBox, nkInput, nkLabel, nkBadge, nkNote, nkAcc, nkH3, chrome, favScalev, scalevEditor, nkRail, nkHead, nkLogo, ED, dim, phoneDesk } from "../ui/kit.mjs";
 import { securityPanel, SECURITY } from "./02-scalev.mjs";
 
 const wrap = (s, w, size = 12, weight = 400) => {

@@ -6,10 +6,10 @@
 // gallery, this guide on docs.page and tutorial.scalev.com/azcustomdomain at 1440x900 in headless Chromium (14 Okt 2026).
 // Not measured, so generic (grey bars, only the labels the guide pages name): Settings > Domain and Profil at 1440 wide,
 // Stores, the Security tab, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
+import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw } from "../lib.mjs";
 import {
-  C, chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkDialogHead, nkBtn, nkInput, nkLabel, nkHint,
-  nkNote, nkAcc, nkH3, icon, iconX, dim, shadow, clipped, phoneDesk, PHONE, group, text, para, rect, line, circle, tw
-} from "../lib.mjs";
+  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkDialogHead, nkBtn, nkInput, nkLabel, nkHint, nkNote, nkAcc, nkH3, dim, phoneDesk
+} from "../ui/kit.mjs";
 
 const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
 const SV = { blue: "#3b8fd0", link: "#2f86d1", ink: "#1f2d3d", sub: "#6b7480", line: "#e5e8ec", bg: "#f8f9fb", soft: "#e6f2fb", bar: "#e9edf2" };
