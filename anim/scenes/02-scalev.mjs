@@ -866,13 +866,14 @@ export const scenes = {
     els: {
       cf: { svg: cfPage, skel: true, enter: "fade" },
       cfForm: { svg: cfForm, enter: "pop", origin: [CF_ADD[0] + 66, CF_ADD[1] + 36] },
+      back: { svg: settingsPage("Domain") + domainSection + dnsTable, skel: true, enter: "fade", delay: -1 },
       ok: { svg: verified, enter: "pop" }
     },
     steps: [
       { caption: "Di Cloudflare buka DNS.", focus: [0, CT + 53, 240, 762], at: [100, CF_DNS[1] + 17], show: ["cf"], dur: 2.8, mark: CF_DNS, lens: { src: [0, 150, 240, 230] } },
       { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", focus: CF_TABLE, at: [CF_ADD[0] + 66, CF_ADD[1] + 18], click: true, show: ["cfForm"], dur: 4,
         mark: CF_ADD, lens: { src: [320, 330, 560, 150], at: [80, 330] } },
-      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["ok"], hide: ["cf", "cfForm"], dur: 4,
+      { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", focus: [MAIN.x, MAIN.y + 73, MAIN.w, 280], at: [VERIFY[0] + 60, VERIFY[1] + 18], click: true, show: ["back", "ok"], hide: ["cf", "cfForm"], dur: 4,
         mark: VERIFY, lens: { src: [MAIN.x + 16, MAIN.y + 84, 300, 140], at: [360, 320] } }
     ]
   },
@@ -948,7 +949,7 @@ export const scenes = {
       mfa: { svg: mfaCard, enter: "fade" }
     },
     steps: [
-      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [470, CT, 320, 60], at: [440, 200] } },
+      { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", focus: [WA.head, [461, WA.foot, 979, 62], [1060, 720, 380, 100]], at: [1404, 869], click: true, press: "send", show: ["bubble"], dur: 3.4, mark: { box: WA_SEND, r: 21 }, lens: { src: [1080, 724, 360, 176], at: [300, 150] } },
       { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", focus: [MAIN.x, MAIN.y, MAIN.w, 420], at: [CEK[0] + 70, CEK[1] + 20], click: true, show: ["back", "ok"], hide: ["wa", "send", "bubble"], dur: 3.8,
         mark: CEK, lens: { src: [PHONE_IN.x - 8, PHONE_IN.y - 10, 470, 60] } },
       { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa"], dur: 4, mark: MFA_METHOD, lens: { src: [MAIN.x + 16, MAIN.y + 180, 420, 70] } }
