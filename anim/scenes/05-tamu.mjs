@@ -541,7 +541,8 @@ export const scenes = {
       { caption: "Ada Perubahan belum disimpan di Scalev? Klik Simpan di Scalev dulu.", focus: [[0, 153, 399, 70], [1183, 44, 257, 48]], mark: [NOTE, SIMPAN], lens: { src: [0, 160, 399, 56] }, dur: 3.4 },
       { caption: "Kolom Nama tamu berisi Nama Tamu. Ganti dengan nama tamumu.", focus: [0, 215, 399, 155], mark: nameBox(0), lens: { src: [0, 218, 399, 150] }, at: [300, 257], click: true, show: ["nameClear", "nameTyped", "urlNew"], type: [{ id: "nameTyped", n: 12, box: [27, 246, tw("Budi Santoso", 14) + 4, 22] }], dur: 3.8 },
       { caption: "Klik Lihat sebagai tamu. Di tab baru, nama tamu tampil di sampul.", focus: [[124, 46, 1184, 34], [480, 300, 480, 320]], mark: shareBox("lihat", 0), note: { text: "Lihat sebagai tamu", at: [24, 300] }, at: center(shareBox("lihat", 0)), click: true, show: ["guest"], dur: 4 },
-      { caption: "Kembali ke editor. Klik Salin tautan tamu, muncul Tersalin.", focus: [0, 413, 399, 112], mark: shareBox("salin", 0), lens: { src: [0, 413, 399, 112] }, at: center(shareBox("salin", 0)), click: true, hide: ["guest"], show: ["copied"], dur: 3.4 },
+      { caption: "Kembali ke tab editor.", focus: [0, 365, 399, 160], hide: ["guest"], dur: 1.8 },
+      { caption: "Klik Salin tautan tamu. Di bawah tombol muncul Tersalin.", focus: [0, 413, 399, 112], mark: shareBox("salin", 0), lens: { src: [0, 413, 399, 112] }, at: center(shareBox("salin", 0)), click: true, show: ["copied"], dur: 3.4 },
       { caption: "Butuh tautan tanpa nama tamu? Klik Salin tautan umum.", focus: [0, 453, 399, 72], mark: shareBox("umum", 0), lens: { src: [0, 453, 399, 72] }, at: center(shareBox("umum", 0)), click: true, hide: ["copied"], show: ["copied2"], dur: 3.2 },
       { caption: "Di bawah ada Untuk pengantin: Kirim undangan dan Buka Dashboard.", focus: [0, 655, 399, 142], mark: [16, 681, 366, 80], lens: { src: [0, 655, 399, 137] }, at: [330, 743], hide: ["copied2"], dur: 3.6 }
     ]
@@ -628,7 +629,8 @@ export const scenes = {
       { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", focus: [PIN_CARD_B, MSG_BOX], mark: BUAT_PIN, lens: { src: [PL, PIN_CARD_B[1], PW, 164] }, at: center(BUAT_PIN), click: true, show: ["winB"], dur: 3.6 },
       { caption: "Klik ikon Salin pesan untuk pengantin. Muncul Pesan tersalin.", focus: [PIN_CARD_B, MSG_BOX], mark: COPY_MSG, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_MSG), click: true, show: ["copiedMsg"], dur: 3.6 },
       { caption: "Tempel di WhatsApp pengantin: undangan, tautan kelola, dan PIN.", focus: pad(WA_BUBBLE, 8), mark: { box: WA_BUBBLE, r: 8 }, lens: { src: pad(WA_BUBBLE, 6) }, at: [PHONE.x + 160, PHONE.y + PHONE.h - 33], hide: ["copiedMsg"], show: ["wa"], dur: 4.2 },
-      { caption: "Hanya perlu PIN saja? Klik ikon Salin PIN. Muncul PIN tersalin.", focus: [PIN_CARD_B, MSG_BOX], mark: COPY_PIN, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_PIN), click: true, hide: ["wa"], show: ["copiedPin"], dur: 3.6 }
+      { caption: "Kembali ke jendela NikahKit.", focus: [PIN_CARD_B, MSG_BOX], hide: ["wa"], dur: 1.8 },
+      { caption: "Hanya perlu PIN saja? Klik ikon Salin PIN. Muncul PIN tersalin.", mark: COPY_PIN, lens: { src: PIN_LENS, zoom: 1.5 }, at: center(COPY_PIN), click: true, show: ["copiedPin"], dur: 3.6 }
     ]
   },
 
@@ -723,7 +725,8 @@ export const scenes = {
       { caption: "Kode hanya tampil sekali. Kirim lewat WA, Salin pesan, atau Salin kode.", mark: CODE_BAR, lens: { src: [CODE_BOX[0], CODE_BOX[1], 420, 120] }, at: center(CODE_BAR), dur: 3.8 },
       { caption: "Staff membuka tautan di HP, lalu mengisi PIN atau kode staff.", focus: GATE_CARDP, mark: { box: GATE_IN, r: 8 }, lens: { src: [GX + 16, GY + 370, 358, 132] }, at: [GATE_IN[0] + 260, GATE_IN[1] + 22], show: ["phone", "masuk", "dots"], type: [{ id: "dots", n: 8, box: [GATE_IN[0] + 14, GATE_IN[1] + 11, 80, 24] }], dur: 3.6 },
       { caption: "Klik Masuk. Staff langsung masuk ke Hari-H, hanya untuk check-in.", focus: [[GX, GY, 390, 220], [GX, GY + 774, 390, 70]], mark: pill(MASUK), lens: { src: [GX, GY, 390, 128] }, at: center(MASUK), click: true, press: "masuk", hide: ["masuk", "dots"], show: ["hariH"], dur: 3.8 },
-      { caption: "Selesai acara? Klik Cabut, lalu OK. Kode langsung tidak berlaku.", focus: [BX - 8, SB.y + 16, BW2 + 16, 240], mark: [{ box: CABUT }, pill(CONFIRM_OK)], lens: { src: [CF, 12, 450, 132] }, at: center(CABUT), click: true, hide: ["phone", "hariH"], show: ["confirm"], dur: 4 }
+      { caption: "Selesai acara? Kembali ke Buku Tamu.", focus: [BX - 8, SB.y + 16, BW2 + 16, 240], hide: ["phone", "hariH"], dur: 1.8 },
+      { caption: "Klik Cabut, lalu OK. Kode langsung tidak berlaku.", mark: [{ box: CABUT }, pill(CONFIRM_OK)], lens: { src: [CF, 12, 450, 132] }, at: center(CABUT), click: true, show: ["confirm"], dur: 4 }
     ]
   }
 };
