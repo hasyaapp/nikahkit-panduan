@@ -60,9 +60,10 @@ export const wrap = (s, width, size = 14, weight = 400) => String(s).split(" ").
   if (last && tw(last + " " + w, size, weight) <= width) ls[ls.length - 1] = last + " " + w; else ls.push(w);
   return ls;
 }, []);
-let clipN = 0;
-// Clip children to a rect (scrolling panels, truncated text).
-export const clipped = (x, y, w, h, ...kids) => { const id = `k${clipN++}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
+// Clip children to a rect (scrolling panels, truncated text). The id comes from the rect itself, so a build never
+// renumbers clips in unrelated scenes; equal rects share one identical clipPath, which is harmless.
+const clipId = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return "k" + (h >>> 0).toString(36); };
+export const clipped = (x, y, w, h, ...kids) => { const id = clipId(`${x},${y},${w},${h}`); return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${kids.join("")}</g>`; };
 export const shadow = (x, y, w, h, r = 8, d = 1) => rect(x, y + 2 * d, w, h, { r, fill: "rgba(16,24,40,.08)" }) + rect(x - d, y + d * 4, w + 2 * d, h, { r: r + 2, fill: "rgba(16,24,40,.04)" });
 
 // Lucide icon from nikahkit/src/icons.js (the exact icons the NikahKit panel shows). size in px, centred at (cx, cy).
