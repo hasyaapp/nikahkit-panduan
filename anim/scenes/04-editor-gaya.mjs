@@ -153,7 +153,7 @@ const pal = (y, name, c, o = {}) => {
   return rect(PX + 0.5, y + 0.5, PW - 1, h - 1, { r: 4, fill: C.white, stroke: o.on ? C.primary : C.line, sw: o.on ? 2 : 1 }) +
     clipped(97, y + h / 2 - 15, 92, 30, ...c.map((col, i) => rect(97 + i * 18.4, y + h / 2 - 15, 18.4, 30, { fill: col }))) + rect(97.5, y + h / 2 - 14.5, 91, 29, { r: 4, stroke: C.line }) +
     (o.lines ? para(199, y + 22, o.lines, { size: 14, weight: 500, lh: 20 }) : text(199, y + h / 2 + 5, name, { size: 14, weight: 500 })) +
-    (o.badge ? nkBadge(269, y + 18, o.badge, { fill: C.mutedBg, fg: C.text }) : "");
+    (o.badge ? nkBadge(PX + PW - 11, y + 18, o.badge, { fill: C.mutedBg, fg: C.text, end: true }) : "");
 };
 const KENCANA_STRIP = ["#FFF7E9", "#FFFDF8", "#8E2818", "#8E2818", "#6B5A55"];
 // Gaya > Warna list for Kencana (model.js paletteChoices): its own palette, then the Jelajah palettes it can wear, grouped
