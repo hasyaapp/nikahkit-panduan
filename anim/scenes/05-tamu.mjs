@@ -10,7 +10,11 @@
 // step's focus, detail inside it), so each step's focus covers whatever state is on screen during that step.
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, clipped, shadow, skeleton, tw, esc } from "../lib.mjs";
 import {
-  CHROME_TOP as T, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, nkRail, nkHead, nkAcc, nkDialogHead, nkBtn, nkLabel, nkHint, nkSwitch, nkH3, nkLogo, phoneDesk
+  BAGIKAN_TOOL as BAGIKAN, NOTE, nameBox, urlBox, shareTop, shareBox, shareBtns, accessHead, switchBox, pinBtn, coupleAll, keamananBox, devicesBox,
+  accessOn, ACC_Y, COUPLE_Y, ON_Y, shareAll, shareScrolled
+} from "../ui/bagikan.mjs";
+import {
+  CHROME_TOP as T, ED, chrome, favScalev, scalevEditor, scalevApp, svMenuAt, nkRail, nkHead, nkAcc, nkLabel, nkHint, nkSwitch, nkH3, nkLogo, phoneDesk
 } from "../ui/kit.mjs";
 
 const PAGE = "rani-dimas", PUBLIC = `https://tokomu.myscalev.com/${PAGE}`, WID = "365671";
@@ -85,56 +89,7 @@ function invPreview() {
 }
 const kontenPanel = () => nkHead(0, 0, "Konten", { account: "Tahunan" }) + nkAcc(88, 169, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, 227, 279, "Mempelai", { badge: "Terisi" }) + nkAcc(88, 285, 279, "Acara & Tanggal", { badge: "Terisi" });
 const editorBase = () => [scalevEditor(0, 0, { rail: "Konten" }), kontenPanel(), invPreview()];
-// Rail tool button Bagikan (styles.js .nk-rail__tool: 71 wide, 4 px padding around icon 18 + gap 4 + label 12).
-const BAGIKAN = [0, 567, 71, 44];
 const SIMPAN = [1193, 50, 82, 34];
-
-// ---- Bagikan dialog (editor-metrics.json "Bagikan": 366 wide body at x 16) ----------------------------------------
-// d = 0 with the "Perubahan belum disimpan" note (editor-bagikan.png), -50 without it.
-const NOTE = [16, 169, 366, 38], nameBox = (d) => [16, d + 239, 366, 36];
-const urlBox = (y, lines) => rect(16, y, 366, 52, { r: 4, fill: C.mutedBg }) + para(26, y + 20, lines, { size: 12, fill: C.strong, lh: 18 }).replace("<text", `<text font-family="'Roboto Mono',ui-monospace,Menlo,monospace"`);
-function shareTop(d) {
-  return nkDialogHead(0, 0, "Bagikan") +
-    (d === 0 ? rect(...NOTE, { r: 4, fill: C.warnSoft }) + text(28, 192, "Perubahan belum disimpan di Scalev.", { size: 12, fill: C.warnStrong }) : "") +
-    nkLabel(16, d + 231, "Nama tamu") +
-    rect(16.5, d + 239.5, 365, 35, { r: 4, fill: C.white, stroke: C.field }) + text(27, d + 262, "Nama Tamu", { size: 14, fill: C.strong }) +
-    nkHint(16, d + 295, "Ditambahkan sebagai ?to=Nama.") + urlBox(d + 311, [`${PUBLIC}?`, "to=Nama+Tamu"]);
-}
-const SHARE = { lihat: ["Lihat sebagai tamu", 375, "primary", "eye"], salin: ["Salin tautan tamu", 419, "ghost", "copy"], umum: ["Salin tautan umum", 463, "quiet", "link"] };
-const shareBox = (k, d) => [16, d + SHARE[k][1], 366, 36];
-const shareBtn = (k, d) => nkBtn(16, d + SHARE[k][1], SHARE[k][0], { w: 366, size: 14, variant: SHARE[k][2], icon: SHARE[k][3] });
-const shareBtns = (d) => ["lihat", "salin", "umum"].map((k) => shareBtn(k, d)).join("");
-// Undangan khusus heading + switch row + hint (y = top of the H3 box).
-const accessHead = (y, on) => nkH3(16, y + 12, "Undangan khusus") + text(16, y + 49, "Undangan khusus", { size: 14, fill: C.text }) + nkSwitch(346, y + 34, on) +
-  para(16, y + 78, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 });
-const switchBox = (y) => [346, y + 34, 36, 20];
-// Untuk pengantin + PIN dashboard (y = top of the "Untuk pengantin" H3 box).
-const forCouple = (y) => nkH3(16, y + 12, "Untuk pengantin") +
-  nkBtn(16, y + 24, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" }) +
-  nkBtn(16, y + 68, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" }) +
-  nkHint(16, y + 120, "Masuk dengan PIN dashboard.") + nkH3(16, y + 160, "PIN dashboard");
-const pinBtn = (y) => nkBtn(16, y + 172, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" });
-const pinHint = (y) => nkHint(16, y + 224, "PIN hanya tampil di jendela NikahKit.");
-const coupleAll = (y) => forCouple(y) + pinBtn(y) + pinHint(y);
-// Access section when switched on (y = top of the Keamanan field, i.e. 12 px under the switch hint).
-const MODES = { link: ["Tautan pribadi", "Hanya tamu dengan tautan dari Dashboard > Kirim."], device: ["+ Kunci perangkat", "Tautan yang diteruskan tidak terbuka di perangkat lain."] };
-const keamananBox = (y) => [16, y + 20, 366, 36], devicesBox = (y) => [16, y + 112, 366, 36];
-function accessOn(y, mode, devices) {
-  let s = rect(0, y - 4, 399, 900 - y + 4, { fill: C.white }) + nkLabel(16, y + 12, "Keamanan") + selectBox(16, y + 20, 366, MODES[mode][0]) + nkHint(16, y + 72, MODES[mode][1]);
-  let at = y + 92;
-  if (mode !== "link") { s += nkLabel(16, at + 12, "Perangkat per tamu") + selectBox(16, at + 20, 366, String(devices)); at += 68; }
-  s += para(16, at + 16, ["Tamu tetap bisa memotret layar. Tombol WhatsApp di halaman", "pribadi memakai nomor konfirmasi hadiah."], { size: 12, fill: C.faint, lh: 16 });
-  at += 36;
-  s += rect(16, at, 366, 56, { r: 4, fill: C.warnSoft }) + para(28, at + 23, ["Tautan di atas tanpa token. Buat tautan tamu di", "Dashboard > Kirim."], { size: 12, fill: C.warnStrong, lh: 18 });
-  at += 88;
-  return s + coupleAll(at);
-}
-// The dialog without the unsaved note (d = -50): its sections' y.
-const ACC_Y = 473, COUPLE_Y = 591, ON_Y = 583;
-const shareAll = (accessMode, devices) => shareTop(-50) + shareBtns(-50) + accessHead(ACC_Y, !!accessMode) + (accessMode ? accessOn(ON_Y, accessMode, devices) : coupleAll(COUPLE_Y));
-// Bagikan dialog with its content scrolled up by dy (the body under the dialog head scrolls; the head stays).
-const shareScrolled = (dy, mode, devices) => rect(0, 154, 399, 746, { fill: C.white }) + clipped(0, 154, 399, 746, `<g transform="translate(0 ${-dy})">${shareAll(mode, devices)}</g>`) +
-  rect(0, 92, 399, 61, { fill: C.white }) + text(16, 128, "Bagikan", { size: 16, weight: 700, fill: C.strong }) + iconX("x", 368, 122, 18, C.text) + line(0, 153, 399, 153, { stroke: C.line });
 
 // Guest page in a new Chrome tab (desktop: the template's 480 px flow column centred, cover with the guest line).
 function guestTab() {
