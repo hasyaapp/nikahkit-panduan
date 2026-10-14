@@ -381,38 +381,52 @@ function pinDialog(revealed) {
 }
 const DLG_A = pinDialog(false), DLG_B = pinDialog(true);
 const pinNote = (s) => nkNote(DLG_X + 16, DLG_B.noteY, 408, [s], { h: 38 });
+// Editor Scalev (tab Konten NikahKit) dengan pratinjau undangan, sebelum panel Bagikan dibuka.
+const EDITOR_BASE = [chrome(0, 0, 1440, 985, { tabs: [{ title: "Landing Page Studio", active: true, fav: favScalev }], url: "app.scalev.com/pages/365671" }),
+  scalevEditor(0, EY, { rail: "Konten", page: "Undangan Rani & Dimas", user: "Rina" }),
+  nkHead(0, EY, "Konten") + nkLabel(88, EY + 192, "Bahasa undangan") + nkInput(88, EY + 200, 279, "Indonesia", { select: true }) +
+    para(88, EY + 256, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
+    nkAcc(88, EY + 300, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, EY + 358, 279, "Mempelai", { badge: "Terisi" }),
+  text(922, EY + 300, "Rani & Dimas", { size: 34, fill: "#8a3b2b", anchor: "middle", italic: true, font: "Georgia,serif" }) + text(922, EY + 340, "Sabtu, 28 November 2026", { size: 15, fill: "#5a4636", anchor: "middle", font: "Georgia,serif" })];
 
 const SCENES = {
-  // 1. Member: salin pesan serah terima untuk pengantin (Bagikan > Kelola PIN dashboard > Lihat PIN > balon chat).
+  // 1a. Member: Bagikan > Kelola PIN dashboard (lajur + panel NikahKit).
+  "pasangan-kelola-pin": {
+    title: "Membuka Kelola PIN dashboard di NikahKit",
+    world: { x: 0, y: 96, w: 400, h: 804 },
+    base: EDITOR_BASE,
+    els: {
+      share: { svg: bagikan(), enter: "fade" },
+      kelola: nkBtn(KELOLA[0], KELOLA[1], "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" }),
+      backdrop: { svg: dim(0, EY, 1440, 900), enter: "fade" }
+    },
+    steps: [
+      { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", at: [36, EY + 584], click: true, show: ["share", "kelola"] },
+      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", at: [200, EY + 760], dur: 2.8 },
+      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", at: [KELOLA[0] + 183, KELOLA[1] + 18], click: true, press: "kelola", show: ["backdrop"] }
+    ]
+  },
+
+  // 1b. Jendela NikahKit (pin.html): Lihat PIN > balon chat > pesan untuk pengantin.
   "pasangan-salin-pesan": (() => {
     const msg = ["Undangan siap: " + SITE, "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas", "PIN: 482913"]
       .flatMap((l) => wrap(l, 372, 14));
-    const bx = 24, by = 250, bh = 24 + msg.length * 20 + 16;
+    const bx = DLG_X + 18, by = 262, bh = 24 + msg.length * 20 + 16, [hx, hy] = DLG_B.handover;
     return {
       title: "Menyalin pesan serah terima untuk pengantin",
-      world: { x: 0, y: 96, w: 1000, h: 820 },
-      base: [chrome(0, 0, 1440, 985, { tabs: [{ title: "Landing Page Studio", active: true, fav: favScalev }], url: "app.scalev.com/pages/365671" }),
-        scalevEditor(0, EY, { rail: "Konten", page: "Undangan Rani & Dimas", user: "Rina" }),
-        nkHead(0, EY, "Konten") + nkLabel(88, EY + 192, "Bahasa undangan") + nkInput(88, EY + 200, 279, "Indonesia", { select: true }) +
-          para(88, EY + 256, ["Hanya halaman tamu. Teks bawaan ikut berganti;", "teks yang sudah diubah tetap."], { size: 12, fill: C.faint, lh: 16 }) +
-          nkAcc(88, EY + 300, 279, "Sampul", { badge: "Terisi" }) + nkAcc(88, EY + 358, 279, "Mempelai", { badge: "Terisi" }),
-        text(922, EY + 300, "Rani & Dimas", { size: 34, fill: "#8a3b2b", anchor: "middle", italic: true, font: "Georgia,serif" }) + text(922, EY + 340, "Sabtu, 28 November 2026", { size: 15, fill: "#5a4636", anchor: "middle", font: "Georgia,serif" })],
+      world: { x: DLG_X - 12, y: 240, w: 500, h: 590 },
+      base: [...EDITOR_BASE, bagikan(), nkBtn(KELOLA[0], KELOLA[1], "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" }), dim(0, EY, 1440, 900)],
       els: {
-        share: { svg: bagikan(), enter: "fade" },
-        kelola: nkBtn(KELOLA[0], KELOLA[1], "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" }),
-        backdrop: { svg: dim(0, EY, 1440, 900), enter: "fade" },
-        dlgA: { svg: DLG_A.svg, enter: "pop" },
+        dlgA: DLG_A.svg,
         dlgB: { svg: DLG_B.svg + pinNote("PIN aktif saat ini. Tetap berlaku sampai Anda membuat PIN baru."), enter: "fade" },
-        tip: { svg: rect(DLG_B.handover[0] - 96, DLG_B.handover[1] + 24, 192, 24, { r: 4, fill: "#fff", stroke: "#c4c7c5" }) + text(DLG_B.handover[0], DLG_B.handover[1] + 40, "Salin pesan untuk pengantin", { size: 12, fill: C.crText, anchor: "middle" }), enter: "fade" },
+        tip: { svg: rect(hx - 120, hy + 24, 192, 24, { r: 4, fill: "#fff", stroke: "#c4c7c5" }) + text(hx - 24, hy + 40, "Salin pesan untuk pengantin", { size: 12, fill: C.crText, anchor: "middle" }), enter: "fade" },
         copied: { svg: pinNote("Pesan tersalin."), enter: "fade" },
         bubble: { svg: rect(bx, by + 2, 404, bh, { r: 8, fill: "rgba(0,0,0,.08)" }) + rect(bx, by, 404, bh, { r: 8, fill: T.soft }) +
           para(bx + 16, by + 30, msg, { size: 14, fill: T.text, lh: 20 }), enter: "rise" }
       },
       steps: [
-        { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", at: [36, EY + 584], click: true, show: ["share", "kelola"] },
-        { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", at: [KELOLA[0] + 183, KELOLA[1] + 18], click: true, press: "kelola", show: ["backdrop", "dlgA"] },
-        { caption: "Di bagian PIN dashboard, klik Lihat PIN. PIN 6 angka tampil.", at: DLG_A.lihat, click: true, show: ["dlgB"] },
-        { caption: "Klik ikon balon chat: Salin pesan untuk pengantin.", at: DLG_B.handover, click: true, hover: "tip", show: ["copied"], dur: 3.6 },
+        { caption: "Di jendela NikahKit, bagian PIN dashboard, klik Lihat PIN. PIN 6 angka tampil.", at: DLG_A.lihat, click: true, show: ["dlgB"], dur: 3.4 },
+        { caption: "Klik ikon balon chat: Salin pesan untuk pengantin. Muncul Pesan tersalin.", at: DLG_B.handover, click: true, hover: "tip", show: ["copied"], dur: 3.6 },
         { caption: "Pesan berisi link undangan, link kelola undangan, dan PIN. Tempel di WA.", show: ["bubble"], dur: 4.4 }
       ]
     };

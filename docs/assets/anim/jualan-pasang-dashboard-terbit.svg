@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 912 882" width="912" height="882" role="img" aria-labelledby="ttl dsc" font-family='Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif' data-total="7.8" data-steps="0,2.8">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 912 882" width="912" height="882" role="img" aria-labelledby="ttl dsc" font-family='Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif' data-total="8" data-steps="0,3">
 <title id="ttl">Menerbitkan halaman Dashboard pasangan</title>
 <desc id="dsc">1. Pratinjau sudah Kelola undangan. Tinggal diterbitkan. 2. Klik Simpan &amp; Terbitkan. Alamat halaman ini jadi alamat Dashboard.</desc>
-<style>.pr1{transform-box:fill-box;transform-origin:center;animation:pr1 7.8s infinite}@keyframes pr1{0%,51.154%{transform:none;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}52.179%{transform:scale(.97)}54.231%,100%{transform:none}}
-#cur{animation:cur 7.8s infinite}@keyframes cur{0%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}35.897%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}51.154%{transform:translate(808.1px,84.9px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}94.231%{transform:translate(808.1px,84.9px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}100%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}}
-#r1{opacity:0;transform-origin:808.1px 84.9px;animation:r1 7.8s infinite}@keyframes r1{0%,51.154%{opacity:0;transform:scale(.4);animation-timing-function:cubic-bezier(0.23,1,0.32,1)}51.795%{opacity:1}58.205%{opacity:0;transform:scale(1.5)}100%{opacity:0}}
-#c0,#n0{opacity:0;animation:c0 7.8s infinite}@keyframes c0{0%{opacity:1}35.897%{opacity:1}38.462%{opacity:0}99.359%{opacity:0}100%{opacity:1}}
-#c1,#n1{opacity:1;animation:c1 7.8s infinite}@keyframes c1{0%{opacity:0}35.897%{opacity:0}38.462%{opacity:1}94.231%{opacity:1}96.795%{opacity:0}100%{opacity:0}}
-#prog{transform-origin:0 0;transform:scaleX(1);animation:prog 7.8s linear infinite}@keyframes prog{0%{transform:scaleX(0)}94.231%{transform:scaleX(1)}100%{transform:scaleX(1)}}
+<style>.pr1{transform-box:fill-box;transform-origin:center;animation:pr1 8s infinite}@keyframes pr1{0%,52.375%{transform:none;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}53.375%{transform:scale(.97)}55.375%,100%{transform:none}}
+#cur{animation:cur 8s infinite}@keyframes cur{0%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}37.5%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}52.375%{transform:translate(808.1px,84.9px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}94.375%{transform:translate(808.1px,84.9px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}100%{transform:translate(852px,786px);animation-timing-function:cubic-bezier(0.77,0,0.175,1)}}
+#r1{opacity:0;transform-origin:808.1px 84.9px;animation:r1 8s infinite}@keyframes r1{0%,52.375%{opacity:0;transform:scale(.4);animation-timing-function:cubic-bezier(0.23,1,0.32,1)}53%{opacity:1}59.25%{opacity:0;transform:scale(1.5)}100%{opacity:0}}
+#c0,#n0{opacity:0;animation:c0 8s infinite}@keyframes c0{0%{opacity:1}37.5%{opacity:1}40%{opacity:0}99.375%{opacity:0}100%{opacity:1}}
+#c1,#n1{opacity:1;animation:c1 8s infinite}@keyframes c1{0%{opacity:0}37.5%{opacity:0}40%{opacity:1}94.375%{opacity:1}96.875%{opacity:0}100%{opacity:0}}
+#prog{transform-origin:0 0;transform:scaleX(1);animation:prog 8s linear infinite}@keyframes prog{0%{transform:scaleX(0)}94.375%{transform:scaleX(1)}100%{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
 <defs><clipPath id="stage"><rect x="0" y="0" width="912" height="836"/></clipPath></defs>
 <rect x="0" y="0" width="912" height="882" rx="0" fill="#eef1f5"/>

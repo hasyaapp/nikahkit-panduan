@@ -1,4 +1,5 @@
-// Scenes for the "Bagikan dan tamu" pages (panduan/docs/tamu/*), drawn at real size in a 1440x985 Chrome window.
+// Scenes for the "Bagikan dan tamu" pages (panduan/docs/tamu/*), drawn at real size in a 1440x985 Chrome window
+// (Buku Tamu: 1112 wide, see WIN).
 // Labels and layout follow nikahkit/src/ui/App.jsx (ShareDialog, AccessSection, ResellerPin), nikahkit/ext/pin.html +
 // pin.js (PIN window), nikahkit/ext/buku-tamu.html + buku-tamu.js (Buku Tamu), server/pages/src/panel/index.html
 // (dashboard gate, Hari-H for staff) and the guest gate texts (gatePrivate*). Measured from /tmp/ref/editor-bagikan.png,
@@ -177,20 +178,25 @@ function waPhone(x, y, h) {
 }
 
 // ---- Scalev dashboard + Buku Tamu (buku-tamu.html framed over <main>: body 960 max, 24 px padding) -------------------
-const BX = 392, BW2 = 912, BR = BX + BW2; // content box 392..1304 (scalev-bukutamu.png)
-const appBase = (active = "Buku Tamu") => [chrome(0, 0, 1440, 985, { tabs: [scalevTab()], url: "app.scalev.com/pages" }), scalevApp(0, T, { active })];
-// Landing Pages content (scalev-pages.png), the screen the member starts from.
+// Drawn in a 1112 px wide Chrome window so the content column fits a readable crop: <main> is 856 wide (< the 960 body
+// max), so the body fills it and the content box is 280..1088 (808 wide). The grid and rows keep the same layout (the
+// narrow-screen rule only applies under 640 px).
+const WIN = 1112, BX = 280, BW2 = 808, BR = BX + BW2;
+const appBase = (active = "Buku Tamu") => [chrome(0, 0, WIN, 985, { tabs: [scalevTab()], url: "app.scalev.com/pages" }), scalevApp(0, T, { active })];
+// Landing Pages content (scalev-pages.png), the screen the member starts from, reflowed to the same 1112 window: the page
+// keeps its 24 px side padding (280..1088) and the Folders column; the table columns share the narrower width.
 function landingPages() {
   const rows = [["The Wedding of Rani & Dimas", "/rani-dimas"], ["Sinta & Bagas", "/sinta-bagas"], ["Contoh Undangan Nikahin", "/contoh"], ["Dashboard Pasangan", "/kelola"], ["Landing Paket Undangan", "/paket"]];
-  let s = rect(256, T, 1184, 900, { fill: "#f7f9fc" }) + rect(256, T, 1170, 137, { fill: C.white }) + text(280, T + 35, "Landing Pages", { size: 18, weight: 700, fill: C.ink }) +
-    line(280, T + 58, 1400, T + 58, { stroke: C.svDivider }) + rect(280, T + 78, 173, 40, { r: 4, fill: "#4497ca" }) + text(366, T + 103, "+ Create Landing Page", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
-    card(280, T + 243, 1120, 657) + text(297, T + 275, "Folders", { size: 14, weight: 700, fill: C.ink }) + line(520, T + 243, 520, T + 900, { stroke: C.line }) +
-    text(537, T + 274, "All Landing Pages", { size: 14, weight: 700, fill: C.ink }) + rect(521, T + 293, 879, 38, { fill: "#f7f9fc" }) +
-    [["Nama Landing Page", 585], ["Slug", 925], ["Mode", 1125]].map(([l, x]) => text(x, T + 317, l, { size: 12, fill: C.text })).join("");
+  const R = WIN - 24, NAME = 585, SLUG = 815, MODE = 960;
+  let s = rect(256, T, WIN - 256, 900, { fill: "#f7f9fc" }) + rect(256, T, WIN - 270, 137, { fill: C.white }) + text(280, T + 35, "Landing Pages", { size: 18, weight: 700, fill: C.ink }) +
+    line(280, T + 58, R, T + 58, { stroke: C.svDivider }) + rect(280, T + 78, 173, 40, { r: 4, fill: "#4497ca" }) + text(366, T + 103, "+ Create Landing Page", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
+    card(280, T + 243, R - 280, 657) + text(297, T + 275, "Folders", { size: 14, weight: 700, fill: C.ink }) + line(520, T + 243, 520, T + 900, { stroke: C.line }) +
+    text(537, T + 274, "All Landing Pages", { size: 14, weight: 700, fill: C.ink }) + rect(521, T + 293, R - 521, 38, { fill: "#f7f9fc" }) +
+    [["Nama Landing Page", NAME], ["Slug", SLUG], ["Mode", MODE]].map(([l, x]) => text(x, T + 317, l, { size: 12, fill: C.text })).join("");
   rows.forEach(([n, slug], i) => {
     const y = T + 331 + i * 71;
-    s += line(521, y + 71, 1400, y + 71, { stroke: C.line }) + checkbox(538, y + 28, false) + text(585, y + 41, n, { size: 14, weight: 500, fill: "#2a8bc9" }) +
-      text(925, y + 41, slug, { size: 14, fill: "#2a8bc9" }) + rect(1125, y + 22, 83, 28, { r: 4, fill: C.primarySoft }) + text(1166, y + 41, "HTML Mode", { size: 12, weight: 500, fill: C.action, anchor: "middle" });
+    s += line(521, y + 71, R, y + 71, { stroke: C.line }) + checkbox(538, y + 28, false) + text(NAME, y + 41, n, { size: 14, weight: 500, fill: "#2a8bc9" }) +
+      text(SLUG, y + 41, slug, { size: 14, fill: "#2a8bc9" }) + rect(MODE, y + 22, 83, 28, { r: 4, fill: C.primarySoft }) + text(MODE + 41, y + 41, "HTML Mode", { size: 12, weight: 500, fill: C.action, anchor: "middle" });
   });
   return s;
 }
@@ -368,7 +374,7 @@ const DY = { staff: T + 284, tools: T + 348, tabs: T + 398, items: T + 482 };
 
 // Dashboard gate and Hari-H on a plain phone screen (dash-gate-hp.png, dash-hari-h-hp.png), cropped to PH tall.
 // GY = top of the gate layout as measured on the full 844 px screen, shifted so the card stays centred.
-const PX = 657, PY = 98, PH = 744, GY = PY + PH / 2 - 422;
+const PX = BX + BW2 / 2 - 195, PY = 98, PH = 744, GY = PY + PH / 2 - 422;
 function phoneGate() {
   const x = PX, y = GY;
   return shadow(x, PY, 390, PH, 0, 3) + rect(x, PY, 390, PH, { fill: C.waWash }) + rect(x + 16, y + 249, 358, 304, { r: 24, fill: C.white }) +
@@ -467,13 +473,14 @@ const kontenList = () => rect(72, T + 153, 327, 747, { fill: C.white }) +
     .map((t, i) => nkAcc(88, T + 169 + i * 58, 279, t, { badge: "Terisi" })).join("");
 
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
-// Crops: the Bagikan panel (rail + panel, 400 wide), the PIN window, and the Buku Tamu content column; each stays
-// readable at the docs' 720 px image width. A flow that leaves its crop continues in a second scene.
+// Crops: the Bagikan panel (rail + panel, 400 wide), the PIN window, and the Buku Tamu content column (832 wide); each
+// keeps 12 px text >= 10.5 px at the docs' 780 px image width. A flow that leaves its crop continues in a second scene.
 const lowerY = 523; // Undangan khusus H3 in the Bagikan dialog (with the unsaved note)
-const PANEL = { x: 0, y: T, w: 400, h: 900 }, CONTENT = (y) => ({ x: 380, y, w: 944, h: 760 });
+const CF = WIN / 2 - 225; // Chrome confirm dialog (450 wide, top centre of the window)
+const PANEL = { x: 0, y: T, w: 400, h: 900 }, CONTENT = (y) => ({ x: BX - 12, y, w: BW2 + 24, h: 760 });
 const sharePanel = (accessOn) => [shareTop(-50), shareBtns.lihat(-50), shareBtns.salin(-50), shareBtns.umum(-50), accessHead(T + lowerY - 50, accessOn)];
 const simpanBtn = rect(1193, T + 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, T + 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, T + 67, 15, C.strong);
-const PK = 132; // file picker, centred on the Buku Tamu crop
+const PK = BX + BW2 / 2 - 720; // file picker (720 wide at PK + 360), centred on the Buku Tamu content
 const picker = shadow(PK + 360, 180, 720, 440, 10, 4) + rect(PK + 360, 180, 720, 440, { r: 10, fill: C.white }) + rect(PK + 360, 180, 180, 440, { r: 10, fill: "#f2f2f4" }) + rect(PK + 530, 180, 10, 440, { fill: "#f2f2f4" }) +
   [0, 1, 2, 3, 4].map((k) => rect(PK + 380, 222 + k * 30, [96, 120, 80, 110, 90][k], 10, { r: 5, fill: "#dcdce0" })).join("") +
   rect(PK + 560, 196, 220, 22, { r: 6, fill: "#ececef" }) + line(PK + 540, 232, PK + 1080, 232, { stroke: "#e3e3e3" }) +
@@ -577,19 +584,16 @@ export const scenes = {
 
   "tamu-pin": {
     title: "Membuka jendela PIN dashboard",
-    world: { x: 0, y: 240, w: 944, h: 670 },
+    world: PANEL,
     base: [...editorBase(), ...sharePanel(false), forCouple(T + 591), pinHint(T + 591)],
     els: {
       kelola: pinBtn(T + 591),
       ringPin: { svg: ring(16, T + 739, 366, 36, { r: 6 }), enter: "fade", delay: 0.3 },
-      shade: { svg: rect(0, T, 1440, 900, { fill: "rgba(15,23,42,.45)" }), enter: "fade" },
-      winA: { svg: pinWindow(false), enter: "pop", origin: [199, T + 781] },
-      ringStatus: { svg: ring(516, T + 194 + 236, 408, 116), enter: "fade", delay: 0.3 }
+      shade: { svg: rect(0, T, 1440, 900, { fill: "rgba(15,23,42,.45)" }), enter: "fade" }
     },
     steps: [
       { caption: "Buka panel Bagikan, lalu gulir ke PIN dashboard.", show: ["ringPin"], dur: 2.8 },
-      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka.", hide: ["ringPin"], at: [199, T + 781], click: true, press: "kelola", show: ["shade", "winA"] },
-      { caption: "Baca status PIN: Undangan ini belum punya PIN.", show: ["ringStatus"], dur: 3 }
+      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", hide: ["ringPin"], at: [199, T + 781], click: true, press: "kelola", show: ["shade"], dur: 3.4 }
     ]
   },
 
@@ -598,13 +602,15 @@ export const scenes = {
     world: { x: 484, y: 220, w: 472, h: 630 },
     base: [...editorBase(), rect(0, T, 1440, 900, { fill: "rgba(15,23,42,.45)" }), pinWindow(false)],
     els: {
+      ringStatus: { svg: ring(516, T + 194 + 236, 408, 116), enter: "fade", delay: 0.3 },
       winB: { svg: pinWindow(true), enter: "fade" },
       copiedMsg: { svg: copiedBar("Pesan tersalin."), enter: "fade" },
       wa: { svg: backdrop() + waPhone(525, 220, 630), enter: "fade", delay: 0.2 },
       copiedPin: { svg: copiedBar("PIN tersalin."), enter: "fade" }
     },
     steps: [
-      { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", at: [576, T + 194 + 236 + 82], click: true, show: ["winB"], dur: 3.6 },
+      { caption: "Jendela NikahKit terbuka. Baca status PIN: Undangan ini belum punya PIN.", show: ["ringStatus"], dur: 3.4 },
+      { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", hide: ["ringStatus"], at: [576, T + 194 + 236 + 82], click: true, show: ["winB"], dur: 3.6 },
       { caption: "Klik ikon Salin pesan untuk pengantin. Muncul Pesan tersalin.", at: [889, PIN_ROW], click: true, show: ["copiedMsg"], dur: 3.6 },
       { caption: "Tempel di WhatsApp pengantin: undangan, tautan kelola, dan PIN.", show: ["wa"], dur: 4 },
       { caption: "Hanya perlu PIN saja? Klik ikon Salin PIN. Muncul PIN tersalin.", hide: ["wa", "copiedMsg"], at: [849, PIN_ROW], click: true, show: ["copiedPin"], dur: 3.6 }
@@ -632,16 +638,16 @@ export const scenes = {
 
   "tamu-buku-tamu-ucapan": {
     title: "Menyaring, memoderasi ucapan, dan mengunduh CSV di Buku Tamu",
-    world: CONTENT(40),
+    world: CONTENT(T),
     base: [...appBase(), detail()],
     els: {
       filter: { svg: selectMenu(SEL_X, DY.tools + 40, 235, ["Semua", "Baru sejak terakhir dibuka", "Disembunyikan", "Belum dibalas", "Diubah/dicatat pemilik"], 2), enter: "pop", origin: [SEL_X + 117, DY.tools + 38] },
       d1: { svg: detail({ hidden: true }), enter: "fade" },
       d2: { svg: detail({ hidden: true, picked: true }), enter: "fade" },
       dl: {
-        svg: circle(1300, 63, 15, { fill: C.crBlueSoft }) + iconX("download", 1300, 63, 18, C.crBlue) + shadow(916, 92, 400, 72, 8, 2) + rect(916, 92, 400, 72, { r: 8, fill: C.white }) +
-          iconX("file-text", 948, 128, 22, C.crSub) + text(972, 133, "daftar-tamu-365671-2026-10-14.csv", { size: 13, weight: 500, fill: C.crText }),
-        enter: "pop", origin: [1300, 80], delay: 0.1
+        svg: circle(WIN - 140, 63, 15, { fill: C.crBlueSoft }) + iconX("download", WIN - 140, 63, 18, C.crBlue) + shadow(BR - 400, 92, 400, 72, 8, 2) + rect(BR - 400, 92, 400, 72, { r: 8, fill: C.white }) +
+          iconX("file-text", BR - 368, 128, 22, C.crSub) + text(BR - 344, 133, "daftar-tamu-365671-2026-10-14.csv", { size: 13, weight: 500, fill: C.crText }),
+        enter: "pop", origin: [WIN - 140, 80], delay: 0.1
       }
     },
     steps: [
@@ -711,11 +717,11 @@ export const scenes = {
       dots: text(PX + 50, GY + 425, "••••••••", { size: 16, fill: C.waText }),
       hariH: { svg: phoneHariH(), enter: "fade", delay: 0.15 },
       confirm: {
-        svg: shadow(495, T + 12, 450, 132, 12, 3) + rect(495, T + 12, 450, 132, { r: 12, fill: C.white }) +
-          para(519, T + 48, ["Cabut kode Rina? Kode itu langsung tidak bisa dipakai", "check-in."], { size: 14, fill: C.crText, lh: 20 }) +
-          rect(763.5, T + 96.5, 79, 31, { r: 16, fill: C.white, stroke: "#c4c7c5" }) + text(803, T + 117, "Batal", { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" }) +
-          rect(852, T + 96, 72, 32, { r: 16, fill: C.crBlue }) + text(888, T + 117, "OK", { size: 13, weight: 500, fill: C.white, anchor: "middle" }),
-        enter: "pop", origin: [720, T + 12]
+        svg: shadow(CF, T + 12, 450, 132, 12, 3) + rect(CF, T + 12, 450, 132, { r: 12, fill: C.white }) +
+          para(CF + 24, T + 48, ["Cabut kode Rina? Kode itu langsung tidak bisa dipakai", "check-in."], { size: 14, fill: C.crText, lh: 20 }) +
+          rect(CF + 268.5, T + 96.5, 79, 31, { r: 16, fill: C.white, stroke: "#c4c7c5" }) + text(CF + 308, T + 117, "Batal", { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" }) +
+          rect(CF + 357, T + 96, 72, 32, { r: 16, fill: C.crBlue }) + text(CF + 393, T + 117, "OK", { size: 13, weight: 500, fill: C.white, anchor: "middle" }),
+        enter: "pop", origin: [WIN / 2, T + 12]
       }
     },
     steps: [

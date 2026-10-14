@@ -314,30 +314,31 @@ const ordersDlg = ordersTop + rect(16.5, 189.5, 365, 113, { r: 4, fill: C.white,
 const FLOW = [
   ["smartphone", "Klien buka Landing page", ["Desain, paket dan harga,", "lalu cara pesan"], "Klien"],
   ["pencil", "Klien isi form", ["Tekan kirim data, muncul", "Data terkirim"], "Klien"],
-  ["credit-card", "Sepakati pembayaran", ["Konfirmasi pesanan dan", "pembayaran lewat WhatsApp"], "Kamu"],
+  ["credit-card", "Sepakati pembayaran", ["Konfirmasi pesanan dan", "bayar lewat WhatsApp"], "Kamu"],
   ["file-text", "Buat halaman undangan", ["HTML Mode baru, isi slug,", "lalu pilih template"], "Kamu"],
   ["inbox", "Pesanan masuk: klik nama", ["Semua kolom undangan", "terisi otomatis"], "Kamu"],
   ["image", "Rapikan isi, ganti foto", ["Foto tidak ikut terisi", "dari form"], "Kamu"],
   ["rocket", "Simpan & Terbitkan", ["Di kanan atas editor", "Scalev"], "Kamu"],
-  ["send", "Kirim PIN dan pesan", ["Bagikan: PIN dashboard dan", "pesan untuk pengantin"], "Kamu"],
+  ["send", "Kirim PIN dan pesan", ["PIN dashboard dan pesan", "untuk pengantin"], "Kamu"],
   ["users", "Kirim undangan ke tamu", ["Tautan per tamu dari", "Dashboard > Kirim"], "Pengantin"],
   ["calendar-check", "Hari-H: check-in", ["Penerima tamu memindai", "QR tamu"], "Staff"],
-  ["eye", "Buka untuk semua", ["Setelah acara, di Dashboard", "> Pengaturan"], "Pengantin"]
+  ["eye", "Buka untuk semua", ["Setelah acara, di", "Dashboard > Pengaturan"], "Pengantin"]
 ];
-const FX = [40, 470, 900], FY = [80, 270, 460, 650], FW = 340, FH = 150;
+// Text is 20-21 px: the 1240-wide diagram shows at ~0.63 in the docs, so it still reads at 12-13 px.
+const FX = [20, 435, 850], FY = [80, 285, 490, 695], FW = 370, FH = 160;
 const flowPos = (i) => { const r = Math.floor(i / 3), c = r % 2 ? 2 - (i % 3) : i % 3; return [FX[c], FY[r]]; };
 function flowCard(i) {
   const [x, y] = flowPos(i), [ic, t, sub, who] = FLOW[i], [whoFill, whoFg] = { Klien: ["#e8f6fb", C.action], Kamu: [C.tint, C.accent], Pengantin: [C.okSoft, C.ok], Staff: ["#f2f5fa", C.strong] }[who];
-  const bw = tw(who, 15, 600) + 20;
-  return shadow(x, y, FW, FH, 14, 2) + rect(x, y, FW, FH, { r: 14, fill: C.white }) + rect(x + 20, y + 22, 44, 44, { r: 12, fill: whoFill }) + iconX(ic, x + 42, y + 44, 22, whoFg) +
-    text(x + 80, y + 40, `Langkah ${i + 1}`, { size: 15, weight: 600, fill: C.faint }) + text(x + 80, y + 66, t, { size: 18, weight: 700, fill: C.ink }) +
-    para(x + 80, y + 94, sub, { size: 15, fill: C.text, lh: 21 }) + rect(x + FW - 20 - bw, y + 20, bw, 26, { r: 13, fill: whoFill }) +
-    text(x + FW - 20 - bw / 2, y + 38, who, { size: 15, weight: 600, fill: whoFg, anchor: "middle" });
+  const bw = tw(who, 20, 600) + 24;
+  return shadow(x, y, FW, FH, 14, 2) + rect(x, y, FW, FH, { r: 14, fill: C.white }) + rect(x + 18, y + 24, 46, 46, { r: 12, fill: whoFill }) + iconX(ic, x + 41, y + 47, 24, whoFg) +
+    text(x + 80, y + 42, `Langkah ${i + 1}`, { size: 20, weight: 600, fill: C.faint }) + text(x + 80, y + 76, t, { size: 21, weight: 700, fill: C.ink }) +
+    para(x + 80, y + 110, sub, { size: 20, fill: C.text, lh: 26 }) + rect(x + FW - 18 - bw, y + 16, bw, 32, { r: 16, fill: whoFill }) +
+    text(x + FW - 18 - bw / 2, y + 39, who, { size: 20, weight: 600, fill: whoFg, anchor: "middle" });
 }
 const arrowHead = (x, y, dir) => { const d = { r: [-9, -6, -9, 6], l: [9, -6, 9, 6], d: [-6, -9, 6, -9] }[dir]; return `<path d="M${x + d[0]} ${y + d[1]} L${x} ${y} L${x + d[2]} ${y + d[3]}" fill="none" stroke="${C.accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`; };
 function flowArrow(i) {
   const [x1, y1] = flowPos(i), [x2, y2] = flowPos(i + 1);
-  if (y1 === y2) { const l = x2 > x1, ax = l ? x1 + FW + 12 : x1 - 12, bx = l ? x2 - 12 : x2 + FW + 12, ay = y1 + FH / 2; return line(ax, ay, bx, ay, { stroke: C.accent, sw: 2.5, cap: "round" }) + arrowHead(bx, ay, l ? "r" : "l"); }
+  if (y1 === y2) { const l = x2 > x1, ax = l ? x1 + FW + 8 : x1 - 8, bx = l ? x2 - 8 : x2 + FW + 8, ay = y1 + FH / 2; return line(ax, ay, bx, ay, { stroke: C.accent, sw: 2.5, cap: "round" }) + arrowHead(bx, ay, l ? "r" : "l"); }
   const ax = x1 + FW / 2; return line(ax, y1 + FH + 6, ax, y2 - 6, { stroke: C.accent, sw: 2.5, cap: "round" }) + arrowHead(ax, y2 - 6, "d");
 }
 // The 10 step titles of checklist-serah.mdx.
@@ -406,43 +407,61 @@ const afterDelete = rect(16, 186, 366, 400, { fill: C.white }) + rect(16.5, 189.
 
 // Marketing card install (Dashboard pasangan / Landing page): dialog + Pasang.
 const CARD_AT = { dashboard: P(155, 360), landing: P(301, 360) };
-const pasangDlg = (name) => ed(rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), shadow(540, 383, 360, 134, 8, 3), rect(540, 383, 360, 134, { r: 8, fill: C.white }),
+const veil = ed(rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }));
+const pasangDlg = (name) => ed(shadow(540, 383, 360, 134, 8, 3), rect(540, 383, 360, 134, { r: 8, fill: C.white }),
   text(560, 418, `Pasang ${name} di halaman ini?`, { size: 14, weight: 600 }), nkHint(560, 442, "Seluruh isi halaman diganti. Bisa diurungkan."), nkBtn(745, 461, "Batal", { variant: "quiet", w: 63 }));
 const pasangBtn = ed(nkBtn(816, 461, "Pasang", { w: 64 }));
 const DLG_O = P(720, 450);
+// The confirm dialog and the preview, without the panel (editor x 520..1120).
+const DLGW = { x: 520, y: OY + 92, w: 600, h: 800 };
 
 // ---- Scenes ------------------------------------------------------------------------------------------------------
 const kontenEd = (page, inv) => [...shell({ page, rail: "Konten" }), ed(nkHead(0, 0, "Konten"), kontenBody, invite(inv))];
 const filled = (o = {}) => ({ konten: { svg: ed(nkRail(0, 0, "Konten"), nkHead(0, 0, "Konten"), rect(72, 153, 327, 747, { fill: C.white }), kontenBody, invite(RANI)), enter: "fade" },
   t1: { svg: ed(nkToast(["Data pesanan dimasukkan.", "Foto tetap; ganti foto", "contoh bila masih ada."])), enter: "slide", delay: o.toast ?? 0.3 } });
-// Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page).
-function pasangScene(kind, title, page, after, toast, steps) {
-  const name = MK[kind][0];
+// Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), in three crops:
+// the panel up to the card click, the centred dialog with the preview, then the panel's toast and Dipakai badge.
+function pasangScenes(kind, title, page, after, result, toast, caps) {
+  const name = MK[kind][0], slug = `jualan-pasang-${kind}`;
+  const donePanel = ed(rect(72, 153, 327, 747, { fill: C.white }), bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind)));
+  const bw = tw("Dipakai", 10, 500) + 12, bx = (kind === "dashboard" ? 88 : 234) + 134 - bw; // mkCard's wrapped-name badge
   return {
-    title, world: PANELW,
-    base: [...shell({ page, rail: "Template", screenFill: C.white }), ed(tplPanel({ head: { inbox: false } }))],
-    els: {
-      mk: { svg: ed(mkPanel()), enter: "fade" },
-      dlg: { svg: pasangDlg(name), enter: "pop", origin: DLG_O },
-      pasang: { svg: pasangBtn, enter: "pop", origin: DLG_O },
-      done: { svg: ed(after, rect(72, 153, 327, 747, { fill: C.white }), bodyClip(kindSeg("marketing"), brandClosed(219), mkCards(MKY, kind))), enter: "fade" },
-      t1: { svg: ed(nkToast(toast)), enter: "slide", delay: 0.3 }
+    [slug]: {
+      title, world: RAILW(848, 44),
+      base: [...shell({ page, rail: "Template", screenFill: C.white }), ed(tplPanel({ head: { inbox: false } }))],
+      els: { mk: { svg: ed(mkPanel()), enter: "fade" }, veil: { svg: veil, enter: "fade" } },
+      steps: [
+        { caption: caps[0], dur: 3 },
+        { caption: caps[1], at: P(...SEG.marketing), click: true, show: ["mk"], dur: 3.2 },
+        { caption: `Klik kartu ${name}. Layar meredup: dialog konfirmasi muncul.`, at: CARD_AT[kind], click: true, show: ["veil"], dur: 3.6 }
+      ]
     },
-    steps: [
-      { caption: steps[0], dur: 3 },
-      { caption: steps[1], at: P(...SEG.marketing), click: true, show: ["mk"], dur: 3.2 },
-      { caption: `Klik kartu ${name}. Muncul dialog konfirmasi.`, at: CARD_AT[kind], click: true, show: ["dlg", "pasang"], dur: 3.6 },
-      { caption: "Klik Pasang. Seluruh isi halaman diganti, bisa diurungkan.", at: P(848, 479), click: true, press: "pasang", hide: ["dlg", "pasang"], show: ["done", "t1"], dur: 3.8 }
-    ]
+    [`${slug}-dialog`]: {
+      title: `Dialog Pasang ${name}`, world: DLGW,
+      base: [...shell({ page, rail: "Template", screenFill: C.white }), ed(mkPanel())],
+      els: { dlg: { svg: veil + pasangDlg(name), enter: "pop", origin: DLG_O }, pasang: { svg: pasangBtn, enter: "pop", origin: DLG_O },
+        done: { svg: ed(after) + donePanel, enter: "fade" } },
+      steps: [
+        { caption: `Muncul dialog Pasang ${name} di halaman ini?`, show: ["dlg", "pasang"], dur: 3.2 },
+        { caption: `Klik Pasang. ${result}`, at: P(848, 479), click: true, press: "pasang", hide: ["dlg", "pasang"], show: ["done"], dur: 3.8 }
+      ]
+    },
+    [`${slug}-hasil`]: {
+      title: `${name} dipasang`, world: RAILW(848, 44),
+      base: [...shell({ page, rail: "Template", screenFill: C.white }), ed(after, nkHead(0, 0, "Template", { inbox: false })), donePanel],
+      els: { t1: { svg: ed(nkToast(toast)), enter: "slide", delay: 0.3 }, hl: { svg: ed(ring(bx, MKY + 185, bw, 18, { r: 12 })), enter: "fade", delay: 0.3 } },
+      steps: [{ caption: `Muncul pesan: ${toast.join(" ")}`, show: ["t1"], dur: 3.4 }, { caption: `Kartu ${name} kini berlabel Dipakai.`, show: ["hl"], dur: 3 }]
+    }
   };
 }
 // The publish step, split off so the panel scenes stay readable: the toolbar and the top of the preview.
-function pubScene(title, page, preview, cap, hl) {
+function pubScene(title, page, preview, cap, hl, before) {
+  const first = [...(hl ? ["hl"] : []), ...(before ? ["nw"] : [])];
   return {
     title, world: TOPW,
-    base: [...shell({ page, rail: "Konten" }), ed(preview)],
-    els: { pub: pubBtn, ...(hl ? { hl: { svg: ed(hl), enter: "fade", delay: 0.4 } } : {}) },
-    steps: [{ caption: cap[0], show: hl ? ["hl"] : [], dur: 2.8 }, { caption: cap[1], at: PUB, click: true, press: "pub", hide: hl ? ["hl"] : [], dur: 3.4 }]
+    base: [...shell({ page, rail: "Konten" }), ed(before ?? preview)],
+    els: { pub: pubBtn, ...(hl ? { hl: { svg: ed(hl), enter: "fade", delay: 0.4 } } : {}), ...(before ? { nw: { svg: ed(preview), enter: "fade", delay: 0.6 } } : {}) },
+    steps: [{ caption: cap[0], show: first, dur: 3 }, { caption: cap[1], at: PUB, click: true, press: "pub", hide: hl ? ["hl"] : [], dur: 3.4 }]
   };
 }
 
@@ -450,8 +469,8 @@ export const scenes = {
   // ---------------------------------------------------------------- alur-dengan-klien
   "jualan-alur": {
     title: "Alur jualan undangan dari klien sampai hari-H",
-    world: { x: 20, y: 0, w: 1240, h: 820 }, bg: C.tint,
-    base: [rect(0, 0, 1280, 820, { fill: C.tint }), text(640, 50, "Alur kerja vendor dengan NikahKit", { size: 28, weight: 700, fill: C.ink, anchor: "middle" })],
+    world: { w: 1240, h: 880 }, bg: C.tint,
+    base: [rect(0, 0, 1240, 880, { fill: C.tint }), text(620, 52, "Alur kerja vendor dengan NikahKit", { size: 32, weight: 700, fill: C.ink, anchor: "middle" })],
     els: Object.fromEntries(FLOW.flatMap((_, i) => [[`c${i}`, { svg: flowCard(i), enter: "pop", origin: [flowPos(i)[0] + FW / 2, flowPos(i)[1] + FH / 2] }],
       ...(i < FLOW.length - 1 ? [[`a${i}`, { svg: flowArrow(i), enter: "fade" }]] : [])])),
     steps: [
@@ -503,7 +522,7 @@ export const scenes = {
   },
 
   // ---------------------------------------------------------------- pasang-dashboard-pasangan
-  "jualan-pasang-dashboard": pasangScene("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview,
+  ...pasangScenes("dashboard", "Memasang Dashboard pasangan di halaman Scalev sendiri", "Dashboard Rina WO", dashPreview, "Pratinjau berubah menjadi Kelola undangan.",
     ["Dashboard pasangan dipasang.", "Tekan Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Di Kategori, klik Marketing."]),
   "jualan-pasang-dashboard-terbit": pubScene("Menerbitkan halaman Dashboard pasangan", "Dashboard Rina WO", dashPreview,
@@ -533,8 +552,8 @@ export const scenes = {
   },
 
   // ---------------------------------------------------------------- landing-page
-  "jualan-pasang-landing": pasangScene("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
-    ["Landing page dipasang. Tekan", "Simpan di Scalev."],
+  ...pasangScenes("landing", "Memasang Landing page di halaman Scalev sendiri", "Landing Rina WO", clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
+    "Pratinjau berubah menjadi Landing page.", ["Landing page dipasang. Tekan", "Simpan di Scalev."],
     ["Halaman HTML Mode baru yang kosong: tab NikahKit menampilkan Template.", "Klik Marketing. Profil merek harus berlabel Terisi."]),
   "jualan-pasang-landing-terbit": pubScene("Menerbitkan Landing page", "Landing Rina WO", clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
     ["Pratinjau sudah Landing page dengan nama bisnismu.", "Klik Simpan & Terbitkan, lalu buka alamat publiknya dari HP."]),
@@ -564,7 +583,7 @@ export const scenes = {
 
   "jualan-perbarui-landing": {
     title: "Memperbarui Landing page setelah Profil merek diubah",
-    world: PANELW,
+    world: RAILW(848, 44),
     base: [...shell({ page: "Landing Rina WO", rail: "Template" }), ed(clipped(727, 106, 390, 784, landingTop(727, 106, "Rina Undangan")), nkHead(0, 0, "Template", { inbox: false }), bodyBg,
       bodyClip(kindSeg("marketing"), brandClosed(219), rect(88.5, 277.5, 278, 49, { r: 4, fill: C.warnSoft, stroke: "#fde7c7" }),
         para(99, 298, ["Profil merek", "berubah."], { size: 12, fill: C.strong, lh: 16 }), mkCards(339, "landing")))],
@@ -581,7 +600,8 @@ export const scenes = {
     ]
   },
   "jualan-perbarui-terbit": pubScene("Menerbitkan Landing page yang diperbarui", "Landing Rina WO", clipped(727, 106, 390, 784, landingTop(727, 106, "Rina WO")),
-    ["Landing page sudah dipasang ulang dengan profil baru.", "Klik Simpan & Terbitkan supaya klien melihat versi baru."]),
+    ["Pratinjau ikut berganti ke profil terbaru, misalnya nama bisnis.", "Klik Simpan & Terbitkan supaya klien melihat versi baru."], null,
+    clipped(727, 106, 390, 784, landingTop(727, 106, "Rina Undangan"))),
 
   // ---------------------------------------------------------------- form-data-klien
   "jualan-form-klien": {

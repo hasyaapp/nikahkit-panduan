@@ -6,9 +6,8 @@
 import { C, ED, rect, text, line, circle, para, tw, clipped, shadow, icon, iconX, nkBtn, nkInput, nkSwitch, nkBadge, nkNote, nkAcc, nkH3,
   scalevEditor, nkRail, nkHead, nkDialogHead, ring, note, chrome, favChrome } from "../lib.mjs";
 
-// Worlds (static crops; the stage takes their shape). GW: rail + panel + preview (scale 0.86); PV: panel + preview
-// without the rail (0.92); PANEL: rail + panel (1.03).
-const GW = { x: 0, y: 92, w: 1117, h: 808 }, PV = { x: 72, y: 92, w: 1045, h: 808 }, PANEL = { x: 0, y: 92, w: 400, h: 808 };
+// Worlds (static crops; the stage takes their shape). PANEL: rail + panel (1.03); PREV: the preview screen (1.04).
+const PANEL = { x: 0, y: 92, w: 400, h: 808 }, PREV = { x: 717, y: 96, w: 410, h: 804 };
 const SC = ED.screen; // preview screen 727,106 390x784
 const PX = 88, PW = 279, BY = 169; // panel body content box (scrolling panels keep 279 next to the scrollbar)
 const SERIF = "Tinos,'Times New Roman',Georgia,serif";
@@ -228,6 +227,7 @@ function palettes(y, sel = 0) {
 }
 const PAL_Y = 597, palRowY = (i) => PAL_Y + 138 + i * 50; // Earthy row i
 const TERAKOTA = { bg: "#F6EFE7", surface: "#FFFBF6", heading: "#5A2E1F", text: "#4A3B33", accent: "#A0522D", on: "#FFFFFF" };
+const SAGE = { bg: "#F1F3EC", surface: "#FBFCF8", heading: "#2F3D2C", text: "#3B4438", accent: "#5B7553", on: "#FFFFFF" };
 // State A: Custom not in use (lead line, colours of the chosen palette), without the sub-tabs.
 function warnaA(p = KENCANA, sel = 0) {
   let s = white(72, BY + 38, 314, 900) + nkH3(PX, 235, "Custom") + para(PX, 259, ["Mulai dari palet yang dipilih; ubah salah satu warna", "untuk memakai Custom."], { size: 12, fill: C.faint, lh: 16 });
@@ -562,42 +562,65 @@ const SCENES = {
     const DY = 200, tY = palRowY(0) - DY + 22; // Terakota row centre after scrolling
     return {
       title: "Memilih palet warna siap pakai",
-      world: GW,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
+      world: PANEL,
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
       els: {
         gaya: { svg: railPanel("Gaya", "Gaya"), enter: "fade" },
         pane: { svg: warnaA(), enter: "fade" },
         terra: { svg: `<g transform="translate(0 -${DY})">${warnaA(TERAKOTA, 1)}</g>`, enter: "fade" },
-        tabs: { svg: gayaTop(0, [], 380), enter: "fade" },
-        prev: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade", delay: 0.3 }
+        tabs: { svg: gayaTop(0, [], 380), enter: "fade" }
       },
       steps: [
         { caption: "Klik Gaya di rel kiri. Tab Warna terbuka lebih dulu.", at: ED.rail.Gaya, click: true, show: ["gaya", "pane", "tabs"] },
         { caption: "Gulir ke daftar palet. Palet bawaan diberi label Bawaan Kencana.", at: [250, 470], scroll: { id: "pane", dy: DY }, dur: 3.6 },
-        { caption: "Klik satu palet, misalnya Terakota. Pratinjau langsung berganti warna.", at: [230, tY], click: true, show: ["terra", "prev"], dur: 3.8 }
+        { caption: "Klik satu palet, misalnya Terakota. Palet itu diberi garis biru.", at: [230, tY], click: true, show: ["terra"], dur: 3.8 }
       ]
     };
   })(),
+  "editor-gaya-palet-pratinjau": {
+    title: "Pratinjau berganti warna saat palet diklik",
+    world: PREV,
+    base: [shell("Gaya", "Gaya"), coverScreen()],
+    els: {
+      terra: { svg: coverScreen({ pal: TERAKOTA }), enter: "fade" },
+      sage: { svg: coverScreen({ pal: SAGE }), enter: "fade" }
+    },
+    steps: [
+      { caption: "Sebelum: pratinjau memakai palet bawaan Merah Kencana.", dur: 2.8 },
+      { caption: "Klik Terakota: pratinjau langsung berganti warna.", show: ["terra"], dur: 3.2 },
+      { caption: "Coba palet lain, misalnya Sage, sampai cocok.", hide: ["terra"], show: ["sage"], dur: 3.2 }
+    ]
+  },
 
   // ------------------------------------------------------------------------------------------- Gaya B: Custom
   "editor-gaya-warna": {
     title: "Mengatur warna sendiri di Custom",
-    world: PV,
+    world: PANEL,
     base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), coverScreen()],
     els: {
       rows: { svg: ring(PX, 291, PW, 294, { r: 8 }), enter: "fade" },
       pick: { svg: picker("#8E2818"), enter: "pop", origin: [115, PICK.y + PICK.h] },
       b: { svg: warnaB() + scrollbar(157, 330), enter: "fade" },
-      gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade", delay: 0.4 },
       warn: { svg: ring(PX, 609, PW, 56, { r: 8 }), enter: "fade" },
-      back: { svg: subtabs(0) + warnaA() + scrollbar(157, 380) + coverScreen(), enter: "fade" }
+      back: { svg: subtabs(0) + warnaA() + scrollbar(157, 380), enter: "fade" }
     },
     steps: [
       { caption: "Di Custom ada lima warna: Latar, Kartu, Judul, Teks, Aksen.", at: [300, 440], show: ["rows"], dur: 3.6 },
       { caption: "Klik kotak warna di kiri Aksen. Pemilih warna Chrome terbuka.", at: [115, 558], click: true, hide: ["rows"], show: ["pick"], dur: 3.4 },
-      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b", "gold"], dur: 3.8 },
+      { caption: "Pilih warna. Kodenya tampil di kanan, Custom diberi tanda dipakai.", at: [PICK.x + 190, PICK.y + 40], click: true, hide: ["pick"], show: ["b"], dur: 3.8 },
       { caption: "Muncul Kurang kontras? Tulisan susah dibaca. Pilih warna lain.", at: [300, 637], show: ["warn"], dur: 3.6 },
       { caption: "Klik Kembali ke palet bawaan untuk membuang warna Custom.", at: [160, 695], click: true, hide: ["warn"], show: ["back"], dur: 3.6 }
+    ]
+  },
+  "editor-gaya-warna-pratinjau": {
+    title: "Pratinjau mengikuti warna Custom",
+    world: PREV,
+    base: [shell("Gaya", "Gaya"), coverScreen()],
+    els: { gold: { svg: coverScreen({ pal: { accent: GOLD, on: "#111111" } }), enter: "fade" }, back: { svg: coverScreen(), enter: "fade" } },
+    steps: [
+      { caption: "Sebelum: Aksen memakai merah dari palet Merah Kencana.", dur: 2.8 },
+      { caption: "Aksen diganti emas: sampul, tombol, dan ikon ikut berubah.", show: ["gold"], dur: 3.2 },
+      { caption: "Setelah Kembali ke palet bawaan, warna awal kembali.", show: ["back"], dur: 3.2 }
     ]
   },
 
@@ -609,57 +632,77 @@ const SCENES = {
       rect(PX + 1, wy + 36, PW - 2, 32, { fill: C.crBlue }) + text(PX + 12, wy + 57, "Tebal (700)", { size: 14, fill: C.white });
     return {
       title: "Mengatur ukuran teks, pasangan font, dan ketebalan",
-      world: PV,
-      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), coverScreen()],
+      world: PANEL,
+      base: [shell("Gaya", "Gaya"), subtabs(0), warnaA()],
       els: {
         h0: { svg: H0 + hurufTabs([]), enter: "fade" },
         pane: { svg: H1, enter: "fade" },
         paneP: { svg: `<g transform="translate(0 -${DY})">${HP}</g>`, enter: "fade" },
         wpop: { svg: wpop, enter: "pop", origin: [PX + PW / 2, wy] },
         paneB: { svg: HB, enter: "fade", delay: 1.0 },
-        tabs: { svg: hurufTabs([1]), enter: "fade" },
-        prevBig: { svg: coverScreen({ scale: 1.15 }), enter: "fade", delay: 0.3 },
-        prevPair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade", delay: 0.3 }
+        tabs: { svg: hurufTabs([1]), enter: "fade" }
       },
       steps: [
         { caption: "Di menu Gaya, klik tab Huruf.", at: [227, 188], click: true, show: ["h0"] },
-        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs", "prevBig"], dur: 3.6 },
-        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", at: [230, 300 + 116 + 54], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "prevPair"], dur: 4.2 },
+        { caption: "Di Ukuran teks, klik ikon Besar bila tamu banyak orang tua.", at: [PX + PW - 30, P0.scale + 19], click: true, show: ["pane", "tabs"], dur: 3.6 },
+        { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", at: [230, 300 + 116 + 54], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP"], dur: 4.2 },
         { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"], dur: 4.2 }
       ]
     };
   })(),
+  "editor-gaya-huruf-pratinjau": {
+    title: "Pratinjau dengan ukuran teks dan pasangan font baru",
+    world: PREV,
+    base: [shell("Gaya", "Gaya"), coverScreen()],
+    els: { big: { svg: coverScreen({ scale: 1.15 }), enter: "fade" }, pair: { svg: coverScreen({ scale: 1.15, nameFont: PAIRS[1][3], nameSize: 44 }), enter: "fade" } },
+    steps: [
+      { caption: "Sebelum: Ukuran teks Normal, pasangan font Walnut.", dur: 2.8 },
+      { caption: "Ukuran teks Besar: semua tulisan di undangan membesar.", show: ["big"], dur: 3.2 },
+      { caption: "Pasangan font Romantis: nama mempelai memakai Great Vibes.", show: ["pair"], dur: 3.2 }
+    ]
+  },
 
   // ------------------------------------------------------------------------------------------- Gaya D: font dari Google Fonts
-  "editor-gaya-font": (() => {
-    const [H0, P0] = huruf(), [HC, PC] = huruf({ font: "check" }), [HD, PD] = huruf({ font: "done" });
-    const SDY = 150, gx = 420, gy = 310;
+  "editor-gaya-font-google": (() => {
+    const gx = 420, gy = 310;
     const gfWin = (url, title, body) => shadow(gx, gy, 630, 560, 10, 3) + chrome(gx, gy, 630, 560, { tabs: [{ title, active: true, fav: favChrome, w: 220 }], url }) + body;
     const fontRow = (y, name, font) => rect(gx + 24.5, y + 0.5, 581, 79, { r: 8, stroke: "#dadce0" }) + text(gx + 44, y + 26, name, { size: 13, fill: "#5f6368" }) + text(gx + 44, y + 62, "Rani & Dimas", { size: 26, fill: "#202124", font });
     const home = gfWin("fonts.google.com", "Google Fonts", text(gx + 24, gy + 130, "Google Fonts", { size: 22, fill: "#202124" }) + rect(gx + 24.5, gy + 150.5, 581, 40, { r: 20, fill: "#f1f3f4" }) +
       fontRow(gy + 210, "Playfair Display", PLAYFAIR) + fontRow(gy + 300, "Lora", ff("Lora")) + fontRow(gy + 390, "Great Vibes", ff("Great Vibes", "cursive")));
     const URL = "fonts.google.com/specimen/Playfair+Display";
-    const spec = gfWin("", "Playfair Display - Google Fonts", rect(gx + 162, gy + 53, tw(URL, 14) + 8, 22, { r: 3, fill: "#c2dbff" }) + text(gx + 166, gy + 68, URL, { size: 14, fill: C.crText }) +
-      text(gx + 24, gy + 150, "Playfair Display", { size: 44, fill: "#202124", font: PLAYFAIR }) + text(gx + 24, gy + 250, "Rani & Dimas", { size: 56, fill: "#202124", font: PLAYFAIR }));
+    const spec = gfWin(URL, "Playfair Display - Google Fonts", text(gx + 24, gy + 150, "Playfair Display", { size: 44, fill: "#202124", font: PLAYFAIR }) + text(gx + 24, gy + 250, "Rani & Dimas", { size: 56, fill: "#202124", font: PLAYFAIR }));
+    const sel = rect(gx + 162, gy + 53, tw(URL, 14) + 8, 22, { r: 3, fill: "#c2dbff" }) + text(gx + 166, gy + 68, URL, { size: 14, fill: C.crText });
+    return {
+      title: "Menyalin link font di Google Fonts",
+      world: { x: gx - 4, y: gy - 4, w: 638, h: 572 },
+      base: [rect(0, 0, 1440, 900, { fill: "#eef1f5" }), home],
+      els: { spec: { svg: spec, enter: "fade" }, sel: { svg: sel, enter: "fade" } },
+      steps: [
+        { caption: "Klik Buka Google Fonts di tab Huruf. Google Fonts terbuka di tab baru.", dur: 3 },
+        { caption: "Klik font yang kamu mau, misalnya Playfair Display.", at: [gx + 300, gy + 250], click: true, show: ["spec"], dur: 3.4 },
+        { caption: "Klik kolom alamat Chrome, lalu salin alamatnya (Ctrl+C, Mac: Cmd+C).", at: [gx + 300, gy + 64], click: true, show: ["sel"], dur: 3.6 }
+      ]
+    };
+  })(),
+  "editor-gaya-font": (() => {
+    const [H0, P0] = huruf(), [HC, PC] = huruf({ font: "check" }), [HD, PD] = huruf({ font: "done" });
+    const SDY = 150;
     return {
       title: "Memakai font sendiri dari Google Fonts",
-      world: PV,
-      base: [shell("Gaya", "Gaya"), subtabs(1), H0, coverScreen()],
+      world: PANEL,
+      base: [shell("Gaya", "Gaya"), subtabs(1), H0],
       els: {
-        gf: { svg: home, enter: "pop", origin: [PX + PW / 2, P0.gf + 18] },
-        gf2: { svg: spec, enter: "fade" },
+        ring0: { svg: ring(PX, P0.gf, PW, 36, { r: 6 }), enter: "fade" },
         chk: { svg: HC, enter: "fade" },
         done: { svg: HD, enter: "fade", delay: 1.0 },
-        prev: { svg: coverScreen({ nameFont: PLAYFAIR, nameSize: 40 }), enter: "fade", delay: 1.2 },
-        back: { svg: H0 + coverScreen(), enter: "fade" },
+        back: { svg: H0, enter: "fade" },
         tabs1: { svg: hurufTabs([1]), enter: "fade" },
         tabs0: { svg: hurufTabs([]), enter: "fade" }
       },
       steps: [
-        { caption: "Di bagian Custom tab Huruf, klik Buka Google Fonts.", at: [PX + PW / 2, P0.gf + 18], click: true, show: ["gf"], dur: 3.4 },
-        { caption: "Klik font yang kamu mau, lalu salin alamatnya dari kolom alamat Chrome.", at: [gx + 300, gy + 250], click: true, show: ["gf2"], dur: 3.8 },
-        { caption: "Kembali ke Scalev. Tempel di Font judul dan nama.", at: [230, PC.font + 38], click: true, hide: ["gf", "gf2"], show: ["chk", "tabs1"], dur: 3.4 },
-        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], show: ["done", "prev"], dur: 3.8 },
+        { caption: "Di bagian Custom tab Huruf ada tombol Buka Google Fonts.", at: [PX + PW / 2, P0.gf + 18], show: ["ring0"], dur: 3.2 },
+        { caption: "Setelah menyalin link, tempel di Font judul dan nama.", at: [230, PC.font + 38], click: true, hide: ["ring0"], show: ["chk", "tabs1"], dur: 3.4 },
+        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], show: ["done"], dur: 3.8 },
         { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["tabs1"], show: ["back", "tabs0"], dur: 3.8 }
       ]
     };
@@ -668,18 +711,27 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Gaya E: Bentuk dan Gerak
   "editor-gaya-bentuk": {
     title: "Mengatur bentuk sudut dan gerak saat digulir",
-    world: PV,
-    base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), coverScreen()],
+    world: PANEL,
+    base: [shell("Gaya", "Gaya"), subtabs(0), warnaA()],
     els: {
       b0: { svg: bentuk(), enter: "fade" },
       b1: { svg: bentuk(0), enter: "fade" },
-      prevSoft: { svg: coverScreen({ shape: "soft" }), enter: "fade", delay: 0.3 },
       b2: { svg: bentuk(0, 2), enter: "fade" }
     },
     steps: [
       { caption: "Di menu Gaya, klik tab Bentuk.", at: [320, 188], click: true, show: ["b0"] },
-      { caption: "Klik Lembut: sudut tombol, kartu, dan bingkai foto jadi membulat.", at: [128, SEG(0, false)], click: true, show: ["b1", "prevSoft"], dur: 3.8 },
+      { caption: "Klik Lembut: sudut tombol, kartu, dan bingkai foto jadi membulat.", at: [128, SEG(0, false)], click: true, show: ["b1"], dur: 3.8 },
       { caption: "Di Gerak pilih Tanpa, Halus, atau Hidup. Hidup bergerak lebih jauh.", at: [PX + PW - 30, SEG(1, true)], click: true, show: ["b2"], dur: 3.8 }
+    ]
+  },
+  "editor-gaya-bentuk-pratinjau": {
+    title: "Pratinjau dengan bentuk sudut Lembut",
+    world: PREV,
+    base: [shell("Gaya", "Gaya"), coverScreen()],
+    els: { soft: { svg: coverScreen({ shape: "soft" }), enter: "fade" } },
+    steps: [
+      { caption: "Bawaan Kencana: Lengkung. Bingkai foto dan tombol melengkung.", dur: 3 },
+      { caption: "Setelah Lembut diklik: bingkai foto dan tombol bersudut membulat.", show: ["soft"], dur: 3.4 }
     ]
   },
 
@@ -689,58 +741,85 @@ const SCENES = {
     const [L0] = lapList(SECS), [L1] = lapList(O1, { button: true }), [L2, Q2] = lapList(O2, { button: true }), [L3] = lapList(O2, { off: "Video", button: true });
     const [R, QR] = lapList(SECS), [R2] = lapList(SECS, { dock: false });
     const up = (svg) => `<g transform="translate(0 -${DY})">${svg}</g>`;
-    const P = (list) => ({ svg: stack(list), enter: "fade", delay: 0.4 });
     return {
       title: "Mengatur urutan dan menyembunyikan bagian di Lapisan",
-      world: GW,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), stack([galeriSec, videoSec, acaraSec])],
+      world: PANEL,
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
       els: {
         lap: { svg: nkRail(0, 0, "Lapisan") + L0 + nkHead(0, 0, "Lapisan"), enter: "fade" },
-        l1: { svg: L1, enter: "fade" }, p1: P([videoSec, galeriSec, acaraSec]),
-        l2: { svg: L2, enter: "fade" }, p2: P([videoSec, acaraSec, galeriSec]),
-        l3: { svg: L3, enter: "fade" }, p3: P([acaraSec, galeriSec, dressSec]),
-        l4: { svg: L2, enter: "fade" }, p4: P([videoSec, acaraSec, galeriSec]),
-        r: { svg: up(R), enter: "fade" }, p0: P([galeriSec, videoSec, acaraSec]),
-        r2: { svg: up(R2), enter: "fade" },
+        l1: { svg: L1, enter: "fade" }, l2: { svg: L2, enter: "fade" }, l3: { svg: L3, enter: "fade" }, l4: { svg: L2, enter: "fade" },
+        r: { svg: up(R), enter: "fade" }, r2: { svg: up(R2), enter: "fade" },
         lhdr: { svg: nkHead(0, 0, "Lapisan") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" }
       },
       steps: [
         { caption: "Klik Lapisan di rel kiri. Daftar bagian tampil sesuai urutan undangan.", at: ED.rail.Lapisan, click: true, show: ["lap", "lhdr"], dur: 3.4 },
-        { caption: "Klik panah naik di Video. Video naik satu langkah, pratinjau ikut berubah.", at: [270, rowY(8) + 25], click: true, show: ["l1", "p1"], dur: 3.8 },
-        { caption: "Klik panah turun di Galeri Foto. Galeri Foto turun satu langkah.", at: [304, rowY(8) + 25], click: true, show: ["l2", "p2"], dur: 3.8 },
-        { caption: "Matikan sakelar Video: tertulis Disembunyikan, Video hilang dari pratinjau.", at: [342, rowY(7) + 25], click: true, show: ["l3", "p3"], dur: 3.8 },
-        { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, show: ["l4", "p4"], dur: 3.6 },
-        { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, show: ["r", "p0"], dur: 4 },
+        { caption: "Klik panah naik di Video. Video naik satu langkah.", at: [270, rowY(8) + 25], click: true, show: ["l1"], dur: 3.6 },
+        { caption: "Klik panah turun di Galeri Foto. Galeri Foto turun satu langkah.", at: [304, rowY(8) + 25], click: true, show: ["l2"], dur: 3.6 },
+        { caption: "Matikan sakelar Video. Di bawah namanya tertulis Disembunyikan.", at: [342, rowY(7) + 25], click: true, show: ["l3"], dur: 3.6 },
+        { caption: "Nyalakan lagi sakelarnya. Video tampil lagi dengan isi yang sama.", at: [342, rowY(7) + 25], click: true, show: ["l4"], dur: 3.6 },
+        { caption: "Gulir ke bawah daftar, lalu klik Kembalikan urutan template.", at: [PX + 90, Q2.btn - DY + 18], scroll: { id: "l4", dy: DY }, click: true, show: ["r"], dur: 4 },
         { caption: "Paling bawah ada sakelar Menu bawah. Matikan bila tidak perlu.", at: [PX + PW - 18, QR.dock - DY + 20], click: true, show: ["r2"], dur: 3.6 }
+      ]
+    };
+  })(),
+  "editor-lapisan-pratinjau": (() => {
+    const P = (list) => ({ svg: stack(list), enter: "fade" });
+    return {
+      title: "Pratinjau mengikuti urutan di Lapisan",
+      world: PREV,
+      base: [shell("Lapisan", "Lapisan"), stack([galeriSec, videoSec, acaraSec])],
+      els: { p1: P([videoSec, galeriSec, acaraSec]), p2: P([videoSec, acaraSec, galeriSec]), p3: P([acaraSec, galeriSec, dressSec]), p4: P([videoSec, acaraSec, galeriSec]), p0: P([galeriSec, videoSec, acaraSec]) },
+      steps: [
+        { caption: "Urutan awal di pratinjau: Galeri Foto, Video, Rangkaian Acara.", dur: 2.8 },
+        { caption: "Panah naik di Video: Video kini di atas Galeri Foto.", show: ["p1"], dur: 3 },
+        { caption: "Panah turun di Galeri Foto: Rangkaian Acara kini di atasnya.", show: ["p2"], dur: 3 },
+        { caption: "Sakelar Video mati: Video hilang dari pratinjau.", show: ["p3"], dur: 3 },
+        { caption: "Sakelar dinyalakan lagi: Video tampil lagi.", show: ["p4"], dur: 3 },
+        { caption: "Kembalikan urutan template: urutan awal kembali.", show: ["p0"], dur: 3 }
       ]
     };
   })(),
 
   // ------------------------------------------------------------------------------------------- Klik di pratinjau (langkah 1-4)
-  "editor-klik-pratinjau": (() => {
-    const [tbCover] = toolbar(SC.x + SC.w, SC.y + 6, ["Isi"]);
+  "editor-klik-aktif": (() => {
     const [kcol, p] = column([{ label: "Nama panggilan", value: "Rani", hint: "Tampil di sampul.", focus: true }, { label: "Nama lengkap dan gelar", value: "Rani Ayu, S.Psi." },
       { label: "Profesi atau bio singkat (opsional)", value: "Psikolog" }, { label: "Anak ke- (opsional)", value: "Putri kedua", hint: "Kosong: \"Putri dari\" / \"Putra dari\"." },
       { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" }, { toggle: "Ibu sudah wafat (Almh.)", on: true }], ACC_X, 161, ACC_W);
     const nY = p["Nama panggilan"] + 20;
     return {
-      title: "Mengisi undangan dengan klik langsung di pratinjau",
-      world: GW,
-      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), coverScreen()],
+      title: "Klik aktif, lalu form terbuka di kolom yang tepat",
+      world: PANEL,
+      base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
       els: {
-        pn: { svg: coverScreen({ names: "Rania & Dimas" }), enter: "fade", delay: 1.6 },
-        hover: { svg: frame(SC.y, SC.h, 2) + hoverTag(SC.x, SC.y, "Sampul · klik untuk mengisi"), enter: "fade" },
-        selCover: { svg: frame(SC.y, SC.h, 3) + tbCover, enter: "fade" },
         klik: { svg: ring(6, 703, 60, 44, { r: 8 }) + note(92, 709, "Klik aktif", 66, 725), enter: "fade" },
         konten: { svg: railPanel("Konten", "Konten") + accFrame(154, 900) + kcol + scrollbar(420, 200) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }), enter: "fade" },
         clr: { svg: white(ACC_X + 3, nY + 3, ACC_W - 6, 30), enter: "fade" },
-        nama: { svg: text(ACC_X + 10, nY + 23, "Rania", { size: 14 }), enter: "fade" }
+        nama: { svg: text(ACC_X + 10, nY + 23, "Rania", { size: 14 }), enter: "fade" },
+        busy: { svg: footStatus("Menulis...", C.changed), enter: "fade", delay: 0.4 },
+        saved: { svg: footStatus("Tersimpan", C.ok), enter: "fade", delay: 1.9 }
       },
       steps: [
         { caption: "Cek tombol di rel kiri: harus tertulis Klik aktif.", at: ED.tool.Klik, show: ["klik"], dur: 3.2 },
-        { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", at: [922, 505], hide: ["klik"], show: ["hover"], dur: 3.4 },
-        { caption: "Klik namanya. Form Mempelai terbuka, kursor di Nama panggilan.", at: [922, 505], click: true, show: ["selCover", "konten"], dur: 3.8 },
-        { caption: "Ketik isi baru. Pratinjau ikut berubah setelah sesaat.", at: [ACC_X + 120, nY + 18], click: true, show: ["clr", "nama", "pn"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], dur: 4 }
+        { caption: "Klik nama mempelai di pratinjau: Mempelai terbuka, kursor di Nama panggilan.", at: [200, nY + 18], hide: ["klik"], show: ["konten"], dur: 3.8 },
+        { caption: "Ketik isi baru. Kaki rel menunjukkan Menulis... lalu Tersimpan.", at: [ACC_X + 120, nY + 18], click: true, show: ["clr", "nama", "busy", "saved"], type: [typed("nama", ACC_X + 10, nY + 8, "Rania")], dur: 4.2 }
+      ]
+    };
+  })(),
+  "editor-klik-pratinjau": (() => {
+    const [tbCover] = toolbar(SC.x + SC.w, SC.y + 6, ["Isi"]);
+    return {
+      title: "Menunjuk dan mengklik nama mempelai di pratinjau",
+      world: PREV,
+      base: [shell("Konten", "Konten"), coverScreen()],
+      els: {
+        hover: { svg: frame(SC.y, SC.h, 2) + hoverTag(SC.x, SC.y, "Sampul · klik untuk mengisi"), enter: "fade" },
+        selCover: { svg: frame(SC.y, SC.h, 3) + tbCover, enter: "fade" },
+        pn: { svg: coverScreen({ names: "Rania & Dimas" }) + frame(SC.y, SC.h, 3) + tbCover, enter: "fade", delay: 0.6 }
+      },
+      steps: [
+        { caption: "Arahkan mouse ke nama mempelai. Sampul diberi garis biru dan label.", at: [922, 505], show: ["hover"], dur: 3.4 },
+        { caption: "Klik namanya. Sampul terpilih dan form Mempelai terbuka di kiri.", at: [922, 505], click: true, hide: ["hover"], show: ["selCover"], dur: 3.6 },
+        { caption: "Setelah kamu mengetik di form, pratinjau ikut berubah.", at: [1000, 640], show: ["pn"], dur: 3.6 }
       ]
     };
   })(),
@@ -752,22 +831,30 @@ const SCENES = {
     const page = cover({ top: SC.y }) + salamSec(SC.y + 784) + ayatSec(SC.y + 1204) + mempelaiSec(SC.y + 1534);
     return {
       title: "Memakai toolbar bagian di pratinjau",
-      world: { x: 72, y: 300, w: 1045, h: 600 },
-      base: [shell("Konten", "Konten"), kontenClosed(), rect(SC.x - 1, SC.y - 1, SC.w + 2, SC.h + 2, { fill: "rgba(16,24,40,.06)" })],
+      world: PREV,
+      base: [shell("Konten", "Konten"), rect(SC.x - 1, SC.y - 1, SC.w + 2, SC.h + 2, { fill: "rgba(16,24,40,.06)" })],
       els: {
         page: { svg: page },
         sel: { svg: frame(salamTop, 420, 3) + tb, enter: "fade" },
         gone: { svg: screen(rect(SC.x, salamTop, SC.w, 900, { fill: KENCANA.bg }), ayatSec(salamTop), mempelaiSec(salamTop + 330)), enter: "fade" },
-        mask: rect(400, SC.y + SC.h, 1040, 900 - SC.y - SC.h, { fill: C.svPreview }),
-        toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" }
+        mask: rect(400, SC.y + SC.h, 1040, 900 - SC.y - SC.h, { fill: C.svPreview })
       },
       steps: [
         { caption: "Gulir pratinjau, lalu klik bagian lain, misalnya Salam Pembuka.", at: [922, salamTop + 140], scroll: { id: "page", dy: PAGE_DY }, click: true, show: ["sel"], dur: 3.8 },
-        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", at: at.Sembunyikan, click: true, hide: ["sel"], show: ["gone", "toast"], dur: 4 },
-        { caption: "Salah klik? Klik Urungkan di pesan bawah. Bagian tampil lagi.", at: [345, 862], click: true, hide: ["gone", "toast"], show: ["sel"], dur: 3.8 }
+        { caption: "Toolbar: Isi buka form, ↑ ↓ pindah bagian. Klik Sembunyikan.", at: at.Sembunyikan, click: true, hide: ["sel"], show: ["gone"], dur: 4 }
       ]
     };
   })(),
+  "editor-klik-urungkan": {
+    title: "Mengurungkan Sembunyikan dari pesan di bawah panel",
+    world: PANEL,
+    base: [shell("Konten", "Konten"), kontenClosed()],
+    els: { toast: { svg: nkToast("Salam Pembuka disembunyikan."), enter: "slide" } },
+    steps: [
+      { caption: "Setelah Sembunyikan, muncul pesan Salam Pembuka disembunyikan.", at: [250, 640], show: ["toast"], dur: 3.2 },
+      { caption: "Klik Urungkan. Bagian tampil lagi. Pesan juga hilang sendiri.", at: [345, 862], click: true, hide: ["toast"], dur: 3.6 }
+    ]
+  },
 
   // ------------------------------------------------------------------------------------------- Klik di pratinjau: Inspect
   "editor-klik-inspect": (() => {
@@ -779,26 +866,35 @@ const SCENES = {
       text(ACC_X, sY + 218, "Foto slideshow (opsional, maks. 4)", { size: 12, weight: 500 }) + scrollbar(157, 300);
     return {
       title: "Memakai Inspect bila Klik aktif tidak tersedia",
-      world: GW,
-      base: [shell("Konten", "Konten"), insTool(false), kontenClosed(), coverScreen()],
+      world: PANEL,
+      base: [shell("Konten", "Konten"), insTool(false), kontenClosed()],
       els: {
         on: { svg: insTool(true), enter: "fade" },
         tip: { svg: note(96, 640, "Inspect aktif", 66, 725), enter: "fade" },
-        sel: { svg: rect(770, 360, 304, 56, { fill: "rgba(30,136,229,.12)", stroke: "#1e88e5", sw: 2 }), enter: "fade" },
         form: { svg: form, enter: "fade" }
       },
       steps: [
         { caption: "Klik Inspect di rel. Tulisannya berubah menjadi Inspect aktif.", at: [36, 725], click: true, show: ["on", "tip"], dur: 3.4 },
-        { caption: "Klik bagian di pratinjau. Formnya terbuka di Konten, tanpa toolbar.", at: [922, 390], click: true, hide: ["tip"], show: ["sel", "form"], dur: 3.8 },
-        { caption: "Selesai? Klik Inspect aktif lagi untuk mematikan.", at: [36, 725], click: true, hide: ["on", "sel"], dur: 3.4 }
+        { caption: "Klik bagian undangan di pratinjau. Form bagian itu terbuka di Konten.", at: [250, 400], hide: ["tip"], show: ["form"], dur: 3.8 },
+        { caption: "Selesai? Klik Inspect aktif lagi untuk mematikan.", at: [36, 725], click: true, hide: ["on"], dur: 3.4 }
       ]
     };
   })(),
+  "editor-klik-inspect-pratinjau": {
+    title: "Mengklik bagian di pratinjau dengan Inspect",
+    world: PREV,
+    base: [shell("Konten", "Konten"), coverScreen()],
+    els: { sel: { svg: rect(770, 360, 304, 56, { fill: "rgba(30,136,229,.12)", stroke: "#1e88e5", sw: 2 }), enter: "fade" } },
+    steps: [
+      { caption: "Dengan Inspect aktif, klik bagian undangan di pratinjau.", at: [922, 390], click: true, show: ["sel"], dur: 3.4 },
+      { caption: "Formnya terbuka di Konten. Kursor tidak masuk kolom, toolbar tidak muncul.", at: [1000, 600], dur: 3.6 }
+    ]
+  },
 
   // ------------------------------------------------------------------------------------------- Urungkan dan Ulangi
   "editor-urungkan-ulangi": {
     title: "Mengurungkan dan mengulangi perubahan",
-    world: GW,
+    world: PANEL,
     base: [shell("Konten", "Konten"), priaPanel("Dimaz"), coverScreen({ names: "Rani & Dimaz" })],
     els: {
       tipU: { svg: tooltip(8, 652, "Urungkan (Ctrl+Z)") + tooltip(40, 684, "Ulangi (Ctrl+Shift+Z)"), enter: "fade", delay: 0.6 },
@@ -818,7 +914,7 @@ const SCENES = {
       nkBtn(16, 237, "Kosongkan halaman", { variant: "danger", icon: "eraser" }) + quiet(16 + tw("Kosongkan halaman", 12, 500) + 52, 237, "Batal");
     return {
       title: "Mengosongkan halaman",
-      world: GW,
+      world: PANEL,
       base: [shell("Konten", "Konten"), priaPanel("Dimas"), coverScreen()],
       els: {
         red: { svg: rect(0, 752, 71, 46, { fill: C.page }) + icon("eraser", 36, 765, 18, C.danger) + text(36, 788, "Kosongkan", { size: 10, fill: C.danger, anchor: "middle" }) + note(96, 700, "Kosongkan", 66, 770), enter: "fade" },
@@ -837,15 +933,22 @@ const SCENES = {
   // ------------------------------------------------------------------------------------------- Kosongkan (langkah 4-5)
   "editor-kosongkan-hasil": {
     title: "Hasil Kosongkan dan cara mengurungkannya",
-    world: PV,
-    base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360), rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white })],
-    els: {
-      toast: { svg: nkToast("Halaman dikosongkan."), enter: "slide", delay: 0.4 },
-      back: { svg: coverScreen(), enter: "fade" }
-    },
+    world: PANEL,
+    base: [shell("Template", "Template"), templatePanel(), scrollbar(157, 360)],
+    els: { toast: { svg: nkToast("Halaman dikosongkan."), enter: "slide", delay: 0.4 } },
     steps: [
-      { caption: "Halaman kosong, menu Template terbuka, muncul pesan Halaman dikosongkan.", at: [700, 640], show: ["toast"], dur: 3.8 },
-      { caption: "Berubah pikiran? Klik Urungkan di pesan itu. Undangan kembali utuh.", at: [345, 862], click: true, hide: ["toast"], show: ["back"], dur: 3.8 }
+      { caption: "Menu Template terbuka. Di bawah muncul pesan Halaman dikosongkan.", at: [250, 640], show: ["toast"], dur: 3.6 },
+      { caption: "Berubah pikiran? Klik Urungkan di pesan itu.", at: [345, 862], click: true, hide: ["toast"], dur: 3.4 }
+    ]
+  },
+  "editor-kosongkan-pratinjau": {
+    title: "Pratinjau kosong, lalu kembali setelah Urungkan",
+    world: PREV,
+    base: [shell("Template", "Template"), rect(SC.x, SC.y, SC.w, SC.h, { fill: C.white })],
+    els: { back: { svg: coverScreen(), enter: "fade" } },
+    steps: [
+      { caption: "Setelah Kosongkan, pratinjau kosong seperti halaman HTML Mode baru.", dur: 3.2 },
+      { caption: "Setelah Urungkan, undangan kembali utuh.", show: ["back"], dur: 3.2 }
     ]
   },
 

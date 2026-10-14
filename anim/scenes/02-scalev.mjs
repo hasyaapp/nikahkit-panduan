@@ -242,7 +242,7 @@ const securityPanel = rect(0, T + 93, 399, 807, { fill: C.white }) + SEC.map((l,
   svInput(20, secY(i) + 10, 359, SEC_VAL[l] ? (SEC_VAL[l].length > 38 ? SEC_VAL[l].slice(0, 37) + "…" : SEC_VAL[l]) : "", { h: 40 })).join("");
 
 // ---- 4/6. Settings (measured 14 Okt 2026): the sub-menu list; Domain and Profil pages not captured ------------------
-const SUB = { x: 280, y: T + 94, w: 240 };
+const SUB = { x: 280, y: T + 94, w: 200 };
 const SUB_ITEMS = ["Bisnis", "Verifikasi", "Anggota", "Peran", "Gudang", "Payment Methods", "Bank Transfer", "Discount Code", "Courier", "Analitik", "Privasi pelanggan",
   "Domain", "Integrations", "Billing", "Add-ons", "Bahasa", "Suppressed IPs", "Apps", "Developers", "Profil"];
 const subAt = (n) => [SUB.x + 70, SUB.y + 26 + SUB_ITEMS.indexOf(n) * 27.5];
@@ -255,7 +255,8 @@ function settingsPage(active) {
   });
   return s;
 }
-const MAIN = { x: 544, y: T + 94, w: 860 };
+// Laid out like the real page in a 1058 px window (measured 14 Okt 2026: sub-menu 280..480, content to 1018).
+const MAIN = { x: 496, y: T + 94, w: 524 };
 const profileCard = (o = {}) => {
   const x = MAIN.x, y = MAIN.y;
   return card(x, y, MAIN.w, 330) + text(x + 24, y + 36, "Profil", { size: 16, weight: 600, fill: SV.ink }) + circle(x + 60, y + 104, 36, { fill: "#dbe7f3" }) + text(x + 60, y + 113, "R", { size: 26, weight: 600, fill: SV.blue, anchor: "middle" }) +
@@ -263,7 +264,7 @@ const profileCard = (o = {}) => {
     icon("smartphone", x + 228, y + 273, 15, SV.sub) + (o.phone ? text(x + 244, y + 278, o.phone, { size: 14, fill: SV.ink }) : bar(x + 244, y + 268, 120, 10)) + (o.edit === false ? "" : svBtn(x + MAIN.w - 104, y + 16, "Edit", { variant: "plain", w: 80, h: 36 }));
 };
 const EDIT_BTN = [MAIN.x + MAIN.w - 64, MAIN.y + 34];
-const PHONE_IN = { x: MAIN.x + 24, y: MAIN.y + 236, w: 360 };
+const PHONE_IN = { x: MAIN.x + 24, y: MAIN.y + 236, w: 300 };
 const editForm = card(MAIN.x, MAIN.y, MAIN.w, 400) + text(MAIN.x + 24, MAIN.y + 36, "Profil", { size: 16, weight: 600, fill: SV.ink }) +
   [0, 1].map((k) => bar(MAIN.x + 24, MAIN.y + 72 + k * 78, 90, 9, "#d5dae1") + svInput(MAIN.x + 24, MAIN.y + 88 + k * 78, 360, "") + bar(MAIN.x + 36, MAIN.y + 103 + k * 78, [160, 210][k])).join("") +
   bar(MAIN.x + 24, MAIN.y + 228 - 6, 90, 9, "#d5dae1") + svInput(PHONE_IN.x, PHONE_IN.y, PHONE_IN.w, "", { focus: true }) + icon("smartphone", PHONE_IN.x + 18, PHONE_IN.y + 20, 15, SV.sub) +
@@ -275,24 +276,24 @@ const domainSection = card(MAIN.x, MAIN.y, MAIN.w, 520) + text(MAIN.x + 24, MAIN
   svBtn(MAIN.x + MAIN.w - 184, MAIN.y + 16, "Tambahkan Domain", { w: 160 }) + line(MAIN.x, MAIN.y + 72.5, MAIN.x + MAIN.w, MAIN.y + 72.5, { stroke: SV.line }) +
   icon("map", MAIN.x + MAIN.w / 2, MAIN.y + 170, 34, "#c3cad3", 1.6) + bar(MAIN.x + MAIN.w / 2 - 110, MAIN.y + 214, 220);
 const ADD_BTN = [MAIN.x + MAIN.w - 104, MAIN.y + 36];
-const MD = { x: 470, y: T + 250, w: 500, h: 210 };
+const MD = { x: 405, y: T + 250, w: 500, h: 210 };
 const DOM_IN = { x: MD.x + 24, y: MD.y + 82, w: 452 };
 const domainDlg = shadow(MD.x, MD.y, MD.w, MD.h, 8, 3) + rect(MD.x, MD.y, MD.w, MD.h, { r: 8, fill: C.white }) + text(MD.x + 24, MD.y + 40, "Tambahkan Domain", { size: 16, weight: 600, fill: SV.ink }) +
   iconX("x", MD.x + MD.w - 30, MD.y + 34, 18, SV.sub) + svInput(DOM_IN.x, DOM_IN.y, DOM_IN.w, "", { focus: true }) + svBtn(MD.x + MD.w - 104, MD.y + 146, "Simpan", { w: 80 });
 const DOM_SAVE = [MD.x + MD.w - 64, MD.y + 166];
 const DNS_ROWS = [["A", "undangan"], [null, null], [null, null]];
 const dnsHead = rect(MAIN.x + 1, MAIN.y + 73, MAIN.w - 2, 446, { fill: C.white }) + text(MAIN.x + 24, MAIN.y + 110, "undangan.namabrand.com", { size: 15, weight: 600, fill: SV.ink, mono: true }) +
-  rect(MAIN.x + 24, MAIN.y + 130, MAIN.w - 48, 36, { fill: "#f6f8fa" }) + [["Type", 40], ["Name", 160], ["Target", 380]].map(([l, dx]) => text(MAIN.x + dx, MAIN.y + 153, l, { size: 12, weight: 600, fill: SV.sub })).join("") +
+  rect(MAIN.x + 24, MAIN.y + 130, MAIN.w - 48, 36, { fill: "#f6f8fa" }) + [["Type", 40], ["Name", 140], ["Target", 280]].map(([l, dx]) => text(MAIN.x + dx, MAIN.y + 153, l, { size: 12, weight: 600, fill: SV.sub })).join("") +
   svBtn(MAIN.x + MAIN.w - 144, MAIN.y + 88, "Verifikasi", { variant: "outline", w: 120, h: 36 });
 const VERIFY = [MAIN.x + MAIN.w - 84, MAIN.y + 106];
 const dnsRow = (i) => {
   const y = MAIN.y + 166 + i * 52, [t, n] = DNS_ROWS[i];
   return line(MAIN.x + 24, y + 51.5, MAIN.x + MAIN.w - 24, y + 51.5, { stroke: SV.line }) + (t ? text(MAIN.x + 40, y + 31, t, { size: 14, weight: 600, fill: SV.ink, mono: true }) : bar(MAIN.x + 40, y + 21, 40)) +
-    (n ? text(MAIN.x + 160, y + 31, n, { size: 14, fill: SV.ink, mono: true }) : bar(MAIN.x + 160, y + 21, 150)) + bar(MAIN.x + 380, y + 21, [260, 330, 300][i]) + iconX("file-text", MAIN.x + MAIN.w - 50, y + 26, 15, SV.sub);
+    (n ? text(MAIN.x + 140, y + 31, n, { size: 14, fill: SV.ink, mono: true }) : bar(MAIN.x + 140, y + 21, 110)) + bar(MAIN.x + 280, y + 21, [140, 160, 150][i]) + iconX("file-text", MAIN.x + MAIN.w - 50, y + 26, 15, SV.sub);
 };
 const verified = icon("circle-check", MAIN.x + 246, MAIN.y + 105, 20, "#15a34a");
 // Cloudflare DNS (not captured): a second window with the labels the guide names.
-const CF = { x: 720, y: 400, w: 680, h: 330 };
+const CF = { x: 320, y: 380, w: 680, h: 330 };
 const cfOrange = "#f38020";
 const cfWin = shadow(CF.x, CF.y, CF.w, CF.h, 10, 4) + rect(CF.x, CF.y, CF.w, CF.h, { r: 10, fill: C.white }) + rect(CF.x, CF.y, CF.w, 44, { r: 10, fill: "#f2f2f2" }) + rect(CF.x, CF.y + 30, CF.w, 14, { fill: "#f2f2f2" }) +
   [["#ff5f57", 20], ["#febc2e", 40], ["#28c840", 60]].map(([c, dx]) => circle(CF.x + dx, CF.y + 22, 6, { fill: c })).join("") +
@@ -308,28 +309,28 @@ const cfForm = rect(CF.x + 16, CF.y + 124, CF.w - 32, 190, { r: 6, fill: "#f8f9f
 
 // ---- 5. Stores (not captured) ---------------------------------------------------------------------------------------
 const STORE_ROW = { x: 280, y: T + 94 };
-const storesPage = scalevApp(0, T, { active: "Stores" }) + head("Stores") + card(280, T + 94, 1124, 300) + rect(281, T + 95, 1122, 40, { fill: "#f6f8fa" }) +
-  [0, 1, 2].map((k) => bar(304 + k * 300, T + 111, 80, 9, "#d5dae1")).join("") +
-  rect(281, T + 135, 1122, 64, { fill: C.white }) + circle(320, T + 167, 18, { fill: "#dbe7f3" }) + iconX("home", 320, T + 167, 16, SV.blue) +
-  text(352, T + 172, "Rina WO", { size: 14, weight: 600, fill: SV.link }) + bar(604, T + 162, 180) + bar(904, T + 162, 120) + line(281, T + 199.5, 1403, T + 199.5, { stroke: SV.line }) +
-  bar(352, T + 226, 130) + bar(604, T + 226, 160) + bar(904, T + 226, 90);
+const storesPage = scalevApp(0, T, { active: "Stores" }) + head("Stores") + card(280, T + 94, 740, 300) + rect(281, T + 95, 738, 40, { fill: "#f6f8fa" }) +
+  [0, 1, 2].map((k) => bar(304 + k * 225, T + 111, 80, 9, "#d5dae1")).join("") +
+  rect(281, T + 135, 738, 64, { fill: C.white }) + circle(320, T + 167, 18, { fill: "#dbe7f3" }) + iconX("home", 320, T + 167, 16, SV.blue) +
+  text(352, T + 172, "Rina WO", { size: 14, weight: 600, fill: SV.link }) + bar(529, T + 162, 180) + bar(754, T + 162, 120) + line(281, T + 199.5, 1019, T + 199.5, { stroke: SV.line }) +
+  bar(352, T + 226, 130) + bar(529, T + 226, 160) + bar(754, T + 226, 90);
 const STORE_AT = [384, T + 167];
 const DET_TOP = T + 70;
 const detHead = rect(256, T, 1184, 70, { fill: C.white }) + line(256, T + 70.5, 1440, T + 70.5, { stroke: SV.line }) + iconX("arrow-left", 290, T + 36, 18, SV.ink) + text(316, T + 43, "Rina WO", { size: 18, weight: 600, fill: SV.ink });
-const TOP_SAVE = { x: 1300, y: T + 16 };
+const TOP_SAVE = { x: 900, y: T + 16 };
 const topSave = svBtn(TOP_SAVE.x, TOP_SAVE.y, "Simpan", { w: 100 });
 const PM_Y = T + 94 + 3 * 200; // Metode Pembayaran card top (before scroll)
 const DET_DY = 520;
 const detContent = rect(256, DET_TOP, 1184, 1500, { fill: SV.bg }) +
-  [0, 1, 2].map((k) => card(280, T + 94 + k * 200, 1124, 176) + bar(304, T + 124 + k * 200, 160, 12, "#dfe4ea") + bar(304, T + 160 + k * 200, 360) + rect(304.5, T + 186.5 + k * 200, 520, 39, { r: 4, fill: C.white, stroke: "#d5dae1" }) + bar(316, T + 201 + k * 200, 200)).join("") +
-  card(280, PM_Y, 1124, 200) + text(304, PM_Y + 38, "Metode Pembayaran", { size: 16, weight: 600, fill: SV.ink }) + bar(304, PM_Y + 62, 420) +
-  svBtn(304, PM_Y + 90, "Pilih Metode Pembayaran", { variant: "outline", w: 220 }) + card(280, PM_Y + 224, 1124, 176) + bar(304, PM_Y + 254, 160, 12, "#dfe4ea");
+  [0, 1, 2].map((k) => card(280, T + 94 + k * 200, 740, 176) + bar(304, T + 124 + k * 200, 160, 12, "#dfe4ea") + bar(304, T + 160 + k * 200, 360) + rect(304.5, T + 186.5 + k * 200, 520, 39, { r: 4, fill: C.white, stroke: "#d5dae1" }) + bar(316, T + 201 + k * 200, 200)).join("") +
+  card(280, PM_Y, 740, 200) + text(304, PM_Y + 38, "Metode Pembayaran", { size: 16, weight: 600, fill: SV.ink }) + bar(304, PM_Y + 62, 420) +
+  svBtn(304, PM_Y + 90, "Pilih Metode Pembayaran", { variant: "outline", w: 220 }) + card(280, PM_Y + 224, 740, 176) + bar(304, PM_Y + 254, 160, 12, "#dfe4ea");
 const detBody = clipCss("detBody", 256, DET_TOP + 1, 1184, 900) + detContent;
 const chosenRow = rect(304, PM_Y + 146 - DET_DY, 300, 36, { r: 4, fill: SV.soft }) + iconX("credit-card", 324, PM_Y + 164 - DET_DY, 16, SV.blue) + text(342, PM_Y + 169 - DET_DY, "Invoice · ALL E-Payment", { size: 14, weight: 500, fill: SV.ink });
 // The store page after the dialog closes (body already scrolled), drawn over the dialog.
 const detAfter = scalevApp(0, T, { active: "Stores" }) + clipped(256, DET_TOP + 1, 1184, 900, `<g transform="translate(0 ${-DET_DY})">${detContent}</g>`) + chosenRow + detHead;
 const PICK = [414, PM_Y + 110 - DET_DY];
-const PD = { x: 450, y: T + 230, w: 540, h: 290 };
+const PD = { x: 385, y: T + 230, w: 540, h: 290 };
 const SEL = { x: PD.x + 24, y: PD.y + 72, w: 492 };
 const payDlg = shadow(PD.x, PD.y, PD.w, PD.h, 8, 3) + rect(PD.x, PD.y, PD.w, PD.h, { r: 8, fill: C.white }) + bar(PD.x + 24, PD.y + 32, 200, 12, "#dfe4ea") + iconX("x", PD.x + PD.w - 30, PD.y + 38, 18, SV.sub) +
   svInput(SEL.x, SEL.y, SEL.w, "", { select: true }) + bar(SEL.x + 12, SEL.y + 15, 140) + check(PD.x + 24, PD.y + 150, false) +
@@ -343,7 +344,7 @@ const CHECK_AT = [PD.x + 33, PD.y + 159];
 const DLG_SAVE = [PD.x + PD.w - 64, PD.y + 250];
 
 // ---- 6. WhatsApp (not captured): chat window with the OTP draft to Scalev's official number ---------------------------
-const WA = { x: 800, y: 190, w: 600, h: 470 };
+const WA = { x: 420, y: 190, w: 600, h: 470 };
 const waGreen = "#008069";
 const waWin = shadow(WA.x, WA.y, WA.w, WA.h, 10, 4) + rect(WA.x, WA.y, WA.w, WA.h, { r: 10, fill: "#efeae2" }) + rect(WA.x, WA.y, WA.w, 64, { r: 10, fill: "#f0f2f5" }) + rect(WA.x, WA.y + 50, WA.w, 14, { fill: "#f0f2f5" }) +
   circle(WA.x + 36, WA.y + 32, 20, { fill: "#dfe5e7" }) + icon("users", WA.x + 36, WA.y + 32, 18, "#8696a0") + text(WA.x + 68, WA.y + 38, "+6282125784683", { size: 15, weight: 500, fill: "#111b21" }) +
@@ -354,10 +355,11 @@ const waSend = circle(WA_SEND[0], WA_SEND[1], 21, { fill: waGreen }) + icon("sen
 const waBubble = rect(WA.x + 16, WA.y + WA.h - 52, WA.w - 92, 40, { r: 8, fill: C.white }) +
   rect(WA.x + WA.w - 336, WA.y + WA.h - 150, 316, 64, { r: 8, fill: "#d9fdd3" }) + bar(WA.x + WA.w - 320, WA.y + WA.h - 132, 220, 10, "#a8c9a2") + bar(WA.x + WA.w - 320, WA.y + WA.h - 112, 90, 10, "#7fa978") +
   `<path d="M${WA.x + WA.w - 58} ${WA.y + WA.h - 100} l3 3 l6 -7 M${WA.x + WA.w - 52} ${WA.y + WA.h - 100} l3 3 l6 -7" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round"/>`;
-const confirmDlg = shadow(520, T + 260, 400, 220, 8, 3) + rect(520, T + 260, 400, 220, { r: 8, fill: C.white }) + bar(544, T + 292, 200, 12, "#dfe4ea") +
-  icon("smartphone", 560, T + 352, 18, SV.sub) + text(578, T + 359, "081234567890", { size: 20, weight: 600, fill: SV.ink, mono: true }) + bar(544, T + 384, 300) +
-  svBtn(776, T + 420, "Verifikasi", { w: 120 });
-const VERIF_AT = [836, T + 440];
+const CD = { x: 455, y: T + 260 };
+const confirmDlg = shadow(CD.x, CD.y, 400, 220, 8, 3) + rect(CD.x, CD.y, 400, 220, { r: 8, fill: C.white }) + bar(CD.x + 24, CD.y + 32, 200, 12, "#dfe4ea") +
+  icon("smartphone", CD.x + 40, CD.y + 92, 18, SV.sub) + text(CD.x + 58, CD.y + 99, "081234567890", { size: 20, weight: 600, fill: SV.ink, mono: true }) + bar(CD.x + 24, CD.y + 124, 300) +
+  svBtn(CD.x + 256, CD.y + 160, "Verifikasi", { w: 120 });
+const VERIF_AT = [CD.x + 316, CD.y + 180];
 const cekBtn = svBtn(CEK.x, CEK.y, "Cek Verifikasi", { variant: "outline", w: 140 });
 
 // ---- 7. Thumbnail: the square image, SEO & PAGE IDENTITY (measured), WhatsApp link card ---------------------------------
@@ -408,11 +410,10 @@ function waLink(x, y, w) {
     text(x + 10, y + p + 30, PUB_URL, { size: 14, fill: "#027eb5" }) + text(x + w - 54, y + p + 60, "10.12", { size: 11, fill: "#667781" }) +
     `<path d="M${x + w - 20} ${y + p + 54} l3 3 l6 -7 M${x + w - 14} ${y + p + 54} l3 3 l6 -7" fill="none" stroke="#53bdeb" stroke-width="1.6" stroke-linecap="round"/>`;
 }
-const WAD = { x: 470, y: T + 130, w: 920, h: 520 };
+const WAD = { x: 470, y: T + 130, w: 740, h: 520 };
 const waDesk = shadow(WAD.x, WAD.y, WAD.w, WAD.h, 10, 4) + rect(WAD.x, WAD.y, WAD.w, WAD.h, { r: 10, fill: "#efeae2" }) + rect(WAD.x, WAD.y, WAD.w, 64, { r: 10, fill: "#f0f2f5" }) + rect(WAD.x, WAD.y + 50, WAD.w, 14, { fill: "#f0f2f5" }) +
   circle(WAD.x + 36, WAD.y + 32, 20, { fill: "#dfe5e7" }) + icon("users", WAD.x + 36, WAD.y + 32, 18, "#8696a0") + text(WAD.x + 68, WAD.y + 38, "Rina WO (Anda)", { size: 15, weight: 500, fill: "#111b21" }) +
-  rect(WAD.x, WAD.y + WAD.h - 64, WAD.w, 64, { r: 10, fill: "#f0f2f5" }) + rect(WAD.x, WAD.y + WAD.h - 64, WAD.w, 14, { fill: "#f0f2f5" }) + rect(WAD.x + 16, WAD.y + WAD.h - 52, WAD.w - 32, 40, { r: 8, fill: C.white }) +
-  waLink(WAD.x + WAD.w - 356, WAD.y + 220, 340);
+  rect(WAD.x, WAD.y + WAD.h - 64, WAD.w, 64, { r: 10, fill: "#f0f2f5" }) + rect(WAD.x, WAD.y + WAD.h - 64, WAD.w, 14, { fill: "#f0f2f5" }) + rect(WAD.x + 16, WAD.y + WAD.h - 52, WAD.w - 32, 40, { r: 8, fill: C.white });
 
 // ---- 8. Canva (gallery measured from canva.com/wedding-invitations/templates; menus and editor not captured) ------------
 const CV = { p: "#8b3dff", ink: "#0e1318", sub: "#545f71", top: 85 };
@@ -428,17 +429,18 @@ const cvCard = ([x, w, name, pro], i) => {
     [0, 1, 2].map((k) => bar(x + w / 2 - 40 + k * 6, CY + 120 + k * 18, 80 - k * 12, 6, dark ? "#8f8b86" : "#d8d4cf")).join("") +
     (pro ? crown(x + w - 22, CY + 218) : "") + text(x, CY + 266, name, { size: 13, fill: CV.ink });
 };
-const CVW = 1060; // window width (the gallery reflows to four cards, as Canva does)
-const CREATE_CV = { x: CVW - 220, y: CV.top + 20, w: 170, h: 40 };
+const CVW = 780; // window width (the gallery reflows to three cards, as Canva does)
+const CREATE_CV = { x: CVW - 170, y: CV.top + 20, w: 150, h: 40 };
+const NAV = ["Design", "Product", "Plans", "Business", "Education", "Help"].reduce((a, n) => [...a, [n, a.length ? a.at(-1)[1] + tw(a.at(-1)[0], 14, 500) + 20 : 170]], []);
 const canvaWin = (o) => chrome(0, 0, CVW, 715, { tabs: o.tabs, url: o.url });
 const gallery = canvaWin({ tabs: [{ title: "Wedding invitation templates | Canva", active: true, w: 300, fav: favCanva }], url: "canva.com/wedding-invitations/templates" }) +
   rect(0, CV.top, CVW, 630, { fill: C.white }) + rect(0, CV.top, CVW, 130, { fill: "#f4f1fe" }) +
   text(32, CV.top + 46, "Canva", { size: 30, weight: 700, fill: "#7d2ae8", italic: true, font: SERIF }) +
-  ["Design", "Product", "Plans", "Business", "Education", "Help"].map((n, i) => text(330 + i * 92, CV.top + 45, n, { size: 15, weight: 500, fill: CV.ink })).join("") +
+  NAV.map(([n, x]) => text(x, CV.top + 45, n, { size: 14, weight: 500, fill: CV.ink })).join("") +
   rect(CREATE_CV.x, CREATE_CV.y, CREATE_CV.w, CREATE_CV.h, { r: 8, fill: CV.p }) + text(CREATE_CV.x + CREATE_CV.w / 2, CREATE_CV.y + 26, "Create a design", { size: 15, weight: 600, fill: C.white, anchor: "middle" }) +
   text(32, CV.top + 100, "Home  ›  Wedding invitation templates", { size: 14, fill: CV.ink }) +
   text(CVW / 2, CV.top + 160, "Wedding invitation templates", { size: 36, weight: 500, fill: CV.ink, anchor: "middle" }) +
-  text(32, CV.top + 210, "Top printed wedding invites", { size: 19, weight: 600, fill: CV.ink }) + CARDS.map(cvCard).join("") +
+  text(32, CV.top + 210, "Top printed wedding invites", { size: 19, weight: 600, fill: CV.ink }) + CARDS.slice(0, 3).map(cvCard).join("") +
   rect(32.5, CV.top + 525.5, 464, 42, { r: 8, fill: C.white, stroke: "#c9ced6" }) + iconX("search", 56, CV.top + 547, 17, CV.sub) + text(76, CV.top + 552, "Search thousands of templates", { size: 15, fill: CV.sub });
 const POP = { x: CVW - 340, y: CV.top + 68, w: 290 };
 const popBox = (h) => shadow(POP.x, POP.y, POP.w, h, 8, 3) + rect(POP.x, POP.y, POP.w, h, { r: 8, fill: C.white });
@@ -454,7 +456,7 @@ const cvSize = popBox(184) + text(POP.x + 16, POP.y + 32, "Custom size", { size:
 const cvW = text(POP.x + 28, POP.y + 91, "1080", { size: 14, fill: CV.ink }), cvH = text(POP.x + 140, POP.y + 91, "1080", { size: 14, fill: CV.ink });
 const NEW_AT = [POP.x + POP.w / 2, POP.y + 145];
 // Canva editor (generic): gradient bar, tool rail, the 1080x1080 page with the elements copied from the template.
-const SQ = { x: 351, y: CV.top + 92, s: 430 };
+const SQ = { x: 211, y: CV.top + 92, s: 430 };
 const SHARE_CV = { x: CVW - 130, y: CV.top + 12, w: 106, h: 34 };
 const cvEditor = canvaWin({ tabs: [{ title: "Wedding invitations | Canva", w: 260, fav: favCanva }, { title: "rani-dimas - 1080 × 1080px", active: true, w: 260, fav: favCanva }], url: "canva.com/design" }) +
   `<defs><linearGradient id="cvBar" x1="0" x2="1"><stop offset="0" stop-color="#00c4cc"/><stop offset="1" stop-color="#7d2ae8"/></linearGradient></defs>` +
@@ -531,70 +533,94 @@ const bizMenu = shadow(24, T + 120, 268, 223, 6, 2) + rect(24, T + 120, 268, 223
   rect(41, T + 171, 234, 40, { r: 4, fill: C.white, stroke: "#d5dae1", sw: 2 }) + text(54, T + 196, "Cari Bisnis", { size: 14, fill: "#8d97a3" }) + iconX("search", 252, T + 191, 13, "#3b4350") +
   rect(41, T + 227, 234, 53, { r: 4, fill: "#f8fafc", stroke: SV.blue, sw: 2 }) + text(66, T + 258, "R", { size: 12, weight: 700, fill: "#3b4350", anchor: "middle" }) + text(86, T + 258, "Rina WO", { size: 14, weight: 500, fill: SV.ink }) +
   text(158, T + 314, "+ Buat Bisnis Baru", { size: 12, weight: 500, fill: SV.link, anchor: "middle" });
-const mfaCard = rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }) + card(MAIN.x, MAIN.y, MAIN.w, 310) + text(MAIN.x + 24, MAIN.y + 38, "Security", { size: 16, weight: 600, fill: SV.ink }) +
-  rect(MAIN.x + 24, MAIN.y + 58, MAIN.w - 48, 92, { r: 6, fill: "#ecf8f1" }) + iconX("check", MAIN.x + 48, MAIN.y + 84, 16, "#15a34a") +
+const mfaCard = rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }) + card(MAIN.x, MAIN.y, MAIN.w, 330) + text(MAIN.x + 24, MAIN.y + 38, "Security", { size: 16, weight: 600, fill: SV.ink }) +
+  rect(MAIN.x + 24, MAIN.y + 58, MAIN.w - 48, 110, { r: 6, fill: "#ecf8f1" }) + iconX("check", MAIN.x + 48, MAIN.y + 84, 16, "#15a34a") +
   text(MAIN.x + 72, MAIN.y + 88, "Multi-Factor Authentication (MFA) is Always Active", { size: 14, weight: 600, fill: SV.ink }) +
-  para(MAIN.x + 72, MAIN.y + 110, ["By default, MFA method is using Email OTP, and you can switch to use Authenticator App", "for better security. MFA is used for: login, fund withdrawal, and change business owner."], { size: 13, fill: "#3b4350", lh: 18 }) +
-  text(MAIN.x + 24, MAIN.y + 188, "Multi-Factor Authentication Method", { size: 12, fill: SV.sub }) + text(MAIN.x + 24, MAIN.y + 214, "Email OTP", { size: 15, weight: 500, fill: SV.ink }) +
-  line(MAIN.x + 24, MAIN.y + 236.5, MAIN.x + MAIN.w - 24, MAIN.y + 236.5, { stroke: SV.line }) + text(MAIN.x + 24, MAIN.y + 262, "Backup Codes", { size: 12, fill: SV.sub }) +
-  text(MAIN.x + 24, MAIN.y + 286, "Emergency access codes for account recovery", { size: 14, fill: SV.ink });
+  para(MAIN.x + 72, MAIN.y + 110, ["By default, MFA method is using Email OTP, and you can switch", "to use Authenticator App for better security. MFA is used for:", "login, fund withdrawal, and change business owner."], { size: 13, fill: "#3b4350", lh: 18 }) +
+  text(MAIN.x + 24, MAIN.y + 206, "Multi-Factor Authentication Method", { size: 12, fill: SV.sub }) + text(MAIN.x + 24, MAIN.y + 232, "Email OTP", { size: 15, weight: 500, fill: SV.ink }) +
+  line(MAIN.x + 24, MAIN.y + 254.5, MAIN.x + MAIN.w - 24, MAIN.y + 254.5, { stroke: SV.line }) + text(MAIN.x + 24, MAIN.y + 280, "Backup Codes", { size: 12, fill: SV.sub }) +
+  text(MAIN.x + 24, MAIN.y + 304, "Emergency access codes for account recovery", { size: 14, fill: SV.ink });
 
 // ---- 12. Domain preparation (registrar and Cloudflare not captured: generic) and the page's domain (editor, measured) --
-const genWin = (title, url, fav) => chrome(0, 0, 1280, 715, { tabs: [{ title, active: true, w: 260, fav }], url }) + rect(0, CV.top, 1280, 630, { fill: C.white });
+const GW = 780; // registrar and Cloudflare drawn in a 780 px window
+const genWin = (title, url, fav) => chrome(0, 0, GW, 715, { tabs: [{ title, active: true, w: 260, fav }], url }) + rect(0, CV.top, GW, 630, { fill: C.white });
 const regPage = genWin("Penyedia domain", "penyedia-domain › namabrand.com") + rect(80.5, CV.top + 60.5, 600, 47, { r: 6, stroke: "#c9ced6" }) + text(98, CV.top + 90, "namabrand.com", { size: 16, fill: C.ink }) +
-  card(80, CV.top + 140, 1120, 90) + text(104, CV.top + 182, "namabrand.com", { size: 20, weight: 600, fill: C.ink }) + bar(104, CV.top + 200, 160) +
-  rect(1060, CV.top + 162, 116, 44, { r: 6, fill: "#2f6fde" }) + text(1118, CV.top + 190, "Beli", { size: 15, weight: 600, fill: C.white, anchor: "middle" }) +
-  card(80, CV.top + 250, 1120, 72) + check(104, CV.top + 277, false) + text(136, CV.top + 292, "Hosting", { size: 16, fill: C.ink }) + bar(240, CV.top + 282, 300);
+  card(80, CV.top + 140, 620, 90) + text(104, CV.top + 182, "namabrand.com", { size: 20, weight: 600, fill: C.ink }) + bar(104, CV.top + 200, 160) +
+  rect(560, CV.top + 162, 116, 44, { r: 6, fill: "#2f6fde" }) + text(618, CV.top + 190, "Beli", { size: 15, weight: 600, fill: C.white, anchor: "middle" }) +
+  card(80, CV.top + 250, 620, 72) + check(104, CV.top + 277, false) + text(136, CV.top + 292, "Hosting", { size: 16, fill: C.ink }) + bar(240, CV.top + 282, 300);
 const cfSign = genWin("Cloudflare", "dash.cloudflare.com/sign-up", (cx, cy) => circle(cx, cy, 8, { fill: cfOrange })) +
-  `<path d="M${560} ${CV.top + 110} a16 16 0 0 1 6 -28 a20 20 0 0 1 38 6 a12 12 0 0 1 4 22 z" fill="${cfOrange}"/>` + text(616, CV.top + 108, "Cloudflare", { size: 26, weight: 600, fill: "#1f1f1f" }) +
-  [0, 1].map((k) => rect(440.5, CV.top + 160.5 + k * 74, 400, 47, { r: 6, stroke: "#c9ced6" }) + bar(456, CV.top + 180 + k * 74, 160, 9, "#e4e6ea")).join("") + rect(440, CV.top + 320, 400, 48, { r: 6, fill: cfOrange });
+  `<path d="M${310} ${CV.top + 110} a16 16 0 0 1 6 -28 a20 20 0 0 1 38 6 a12 12 0 0 1 4 22 z" fill="${cfOrange}"/>` + text(366, CV.top + 108, "Cloudflare", { size: 26, weight: 600, fill: "#1f1f1f" }) +
+  [0, 1].map((k) => rect(190.5, CV.top + 160.5 + k * 74, 400, 47, { r: 6, stroke: "#c9ced6" }) + bar(206, CV.top + 180 + k * 74, 160, 9, "#e4e6ea")).join("") + rect(190, CV.top + 320, 400, 48, { r: 6, fill: cfOrange });
 const nsPage = genWin("Penyedia domain", "penyedia-domain › namabrand.com › nameserver") + text(80, CV.top + 70, "namabrand.com", { size: 24, weight: 700, fill: C.ink }) +
-  card(80, CV.top + 100, 700, 250) + text(104, CV.top + 140, "Nameserver", { size: 18, weight: 600, fill: C.ink }) +
+  card(80, CV.top + 100, 620, 250) + text(104, CV.top + 140, "Nameserver", { size: 18, weight: 600, fill: C.ink }) +
   ["ana.ns.cloudflare.com", "bob.ns.cloudflare.com"].map((v, k) => rect(104.5, CV.top + 164.5 + k * 60, 520, 45, { r: 6, stroke: "#c9ced6" }) + text(120, CV.top + 193 + k * 60, v, { size: 16, fill: C.ink, mono: true })).join("") +
   rect(104, CV.top + 290, 120, 42, { r: 6, fill: "#2f6fde" }) + text(164, CV.top + 317, "Simpan", { size: 15, weight: 600, fill: C.white, anchor: "middle" });
 
-const DASH = { x: 270, y: T, w: 1150, h: 640 }; // Scalev dashboard main area
+const DASH = { x: 270, y: T, w: 770, h: 690 }; // Scalev dashboard main area (1058 px window)
 const PANEL = { x: 0, y: T + 44, w: 400, h: 856 }; // editor tab strip + left panel
 const SET_PUB = () => scalevEditor(0, T, { tab: "Settings" }) + settingsPanel({ now: "https://tokomu.myscalev.com/undangan-baru" }) + cover(SC.x, SC.y);
 
 export const scenes = {
   "scalev-buat-halaman-html": {
-    title: "Membuat halaman HTML Mode di Scalev untuk undangan",
-    world: { x: 0, y: T, w: 1000, h: 558 },
+    title: "Membuka Landing Pages di dasbor Scalev",
+    world: { x: 0, y: T, w: 256, h: 640 },
     base: [win(), scalevApp(0, T, { active: "Home" }), head("Home"), genericBody()],
+    els: { lp: { svg: scalevApp(0, T, { active: "Landing Pages" }) + lpPage(), enter: "fade" } },
+    steps: [{ caption: "Di dasbor Scalev, klik Landing Pages di menu kiri.", at: menu("Landing Pages"), click: true, show: ["lp"], dur: 3.4 }]
+  },
+
+  "scalev-lp-html": {
+    title: "Membuat landing page baru tipe HTML Mode",
+    world: { x: 270, y: T, w: 820, h: 600 },
+    base: [win(), scalevApp(0, T, { active: "Landing Pages" }), lpPage(), ...LP_ROWS.map((_, i) => lpRow(i))],
     els: {
-      lp: { svg: scalevApp(0, T, { active: "Landing Pages" }) + lpPage(), enter: "fade" },
-      ...Object.fromEntries(LP_ROWS.map((_, i) => [`row${i}`, { svg: lpRow(i), delay: 0.12 + i * 0.06 }])),
-      create: { svg: btnCreate, enter: "fade" },
+      create: btnCreate,
       shade: { svg: dim(0, T, 1440, 900), enter: "fade" },
       typeDlg: { svg: typeDlg, enter: "pop", origin: [CREATE.x + CREATE.w / 2, CREATE.y + 20] },
-      edCode: { svg: scalevEditor(0, T, { tab: "Code" }) + desktopPreview, enter: "fade" },
+      tile: { svg: rect(DLG.x + 260.5, DLG.y + 74.5, 215, 190, { r: 6, fill: SV.soft, stroke: SV.blue, sw: 3 }) + icon("code-xml", DLG.x + 368, DLG.y + 140, 34, SV.blue, 1.8) + text(DLG.x + 368, DLG.y + 204, "HTML Mode", { size: 16, weight: 700, fill: SV.ink, anchor: "middle" }) + bar(DLG.x + 298, DLG.y + 222, 140, 8), enter: "fade" }
+    },
+    steps: [
+      { caption: "Klik + Create Landing Page.", at: [CREATE.x + CREATE.w / 2, CREATE.y + 20], click: true, press: "create", show: ["shade", "typeDlg"] },
+      { caption: "Pilih tipe HTML Mode.", at: HTML_TILE, click: true, press: "tile", show: ["tile"], dur: 3.2 }
+    ]
+  },
+
+  "scalev-tab-nikahkit": {
+    title: "Editor HTML Mode terbuka, lalu klik tab NikahKit",
+    world: { x: 0, y: T, w: 720, h: 560 },
+    base: [win(), scalevEditor(0, T, { tab: "Code" }), desktopPreview],
+    els: {
+      tabsRing: { svg: ring(8, T + 52, 210, 28, { r: 6 }), enter: "pop", delay: 0.3 },
       tabRing: { svg: ring(226, T + 52, 82, 28, { r: 6 }), enter: "pop" },
       edNk: { svg: scalevEditor(0, T, { tab: "NikahKit", rail: "Template", screenFill: "#ffffff" }) + templatePanel() + lockRail, enter: "fade" },
       tip: { svg: lockTip, enter: "fade", delay: 0.8 }
     },
     steps: [
-      { caption: "Di dasbor Scalev, klik Landing Pages di menu kiri.", at: menu("Landing Pages"), click: true, show: ["lp", "row0", "row1", "row2", "row3", "create"] },
-      { caption: "Klik + Create Landing Page.", at: [CREATE.x + CREATE.w / 2, CREATE.y + 20], click: true, press: "create", show: ["shade", "typeDlg"] },
-      { caption: "Pilih HTML Mode. Editor terbuka: Code, Media, Security, Settings.", at: HTML_TILE, click: true, show: ["edCode"], hide: ["shade", "typeDlg"], dur: 3.6 },
-      { caption: "Tab NikahKit berlogo biru ada di ujung strip tab.", at: at(ED.tab.NikahKit), show: ["tabRing"] },
+      { caption: "Editor terbuka dengan tab Code, Media, Security, Settings.", show: ["tabsRing"], dur: 3.2 },
+      { caption: "Tab NikahKit berlogo biru ada di ujung strip tab.", at: at(ED.tab.NikahKit), show: ["tabRing"], hide: ["tabsRing"] },
       { caption: "Klik NikahKit. Menu selain Template dan Media terkunci.", at: at(ED.tab.NikahKit), click: true, show: ["edNk", "tip"], hide: ["tabRing"], dur: 4 }
     ]
   },
 
   "scalev-slug-simpan": {
-    title: "Klik Simpan sampai halaman punya ID undangan",
-    world: { x: 140, y: 0, w: 1150, h: 380 },
+    title: "Klik Simpan di kanan atas editor",
+    world: { x: 700, y: T, w: 740, h: 300 },
+    base: [win(), scalevEditor(0, T, { tab: "Settings" }), desktopPreview, settingsPanel({ pub: false }), slugText("rani-dimas")],
+    els: { simpan: btnSimpan, ring: { svg: ring(1193, T + 50, 82, 34, { r: 6 }), enter: "pop", delay: 0.4 } },
+    steps: [{ caption: "Klik Simpan di kanan atas editor.", at: at(ED.simpan), click: true, press: "simpan", show: ["ring"], dur: 3.4 }]
+  },
+
+  "scalev-slug-id": {
+    title: "Alamat halaman berisi ID undangan",
+    world: { x: 0, y: 0, w: 800, h: 520 },
     base: [win(), scalevEditor(0, T, { tab: "Settings" }), desktopPreview, settingsPanel({ pub: false }), slugText("rani-dimas")],
     els: {
-      simpan: btnSimpan,
-      saved: { svg: urlSwap("app.scalev.com/pages/365671") + text(34, T + 334, "Saat ini:", { size: 12, weight: 500, fill: C.strong }) + text(82, T + 334, PUB_URL, { size: 12, weight: 500, fill: C.primary }), enter: "fade" },
-      idNote: { svg: note(560, 240, "ID undangan: 365671", 345, 74), enter: "pop", origin: [345, 74], delay: 0.3 },
+      saved: { svg: urlSwap("app.scalev.com/pages/365671") + text(34, T + 334, "Saat ini:", { size: 12, weight: 500, fill: C.strong }) + text(82, T + 334, PUB_URL, { size: 12, weight: 500, fill: C.primary }), enter: "fade", delay: 0.3 },
+      idNote: { svg: note(560, 240, "ID undangan: 365671", 345, 74), enter: "pop", origin: [345, 74], delay: 0.6 },
       edNk: { svg: scalevEditor(0, T, { tab: "NikahKit", rail: "Template", screenFill: "#ffffff" }) + templatePanel(), enter: "fade" }
     },
     steps: [
-      { caption: "Klik Simpan di kanan atas editor.", at: at(ED.simpan), click: true, press: "simpan", show: ["saved"] },
-      { caption: "Alamat jadi app.scalev.com/pages/365671. Angka itu ID undangan.", show: ["idNote"], dur: 3.8 },
+      { caption: "Tersimpan: alamat jadi app.scalev.com/pages/365671. Angka itu ID undangan.", show: ["saved", "idNote"], dur: 4 },
       { caption: "Klik NikahKit lagi, lalu pilih template. Menu lain terbuka.", at: at(ED.tab.NikahKit), click: true, show: ["edNk"], hide: ["idNote"], dur: 3.6 }
     ]
   },
@@ -646,7 +672,7 @@ export const scenes = {
 
   "scalev-terbitkan": {
     title: "Klik Simpan & Terbitkan di kanan atas editor Scalev",
-    world: { x: 680, y: T, w: 760, h: 440 },
+    world: { x: 700, y: T, w: 740, h: 440 },
     base: [win("app.scalev.com/pages/365671"), editorKonten()],
     els: { pub: btnPub, ring: { svg: ring(1283, T + 50, 151, 34, { r: 6 }), enter: "pop", delay: 0.4 } },
     steps: [{ caption: "Klik Simpan & Terbitkan di kanan atas editor. Tunggu sampai selesai.", at: at(ED.terbitkan), click: true, press: "pub", show: ["ring"], dur: 3.4 }]
@@ -719,7 +745,7 @@ export const scenes = {
   },
 
   "scalev-custom-domain": {
-    title: "Menambahkan domain sendiri ke Scalev lewat Cloudflare",
+    title: "Menambahkan domain sendiri di Settings Scalev",
     world: DASH,
     base: [win(), settingsPage("Profil"), profileCard()],
     els: {
@@ -729,23 +755,34 @@ export const scenes = {
       dlg: { svg: domainDlg, enter: "pop", origin: ADD_BTN },
       typed: text(DOM_IN.x + 12, DOM_IN.y + 25, "undangan.namabrand.com", { size: 14, fill: SV.ink }),
       done: { svg: settingsPage("Domain") + domainSection + dnsHead, enter: "fade" },
-      ...Object.fromEntries(DNS_ROWS.map((_, i) => [`dns${i}`, { svg: dnsRow(i), delay: 0.15 + i * 0.06 }])),
-      cf: { svg: cfWin, enter: "rise" },
-      cfForm: { svg: cfForm, enter: "pop", origin: CF_ADD },
-      ok: { svg: verified, enter: "pop" }
+      ...Object.fromEntries(DNS_ROWS.map((_, i) => [`dns${i}`, { svg: dnsRow(i), delay: 0.15 + i * 0.06 }]))
     },
     steps: [
       { caption: "Di Settings dasbor Scalev, buka bagian Domain.", at: subAt("Domain"), click: true, show: ["dom", "addBtn"] },
       { caption: "Klik Tambahkan Domain.", at: ADD_BTN, click: true, press: "addBtn", show: ["shade", "dlg"] },
       { caption: "Ketik domain atau subdomain, misalnya undangan.namabrand.com.", at: [DOM_IN.x + 200, DOM_IN.y + 20], click: true, show: ["typed"], type: [{ id: "typed", n: 22, box: [DOM_IN.x + 12, DOM_IN.y + 9, 172, 22] }], dur: 3.6 },
-      { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", at: DOM_SAVE, click: true, show: ["done", "dns0", "dns1", "dns2"], hide: ["shade", "dlg", "typed"], dur: 3.6 },
-      { caption: "Di Cloudflare: DNS, Add Record. Salin persis, Proxy status DNS Only.", at: CF_ADD, click: true, show: ["cf", "cfForm"], dur: 4 },
+      { caption: "Klik Simpan. Scalev menampilkan kode DNS (Type, Name, Target).", at: DOM_SAVE, click: true, show: ["done", "dns0", "dns1", "dns2"], hide: ["shade", "dlg", "typed"], dur: 3.6 }
+    ]
+  },
+
+  "scalev-domain-verifikasi": {
+    title: "Menyalin record DNS ke Cloudflare lalu verifikasi di Scalev",
+    world: DASH,
+    base: [win(), settingsPage("Domain"), domainSection, dnsHead, ...DNS_ROWS.map((_, i) => dnsRow(i))],
+    els: {
+      cf: { svg: cfWin, enter: "rise" },
+      cfForm: { svg: cfForm, enter: "pop", origin: CF_ADD },
+      ok: { svg: verified, enter: "pop" }
+    },
+    steps: [
+      { caption: "Di Cloudflare buka DNS.", show: ["cf"], dur: 2.8 },
+      { caption: "Klik Add Record. Salin Type, Name, Target persis. Proxy status: DNS Only.", at: CF_ADD, click: true, show: ["cfForm"], dur: 4 },
       { caption: "Kembali ke Scalev, klik Verifikasi. Bisa butuh sampai 2x24 jam.", at: VERIFY, click: true, show: ["ok"], hide: ["cf", "cfForm"], dur: 4 }
     ]
   },
 
   "scalev-epayment": {
-    title: "Mengaktifkan ePayment di toko Scalev",
+    title: "Memilih metode pembayaran Invoice di toko Scalev",
     world: DASH,
     base: [win(), storesPage],
     els: {
@@ -755,25 +792,35 @@ export const scenes = {
       shade: { svg: dim(0, T, 1440, 900), enter: "fade" },
       dlg: { svg: payDlg, enter: "pop", origin: PICK },
       menu: { svg: payMenu, enter: "pop", origin: [SEL.x + SEL.w / 2, SEL.y + 40] },
-      val: { svg: payDlg + payVal, enter: "fade" },
+      val: { svg: payDlg + payVal, enter: "fade" }
+    },
+    steps: [
+      { caption: "Di Stores, klik nama tokomu.", at: STORE_AT, click: true, show: ["det", "detBody", "detHead"], dur: 3.4 },
+      { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", scroll: { id: "detBody", dy: DET_DY }, at: PICK, click: true, show: ["shade", "dlg"], dur: 3.8 },
+      { caption: "Di dialog, klik dropdown.", at: [SEL.x + SEL.w - 30, SEL.y + 20], click: true, show: ["menu"], dur: 2.8 },
+      { caption: "Pilih Invoice.", at: INVOICE_AT, click: true, show: ["val"], hide: ["menu"], dur: 2.8 }
+    ]
+  },
+
+  "scalev-epayment-simpan": {
+    title: "Mencentang ALL E-Payment lalu menyimpan toko",
+    world: DASH,
+    base: [win(), detAfter, topSave, dim(0, T, 1440, 900), payDlg, payVal],
+    els: {
       on: { svg: check(PD.x + 24, PD.y + 150, true), enter: "pop" },
       dlgSave: svBtn(PD.x + PD.w - 104, PD.y + 230, "Simpan", { w: 80 }),
       after: { svg: detAfter, enter: "fade" },
       topSave: topSave
     },
     steps: [
-      { caption: "Di Stores, klik nama tokomu.", at: STORE_AT, click: true, show: ["det", "detBody", "detHead"], dur: 3.4 },
-      { caption: "Gulir ke Metode Pembayaran, klik Pilih Metode Pembayaran.", scroll: { id: "detBody", dy: DET_DY }, at: PICK, click: true, show: ["shade", "dlg"], dur: 3.8 },
-      { caption: "Di dialog, klik dropdown.", at: [SEL.x + SEL.w - 30, SEL.y + 20], click: true, show: ["menu"], dur: 2.8 },
-      { caption: "Pilih Invoice.", at: INVOICE_AT, click: true, show: ["val"], hide: ["menu"], dur: 2.8 },
       { caption: "Centang Aktifkan Metode Pembayaran ALL E-Payment.", at: CHECK_AT, click: true, show: ["on", "dlgSave"] },
-      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", at: DLG_SAVE, click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["shade", "dlg", "val", "on", "dlgSave"] },
+      { caption: "Klik Simpan di dialog. Metode pembayaran tercatat.", at: DLG_SAVE, click: true, press: "dlgSave", show: ["after", "topSave"], hide: ["on", "dlgSave"] },
       { caption: "Klik Simpan di kanan atas supaya pengaturan benar-benar tersimpan.", at: [TOP_SAVE.x + 50, TOP_SAVE.y + 20], click: true, press: "topSave", dur: 3.8 }
     ]
   },
 
   "scalev-verifikasi-wa": {
-    title: "Verifikasi nomor WhatsApp di Scalev",
+    title: "Mengisi nomor WhatsApp di Profil Scalev",
     world: DASH,
     base: [win(), settingsPage("Profil"), profileCard()],
     els: {
@@ -782,23 +829,32 @@ export const scenes = {
       saveBtn: { svg: svBtn(MAIN.x + 24, MAIN.y + 318, "Save", { w: 80 }), enter: "fade" },
       shade: { svg: dim(0, T, 1440, 900), enter: "fade" },
       konf: { svg: confirmDlg, enter: "pop", origin: SAVE_BTN },
-      back: { svg: settingsPage("Profil") + rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }) + editForm + text(PHONE_IN.x + 34, PHONE_IN.y + 25, "081234567890", { size: 14, fill: SV.ink }) + cekBtn, enter: "fade" },
-      wa: { svg: waWin, enter: "rise", delay: 0.15 },
-      draft: { svg: waDraft, enter: "fade", delay: 0.15 },
-      send: { svg: waSend, enter: "fade", delay: 0.15 },
-      bubble: { svg: waBubble, enter: "slide" },
-      ok: { svg: icon("circle-check", PHONE_IN.x + PHONE_IN.w - 22, PHONE_IN.y + 20, 20, "#15a34a"), enter: "pop" },
-      mfa: { svg: mfaCard, enter: "fade" },
-      mfaRing: { svg: ring(MAIN.x + 20, MAIN.y + 176, 320, 48), enter: "pop", delay: 0.5 }
+      wa: { svg: waWin + waDraft + waSend, enter: "rise", delay: 0.15 }
     },
     steps: [
       { caption: "Di Settings bagian Profil, klik Edit.", at: EDIT_BTN, click: true, show: ["edit", "saveBtn"] },
       { caption: "Isi nomor WhatsApp yang aktif di kolom nomor telepon.", at: [PHONE_IN.x + 200, PHONE_IN.y + 20], click: true, show: ["num"], type: [{ id: "num", n: 12, box: [PHONE_IN.x + 34, PHONE_IN.y + 9, 104, 22] }], dur: 3.4 },
       { caption: "Klik Save. Jendela konfirmasi menampilkan nomormu.", at: SAVE_BTN, click: true, press: "saveBtn", show: ["shade", "konf"], dur: 3.4 },
-      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", at: VERIF_AT, click: true, show: ["back", "wa", "draft", "send"], hide: ["shade", "konf"], dur: 3.8 },
+      { caption: "Klik Verifikasi. WhatsApp terbuka dengan draf kode OTP ke Scalev.", at: VERIF_AT, click: true, show: ["wa"], hide: ["shade", "konf"], dur: 3.8 }
+    ]
+  },
+
+  "scalev-wa-otp": {
+    title: "Mengirim OTP lewat WhatsApp, Cek Verifikasi, lalu MFA",
+    world: DASH,
+    base: [win(), settingsPage("Profil"), rect(MAIN.x, MAIN.y, MAIN.w, 420, { fill: SV.bg }), editForm, text(PHONE_IN.x + 34, PHONE_IN.y + 25, "081234567890", { size: 14, fill: SV.ink }), cekBtn],
+    els: {
+      wa: waWin + waDraft,
+      send: waSend,
+      bubble: { svg: waBubble, enter: "slide" },
+      ok: { svg: icon("circle-check", PHONE_IN.x + PHONE_IN.w - 22, PHONE_IN.y + 20, 20, "#15a34a"), enter: "pop" },
+      mfa: { svg: mfaCard, enter: "fade" },
+      mfaRing: { svg: ring(MAIN.x + 20, MAIN.y + 194, 320, 48), enter: "pop", delay: 0.5 }
+    },
+    steps: [
       { caption: "Kirim apa adanya ke +6282125784683. Jangan ubah kodenya.", at: WA_SEND, click: true, press: "send", show: ["bubble"], dur: 3.4 },
-      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", at: [CEK.x + 70, CEK.y + 20], click: true, show: ["ok"], hide: ["wa", "draft", "send", "bubble"], dur: 3.8 },
-      { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 206], show: ["mfa", "mfaRing"], dur: 4 }
+      { caption: "Kembali ke Scalev, klik Cek Verifikasi. Nomor jadi terverifikasi.", at: [CEK.x + 70, CEK.y + 20], click: true, show: ["ok"], hide: ["wa", "send", "bubble"], dur: 3.8 },
+      { caption: "Nyalakan MFA: Profil, bagian Security. Ganti Email OTP ke Authenticator App.", at: [MAIN.x + 140, MAIN.y + 224], show: ["mfa", "mfaRing"], dur: 4 }
     ]
   },
 
@@ -859,14 +915,11 @@ export const scenes = {
   },
 
   "scalev-thumbnail-terbit": {
-    title: "Menerbitkan lalu mengecek kartu pratinjau di WhatsApp",
-    world: { x: 460, y: T, w: 980, h: 660 },
-    base: [win("app.scalev.com/pages/365671"), scalevEditor(0, T, { tab: "Settings" }), cover(SC.x, SC.y)],
-    els: { pub: btnPub, wa: { svg: waDesk, enter: "rise", delay: 0.3 } },
-    steps: [
-      { caption: "Klik Simpan & Terbitkan.", at: at(ED.terbitkan), click: true, press: "pub" },
-      { caption: "Kirim tautannya di WhatsApp: kartu pratinjau memakai gambar itu.", show: ["wa"], dur: 4 }
-    ]
+    title: "Kartu pratinjau tautan undangan di WhatsApp",
+    world: { x: WAD.x - 20, y: WAD.y - 20, w: WAD.w + 40, h: WAD.h + 40 },
+    base: [waDesk],
+    els: { bubble: { svg: waLink(WAD.x + WAD.w - 356, WAD.y + 220, 340), enter: "slide", delay: 0.3 } },
+    steps: [{ caption: "Kirim tautannya di WhatsApp: kartu pratinjau memakai gambar itu.", show: ["bubble"], dur: 4 }]
   },
 
   "scalev-tutorial-resmi": {
@@ -905,19 +958,22 @@ export const scenes = {
     ]
   },
 
-  "scalev-domain-cloudflare": {
-    title: "Membeli domain dan memindahkan DNS ke Cloudflare",
-    world: { x: 0, y: 0, w: 1220, h: 480 },
+  "scalev-domain-beli": {
+    title: "Membeli domain saja, tanpa hosting",
+    world: { x: 0, y: 0, w: GW, h: 480 },
     base: [regPage],
-    els: {
-      noHost: { svg: ring(100, CV.top + 271, 120, 30, { r: 6 }), enter: "pop" },
-      cf: { svg: cfSign, enter: "fade" },
-      ns: { svg: nsPage, enter: "fade" }
-    },
+    els: { noHost: { svg: ring(100, CV.top + 271, 120, 30, { r: 6 }), enter: "pop" } },
+    steps: [{ caption: "Beli domain saja di penyedia domain. Hosting tidak usah.", at: [618, CV.top + 184], click: true, show: ["noHost"], dur: 3.6 }]
+  },
+
+  "scalev-domain-cloudflare": {
+    title: "Memindahkan DNS domain ke Cloudflare",
+    world: { x: 0, y: 0, w: GW, h: 480 },
+    base: [cfSign],
+    els: { ns: { svg: nsPage, enter: "fade" } },
     steps: [
-      { caption: "Beli domain saja di penyedia domain. Hosting tidak usah.", at: [1118, CV.top + 184], click: true, show: ["noHost"], dur: 3.6 },
-      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", show: ["cf"], hide: ["noHost"], dur: 3.4 },
-      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", at: [164, CV.top + 311], click: true, show: ["ns"], hide: ["cf"], dur: 4 }
+      { caption: "Daftar Cloudflare di dash.cloudflare.com/sign-up.", dur: 3.4 },
+      { caption: "Pindahkan DNS: ganti nameserver ke Cloudflare (ikuti video Scalev).", at: [164, CV.top + 311], click: true, show: ["ns"], dur: 4 }
     ]
   }
 };

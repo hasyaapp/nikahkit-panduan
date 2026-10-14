@@ -7,9 +7,11 @@ import { C, ED, esc, rect, text, line, circle, para, clipped, shadow, icon, icon
 // Text with inline bold / underlined runs (link buttons, <b> in notes); parts: string | { t, w?, fill?, u? }.
 const rich = (x, y, parts, o = {}) => `<text x="${x}" y="${y}" font-size="${o.size ?? 12}" fill="${o.fill ?? C.faint}">${parts.map((p) => (typeof p === "string" ? esc(p) : `<tspan font-weight="${p.w ?? 700}" fill="${p.fill ?? C.strong}"${p.u ? ' text-decoration="underline"' : ""}>${esc(p.t)}</tspan>`)).join("")}</text>`;
 
-// Crops: WIDE = rail, panel and preview (scale .857); SIDE = rail and panel only (scale 1.03). TABS adds the Scalev tab row.
-// The Scalev Simpan button (x 1193) never fits with the rail; walk-throughs end on the Tersimpan status (SAVED).
-const WIDE = { x: 0, y: 92, w: 1120, h: 808 }, SIDE = { x: 0, y: 92, w: 400, h: 808 }, TABS = { x: 0, y: 44, w: 1120, h: 856 };
+// Crops (world width <= 800 or portrait, scale ~1): SIDE = rail and panel; TABS = SIDE plus the Scalev tab row;
+// PV = the preview screen; PVS = preview plus the Scalev Simpan button; DLG = a centred dialog plus the preview.
+// The rail and the preview never share a crop: a flow that needs both is split into a panel scene and a preview scene.
+const SIDE = { x: 0, y: 92, w: 400, h: 808 }, TABS = { x: 0, y: 44, w: 400, h: 856 }, PV = { x: 707, y: 92, w: 430, h: 808 };
+const PVS = { x: 707, y: 44, w: 733, h: 856 }, DLG = { x: 520, y: 92, w: 620, h: 808 };
 const ACCOUNT = "Tahunan"; // the account chip shows the member's plan
 const P = 88, PW = 279, I = 101, IW = 253; // panel content box; inside an open accordion
 const SC = ED.screen, CX = SC.x + SC.w / 2; // plain preview screen 727,106 390x784
@@ -262,6 +264,8 @@ const editor = (rail) => [DEFS, scalevEditor(0, 0, { rail })];
 const lid = (rail, o = {}) => clipped(72, 0, 327, 153, scalevEditor(0, 0, { rail }), nkHead(0, 0, rail, { account: ACCOUNT, ...o }));
 // Save status at the foot of the rail.
 const SAVED = { svg: ring(0, 851, 71, 49, { r: 4 }), enter: "fade" }, SAVED_AT = [36, 878];
+// Scalev Simpan button, redrawn so it can dip when clicked.
+const simpanBtn = () => rect(1193, 50, 82, 34, { r: 4, fill: C.white, stroke: C.svBtnLine, sw: 2 }) + text(1201, 72, "Simpan", { size: 13, weight: 500, fill: C.strong }) + iconX("file-text", 1258, 67, 15, C.strong);
 // Rail before a template is picked: only Template and Media open; Bagikan and Kosongkan disabled.
 const LOCKED = [160, 216, 328, 384].map((y) => rect(0, y, 71, 52, { fill: C.page, opacity: 0.62 })).join("") + rect(0, 560, 71, 50, { fill: C.page, opacity: 0.62 }) + rect(0, 750, 71, 46, { fill: C.page, opacity: 0.62 });
 // Typing into a cleared, focused input: [box, typed text, type spec].
@@ -294,65 +298,89 @@ const GAL = (() => {
 
 export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
-  "editor-peta": (() => {
-    const nickY = kList({ open: "Mempelai", fill: fillMempelai() }).f["Nama panggilan"] + 20;
-    const [clear, typed, ty] = typeIn(I, nickY, IW, "Sinta");
-    return {
-      title: "Langkah pertama di editor NikahKit",
-      world: TABS,
-      base: [DEFS, scalevEditor(0, 0, { tab: "Code", screenFill: C.white })],
-      els: {
-        rTabs: { svg: ring(10, 52, 210, 30, { r: 6 }), enter: "fade", delay: 0.3 },
-        gate: { svg: scalevEditor(0, 0, { rail: "Template", screenFill: C.white }) + rect(0, 93, 399, 807, { fill: C.white }) + text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade" },
-        tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + body(seg(), cards(219)), enter: "fade", delay: 0.5 },
-        locked: { svg: LOCKED, enter: "fade", delay: 0.5 },
-        picked: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
-        pvF: { svg: pvFolio(), enter: "fade", delay: 0.2 },
-        konten: { svg: kontenPanel(), enter: "fade" },
-        clear: { svg: clear, enter: "fade" },
-        typed: { svg: typed, enter: "fade" },
-        pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.5 },
-        saved: SAVED
-      },
-      steps: [
-        { caption: "Buka halaman undangan di Scalev. Editornya terbuka dalam HTML Mode.", show: ["rTabs"], at: [120, 66] },
-        { caption: "Klik tab NikahKit. Sebentar tertulis Memeriksa akses...", hide: ["rTabs"], show: ["gate"], at: ED.tab.NikahKit, click: true },
-        { caption: "Tunggu pemeriksaan akses selesai. Menu dan panel muncul.", show: ["tpl", "locked"], at: [230, 330] },
-        { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", hide: ["locked"], show: ["picked", "pvF"], at: FOLIO_C, click: true, dur: 3.4 },
-        { caption: "Klik Konten untuk mengisi data. Daftar bagian undangan muncul.", show: ["konten"], at: ED.rail.Konten, click: true },
-        { caption: "Ketik di kotak, misalnya Nama panggilan Sinta. Pratinjau ikut berubah.", show: ["clear", "typed", "pvName"], at: [230, nickY + 18], click: true, type: [{ id: "typed", ...ty }], dur: 3.8 },
-        { caption: "Tunggu status Tersimpan di bawah kolom kiri, lalu klik Simpan di Scalev.", show: ["saved"], at: SAVED_AT, dur: 3.4 }
-      ]
-    };
-  })(),
+  "editor-peta": {
+    title: "Langkah pertama di editor NikahKit: tab NikahKit sampai Konten",
+    world: TABS,
+    base: [DEFS, scalevEditor(0, 0, { tab: "Code", screenFill: C.white })],
+    els: {
+      rTabs: { svg: ring(10, 52, 210, 30, { r: 6 }), enter: "fade", delay: 0.3 },
+      gate: { svg: scalevEditor(0, 0, { rail: "Template", screenFill: C.white }) + rect(0, 93, 399, 807, { fill: C.white }) + text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade" },
+      tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + body(seg(), cards(219)), enter: "fade", delay: 0.5 },
+      locked: { svg: LOCKED, enter: "fade", delay: 0.5 },
+      picked: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
+      konten: { svg: kontenPanel(), enter: "fade" }
+    },
+    steps: [
+      { caption: "Buka halaman undangan di Scalev. Editornya terbuka dalam HTML Mode.", show: ["rTabs"], at: [120, 66] },
+      { caption: "Klik tab NikahKit. Sebentar tertulis Memeriksa akses...", hide: ["rTabs"], show: ["gate"], at: ED.tab.NikahKit, click: true },
+      { caption: "Tunggu pemeriksaan akses selesai. Menu dan panel muncul.", show: ["tpl", "locked"], at: [230, 330] },
+      { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", hide: ["locked"], show: ["picked"], at: FOLIO_C, click: true, dur: 3.4 },
+      { caption: "Klik Konten untuk mengisi data. Daftar bagian undangan muncul.", show: ["konten"], at: ED.rail.Konten, click: true }
+    ]
+  },
+
+  "editor-peta-simpan": {
+    title: "Langkah pertama di editor NikahKit: pratinjau dan Simpan",
+    world: PVS,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvFolio()],
+    els: {
+      pvName: { svg: pvSintaFolio() + ring(770, 420, 304, 46, { r: 10 }), enter: "fade" },
+      sBtn: simpanBtn()
+    },
+    steps: [
+      { caption: "Lihat hasilnya di pratinjau: nama yang kamu ketik langsung tampil.", show: ["pvName"], at: [922, 560], dur: 3.4 },
+      { caption: "Status Tersimpan di kolom kiri? Klik Simpan di kanan atas Scalev.", at: ED.simpan, click: true, press: "sBtn" }
+    ]
+  },
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-pilih-template": {
-    title: "Memilih template NikahKit pertama kali",
-    world: WIDE,
-    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), pvForeign()],
+    title: "Memilih template NikahKit pertama kali: kartu template",
+    world: SIDE,
+    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT })],
     els: {
       locked: LOCKED,
       cardsA: { svg: seg() + htmlNote() + cards(287), enter: "fade" },
       lidT: lid("Template", { inbox: false }),
       rSeg: { svg: ring(P, 169, PW, 38, { r: 6 }), enter: "fade" },
+      selF: { svg: ring(234, 287, 134, 167, { r: 10 }), enter: "pop", origin: [301, 370] }
+    },
+    steps: [
+      { caption: "Klik Template di menu kiri. Panel Template terbuka.", at: ED.rail.Template, click: true, show: ["cardsA"] },
+      { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", show: ["rSeg"], at: [160, 188] },
+      { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", hide: ["rSeg"], scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
+      { caption: "Klik kartu yang kamu suka, misalnya Folio.", scroll: { id: "cardsA", dy: -241 }, at: [301, 370], click: true, show: ["selF"], dur: 3.6 }
+    ]
+  },
+
+  "editor-pilih-template-ganti": {
+    title: "Memilih template NikahKit pertama kali: dialog Ganti",
+    world: DLG,
+    base: [...editor("Template"), pvForeign()],
+    els: {
       veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade" },
       dlg: { svg: shadow(540, 383, 360, 134, 8, 3) + rect(540, 383, 360, 134, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Folio?", { size: 14, weight: 600 }) +
-        text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 }), enter: "pop", origin: [301, 370] },
-      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "pop", origin: [301, 370] },
-      cardsB: { svg: body(panelBg(), seg(), cards(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade" },
-      pvF: { svg: pvFolio(), enter: "fade", delay: 0.2 },
+        text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 }), enter: "fade" },
+      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "fade" },
+      pvF: { svg: pvFolio(), enter: "fade", delay: 0.2 }
+    },
+    steps: [
+      { caption: "Halaman berisi HTML lain, jadi muncul dialog Ganti isi halaman.", at: [650, 495] },
+      { caption: "Klik Ganti. Pratinjau kini menampilkan Folio.", at: [851, 479], click: true, press: "gnt", hide: ["veil", "dlg", "gnt"], show: ["pvF"], dur: 3.6 }
+    ]
+  },
+
+  "editor-pilih-template-dipakai": {
+    title: "Memilih template NikahKit pertama kali: Dipakai dan Konten",
+    world: SIDE,
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), body(panelBg(), seg(), cards(219, "folio"))],
+    els: {
       rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade" },
       konten: { svg: kontenPanel(), enter: "fade" },
       rNote: { svg: ring(P, 169, PW, 64, { r: 6 }), enter: "fade", delay: 0.4 },
       saved: SAVED
     },
     steps: [
-      { caption: "Klik Template di menu kiri. Panel Template terbuka.", at: ED.rail.Template, click: true, show: ["cardsA"] },
-      { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", show: ["rSeg"], at: [160, 188] },
-      { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", hide: ["rSeg"], scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", scroll: { id: "cardsA", dy: -241 }, at: [301, 370], click: true, show: ["veil", "dlg", "gnt"], dur: 3.6 },
-      { caption: "Halaman berisi HTML lain, jadi muncul dialog. Klik Ganti.", at: [851, 479], click: true, press: "gnt", hide: ["veil", "dlg", "gnt", "cardsA", "locked"], show: ["cardsB", "pvF"], dur: 3.4 },
       { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", show: ["rDip"], at: [346, 402] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", hide: ["rDip"], at: ED.rail.Konten, click: true, show: ["konten", "rNote"], dur: 3.6 },
       { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", hide: ["rNote"], show: ["saved"], at: SAVED_AT }
@@ -361,23 +389,33 @@ export const scenes = {
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-ganti-template": {
-    title: "Mengganti template nanti",
-    world: WIDE,
-    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), kontenPanel(), pvFolio()],
+    title: "Mengganti template nanti: kartu lain",
+    world: SIDE,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), kontenPanel()],
     els: {
       tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + body(seg(), cards(219, "folio")), enter: "fade" },
       rDip: { svg: ring(326, 393, 41, 18, { r: 12 }), enter: "fade", delay: 0.4 },
       cardsC: { svg: body(panelBg(), seg(), cards(219, "dasar")), enter: "fade" },
-      pvD: { svg: pvDasar(), enter: "fade", delay: 0.2 },
-      rPv: { svg: ring(780, 322, 284, 52, { r: 10 }), enter: "fade" },
       toast: { svg: shadow(84, 836, 302, 52, 4, 2) + rect(84, 836, 302, 52, { r: 4, fill: C.strong }) + text(96, 867, "Template diganti ke Dasar.", { size: 14, fill: C.white }) +
         text(374, 867, "Urungkan", { size: 14, weight: 700, fill: "#7fd3f5", anchor: "end" }), enter: "slide", delay: 0.4 }
     },
     steps: [
       { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", at: ED.rail.Template, click: true, show: ["tplB", "rDip"] },
-      { caption: "Klik kartu template lain, misalnya Dasar. Template langsung berganti.", hide: ["rDip"], at: DASAR_C, click: true, show: ["cardsC", "pvD", "toast"], dur: 3.6 },
-      { caption: "Periksa pratinjau. Desainnya baru, isian Konten tetap ada.", show: ["rPv"], at: [922, 380] },
-      { caption: "Tidak suka? Klik Urungkan di pesan itu. Folio kembali.", hide: ["cardsC", "pvD", "toast", "rPv"], show: ["rDip"], at: [343, 862], click: true, dur: 3.6 }
+      { caption: "Klik kartu template lain, misalnya Dasar. Muncul pesan dengan Urungkan.", hide: ["rDip"], at: DASAR_C, click: true, show: ["cardsC", "toast"], dur: 3.6 }
+    ]
+  },
+
+  "editor-ganti-template-pratinjau": {
+    title: "Mengganti template nanti: pratinjau",
+    world: PV,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Template" }), pvDasar()],
+    els: {
+      rPv: { svg: ring(780, 322, 284, 52, { r: 10 }), enter: "fade" },
+      pvF: { svg: pvFolio(), enter: "fade" }
+    },
+    steps: [
+      { caption: "Periksa pratinjau. Desainnya Dasar, isian Konten tetap ada.", show: ["rPv"], at: [922, 420] },
+      { caption: "Tidak suka? Klik Urungkan di pesan bawah panel. Folio kembali.", hide: ["rPv"], show: ["pvF"], at: [922, 560], dur: 3.4 }
     ]
   },
 
@@ -402,8 +440,8 @@ export const scenes = {
     const sub = (D) => (D ? { scroll: { id: "v1b", dy: D } } : {});
     return {
       title: "Mengisi Mempelai, Acara, Sampul, dan Salam di Konten",
-      world: WIDE,
-      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton"), pvCover("Rani & Dimas")],
+      world: SIDE,
+      base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), templatePanel("sekar-kedaton")],
       els: {
         railK: { svg: nkRail(0, 0, "Konten"), enter: "fade" },
         v1: { svg: v1.svg, enter: "fade" },
@@ -419,23 +457,35 @@ export const scenes = {
         v5: { svg: v5.svg, enter: "fade" },
         rBad: { svg: ring(310, 397, 46, 18 + 58 * 5, { r: 10 }), enter: "fade", delay: 0.3 },
         lidK: { svg: lid("Konten"), enter: "fade" },
-        pvS: { svg: pvSinta(), enter: "fade", delay: 0.5 },
-        pvEv: { svg: pvEvents(["akad", "resepsi"]), enter: "fade", delay: 0.3 },
         saved: SAVED
       },
       steps: [
         { caption: "Klik Konten di menu kiri. Daftar bagian muncul, di atasnya Bahasa undangan.", at: ED.rail.Konten, click: true, show: ["railK", "v1", "lidK"] },
         { caption: "Buka Mempelai. Biasanya sudah terbuka; bila tertutup, klik namanya.", show: ["rMemp"], at: [190, v1.at.Mempelai + 25] },
-        { caption: "Klik Nama panggilan di bawah Mempelai Wanita, lalu ketik nama klien.", hide: ["rMemp"], show: ["clear", "typed", "pvS"], at: [230, nickY + 18], click: true, type: [{ id: "typed", ...ty }], dur: 3.6 },
+        { caption: "Klik Nama panggilan di bawah Mempelai Wanita, lalu ketik nama klien.", hide: ["rMemp"], show: ["clear", "typed"], at: [230, nickY + 18], click: true, type: [{ id: "typed", ...ty }], dur: 3.6 },
         { caption: "Isi kolom mempelai lain: Nama lengkap, Nama ayah, Nama ibu. Ulangi untuk pria.", hide: ["clear", "typed"], show: ["v1b", "ayahF"], ...sub(D4), at: [230, ayahY + 18], click: true, dur: 3.8 },
-        { caption: "Klik Acara & Tanggal. Pilih Zona waktu, lalu ganti isi acara contoh.", hide: ["ayahF"], show: ["v2", "pvEv"], ...sub(D5), at: [190, barA + 25], click: true, dur: 3.6 },
+        { caption: "Klik Acara & Tanggal. Pilih Zona waktu, lalu ganti isi acara contoh.", hide: ["ayahF"], show: ["v2"], ...sub(D5), at: [190, barA + 25], click: true, dur: 3.6 },
         { caption: "Hapus acara yang tidak dipakai dengan ikon tempat sampah.", show: ["v2d"], scroll: { id: "v2", dy: D6 }, at: [I + IW - 24, 344], click: true, dur: 3.6 },
-        { caption: "Klik Sampul. Pilih Foto sampul; teks sampul boleh dibiarkan kosong.", hide: ["pvEv"], show: ["v3"], scroll: { id: "v2d", dy: -(dyA + D6) }, at: [190, v3.at.Sampul + 25], click: true, dur: 3.6 },
+        { caption: "Klik Sampul. Pilih Foto sampul; teks sampul boleh dibiarkan kosong.", show: ["v3"], scroll: { id: "v2d", dy: -(dyA + D6) }, at: [190, v3.at.Sampul + 25], click: true, dur: 3.6 },
         { caption: "Klik Salam Pembuka dan pilih Preset salam. Lalu buka Ayat / Kutipan.", show: ["v4"], scroll: { id: "v3", dy: D8 }, at: [190, 445], click: true, dur: 3.6 },
         { caption: "Periksa tanda Terisi. Status Tersimpan? Klik Simpan di Scalev.", show: ["v5", "rBad", "saved"], at: SAVED_AT, dur: 3.8 }
       ]
     };
   })(),
+
+  "editor-isi-mempelai-pratinjau": {
+    title: "Hasil isian Mempelai dan Acara di pratinjau",
+    world: PV,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvCover("Rani & Dimas")],
+    els: {
+      pvS: { svg: pvSinta() + ring(770, 466, 304, 58, { r: 10 }), enter: "fade" },
+      pvEv: { svg: pvEvents(["akad", "resepsi"]), enter: "fade" }
+    },
+    steps: [
+      { caption: "Isi Nama panggilan mempelai wanita: sampul di pratinjau ikut berubah.", show: ["pvS"], at: [922, 580], dur: 3.4 },
+      { caption: "Klik Acara & Tanggal: acara-acara tampil di pratinjau.", show: ["pvEv"], at: [922, 340], dur: 3.4 }
+    ]
+  },
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-tambah-acara": (() => {
     const DY = 560;
@@ -464,8 +514,8 @@ export const scenes = {
       ["WIB", "WITA", "WIT"].map((v, i) => text(I + 14, 302 + i * 24, v, { size: 14, fill: C.strong })).join("") + iconX("check", I + IW - 18, 297, 14, C.action);
     return {
       title: "Menambah acara di Acara & Tanggal",
-      world: WIDE,
-      base: [...editor("Konten"), pvEvents(["akad"])],
+      world: SIDE,
+      base: [...editor("Konten")],
       els: {
         list: scrolled,
         dd: { svg: dd, enter: "pop", origin: [I + IW / 2, 279] },
@@ -476,8 +526,7 @@ export const scenes = {
         title2: { svg: rect(I + 8, y2 + 12, 80, 22, { fill: C.page }) + text(I + 10, y2 + 28, "Resepsi", { size: 12, weight: 700 }), enter: "fade", delay: 0.9 },
         times: { svg: times, enter: "fade" },
         fixed: { svg: fixed, enter: "fade" },
-        lidE: lid("Konten"),
-        pv2: { svg: pvEvents(["akad", "resepsi"]) + ring(751, EV.resepsi.y, 342, EV.resepsi.h, { r: 16 }), enter: "fade", delay: 0.3 },
+        lidE: lid("Konten")
       },
       steps: [
         { caption: "Di Acara & Tanggal, pilih Zona waktu: WIB, WITA, atau WIT.", at: [I + 120, 261], click: true, show: ["dd"] },
@@ -485,32 +534,46 @@ export const scenes = {
         { caption: "Kotak Acara 2 muncul. Klik kotak Nama acara.", at: [I + 120, nameY + 38], click: true, show: ["nFocus"] },
         { caption: "Ketik nama acara, misalnya Resepsi. Judul kotaknya ikut berganti.", show: ["nTyped", "title2"], type: [{ id: "nTyped", n: 7, box: [I + 20, nameY + 27, tw("Resepsi", 14) + 2, 22] }], dur: 3.4 },
         { caption: "Isi Mulai dan Selesai. Selesai lebih awal? Muncul pesan merah.", hide: ["nFocus"], show: ["nBlur", "times"], at: [I + 120, endY + 38], click: true, dur: 3.6 },
-        { caption: "Perbaiki jam Selesai, misalnya 14.00. Pesan merah hilang.", at: [I + 60, endY + 38], click: true, show: ["fixed"] },
-        { caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", show: ["pv2"], at: [922, 470], dur: 3.6 }
+        { caption: "Perbaiki jam Selesai, misalnya 14.00. Pesan merah hilang.", at: [I + 60, endY + 38], click: true, show: ["fixed"] }
       ]
     };
   })(),
 
+  "editor-tambah-acara-pratinjau": {
+    title: "Acara baru di pratinjau",
+    world: PV,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvEvents(["akad"])],
+    els: { pv2: { svg: pvEvents(["akad", "resepsi"]) + ring(751, EV.resepsi.y, 342, EV.resepsi.h, { r: 16 }), enter: "fade" } },
+    steps: [{ caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", show: ["pv2"], at: [922, 620], dur: 3.6 }]
+  },
+
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-galeri-pilih-foto": {
     title: "Memilih foto galeri dari Media Scalev",
-    world: WIDE,
-    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), body(GAL.top(0), GAL.rest(471)), pvCover("Rani & Dimas")],
+    world: SIDE,
+    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), body(GAL.top(0), GAL.rest(471))],
     els: {
       dlg: { svg: GAL.dlg, enter: "rise" },
       s1: { svg: GAL.pick(0), enter: "pop", origin: [75, 350] },
       b1: { svg: GAL.foot(1), enter: "fade" },
       s2: { svg: GAL.pick(4), enter: "pop", origin: [199, 474] },
       b2: { svg: GAL.foot(2), enter: "fade" },
-      after: { svg: GAL.after(), enter: "fade" },
-      pvG: { svg: pvGallery(), enter: "fade", delay: 0.2 }
+      after: { svg: GAL.after(), enter: "fade" }
     },
     steps: [
       { caption: "Klik Tambah foto. Jendela Pilih foto berisi foto Media Scalev.", at: [I + IW / 2, 489], click: true, show: ["dlg"] },
       { caption: "Klik foto yang ingin dipakai. Foto terpilih diberi tanda centang.", at: [75, 350], click: true, show: ["s1", "b1"] },
       { caption: "Klik foto lain bila perlu. Tombolnya kini Pakai 2 foto.", at: [199, 474], click: true, show: ["s2", "b2"] },
-      { caption: "Klik Pakai 2 foto. Foto masuk daftar dan tampil di pratinjau.", at: [199, 869], click: true, press: "b2", hide: ["dlg", "s1", "b1", "s2", "b2"], show: ["after", "pvG"], dur: 3.6 }
+      { caption: "Klik Pakai 2 foto. Foto masuk daftar Foto galeri (2).", at: [199, 869], click: true, press: "b2", hide: ["dlg", "s1", "b1", "s2", "b2"], show: ["after"], dur: 3.6 }
     ]
+  },
+
+  "editor-galeri-pratinjau": {
+    title: "Galeri Foto di pratinjau",
+    world: PV,
+    base: [DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvCover("Rani & Dimas")],
+    els: { pvG: { svg: pvGallery(), enter: "fade" } },
+    steps: [{ caption: "Galeri tampil di pratinjau. Foto pertama tampil paling besar.", show: ["pvG"], at: [1000, 640], dur: 3.6 }]
   },
 
   // ---------------------------------------------------------------------------------------------------------------------
