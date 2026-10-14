@@ -1056,7 +1056,7 @@ export const scenes = {
     title: "Membeli domain saja, tanpa hosting",
     base: [regPage],
     steps: [{ caption: "Beli domain saja di penyedia domain. Hosting tidak usah.", focus: [320, CT + 180, 800, 192], at: [1038, BELI[1] + 22], click: true, dur: 3.6,
-      mark: [{ box: BELI, r: 6 }, { box: HOSTING, r: 4 }], lens: { src: [320, CT + 300, 300, 72], at: [140, 330] } }]
+      mark: [{ box: HOSTING, r: 4 }, { box: BELI, r: 6 }], lens: { src: [320, CT + 300, 300, 72], at: [140, 330] } }]
   },
 
   "scalev-domain-cloudflare": {

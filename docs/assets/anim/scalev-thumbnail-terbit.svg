@@ -3,7 +3,7 @@
 <desc id="dsc">1. Kirim tautannya di WhatsApp: kartu pratinjau memakai gambar itu.</desc>
 <style>.fz0{opacity:1;animation:fz0 5.6s infinite}@keyframes fz0{0%{opacity:1}91.964%{opacity:1}100%{opacity:1}}
 .ov0{opacity:1;animation:ov0 5.6s infinite}@keyframes ov0{0%{opacity:0}2.679%{opacity:0;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}6.607%{opacity:1}91.964%{opacity:1}100%{opacity:0}}
-.om0{opacity:1;animation:om0 5.6s infinite}@keyframes om0{0%{opacity:0}2.679%{opacity:0;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}6.607%{opacity:1}91.964%{opacity:1}100%{opacity:0}}
+.om0_0{opacity:1;animation:om0_0 5.6s infinite}@keyframes om0_0{0%{opacity:0}2.679%{opacity:0;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}6.607%{opacity:1}91.964%{opacity:1}100%{opacity:0}}
 #c0,#n0{opacity:1;animation:c0 5.6s infinite}@keyframes c0{0%{opacity:1}91.964%{opacity:1}95.536%{opacity:0}99.107%{opacity:0}100%{opacity:1}}
 #prog{transform-origin:0 0;transform:scaleX(1);animation:prog 5.6s linear infinite}@keyframes prog{0%{transform:scaleX(0)}91.964%{transform:scaleX(1)}100%{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}#cur{display:none}}</style>
@@ -15,7 +15,7 @@
 
 </g>
 <g class="ov0"><rect x="199" y="203" width="455.3333333333333" height="146.66666666666666" rx="11" fill="rgba(16,24,40,.14)"/><rect x="200" y="200" width="453.3333333333333" height="146.66666666666666" rx="10" fill="#ffffff"/><g clip-path="url(#lc0)"><g transform="translate(200 200) scale(1.3333) translate(-1076 -640)"><g clip-path="url(#ln0)"><use href="#db"/><use href="#ed-bubble"/></g></g></g><rect x="200" y="200" width="453.3333333333333" height="146.66666666666666" rx="10" fill="none" stroke="#b8460d" stroke-width="2.5"/></g>
-<g class="om0"><line x1="568.1953290870488" y1="346.66666666666663" x2="706.8795004013397" y2="418.5261217701111" stroke="#b8460d" stroke-width="2.5" stroke-linecap="round"/><path d="M714.9 422.7 L703.9 422.4 L708.3 413.9 Z" fill="#b8460d"/><rect x="713.3333333333333" y="422.66666666666663" width="234.66666666666666" height="120" rx="9.333333333333332" fill="none" stroke="#b8460d" stroke-width="2.5"/><circle cx="713.3333333333333" cy="422.66666666666663" r="10" fill="#b8460d"/><text x="713.3333333333333" y="426.66666666666663" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g>
+<g class="om0_0"><line x1="568.1953290870488" y1="346.66666666666663" x2="706.8795004013397" y2="418.5261217701111" stroke="#b8460d" stroke-width="2.5" stroke-linecap="round"/><path d="M714.9 422.7 L703.9 422.4 L708.3 413.9 Z" fill="#b8460d"/><rect x="713.3333333333333" y="422.66666666666663" width="234.66666666666666" height="120" rx="9.333333333333332" fill="none" stroke="#b8460d" stroke-width="2.5"/><circle cx="713.3333333333333" cy="422.66666666666663" r="10" fill="#b8460d"/><text x="713.3333333333333" y="426.66666666666663" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text></g>
 </g>
 
 
