@@ -339,13 +339,24 @@ function lpList(x, y) {
   });
   return s;
 }
-// Scalev payment page (not measured: grey bars), total Rp299.000, in the laptop viewport.
+// Scalev PayLink invoice page (nikahin.myscalev.com/pay/…, labels as seen live), Tahunan Rp299.000, in the laptop viewport.
 const PAY = { x: WIN / 2 - 250, w: 500 }, PAYBTN = [PAY.x + PAY.w / 2, CT + 524];
-const payPage = () => rect(0, CT, WIN, VIEW, { fill: "#f5f6f8" }) + rect(PAY.x, CT + 30, PAY.w, 560, { r: 10, fill: C.white, stroke: "#e6e8ec" }) +
-  circle(PAY.x + 40, CT + 70, 16, { fill: C.primary }) + rect(PAY.x + 66, CT + 63, 140, 14, { r: 7, fill: BAR }) + line(PAY.x, CT + 106.5, PAY.x + PAY.w, CT + 106.5, { stroke: "#eef0f3" }) +
-  rect(PAY.x + 24, CT + 130, 180, 12, { r: 6, fill: BAR }) + text(PAY.x + PAY.w - 24, CT + 142, "Rp299.000", { size: 18, weight: 700, fill: C.strong, anchor: "end" }) +
-  [0, 1, 2, 3].map((k) => rect(PAY.x + 24, CT + 176 + k * 64, PAY.w - 48, 44, { r: 6, fill: C.white, stroke: "#dcdfe4" }) + (k < 2 ? text(PAY.x + 40, CT + 203 + k * 64, ["QRIS", "Virtual Account"][k], { size: 14, weight: 500, fill: C.strong }) : rect(PAY.x + 40, CT + 194 + k * 64, [120, 180, 90, 150][k], 9, { r: 4, fill: "#eceef1" }))).join("") +
-  rect(PAY.x + 24, CT + 500, PAY.w - 48, 48, { r: 6, fill: C.primary });
+const payPage = () => {
+  const L = PAY.x + 24, R = PAY.x + PAY.w - 24, f = { size: 14, fill: C.strong }, sm = { size: 12, fill: C.faint }, rule = (y) => line(PAY.x, y + 0.5, PAY.x + PAY.w, y + 0.5, { stroke: "#eef0f3" });
+  const opt = (x, y, w, label) => rect(x + 0.5, y + 0.5, w - 1, 35, { r: 6, fill: C.white, stroke: "#dcdfe4" }) + text(x + 14, y + 23, label, { size: 14, weight: 500, fill: C.strong });
+  const half = (PAY.w - 48 - 10) / 2;
+  return rect(0, CT, WIN, VIEW, { fill: "#f5f6f8" }) + rect(PAY.x, CT + 30, PAY.w, 560, { r: 10, fill: C.white, stroke: "#e6e8ec" }) +
+    text(PAY.x + PAY.w / 2, CT + 66, "Nikahin", { size: 18, weight: 700, fill: C.strong, anchor: "middle" }) + rule(CT + 86) +
+    text(L, CT + 112, "RINGKASAN PESANAN", { ...sm, weight: 700 }) + text(R, CT + 112, "Invoice #261014KXRWQPT", { ...sm, anchor: "end" }) +
+    text(L, CT + 138, "NikahKit Membership - Tahunan", f) + text(R, CT + 138, "Rp299.000", { ...f, anchor: "end" }) + text(L, CT + 156, "1 x Rp299.000", sm) +
+    text(L, CT + 184, "Total Tagihan", { ...f, weight: 700 }) + text(R, CT + 184, "Rp299.000", { size: 16, weight: 700, fill: C.strong, anchor: "end" }) + rule(CT + 200) +
+    text(L, CT + 224, "BAYAR SEBELUM 17 OKT 2026, 09.30", { size: 12, weight: 700, fill: C.strong }) + text(R, CT + 224, "Sisa waktu 71:58:43", { ...sm, anchor: "end" }) +
+    text(L, CT + 254, "PILIH METODE PEMBAYARAN", { ...sm, weight: 700 }) + opt(L, CT + 266, PAY.w - 48, "QRIS") +
+    text(L, CT + 326, "Virtual Account", { ...sm, weight: 700 }) + opt(L, CT + 338, half, "BCA") + opt(L + half + 10, CT + 338, half, "BNI") +
+    opt(L, CT + 382, half, "BRI") + opt(L + half + 10, CT + 382, half, "Bank Mandiri") + opt(L, CT + 426, half, "Bank Permata") +
+    rect(L, CT + 500, PAY.w - 48, 48, { r: 6, fill: C.primary }) + text(PAYBTN[0], CT + 529, "Bayar ke Nikahin", { size: 15, weight: 700, fill: C.white, anchor: "middle" }) +
+    text(PAYBTN[0], CT + 572, "Pembayaran diproses dengan aman dan terenkripsi", { ...sm, anchor: "middle" });
+};
 const payDone = rect(PAY.x + 24, CT + 500, PAY.w - 48, 48, { r: 6, fill: C.ok }) + iconX("check", PAYBTN[0], PAYBTN[1], 22, C.white, 3);
 const TABS_PAY = [{ ...TAB_ED, active: false }, { title: "nikahin.myscalev.com", active: true, fav: favScalev }];
 // Separate Scalev window (OAuth): login, then consent with the business chosen. Not measured: grey bars.
