@@ -116,6 +116,7 @@ const PLAN_ROWS = [
   [[[{ t: "Buku Tamu Digital", w: 700, fill: C.strong }, ": RSVP, ucapan,"], "check-in QR. Tanpa kuota tamu", "dan event"], 1, 1, 1],
   [["Akun staff penerima tamu (kode", "check-in, tanpa membagi PIN)"], 0, 1, 1],
   [["Impor daftar tamu CSV (kategori,", "jumlah orang, WhatsApp)"], 0, 1, 1],
+  [["Undangan khusus: isi hanya terbuka", "lewat tautan pribadi tamu"], 0, 1, 1],
   [["PIN dashboard dan tautan tamu"], 1, 1, 1],
   [["Semua template yang tersedia", "saat ini"], 1, 1, 1],
   [["Saat masa aktif habis"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tidak perlu", "perpanjang"]]
