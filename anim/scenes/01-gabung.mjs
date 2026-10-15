@@ -471,11 +471,14 @@ const HTML_NOTE = [88, 219, 279, 56], DASAR_CARD = [88, 405, 134, 167];
 const GD = [540, 383, 360, 134], GANTI = [823, 461, 57, 36];
 const gantiDlg = shadow(540, 383, 360, 134, 8, 3) + rect(...GD, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Dasar?", { size: 14, weight: 600 }) +
   text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 });
-// Media panel (App.jsx MediaPanel): Unggah foto, "Atau seret ke sini.", the Scalev Media grid (3 columns, newest first).
+// Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
+// before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
 const UNGGAH = [88, 169, 279, 36];
 const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Media", true) + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
-  text(88, 223, "Atau seret ke sini.", { size: 12, fill: C.faint }) + clipped(88, 239, 279, 661, ks.map((k, i) => mTile(i, k)).join(""));
+  text(88, 223, "Atau seret ke sini.", { size: 12, fill: C.faint }) +
+  (ks.length ? ks.map((k, i) => mTile(i, k)).join("") : text(88, 255, "Belum ada foto.", { size: 12, fill: C.faint })) +
+  nkBtn(88, ks.length ? 239 + Math.ceil(ks.length / 3) * (MS + 6) + 4 : 271, "Muat lainnya", { variant: "quiet", w: 279 });
 // The system file window (generic), in the gap between panel and preview: one photo picked, Buka.
 const FW = { x: 403, y: 290, w: 320, h: 370 }, FW_BOX = [FW.x, FW.y, FW.w, FW.h], BUKA = [FW.x + FW.w - 96, FW.y + FW.h - 40, 80, 28];
 const fileWin = (sel) => {
@@ -1010,10 +1013,10 @@ export const scenes = {
       gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "fade", skel: true },
       picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
       pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true },
-      media: { svg: mediaK([0, 1, 2, 3, 5, 6, 7, 8, 2]), enter: "fade", skel: true },
+      media: { svg: mediaK([]), enter: "fade", skel: true },
       win: { svg: fileWin(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },
       winSel: { svg: fileWin(true), enter: "fade", delay: 0.9 },
-      up: { svg: mediaK([4, 0, 1, 2, 3, 5, 6, 7, 8]), enter: "fade", skel: true },
+      up: { svg: mediaK([4]), enter: "fade", skel: true },
       simpan: { svg: svSimpan(), skel: true }
     },
     steps: [
@@ -1022,11 +1025,11 @@ export const scenes = {
         lens: { src: GD }, dur: 3.6 },
       { caption: "Klik Ganti. HTML lama diganti template Dasar, menu lain terbuka.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(GANTI), click: true, press: "gnt",
         hide: ["veil", "dlg", "gnt", "tpl"], show: ["picked", "pvD"], mark: GANTI, note: "Ganti", dur: 3.6 },
-      { caption: "Klik Media di rail kiri. Panel Media terbuka.", focus: [[0, 92, 399, 808]], at: ED.rail.Media, click: true, show: ["media"], mark: { box: [0, ED.rail.Media[1] - 26, 71, 52], r: 0 },
+      { caption: "Klik Media di rail kiri. Isinya hanya foto unggahanmu: masih kosong.", focus: [[0, 92, 399, 808]], at: ED.rail.Media, click: true, show: ["media"], mark: { box: [0, ED.rail.Media[1] - 26, 71, 52], r: 0 },
         lens: { src: [0, 96, 384, 116], at: [300, 40] } },
       { caption: "Klik Unggah foto, lalu pilih foto di jendela file.", focus: [[72, 154, 327, 84], FW_BOX], at: mid(UNGGAH), click: true, show: ["win", "winSel"], mark: UNGGAH,
         lens: { src: [80, 161, 295, 70] }, dur: 3.6 },
-      { caption: "Klik Buka. Fotonya masuk paling depan di pustaka Media.", focus: [[72, 154, 327, 300], FW_BOX], at: mid(BUKA), click: true, hide: ["win", "winSel"], show: ["up"],
+      { caption: "Klik Buka. Fotomu tampil di Media; foto anggota lain tidak tampil.", focus: [[72, 154, 327, 300], FW_BOX], at: mid(BUKA), click: true, hide: ["win", "winSel"], show: ["up"],
         mark: [{ box: BUKA, r: 6 }, { box: [88, 239, MS, MS], r: 4 }], lens: { src: [80, 230, 295, 110], at: [12, 420] }, dur: 3.6 },
       { caption: "Klik Simpan di kanan atas Scalev.", focus: [[1183, 44, 257, 48]], at: ED.simpan, click: true, press: "simpan", mark: ED.simpanBox, lens: { src: [1180, 44, 260, 50] } }
     ]
