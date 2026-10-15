@@ -13,7 +13,7 @@ import {
   chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan, crDownload
 } from "../ui/kit.mjs";
 import {
-  SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
+  SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, CREATE_ROW, createMenu, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
   BIZ_BOX as BIZ, bizMenu,
   SLUG_LENS, DOMAIN_ACC, secContent, secPicker, SECURITY, subAt, subBox, SUBMENU, domainPage, TAMBAH, DOM_IN, DOM_SAVE, DOM_DLG, domainDlg, domTyped, domSaveOn,
   VERIFY, dnsTable, verified, profilPage, PROFIL_EDIT, MFA_METHOD, SECURITY_BOX, EA, EA_PHONE, EA_SAVE, editAccount, eaPhone, eaSaveOn, STORE_DY, storeHead,
@@ -51,14 +51,9 @@ const COVER = PHOTO_DEFS + pvCover("Rani & Dimas");
 // Konten panel (../ui/editor-panels.mjs) with Mempelai open, over the editor's own rail (which carries the save status).
 const editorKonten = () => scalevEditor(0, 0, { tab: "NikahKit", rail: "Konten" }) + kontenPanel() + COVER;
 
-// ---- 1. Landing Pages → HTML Mode → NikahKit → Simpan --------------------------------------------------------------
-// Type chooser (not captured): modal with a generic tile and the HTML Mode tile.
-const DLG = { x: 470, y: 260, w: 500, h: 300 };
-const HTML_TILE = [DLG.x + 260, DLG.y + 74, 216, 191];
-const htmlTile = (on) => rect(DLG.x + 260.5, DLG.y + 74.5, 215, 190, { r: 6, fill: on ? SV.soft : "#f3f9fd", stroke: SV.blue, sw: on ? 3 : 2 }) + icon("code-xml", DLG.x + 368, DLG.y + 140, 34, SV.blue, 1.8) +
-  text(DLG.x + 368, DLG.y + 204, "HTML Mode", { size: 16, weight: 700, fill: SV.ink, anchor: "middle" }) + bar(DLG.x + 298, DLG.y + 222, 140, 8);
-const typeDlg = shadow(DLG.x, DLG.y, DLG.w, DLG.h, 8, 3) + rect(DLG.x, DLG.y, DLG.w, DLG.h, { r: 8, fill: C.white }) + bar(DLG.x + 24, DLG.y + 30, 180, 12, "#dfe4ea") + iconX("x", DLG.x + DLG.w - 30, DLG.y + 36, 18, SV.sub) +
-  rect(DLG.x + 24.5, DLG.y + 74.5, 215, 190, { r: 6, fill: C.white, stroke: SV.line }) + icon("layout-grid", DLG.x + 132, DLG.y + 140, 34, "#b8c0ca", 1.6) + bar(DLG.x + 82, DLG.y + 196, 100, 10) + bar(DLG.x + 62, DLG.y + 220, 140, 8) + htmlTile(false);
+// ---- 1. Landing Pages → HTML Sales Page → NikahKit → Simpan --------------------------------------------------------
+// + Create Landing Page opens Scalev's four-item menu (ui/scalev.mjs createMenu, measured); HTML Sales Page opens the
+// HTML Mode editor (QA 16 Okt: the old scene drew an invented type dialog with an "HTML Mode" tile).
 // Desktop preview (no NikahKit yet): empty white page across the preview area.
 const desktopPreview = rect(400, 93, 1040, 807, { fill: C.svPreview }) + rect(424, 106, 992, 794, { fill: C.white });
 // Locked rail menus (disabled buttons) and the native title tooltip (hovering Konten).
@@ -387,17 +382,16 @@ export const scenes = {
   },
 
   "scalev-lp-html": {
-    title: "Membuat landing page baru tipe HTML Mode",
+    title: "Membuat landing page baru tipe HTML Sales Page",
     base: [lpScreen()],
     els: {
       create: btnCreate,
-      shade: { svg: dim(0, 0, 1440, 900), enter: "fade" },
-      typeDlg: { svg: typeDlg, enter: "pop", origin: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20] },
-      tile: { svg: htmlTile(true), enter: "fade" }
+      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 84] }
     },
     steps: [
-      { caption: "Klik + Create Landing Page.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [CREATE[0] + CREATE[2] / 2, CREATE[1] + 20], click: true, press: "create", show: ["shade", "typeDlg"], mark: CREATE, lens: { src: [270, 70, 192, 56] } },
-      { caption: "Pilih tipe HTML Mode.", focus: [DLG.x, DLG.y, DLG.w, DLG.h], at: [DLG.x + 368, DLG.y + 170], click: true, press: "tile", show: ["tile"], mark: { box: HTML_TILE, r: 6 }, lens: { src: [DLG.x + 252, DLG.y + 66, 232, 207] } }
+      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 70, 230, 240]], at: mid(CREATE), click: true, press: "create", show: ["cmenu"], mark: CREATE,
+        lens: { src: [274, 78, 216, 228], zoom: 1.5 } },
+      { caption: "Klik HTML Sales Page. Editor HTML Mode terbuka.", focus: [[270, 70, 230, 240]], at: mid(CREATE_ROW(1)), click: true, mark: CREATE_ROW(1), note: "HTML Sales Page", dur: 3.4 }
     ]
   },
 
