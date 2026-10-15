@@ -159,8 +159,9 @@ const docsHeader = (scrolled) => rect(0, T, 1440, 65, { fill: C.white }) + (scro
   rect(1211, T + 12, 95, 32, { r: 8, fill: DOC.accent }) + dt(1258.5, T + 33, "WhatsApp", { size: 14, weight: 500, fill: C.white, anchor: "middle", len: 67 }) +
   circle(1330, T + 28, 9, { fill: DOC.ink }) + text(1352, T + 32, "0", { size: 12, weight: 500, fill: DOC.sub, anchor: "middle" }) + moon(1386, T + 28);
 const SIDEBAR = [["rocket", "Mulai", 120, [["Selamat datang", 141], ["Alur kerja dari nol sampai jualan", 181], ["Istilah penting", 221]], 273],
-  ["users", "Gabung dan pasang", 305, [["Pilih paket membership", 326], ["Pasang ekstensi NikahKit", 366], ["Masuk dan bayar membership", 406], ["Hubungkan bisnis Scalev", 446], ["Update ekstensi", 486]], 538],
-  ["home", "Siapkan Scalev", 570, [["Akun dan paket Scalev", 591], ["Buat halaman undangan", 631], ["Simpan dan terbitkan", 671], ["Thumbnail WhatsApp dan|sosmed", 711], ["Alamat dan domain sendiri", 771]]]];
+  ["users", "Gabung dan pasang", 305, [["Pilih paket membership", 326], ["Pasang ekstensi NikahKit", 366], ["Masuk dan bayar membership", 406], ["Hubungkan bisnis Scalev", 446],
+    ["Gabung sebagai Kreator Nikahin", 486], ["Update ekstensi", 526]], 578],
+  ["home", "Siapkan Scalev", 610, [["Akun dan paket Scalev", 631], ["Buat halaman undangan", 671], ["Simpan dan terbitkan", 711], ["Thumbnail WhatsApp dan|sosmed", 751], ["Alamat dan domain sendiri", 811]]]];
 const docsSidebar = (active) => SIDEBAR.map(([ic, h, hy, items, sep]) => iconX(ic, 32, T + hy, 14, DOC.ink) + dt(50, T + hy + 4, h, { size: 12, weight: 500, fill: DOC.ink }) +
   items.map(([l, y]) => { const on = l === active; return (on ? rect(16, T + y, 232, 36, { r: 8, fill: DOC.muted }) : "") + dpara(24, T + y + 23, l.split("|"), { size: 14, weight: on ? 500 : undefined, fill: on ? DOC.ink : y > 760 ? "#a3a3a3" : DOC.sub, lh: 20 }); }).join("") +
   (sep ? line(16, T + sep + 0.5, 248, T + sep + 0.5, { stroke: DOC.line }) : "")).join("");
@@ -182,7 +183,8 @@ const MAIN = [256, T + 65, 900, 900 - T - 65]; // the scrolling column between s
 // Kamus pesan galat (bantuan/pesan-galat.mdx) at scroll 0.
 const GALAT_TOC = [["Langkah"], ["Panel NikahKit: akses"], ["Panel NikahKit: catatan di atas ..."], ["Editor: template dan undangan..."], ["Editor: Bagikan, PIN, dan salin"],
   ["Editor: isian Konten, foto, dan ..."], ["Editor: Profil merek dan Market..."], ["Editor: Pesanan masuk"], ["Bantuan dan update"], ["Jendela akun NikahKit"], ["Buku Tamu (menu Scalev)"],
-  ["Halaman tamu (undangan)"], ["Dashboard pasangan"], ["Halaman check-in"], ["Form pesanan klien"], ["Kode dalam kurung"], ["Tanda berhasil"], ["Kalau ada masalah"], ["Lanjut"]];
+  ["Halaman tamu (undangan)"], ["Dashboard pasangan"], ["Halaman check-in"], ["Form pesanan klien"], ["Scalev: gabung ke bisnis Ni..."], ["Kode dalam kurung"], ["Tanda berhasil"], ["Kalau ada masalah"],
+  ["Lanjut"]];
 const H1 = [320, T + 105, 291, 40];
 const galatTop = dt(320, T + 135, "Kamus pesan galat", { size: 36, fill: DOC.ink, len: 291 }) + copyPage +
   dt(320, T + 173, "Semua pesan yang bisa muncul di NikahKit, Buku Tamu, Dashboard pasangan, halaman tamu,", { size: 18, fill: DOC.sub, len: 747 }) +

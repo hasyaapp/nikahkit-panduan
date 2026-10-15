@@ -14,6 +14,7 @@ import {
 } from "../ui/kit.mjs";
 import {
   SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
+  BIZ_BOX as BIZ, bizMenu,
   SLUG_LENS, DOMAIN_ACC, secContent, secPicker, SECURITY, subAt, subBox, SUBMENU, domainPage, TAMBAH, DOM_IN, DOM_SAVE, DOM_DLG, domainDlg, domTyped, domSaveOn,
   VERIFY, dnsTable, verified, profilPage, PROFIL_EDIT, MFA_METHOD, SECURITY_BOX, EA, EA_PHONE, EA_SAVE, editAccount, eaPhone, eaSaveOn, STORE_DY, storeHead,
   storeRight, storeLeft, storeScrolled, ADD_PM, PM_BLOCK, payDialog, PAY_DLG, PAY_DLG_OPEN, ALLPAY_ROW, ALLPAY_TICK, PAY_SAVE, payTicked
@@ -270,8 +271,9 @@ const dlBubble = crDownload(DLB.x, DLB.y, "rani-dimas.png", { sub: "Selesai · s
 const GUIDE_TAB = { title: "Tutorial resmi Scalev yang berg…", w: 250 }, TUT_TAB = { title: "A – Z Custom Domain di Scal…", w: 250, fav: favScalev };
 const GUIDE_URL = "docs.page/hasyaapp/nikahkit-panduan/scalev/tutorial-scalev";
 const DP = { ink: "#070707", sub: "#737373", line: "#e5e5e5", acc: C.accent };
-const SIDE = [["Mulai", "rocket", 120, ["Selamat datang", "Alur kerja dari nol sampai jualan", "Istilah penting"]], ["Gabung dan pasang", "users", 305, ["Pilih paket membership", "Pasang ekstensi NikahKit", "Masuk dan bayar membership", "Hubungkan bisnis Scalev", "Update ekstensi"]],
-  ["Siapkan Scalev", "landmark", 570, ["Akun dan paket Scalev", "Buat halaman undangan", "Simpan dan terbitkan", "Thumbnail WhatsApp dan", "sosmed", "Alamat dan domain sendiri", "Izin domain (tab Security)", "Terima pembayaran klien"]]];
+const SIDE = [["Mulai", "rocket", 120, ["Selamat datang", "Alur kerja dari nol sampai jualan", "Istilah penting"]],
+  ["Gabung dan pasang", "users", 305, ["Pilih paket membership", "Pasang ekstensi NikahKit", "Masuk dan bayar membership", "Hubungkan bisnis Scalev", "Gabung sebagai Kreator Nikahin", "Update ekstensi"]],
+  ["Siapkan Scalev", "landmark", 610, ["Akun dan paket Scalev", "Buat halaman undangan", "Simpan dan terbitkan", "Thumbnail WhatsApp dan", "sosmed", "Alamat dan domain sendiri", "Izin domain (tab Security)", "Terima pembayaran klien"]]];
 const TOC = ["Langkah", "Akun dan keamanan", "Halaman (landing page)", "Domain", "Toko", "Jualan dan pembayaran", "Tanda berhasil", "Kalau ada masalah", "Lanjut"];
 // One guide bullet (page y = text centre): link + rest flowed as one line (runs, so the rest follows the link in any font),
 // the accent underline at the link's measured width, optional second line.
@@ -285,7 +287,7 @@ const guidePage = (tabs) => chrome(0, 0, 1440, 900, { tabs, url: GUIDE_URL }) + 
   rect(1211, CT + 12, 95, 32, { r: 8, fill: DP.acc }) + text(1258.5, CT + 33, "WhatsApp", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
   circle(1330, CT + 28, 9, { fill: DP.ink }) + text(1348, CT + 33, "0", { size: 12, fill: DP.sub }) + circle(1386, CT + 28, 8, { fill: DP.ink }) +
   SIDE.map(([g, ic, y, items], k) => (k ? line(16, y + CT - 32, 248, y + CT - 32, { stroke: DP.line }) : "") + iconX(ic, 32, y + CT, 14, DP.ink) + text(50, y + CT + 4, g, { size: 12, weight: 500, fill: "#3d3d3d" }) +
-    items.map((t, i) => text(24, y + CT + 44 + i * 40 - (k === 2 && i > 3 ? 20 : 0), t, { size: 14, fill: k === 2 && i === 7 ? "#b5b5b5" : DP.sub })).join("")).join("") +
+    items.map((t, i) => text(24, y + CT + 44 + i * 40 - (k === 2 && i > 3 ? 20 : 0), t, { size: 14, fill: k === 2 && i >= 3 ? "#b5b5b5" : DP.sub })).join("")).join("") +
   icon("list", 1178, CT + 115, 14, DP.ink) + text(1195, CT + 120, "On this page", { size: 14, fill: DP.ink }) + line(1173.5, CT + 142, 1173.5, CT + 395, { stroke: DP.line }) + rect(1172, CT + 229, 3, 20, { fill: DP.acc }) +
   TOC.map((t, i) => text(1198, CT + 157 + i * 29, t, { size: 14, fill: t === "Domain" ? DP.acc : DP.sub })).join("") +
   text(348, CT + 79, ["setiap kolom tab ", { t: "Security", w: 600, fill: DP.ink }, "."], { size: 16, fill: "#262626" }) +
@@ -352,13 +354,6 @@ const phPlaying = rect(PX + 20, P0 + 20, 350, 197, { r: 6, fill: "#2b2b2b" }) + 
 const phThanks = rect(PX + 24, P0 + 262, 342, 320, { r: 8, fill: C.white, stroke: "#d8c6b0" }) + text(PX + 195, P0 + 400, "Terima Kasih", { size: 28, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
   para(PX + 195, P0 + 440, ["Terima kasih, pesan Anda", "sudah kami terima."], { size: 15, fill: "#1f1f1f", anchor: "middle", lh: 22 });
 const PHONE_R = [PX, PY, 390, PH];
-
-// ---- 11. Akun: business switcher (measured: Pilih Bisnis Kamu), Security / MFA under Profil (measured text) ----------
-const bizMenu = shadow(24, 120, 268, 223, 6, 2) + rect(24, 120, 268, 223, { r: 6, fill: C.white }) + text(40, 150, "Pilih Bisnis Kamu", { size: 12, fill: "#3b4350" }) +
-  rect(41, 171, 234, 40, { r: 4, fill: C.white, stroke: "#d5dae1", sw: 2 }) + text(54, 196, "Cari Bisnis", { size: 14, fill: "#8d97a3" }) + iconX("search", 252, 191, 13, "#3b4350") +
-  rect(41, 227, 234, 53, { r: 4, fill: "#f8fafc", stroke: SV.blue, sw: 2 }) + text(66, 258, "R", { size: 12, weight: 700, fill: "#3b4350", anchor: "middle" }) + text(86, 258, "Rina WO", { size: 14, weight: 500, fill: SV.ink }) +
-  text(158, 314, "+ Buat Bisnis Baru", { size: 12, weight: 500, fill: SV.link, anchor: "middle" });
-const BIZ = [24, 62, 206, 48];
 
 // ---- 12. Domain preparation: registrar and Cloudflare sign-up (not captured: generic, 1440 wide) ------------------------
 const genWin = (title, url, fav) => chrome(0, 0, 1440, 900, { tabs: [{ title, active: true, w: 260, fav }], url }) + rect(0, CT, 1440, 815, { fill: C.white });
@@ -765,7 +760,7 @@ export const scenes = {
     els: {
       url: text(166, 68, "app.scalev.com", { size: 14, fill: C.crText }),
       dash: { svg: shifted(scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody()), skel: true, enter: "fade", delay: 1.3 },
-      biz: { svg: shifted(bizMenu), enter: "pop", origin: [127, CT + 110] }
+      biz: { svg: shifted(bizMenu([{ name: "Rina WO", cur: true }])), enter: "pop", origin: [127, CT + 110] }
     },
     steps: [
       { caption: "Buka app.scalev.com di Chrome komputer, lalu daftar dan masuk.", focus: OMNI.box, at: [300, 63], click: true, show: ["url", "dash"], type: [{ id: "url", n: 14, box: [166, 54, 108, 20] }], dur: 3.8,

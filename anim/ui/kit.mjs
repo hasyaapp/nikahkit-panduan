@@ -176,8 +176,14 @@ const SV_MENU = [["Home", "home", 1], ["E-Payment", "credit-card"], ["Products",
   ["Checkout Flows", "shopping-cart", 0, "New"], ["Orders", "list", 1], ["Subscriptions", "refresh-ccw"], ["Ads & WhatsApp", "send", 1], ["Stores", "home"], ["Customers", "users"],
   ["Marketers", "link"], ["Collaborations", "heart"], ["Developers", "code-xml"], ["Mailev", "mail", 0, "ext"], ["Waylev", "message-circle", 0, "ext"]];
 const SV_BOTTOM = [["Tutorials", "video", 803], ["Billing", "landmark", 833], ["Settings", "settings", 862]];
-// Row centre of a sidebar item (pointer target): svMenuAt("Landing Pages").
-export const svMenuAt = (name) => { const i = SV_MENU.findIndex((m) => m[0] === name); if (i >= 0) return [110, 138 + i * 32]; const b = SV_BOTTOM.find((m) => m[0] === name); if (b) return [100, b[2]]; throw new Error(`svMenuAt: "${name}"`); };
+// Sidebar of the Kreator role in the Nikahin business (docs/gambar/kreator/menu-kreator.jpg, 15 Okt 2026): the same rows
+// and spacing, fewer items, Home without a submenu. Bottom group not captured: Tutorials and Settings kept at the bottom.
+export const SV_KREATOR = {
+  menu: [["Home", "home"], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"], ["Checkout Flows", "shopping-cart", 0, "New"], ["Mailev", "mail", 0, "ext"], ["Waylev", "message-circle", 0, "ext"]],
+  bottom: [["Tutorials", "video", 833], ["Settings", "settings", 862]]
+};
+// Row centre of a sidebar item (pointer target): svMenuAt("Landing Pages"); o: { menu, bottom } as given to scalevApp.
+export const svMenuAt = (name, o = {}) => { const menu = o.menu ?? SV_MENU, bottom = o.bottom ?? SV_BOTTOM; const i = menu.findIndex((m) => m[0] === name); if (i >= 0) return [110, 138 + i * 32]; const b = bottom.find((m) => m[0] === name); if (b) return [100, b[2]]; throw new Error(`svMenuAt: "${name}"`); };
 export function scalevApp(x, y, o = {}) {
   const active = o.active ?? "Landing Pages", biz = o.biz ?? "Rina WO";
   let s = rect(x, y, 1440, 900, { fill: C.white }) + rect(x, y, 255, 900, { fill: C.white }) + line(x + 255.5, y, x + 255.5, y + 900, { stroke: C.svDivider }) +
@@ -186,14 +192,14 @@ export function scalevApp(x, y, o = {}) {
     `<defs><linearGradient id="svBiz" x1="0" x2="1"><stop offset="0" stop-color="#4497ca"/><stop offset="1" stop-color="#7cc6f0"/></linearGradient></defs>` +
     rect(x + 24, y + 62, 206, 48, { r: 4, fill: "url(#svBiz)" }) + circle(x + 47, y + 86, 11, { fill: C.white }) + text(x + 47, y + 90, biz[0], { size: 11, weight: 700, fill: C.strong, anchor: "middle" }) +
     text(x + 68, y + 91, biz, { size: 13, weight: 600, fill: C.white }) + icon("chevron-down", x + 212, y + 86, 14, C.white);
-  SV_MENU.forEach(([n, ic, sub, tag], i) => {
+  (o.menu ?? SV_MENU).forEach(([n, ic, sub, tag], i) => {
     const my = y + 138 + i * 32, on = n === active;
     s += iconX(ic, x + 41, my, 15, on ? C.primary : "#4a5361") + text(x + 64, my + 5, n, { size: 14, weight: on ? 700 : 400, fill: on ? C.ink : "#3b4350" });
     if (sub) s += icon("chevron-down", x + 215, my, 14, "#4a5361");
     if (tag === "New") s += rect(x + 172, my - 9, 43, 18, { r: 9, fill: "#3b8fd0" }) + text(x + 193.5, my + 4, "New", { size: 11, weight: 600, fill: C.white, anchor: "middle" });
     if (tag === "ext") s += icon("external-link", x + 212, my, 12, "#4a5361");
   });
-  SV_BOTTOM.forEach(([n, ic, by]) => { const on = n === active; s += iconX(ic, x + 44, y + by, 15, on ? C.primary : "#3b4350") + text(x + 68, y + by + 5, n, { size: 14, weight: on ? 700 : 500, fill: C.ink }); });
+  (o.bottom ?? SV_BOTTOM).forEach(([n, ic, by]) => { const on = n === active; s += iconX(ic, x + 44, y + by, 15, on ? C.primary : "#3b4350") + text(x + 68, y + by + 5, n, { size: 14, weight: on ? 700 : 500, fill: C.ink }); });
   return s;
 }
 

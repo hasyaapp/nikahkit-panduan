@@ -1,5 +1,5 @@
 // Mulai + Gabung dan pasang: peta perjalanan, checklist per bagian, istilah alamat, pasang ekstensi, masuk, bayar, kode
-// uji, Scalev, update. Every scene is one 1440x900 desktop screen (lib v4). Chrome pages sit in a maximized Chrome window
+// uji, Scalev, Kreator Nikahin, update. Every scene is one 1440x900 desktop screen (lib v4). Chrome pages sit in a maximized Chrome window
 // (page from y 85, viewport 1440 x 815); the Scalev editor and app are drawn at their measured 1440 layout from y 85.
 // Real screens come from ui/: the Scalev Landing Pages list, editor Settings and Security tabs (ui/scalev), the Template
 // and Konten panels (ui/editor-panels), Template > Marketing (ui/marketing), the invitation cover (ui/invitation), the
@@ -13,14 +13,17 @@
 import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, mid, grow } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
-  svMenuAt, favScalev, favChrome, ED, dim, crDownload
+  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan
 } from "../ui/kit.mjs";
-import { securityPanel, settingsPanel, slugText, SLUG as SLUG_BOX, SLUG_LENS, lpScreen, LP_ROWS, head, genericBody } from "../ui/scalev.mjs";
-import { templatePanel, cardAt, kList, panelBody, panelBg, seg, ACCOUNT } from "../ui/editor-panels.mjs";
+import {
+  securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, LP_ROWS, head, genericBody,
+  CREATE, CREATE_ROW, createMenu, BIZ_BOX, BIZ_ROW, bizMenu
+} from "../ui/scalev.mjs";
+import { templatePanel, cardAt, kList, panelBody, panelBg, seg, htmlNote, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
 import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY } from "../ui/marketing.mjs";
-import { pvCover, PHOTO_DEFS } from "../ui/invitation.mjs";
+import { pvCover, pvForeign, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
-import { gate, gLogo, gBtn, GBTN_W } from "../ui/gate.mjs";
+import { gate, gLogo, gBtn, GBTN_W, accountChip, chipW } from "../ui/gate.mjs";
 import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen } from "../ui/pesanan.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
@@ -361,6 +364,142 @@ const PV = {
   template: () => pv(edLeft(tplPanel()), -184, 92, TPL_CARD, { lens: [80, 329, 150, 241] })
 };
 
+// ---- Google account chooser (generic): a popup at the right, Rina WO's account first ---------------------------------
+const GG = { x: 960, y: 130, w: 440, h: 560 }, GOOGLE_ACCT = [GG.x + 32, GG.y + 204, GG.w - 64, 66];
+const googleWin = (() => {
+  const { x: GX, y: GY, w: GW, h: GH } = GG;
+  return popup(GX, GY, GW, GH, "accounts.google.com") + gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
+    line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
+    text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
+    circle(GX + 52, GY + 304, 14, { stroke: C.crSub }) + text(GX + 80, GY + 309, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(GX + 32, GY + 336.5, GX + GW - 32, GY + 336.5, { stroke: "#e3e3e3" });
+})();
+
+// ---- Kreator Nikahin (docs/Panduan Kreator.md; screens observed 15 Okt 2026) -----------------------------------------
+// Measured from docs/gambar/kreator: the Terms dialog (ketentuan.jpg, 468 x 741, centred), Pilih Bisnis Kamu and the
+// + Create Landing Page menu (ui/scalev), Tawaran Bergabung ke Bisnis (tawaran-bergabung.jpg, 488 x 620, centred), the
+// Kreator sidebar (ui/kit SV_KREATOR), the Buku Tamu row (buku-tamu-kreator.jpg, laid out like the member's Buku Tamu).
+// Generic, with the labels as observed: the invitation email and the Scalev login page. Generic without labels (they were
+// not recorded): the WhatsApp number check after Bergabung ke Bisnis. The owner's name on the offer card stays a bar.
+const KR = { biz: "Nikahin", ...SV_KREATOR };
+const krApp = (active) => scalevApp(0, 0, { active, ...KR });
+const krMenuBox = (name) => { const [, y] = svMenuAt(name, KR); return [24, y - 16, 207, 32]; };
+const svLogo = (cx, cy, r) => circle(cx, cy, r, { fill: "#3b7dd8" }) + circle(cx - r * 0.3, cy - r * 0.25, r * 0.25, { fill: C.white }) + circle(cx + r * 0.3, cy + r * 0.25, r * 0.25, { fill: C.white });
+// Invitation email (Gmail in Chrome, generic layout; subject and body as received).
+const MAIL_TAB = { title: "Gmail", active: true }, SV_TAB = { title: "Scalev", active: true, fav: favScalev };
+const MAIL_SUBJ = [270, CT + 41, tw("You are invited to join Scalev", 22) + 4, 30], MAIL_BTN = [620, CT + 400, 200, 46];
+const mailPage = () => rect(0, CT, W, VIEW, { fill: "#f6f8fc" }) + rect(16, CT + 16, 200, 52, { r: 16, fill: "#c2e7ff" }) + bars(40, CT + 37, [120]) + bars(36, CT + 100, [150, 120, 140, 110, 130]) +
+  rect(240, CT + 8, W - 256, VIEW - 16, { r: 16, fill: C.white }) + text(272, CT + 64, "You are invited to join Scalev", { size: 22, fill: "#1f1f1f" }) +
+  circle(292, CT + 112, 20, { fill: "#3b7dd8" }) + text(292, CT + 118, "S", { size: 16, weight: 700, fill: C.white, anchor: "middle" }) +
+  text(324, CT + 108, "Scalev", { size: 14, weight: 700, fill: "#1f1f1f" }) + rect(382, CT + 99, 160, 10, { r: 5, fill: BAR }) + rect(324, CT + 118, 90, 9, { r: 4.5, fill: BAR }) +
+  rect(420.5, CT + 160.5, 599, 560, { r: 8, fill: C.white, stroke: "#e3e5e8" }) + svLogo(720, CT + 214, 22) +
+  text(720, CT + 290, "Selamat datang di Scalev", { size: 22, weight: 700, fill: "#1f2d3d", anchor: "middle" }) +
+  para(720, CT + 330, wrap("Anda diundang oleh Nikahin untuk bergabung dengan Scalev, platform yang dirancang untuk membantu Anda mengelola bisnis Anda dengan lebih efisien.", 520, 15), { size: 15, fill: "#3b4350", anchor: "middle", lh: 22 }) +
+  rect(...MAIL_BTN, { r: 6, fill: "#3b8fd0" }) + text(720, CT + 429, "Terima Undangan", { size: 15, weight: 600, fill: C.white, anchor: "middle" }) +
+  text(720, CT + 488, "Atau dengan cara klik tautan di bawah ini", { size: 14, fill: "#3b4350", anchor: "middle" }) + rect(520, CT + 504, 400, 10, { r: 5, fill: "#cfe3f7" }) +
+  para(720, CT + 556, wrap("Abaikan email ini jika Anda tidak merasa diundang oleh Nikahin untuk bergabung dengan Scalev.", 520, 13), { size: 13, fill: "#6b7480", anchor: "middle", lh: 19 });
+// Scalev login page (generic layout, labels as observed): Login, Email, Password, Continue, or, Login dengan Google.
+const LG = { x: 520, w: 400 }, LG_GOOGLE = [LG.x, CT + 480, LG.w, 44];
+const loginPage = () => {
+  const { x, w } = LG, gx = 720 - Math.round((30 + tw("Login dengan Google", 14, 500)) / 2), field = (y) => rect(x + 1, y + 1, w - 2, 42, { r: 4, fill: C.white, stroke: "#d5dae1", sw: 2 });
+  return rect(0, CT, W, VIEW, { fill: "#f8f9fb" }) + rect(x - 39.5, CT + 70.5, w + 79, 499, { r: 12, fill: C.white, stroke: "#e5e8ec" }) + svLogo(720, CT + 116, 18) +
+    text(x, CT + 180, "Login", { size: 24, weight: 700, fill: "#1f2d3d" }) + text(x, CT + 222, "Email", { size: 13, weight: 500, fill: "#5b6675" }) + field(CT + 232) +
+    text(x, CT + 300, "Password", { size: 13, weight: 500, fill: "#5b6675" }) + field(CT + 310) +
+    rect(x, CT + 376, w, 44, { r: 4, fill: "#3b8fd0" }) + text(720, CT + 403, "Continue", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
+    line(x, CT + 452.5, 704, CT + 452.5, { stroke: "#e5e8ec" }) + line(736, CT + 452.5, x + w, CT + 452.5, { stroke: "#e5e8ec" }) + text(720, CT + 457, "or", { size: 13, fill: "#6b7480", anchor: "middle" }) +
+    rect(x + 0.5, CT + 480.5, w - 1, 43, { r: 4, fill: C.white, stroke: "#d5dae1" }) + gLogo(gx, CT + 492, 20) + text(gx + 30, CT + 507, "Login dengan Google", { size: 14, weight: 500, fill: "#1f2d3d" });
+};
+// Terms dialog for new Scalev accounts (ketentuan.jpg): line baselines relative to the dialog top, bullet on a group's first line.
+const TD = { x: 486, y: CT + 37, w: 468, h: 741 }, TD_BOX = [TD.x, TD.y, TD.w, TD.h];
+const TD_CHECK = [TD.x + 12, TD.y + 626, 436, 26], TD_CLOSE = [TD.x + 264, TD.y + 682, 78, 42], TD_ACCEPT = [TD.x + 364, TD.y + 682, 80, 42];
+const TD_LINES = [
+  [120, "Ketentuan Web Analytics menjelaskan pengukuran kunjungan", 1], [139, "dan konversi pesanan serta tanggung jawab Scalev dan"], [158, "pemilik toko."],
+  [178, "Persetujuan menggunakan Scalev tidak menggantikan izin", 1], [197, "pengunjung untuk analitik dan iklan jika izin tersebut"], [216, "diperlukan."],
+  [237, "Ketentuan penggunaan penyedia layanan, pelindungan data,", 1], [256, "dan penghapusan data diperjelas."],
+  [276, "Pemberitahuan perubahan layanan, banding atas pembatasan", 1], [295, "akun, dan tanggung jawab masing-masing pihak diperjelas"], [315, "tanpa mengurangi hak yang dijamin hukum."],
+  [404, "Dijelaskan data yang digunakan, tujuan penggunaannya, pihak", 1], [423, "yang menerima data, dan masa penyimpanannya."],
+  [443, "Web Analytics dapat menghubungkan kunjungan dengan", 1], [462, "pembuatan dan pembayaran pesanan untuk mengukur"], [482, "konversi."],
+  [502, "Pilihan analitik dan iklan dijelaskan secara terpisah.", 1], [521, "Pengunjung dapat mengubah pilihan privasinya tanpa"], [541, "menghalangi belanja atau pembayaran."],
+  [561, "Akses asisten AI, penggunaan penyedia layanan, pelindungan", 1], [580, "data, dan cara meminta akses atau penghapusan data"], [600, "diperjelas."]
+];
+const termsDlg = () => {
+  const { x, y, w, h } = TD, doc = (by) => text(x + 16, y + by, "Click here to see the document", { size: 12, fill: "#3b8fd0" });
+  return shadow(x, y, w, h, 8, 3) + rect(x, y, w, h, { r: 8, fill: C.white }) + text(x + 16, y + 32, "Changes to Our Terms and Privacy Policy", { size: 16, weight: 600, fill: "#374151" }) +
+    text(x + 16, y + 79, "Terms and Conditions", { size: 16, weight: 700, fill: "#111827" }) + doc(97) + text(x + 16, y + 363, "Privacy Policy", { size: 16, weight: 700, fill: "#111827" }) + doc(381) +
+    TD_LINES.map(([by, s, dot]) => (dot ? circle(x + 40, y + by - 4, 2.2, { fill: "#111827" }) : "") + text(x + 48, y + by, s, { size: 14, fill: "#111827" })).join("") +
+    rect(x + 18, y + 633, 13, 13, { r: 3, fill: C.white, stroke: "#4b5563", sw: 2 }) + text(x + 40, y + 645, "I accept all of the changes above and continue to use Scalev.", { size: 14, fill: "#111827" }) +
+    rect(TD_CLOSE[0] + 1, TD_CLOSE[1] + 1, 76, 40, { r: 4, fill: C.white, stroke: "#d1d5db", sw: 2 }) + text(TD_CLOSE[0] + 39, TD_CLOSE[1] + 26, "Close", { size: 14, weight: 500, fill: "#374151", anchor: "middle" }) +
+    rect(...TD_ACCEPT, { r: 4, fill: "#f3f4f6" }) + text(TD_ACCEPT[0] + 40, TD_ACCEPT[1] + 26, "Accept", { size: 14, weight: 500, fill: "#9ca3af", anchor: "middle" });
+};
+// Ticked: the box checked and Accept enabled (its enabled colour is inferred: Scalev's primary blue).
+const termsOn = rect(TD.x + 17, TD.y + 632, 15, 15, { r: 3, fill: "#3b8fd0" }) + iconX("check", TD.x + 24.5, TD.y + 639.5, 11, C.white, 3) +
+  rect(...TD_ACCEPT, { r: 4, fill: "#3b8fd0" }) + text(TD_ACCEPT[0] + 40, TD_ACCEPT[1] + 26, "Accept", { size: 14, weight: 500, fill: C.white, anchor: "middle" });
+// Tawaran Bergabung ke Bisnis (tawaran-bergabung.jpg), the Scalev app at 0,0. The illustration is drawn simplified.
+const TW = { x: 476, y: 140, w: 488, h: 620 }, TW_BOX = [TW.x, TW.y, TW.w, TW.h];
+const TW_INPUT = [TW.x + 16, TW.y + 445, 456, 44], TW_JOIN = [TW.x + 312, TW.y + 535, 160, 40], PHONE_NO = "812-3456-7890";
+const tawaran = () => {
+  const { x, y, w, h } = TW, cardBg = (cx) => rect(cx, y + 332, 220, 59, { r: 6, fill: "#f5f7fa" }), av = (cx) => circle(cx, y + 358, 15, { fill: C.white, stroke: "#e2e8f0" });
+  return shadow(x, y, w, h, 8, 3) + rect(x, y, w, h, { r: 8, fill: C.white }) + iconX("x", x + 466, y + 24, 16, "#e0434b", 2.5) +
+    `<ellipse cx="${x + 250}" cy="${y + 150}" rx="170" ry="100" fill="#f4f5f7"/>` + rect(x + 156, y + 64, 254, 176, { r: 4, fill: "#e5e7eb" }) +
+    [0, 1, 2, 3].map((k) => rect(x + 176 + k * 56, y + 84, 40, 46, { fill: "#f9fafb" })).join("") + [0, 1, 2].map((k) => rect(x + 232, y + 146 + k * 14, 150, 7, { fill: "#d1d5db" })).join("") +
+    rect(x + 90, y + 196, 170, 44, { fill: "#d1d5db" }) + rect(x + 90, y + 192, 170, 6, { fill: "#6b7280" }) +
+    rect(x + 86, y + 110, 70, 90, { r: 30, fill: "#5aa9e6" }) + circle(x + 121, y + 96, 14, { fill: "#f2c5a0" }) + rect(x + 162, y + 116, 70, 84, { r: 30, fill: "#3b8fd0" }) + circle(x + 197, y + 102, 14, { fill: "#f2c5a0" }) +
+    rect(x + 130, y + 174, 26, 18, { r: 2, fill: "#f6c23e" }) + rect(x + 362, y + 222, 18, 18, { fill: "#2f3e8f" }) + circle(x + 371, y + 212, 10, { fill: "#5aa9e6" }) +
+    text(x + w / 2, y + 287, "Tawaran Bergabung ke Bisnis", { size: 22, weight: 700, fill: "#2d3748", anchor: "middle" }) +
+    text(x + w / 2, y + 311, "Kamu telah di undang untuk bergabung menjadi staf anggota oleh", { size: 14, fill: "#4a5568", anchor: "middle" }) +
+    cardBg(x + 16) + rect(x + 32, y + 348, 64, 10, { r: 5, fill: "#cbd2da" }) + text(x + 32, y + 377, "Pemilik Bisnis", { size: 12, fill: "#718096" }) + av(x + 204) +
+    cardBg(x + 252) + text(x + 268, y + 367, "Nikahin", { size: 14, weight: 700, fill: "#2d3748" }) + av(x + 450) + text(x + 450, y + 363, "N", { size: 13, weight: 500, fill: "#2d3748", anchor: "middle" }) +
+    text(x + 16, y + 429, ["Nomor Telepon Bisnis ", { t: "*", fill: "#e53e3e" }], { size: 12, weight: 500, fill: "#4a5568" }) +
+    rect(x + 17, y + 446, 454, 42, { r: 4, fill: C.white, stroke: "#cbd5e0", sw: 2 }) + rect(x + 28, y + 460, 20, 7, { fill: "#e53e3e" }) + rect(x + 28.5, y + 460.5, 19, 13, { stroke: "#e2e8f0" }) +
+    text(x + 54, y + 472, "+62", { size: 14, fill: "#2d3748" }) + icon("chevron-down", x + 98, y + 467, 12, "#a0aec0") + line(x + 112.5, y + 447, x + 112.5, y + 487, { stroke: "#cbd5e0" }) +
+    text(x + 112, y + 560, "Lewati", { size: 14, fill: "#a0aec0" }) + rect(x + 163, y + 535, 139, 40, { r: 4, fill: "#fdf2f2" }) +
+    text(x + 232.5, y + 560, "Tolak Penawaran", { size: 14, weight: 500, fill: "#e53e3e", anchor: "middle" }) + rect(...TW_JOIN, { r: 4, fill: "#4299d6" }) +
+    text(x + 392, y + 560, "Bergabung ke Bisnis", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) + text(x + 472, y + 600, "Metode verifikasi lain", { size: 14, fill: "#3b8fd0", anchor: "end" });
+};
+// The WhatsApp number check after Bergabung ke Bisnis: generic, no labels (not recorded).
+const VF = { x: 520, y: 290, w: 400, h: 300 }, VF_BOX = [VF.x, VF.y, VF.w, VF.h];
+const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, fill: C.white }) + circle(720, VF.y + 70, 28, { fill: "#25d366" }) + iconX("message-circle", 720, VF.y + 70, 26, C.white) +
+  bars(560, VF.y + 126, [320]) + bars(600, VF.y + 152, [240]) + bars(580, VF.y + 178, [280]) + rect(VF.x + 40, VF.y + 226, VF.w - 80, 44, { r: 6, fill: "#25d366" }) + rect(640, VF.y + 243, 160, 10, { r: 5, fill: "rgba(255,255,255,.6)" });
+// NikahKit panel head for a Kreator: the plan chip reads Sekali Bayar (wider than kit nkHead's fixed chip); the inbox icon
+// only once the page holds an invitation (App.jsx: ready).
+const SB = "Sekali Bayar", CHX = 341 - chipW(SB), CHIP_K = [CHX, 108, chipW(SB), 28];
+const headK = (title, inbox) => rect(72, 92, 327, 61, { fill: C.white }) + text(88, 128, title, { size: 16, weight: 700, fill: C.strong }) +
+  (inbox ? icon("inbox", CHX - 20, 122, 18, C.text) : "") + accountChip(CHX, 108, SB) + iconX("x", 368, 122, 18, C.text);
+// Template panel on a page with other HTML: the warning, the library under it, the rail locked but Template and Media.
+const tplForeign = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", false) + panelBody(panelBg(), seg(), htmlNote(), library(287)) + LOCKED;
+const HTML_NOTE = [88, 219, 279, 56], DASAR_CARD = [88, 405, 134, 167];
+// Dialog Ganti isi halaman (panels-style.jsx), as editor-pilih-template-ganti draws it.
+const GD = [540, 383, 360, 134], GANTI = [823, 461, 57, 36];
+const gantiDlg = shadow(540, 383, 360, 134, 8, 3) + rect(...GD, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Dasar?", { size: 14, weight: 600 }) +
+  text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 });
+// Media panel (App.jsx MediaPanel): Unggah foto, "Atau seret ke sini.", the Scalev Media grid (3 columns, newest first).
+const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
+const UNGGAH = [88, 169, 279, 36];
+const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Media", true) + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
+  text(88, 223, "Atau seret ke sini.", { size: 12, fill: C.faint }) + clipped(88, 239, 279, 661, ks.map((k, i) => mTile(i, k)).join(""));
+// The system file window (generic), in the gap between panel and preview: one photo picked, Buka.
+const FW = { x: 403, y: 290, w: 320, h: 370 }, FW_BOX = [FW.x, FW.y, FW.w, FW.h], BUKA = [FW.x + FW.w - 96, FW.y + FW.h - 40, 80, 28];
+const fileWin = (sel) => {
+  const { x, y, w, h } = FW;
+  return shadow(x, y, w, h, 10, 3) + rect(x, y, w, h, { r: 10, fill: C.white, stroke: "#d0d4da" }) + rect(x, y, w, 36, { r: 10, fill: "#eceef1" }) + rect(x, y + 26, w, 10, { fill: "#eceef1" }) +
+    circle(x + 18, y + 18, 6, { fill: "#ff5f57" }) + circle(x + 38, y + 18, 6, { fill: "#febc2e" }) + circle(x + 58, y + 18, 6, { fill: "#28c840" }) + iconX("folder", x + 90, y + 18, 16, C.text) +
+    text(x + 106, y + 23, "Foto Rani & Dimas", { size: 13, weight: 500, fill: C.crText }) +
+    [["akad-1.jpg", 4], ["akad-2.jpg", 1], ["resepsi.jpg", 8], ["lamaran.jpg", 3]].map(([n, k], i) => {
+      const fx = x + 20 + (i % 2) * 154, fy = y + 56 + Math.floor(i / 2) * 124;
+      return (sel && !i ? rect(fx, fy - 8, 108, 128, { r: 8, fill: C.crBlueSoft }) : "") + photo(fx + 14, fy, 80, 80, k) + text(fx + 54, fy + 104, n, { size: 13, fill: C.crText, anchor: "middle" });
+    }).join("") +
+    line(x, y + h - 56, x + w, y + h - 56, { stroke: "#e3e5e8" }) + rect(...BUKA, { r: 6, fill: sel ? C.crBlue : "#c4c7c5" }) + text(BUKA[0] + 40, BUKA[1] + 19, "Buka", { size: 13, weight: 500, fill: C.white, anchor: "middle" });
+};
+// Buku Tamu (ext/buku-tamu.html over Scalev's main, content box 392..1304) with the Kreator's one invitation.
+const BT = { x: 392, w: 912 }, BT_CARD = [BT.x, 150, BT.w, 74];
+const bukuTamuK = () => {
+  const { x, w } = BT, n = "Undangan Rani & Dimas";
+  return rect(256, 0, 1184, 900, { fill: C.page }) + nkLogo(x + 16, 40, 32) + text(x + 42, 46, "Buku Tamu", { size: 16, weight: 700, fill: C.strong }) +
+    text(x, 84, EMAIL, { size: 12, weight: 700, fill: C.faint }) + text(x + w, 84, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
+    rect(x + 0.5, 100.5, w - 1, 37, { r: 4, fill: C.white, stroke: C.field }) + text(x + 11, 124, "Cari nama atau ID undangan", { size: 14, fill: C.faint }) +
+    rect(x + 0.5, 150.5, w - 1, 73, { r: 8, fill: C.white, stroke: C.line }) + text(x + 17, 181, [{ t: n, w: 700 }, ` /${ID} · Belum terbit`], { fill: C.text }) +
+    text(x + 17, 201, "Ucapan 0 (tampil 0) · Hadir 0 orang · Tidak 0 · Ragu 0", { size: 14, fill: C.text }) + text(x, 252, "Menampilkan 1–1 dari 1", { size: 12, fill: C.faint });
+};
+
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
 export const scenes = {
   // Home page overview: eight stops, each with a glimpse of the screen involved.
@@ -589,11 +728,7 @@ export const scenes = {
   "gabung-masuk-google": (() => {
     const g = GATE_OUT(CT);
     const chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, gDisabled: true }), inn = dlg({});
-    const GX = 960, GY = 130, GW = 440, GH = 560, ACCT = [GX + 32, GY + 204, GW - 64, 66];
-    const google = popup(GX, GY, GW, GH, "accounts.google.com") + gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
-      line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
-      text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
-      circle(GX + 52, GY + 304, 14, { stroke: C.crSub }) + text(GX + 80, GY + 309, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(GX + 32, GY + 336.5, GX + GW - 32, GY + 336.5, { stroke: "#e3e3e3" });
+    const { x: GX, y: GY, w: GW, h: GH } = GG, ACCT = GOOGLE_ACCT, google = googleWin;
     return {
       title: "Masuk ke NikahKit dengan akun Google",
       base: [win({ tabs: [TAB_ED], url: URL }), editor("Code")],
@@ -743,6 +878,172 @@ export const scenes = {
       ]
     };
   })(),
+
+  // Kreator Nikahin 1: email undangan, Terima Undangan, Login dengan Google, ketentuan Scalev untuk akun baru.
+  "gabung-kreator-terima-undangan": (() => {
+    const tabs2 = [{ ...MAIL_TAB, active: false }, SV_TAB], LOGIN = [LG.x - 40, CT + 70, LG.w + 80, 500];
+    return {
+      title: "Menerima undangan Scalev dari bisnis Nikahin",
+      base: [win({ tabs: [MAIL_TAB], url: "mail.google.com" }), mailPage()],
+      els: {
+        top2: { svg: crTop({ tabs: tabs2, url: "app.scalev.com/login" }), skel: true },
+        login: { svg: loginPage(), enter: "fade", skel: true },
+        google: { svg: googleWin, enter: "pop", origin: [GG.x + GG.w / 2, GG.y + GG.h / 2] },
+        dash: { svg: crTop({ tabs: tabs2, url: "app.scalev.com/dashboard" }) + vp(atY(CT, scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody())), enter: "fade", skel: true },
+        dim: { svg: DIM, enter: "fade" },
+        terms: { svg: termsDlg(), enter: "pop", origin: mid(TD_BOX) },
+        tick: { svg: termsOn, enter: "fade" }
+      },
+      steps: [
+        { caption: "Buka email You are invited to join Scalev dari Scalev.", focus: [[256, CT + 20, 760, 120]], at: mid(MAIL_SUBJ), mark: { box: MAIL_SUBJ, r: 3 }, lens: { src: [256, CT + 30, 420, 104] }, dur: 3.4 },
+        { caption: "Klik Terima Undangan. Halaman Login Scalev terbuka di tab baru.", focus: [[0, 0, W, CT], LOGIN], at: mid(MAIL_BTN), click: true, show: ["top2", "login"],
+          mark: { box: MAIL_BTN, r: 6 }, note: "Terima Undangan", dur: 3.6 },
+        { caption: "Klik Login dengan Google. Jendela Google terbuka.", focus: [LOGIN, [GG.x, GG.y, GG.w, GG.h]], at: mid(LG_GOOGLE), click: true, show: ["google"], mark: LG_GOOGLE,
+          lens: { src: [LG.x - 8, CT + 436, LG.w + 16, 96] } },
+        { caption: "Klik akun Google yang menerima undangan. Jendela Google menutup.", focus: [TD_BOX], at: mid(GOOGLE_ACCT), click: true, hide: ["google", "login", "top2"],
+          show: ["dash", "dim", "terms"], mark: GOOGLE_ACCT, note: "Rina WO", dur: 3.6 },
+        { caption: "Akun Scalev baru? Centang I accept all of the changes above.", at: [TD.x + 24, TD.y + 639], click: true, show: ["tick"], mark: TD_CHECK,
+          lens: { src: [TD.x, TD.y + 612, TD.w, 120] }, dur: 3.8 },
+        { caption: "Klik Accept. Jangan klik Close: akunmu langsung keluar dari Scalev.", at: mid(TD_ACCEPT), click: true, hide: ["terms", "tick", "dim"], mark: TD_ACCEPT,
+          note: "Accept", dur: 3.6 },
+        { caption: "Kamu sudah masuk Scalev. Lanjut ke kotak bisnis di kiri atas.", focus: [[0, CT, 256, 140]], at: [127, CT + 86], mark: [24, CT + 62, 206, 48],
+          lens: { src: [0, CT, 256, 130] }, dur: 3 }
+      ]
+    };
+  })(),
+
+  // Kreator Nikahin 2: Pilih Bisnis Kamu > Nikahin (!), Tawaran Bergabung ke Bisnis, nomor HP sendiri, verifikasi, menu Kreator.
+  "gabung-kreator-bergabung": {
+    title: "Bergabung ke bisnis Nikahin sebagai Kreator",
+    base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
+    els: {
+      menu: { svg: bizMenu([{ name: "Rina WO", cur: true }, { name: "Nikahin", invite: true }]), enter: "pop", origin: [127, 110] },
+      dim: { svg: dim(0, 0, W, 900), enter: "fade" },
+      offer: { svg: tawaran(), enter: "pop", origin: mid(TW_BOX) },
+      num: text(TW.x + 125, TW.y + 472, PHONE_NO, { size: 14, fill: "#2d3748" }),
+      verify: { svg: verifyWa, enter: "pop", origin: mid(VF_BOX) },
+      kr: { svg: krApp("Home") + head("Home") + genericBody(), enter: "fade", skel: true }
+    },
+    steps: [
+      { caption: "Klik kotak bisnis di kiri atas. Muncul Pilih Bisnis Kamu.", focus: [[0, 0, 300, 420]], at: mid(BIZ_BOX), click: true, show: ["menu"], mark: BIZ_BOX,
+        lens: { src: [18, 114, 280, 300], zoom: 1.5 }, dur: 3.4 },
+      { caption: "Klik Nikahin, yang berlatar kuning dengan tanda !.", focus: [TW_BOX], at: mid(BIZ_ROW(1)), click: true, hide: ["menu"], show: ["dim", "offer"], mark: BIZ_ROW(1), note: "Nikahin", dur: 3.4 },
+      { caption: "Isi Nomor Telepon Bisnis dengan nomor HP-mu sendiri.", at: [TW.x + 300, TW.y + 467], click: true, show: ["num"],
+        type: [{ id: "num", n: PHONE_NO.length, box: [TW.x + 124, TW.y + 456, tw(PHONE_NO, 14) + 4, 22] }], mark: TW_INPUT, lens: { src: [TW.x, TW.y + 410, TW.w, 90] }, dur: 3.6 },
+      { caption: "Klik Bergabung ke Bisnis.", focus: [VF_BOX], at: mid(TW_JOIN), click: true, hide: ["offer", "num"], show: ["verify"], mark: TW_JOIN, note: "Bergabung ke Bisnis" },
+      { caption: "Verifikasi nomor HP lewat WhatsApp. Ikuti petunjuk di layar Scalev.", mark: { box: VF_BOX, r: 8 }, at: [720, VF.y + 248], dur: 3.6 },
+      { caption: "Bisnis Nikahin terbuka: Home, Landing Pages, Buku Tamu, Checkout Flows.", focus: [[0, 0, 256, 330]], hide: ["verify", "dim"], show: ["kr"],
+        mark: [BIZ_BOX, [24, 122, 207, 128]], lens: { src: [0, 56, 256, 200], at: [300, 120] }, dur: 4 }
+    ]
+  },
+
+  // Kreator Nikahin 3: Landing Pages (hanya halaman sendiri), + Create Landing Page > HTML Sales Page, slug, Simpan.
+  "gabung-kreator-buat-halaman": {
+    title: "Membuat halaman HTML Sales Page di bisnis Nikahin",
+    base: [krApp("Home"), head("Home"), genericBody()],
+    els: {
+      lp: { svg: krApp("Landing Pages") + lpPage(0), enter: "fade", skel: true },
+      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 84] },
+      ed: { svg: scalevEditor(0, 0, { tab: "Code" }) + pvForeign(), enter: "fade", skel: true },
+      simpan: { svg: svSimpan(), skel: true },
+      set: { svg: scalevEditor(0, 0, { tab: "Settings" }) + settingsPanel({ pub: false }) + pvForeign(), enter: "fade", skel: true },
+      sf: { svg: slugFocus, enter: "fade" },
+      slug: slugText(SLUG)
+    },
+    steps: [
+      { caption: "Di bisnis Nikahin, klik Landing Pages. Isinya hanya halaman buatanmu.", focus: [[0, 0, 256, 330], [256, 0, 1184, 520]], at: svMenuAt("Landing Pages", KR), click: true,
+        show: ["lp"], mark: krMenuBox("Landing Pages"), lens: { src: [0, 120, 256, 100], at: [520, 330] }, dur: 3.6 },
+      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 70, 230, 240]], at: mid(CREATE), click: true, show: ["cmenu"], mark: CREATE, lens: { src: [274, 78, 216, 228], zoom: 1.5 } },
+      { caption: "Klik HTML Sales Page. Editor halaman baru terbuka.", focus: [[0, 44, 399, 48]], at: mid(CREATE_ROW(1)), click: true, hide: ["cmenu", "lp"], show: ["ed", "simpan"],
+        mark: CREATE_ROW(1), note: "HTML Sales Page", dur: 3.4 },
+      { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set"], hide: ["ed"],
+        mark: { box: [161, 52, 69, 28], r: 6 }, lens: { src: [0, 44, 392, 280], at: [300, 40] } },
+      { caption: "Isi Slug URL, misalnya rani-dimas.", focus: DOMAIN_ACC, at: [SLUG_BOX[0] + 200, SLUG_BOX[1] + 21], click: true, show: ["sf", "slug"],
+        type: [{ id: "slug", n: SLUG.length, box: [48, 285, 76, 22] }], mark: SLUG_BOX, lens: SLUG_LENS, dur: 3.4 },
+      { caption: "Klik Simpan. Halaman tersimpan dan punya ID undangan.", focus: [[1183, 44, 257, 48]], at: ED.simpan, click: true, press: "simpan", mark: ED.simpanBox,
+        lens: { src: [1180, 44, 260, 50] }, dur: 3.4 }
+    ]
+  },
+
+  // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (Sekali Bayar aktif), chip, kartu Bisnis Scalev.
+  "gabung-kreator-masuk": (() => {
+    const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, gDisabled: true });
+    const acct = dlg({ license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true });
+    const CHIP = [CHIP_K[0], CT + CHIP_K[1], CHIP_K[2], CHIP_K[3]], HEAD = [0, CT + 92, 400, 62];
+    const cards = [acct.X + 16, acct.at.licCard[1], 360, acct.at.bizCard[1] + acct.at.bizCard[3] - acct.at.licCard[1]];
+    return {
+      title: "Masuk ke NikahKit sebagai Kreator Nikahin",
+      base: [win({ tabs: [TAB_ED], url: URL }), scalevEditor(0, CT, { tab: "Code" }), atY(CT, pvForeign())],
+      els: {
+        gate: { svg: gateEl(g), enter: "fade", skel: true },
+        dim: { svg: DIM, enter: "fade" },
+        chk: { svg: chk.svg, enter: "pop", origin: mid(chk.box) },
+        out: { svg: out.svg, enter: "fade", delay: 1 },
+        google: { svg: googleWin, enter: "pop", origin: [GG.x + GG.w / 2, GG.y + GG.h / 2], delay: 1.1 },
+        open: { svg: clipped(...LEFT, atY(CT, tplForeign())), enter: "fade", skel: true },
+        dim2: { svg: DIM, enter: "fade" },
+        acct: { svg: acct.svg, enter: "pop", origin: mid(acct.box) }
+      },
+      steps: [
+        { caption: "Buka editor halaman yang tadi kamu simpan di bisnis Nikahin.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
+        { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
+        { caption: "Klik Masuk dengan Google. Jendela NikahKit, lalu jendela Google terbuka.", focus: "none", at: mid(g.at.google), click: true,
+          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: g.area }, dur: 4 },
+        { caption: "Pilih akunmu. Paket Sekali Bayar sudah aktif: jendela menutup sendiri.", focus: [LEFT], at: mid(GOOGLE_ACCT), click: true, hide: ["google", "chk", "out", "dim"],
+          show: ["open"], mark: GOOGLE_ACCT, note: "Rina WO", dur: 3.8 },
+        { caption: "Editor NikahKit terbuka tanpa bayar. Chip akun bertuliskan Sekali Bayar.", at: mid(CHIP), mark: { box: CHIP, r: 14 }, lens: { src: HEAD }, dur: 3.6 },
+        { caption: "Klik Sekali Bayar. Jendela akun NikahKit terbuka.", focus: [acct.box], at: mid(CHIP), click: true, show: ["dim2", "acct"], mark: { box: CHIP, r: 14 }, lens: { src: HEAD } },
+        { caption: "Bisnis Scalev: Belum terhubung. Itu normal untuk Kreator, jangan diklik.", mark: [{ box: acct.at.licCard, r: 8 }, { box: acct.at.bizCard, r: 8 }], lens: { src: cards, zoom: 1.3 }, dur: 4.2 },
+        { caption: "Tutup jendela NikahKit: klik ×, tekan Esc, atau klik area gelap.", focus: [LEFT], at: mid(acct.at.close), click: true, hide: ["acct", "dim2"], mark: acct.at.close, note: "Tutup" }
+      ]
+    };
+  })(),
+
+  // Kreator Nikahin 5: catatan HTML lain, kartu Dasar, dialog Ganti, Media > Unggah foto, Simpan.
+  "gabung-kreator-template": {
+    title: "Memilih template, mengunggah foto, dan menyimpan",
+    base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvForeign()],
+    els: {
+      tpl: { svg: tplForeign(), skel: true },
+      veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade", skel: true },
+      dlg: { svg: gantiDlg, enter: "fade", skel: true },
+      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "fade", skel: true },
+      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
+      pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true },
+      media: { svg: mediaK([0, 1, 2, 3, 5, 6, 7, 8, 2]), enter: "fade", skel: true },
+      win: { svg: fileWin(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },
+      winSel: { svg: fileWin(true), enter: "fade", delay: 0.9 },
+      up: { svg: mediaK([4, 0, 1, 2, 3, 5, 6, 7, 8]), enter: "fade", skel: true },
+      simpan: { svg: svSimpan(), skel: true }
+    },
+    steps: [
+      { caption: "Halaman berisi HTML lain? Panel Template memberi catatan kuning.", focus: [[0, 92, 399, 808]], at: [230, 247], mark: HTML_NOTE, lens: { src: [80, 161, 295, 122], at: [290, 70] }, dur: 3.6 },
+      { caption: "Klik kartu template, misalnya Dasar. Muncul dialog Ganti isi halaman.", focus: [GD], at: mid(DASAR_CARD), click: true, show: ["veil", "dlg", "gnt"], mark: { box: DASAR_CARD, r: 8 },
+        lens: { src: GD }, dur: 3.6 },
+      { caption: "Klik Ganti. HTML lama diganti template Dasar, menu lain terbuka.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(GANTI), click: true, press: "gnt",
+        hide: ["veil", "dlg", "gnt", "tpl"], show: ["picked", "pvD"], mark: GANTI, note: "Ganti", dur: 3.6 },
+      { caption: "Klik Media di rail kiri. Panel Media terbuka.", focus: [[0, 92, 399, 808]], at: ED.rail.Media, click: true, show: ["media"], mark: { box: [0, ED.rail.Media[1] - 26, 71, 52], r: 0 },
+        lens: { src: [0, 96, 384, 116], at: [300, 40] } },
+      { caption: "Klik Unggah foto, lalu pilih foto di jendela file.", focus: [[72, 154, 327, 84], FW_BOX], at: mid(UNGGAH), click: true, show: ["win", "winSel"], mark: UNGGAH,
+        lens: { src: [80, 161, 295, 70] }, dur: 3.6 },
+      { caption: "Klik Buka. Fotonya masuk paling depan di pustaka Media.", focus: [[72, 154, 327, 300], FW_BOX], at: mid(BUKA), click: true, hide: ["win", "winSel"], show: ["up"],
+        mark: [{ box: BUKA, r: 6 }, { box: [88, 239, MS, MS], r: 4 }], lens: { src: [80, 230, 295, 110], at: [12, 420] }, dur: 3.6 },
+      { caption: "Klik Simpan di kanan atas Scalev.", focus: [[1183, 44, 257, 48]], at: ED.simpan, click: true, press: "simpan", mark: ED.simpanBox, lens: { src: [1180, 44, 260, 50] } }
+    ]
+  },
+
+  // Kreator Nikahin 6: menu Buku Tamu di bisnis Nikahin, baris undangan milik Kreator.
+  "gabung-kreator-buku-tamu": {
+    title: "Melihat undangan Kreator di Buku Tamu",
+    base: [krApp("Landing Pages"), lpPage(1), lpRow(0)],
+    els: { bt: { svg: krApp("Buku Tamu") + bukuTamuK(), enter: "fade", skel: true } },
+    steps: [
+      { caption: "Di menu kiri bisnis Nikahin, klik Buku Tamu.", focus: [[0, 0, 256, 330], [BT.x - 8, 0, BT.w + 16, 270]], at: svMenuAt("Buku Tamu", KR), click: true, show: ["bt"],
+        mark: krMenuBox("Buku Tamu"), lens: { src: [0, 150, 256, 100], at: [520, 330] }, dur: 3.4 },
+      { caption: "Undanganmu tampil: Undangan Rani & Dimas /365671 · Belum terbit.", focus: [[BT.x - 8, 92, BT.w + 16, 180]], at: [760, 186], mark: { box: BT_CARD, r: 8 },
+        lens: { src: [BT.x, 144, 560, 86] }, dur: 3.8 }
+    ]
+  },
 
   // Update: banner (nomor versi tidak ditampilkan), unduh, ekstrak, salin, timpa folder lama, ↻ di chrome://extensions, muat ulang.
   "gabung-update": (() => {

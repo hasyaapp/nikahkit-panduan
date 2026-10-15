@@ -40,7 +40,9 @@ const genericBody = (y = 94) => [0, 1, 2].map((i) => card(280 + i * 380, y, 364,
 
 // ---- Landing Pages list (measured 14 Okt 2026, page 365671): rows of HTML Mode pages (row i name at 585, 372 + 71 i) -----
 const LP_ROWS = [["Undangan Rani & Dimas", "/rani-dimas"], ["Undangan Sari & Bima", "/sari-bima"], ["Contoh Undangan", "/contoh"], ["Katalog Rina WO", "/katalog"]];
-function lpPage() {
+// n: the page count in the folder list and the list heading; with 0 the list shows "No Landing Pages Yet" (observed on a
+// Kreator's list, 15 Okt 2026; its place in the list is not measured).
+function lpPage(n = 4) {
   return rect(256, 0, 1184, 900, { fill: SV.bg }) + rect(256, 0, 1184, 137, { fill: C.white }) + line(256, 137.5, 1440, 137.5, { stroke: SV.line }) +
     text(280, 36, "Landing Pages", { size: 18, weight: 600, fill: SV.ink }) + line(280, 58.5, 1400, 58.5, { stroke: SV.line }) +
     text(469, 93, "Checkout form creation has moved.", { size: 13, fill: "#3b4350" }) + text(469, 112, "Create a checkout form here →", { size: 13, fill: SV.link, underline: true }) +
@@ -51,12 +53,13 @@ function lpPage() {
     text(336 + tw("Looking for landing pages with an order form? They're now called Checkout Flows. ", 14) - 12, 195, "Open Checkout Flows", { size: 14, fill: SV.ink, underline: true }) +
     card(281, 244, 1119, 680) + line(520.5, 244, 520.5, 900, { stroke: SV.line }) +
     text(297, 275, "Folders", { size: 14, weight: 600, fill: SV.ink }) + para(297, 294, ["Kelompokkan landing page per", "campaign, produk, atau klien."], { size: 11, fill: SV.sub, lh: 16 }) +
-    rect(297, 328, 207, 36, { r: 4, fill: "#eef6fc" }) + icon("layout-grid", 316, 346, 15, SV.blue) + text(335, 351, "All Landing Pages", { size: 14, weight: 500, fill: SV.link }) + text(498, 351, "4", { size: 12, fill: SV.link, anchor: "end" }) +
-    [["Ungrouped", "file-text", 4], ["Page", "folder", 0], ["Undangan", "folder", 0]].map(([n, ic, c], i) => iconX(ic, 316, 384 + i * 38, 15, "#4a5361") + text(335, 389 + i * 38, n, { size: 14, fill: "#3b4350" }) + text(498, 389 + i * 38, String(c), { size: 12, fill: SV.sub, anchor: "end" })).join("") +
+    rect(297, 328, 207, 36, { r: 4, fill: "#eef6fc" }) + icon("layout-grid", 316, 346, 15, SV.blue) + text(335, 351, "All Landing Pages", { size: 14, weight: 500, fill: SV.link }) + text(498, 351, String(n), { size: 12, fill: SV.link, anchor: "end" }) +
+    [["Ungrouped", "file-text", n], ["Page", "folder", 0], ["Undangan", "folder", 0]].map(([nm, ic, c], i) => iconX(ic, 316, 384 + i * 38, 15, "#4a5361") + text(335, 389 + i * 38, nm, { size: 14, fill: "#3b4350" }) + text(498, 389 + i * 38, String(c), { size: 12, fill: SV.sub, anchor: "end" })).join("") +
     rect(297.5, 488.5, 206, 41, { r: 4, fill: C.white, stroke: SV.blue }) + text(400, 514, "+  New Folder", { size: 14, weight: 500, fill: SV.link, anchor: "middle" }) +
-    text(537, 273, "All Landing Pages", { size: 14, weight: 600, fill: SV.ink }) + text(667, 273, "4", { size: 12, fill: SV.sub }) +
+    text(537, 273, "All Landing Pages", { size: 14, weight: 600, fill: SV.ink }) + text(667, 273, String(n), { size: 12, fill: SV.sub }) +
     rect(521, 293, 879, 38, { fill: "#f6f8fa" }) + check(537, 303, false) +
-    [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].map(([l, x]) => text(x, 316, l, { size: 12, fill: SV.sub })).join("");
+    [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].map(([l, x]) => text(x, 316, l, { size: 12, fill: SV.sub })).join("") +
+    (n ? "" : iconX("file-text", 960, 420, 32, "#b8c0ca") + text(960, 468, "No Landing Pages Yet", { size: 16, weight: 600, fill: SV.ink, anchor: "middle" }));
 }
 function lpRow(i) {
   const [name, slug] = LP_ROWS[i], y = 331 + i * 71;
@@ -68,6 +71,33 @@ function lpRow(i) {
 const lpScreen = () => scalevApp(0, 0, { active: "Landing Pages" }) + lpPage() + LP_ROWS.map((_, i) => lpRow(i)).join("");
 const CREATE = svBox(280, 78, "+ Create Landing Page", { w: 173 });
 const btnCreate = svBtn(280, 78, "+ Create Landing Page", { w: 173 });
+// + Create Landing Page menu (docs/gambar/kreator/buat-halaman.jpg, 15 Okt 2026): 202 wide over the button, four 54 px
+// rows, the first highlighted. CREATE_ROW(i) gives row i's box.
+const CREATE_ITEMS = ["Sales Page", "HTML Sales Page", "Blank Page", "Import Sesama Scalev"];
+const CREATE_ROW = (i) => [281, 84 + i * 54, 202, 54];
+const createMenu = () => shadow(281, 84, 202, 216, 6, 2) + rect(281, 84, 202, 216, { r: 4, fill: C.white }) + rect(282, 85, 200, 53, { r: 3, fill: "#f3f7fc" }) +
+  CREATE_ITEMS.map((l, i) => (i ? line(281, 84.5 + i * 54, 483, 84.5 + i * 54, { stroke: SV.line }) : "") + text(298, 116 + i * 54, l, { size: 14, weight: 500, fill: i ? "#3b4350" : SV.link })).join("") +
+  rect(434, 160, 34, 17, { r: 4, fill: SV.soft }) + text(451, 172, "New", { size: 11, weight: 500, fill: SV.blue, anchor: "middle" });
+
+// ---- Business switcher (Pilih Bisnis Kamu, measured: docs/gambar/kreator/pilih-bisnis.jpg) ----------------------------
+// Under the business box: search, one 53 px row per business (66 apart), + Buat Bisnis Baru. rows: [{ name, cur, invite }]:
+// cur = the active business (blue border); invite = an invitation not yet accepted (light yellow, "!" at the right).
+// BIZ_BOX: the business box in the sidebar; BIZ_ROW(i): row i's box.
+const BIZ_BOX = [24, 62, 206, 48];
+const BIZ_ROW = (i) => [41, 227 + i * 66, 234, 53];
+function bizMenu(rows) {
+  const h = 223 + 66 * (rows.length - 1);
+  let s = shadow(24, 120, 268, h, 6, 2) + rect(24, 120, 268, h, { r: 6, fill: C.white }) + text(40, 150, "Pilih Bisnis Kamu", { size: 12, fill: "#3b4350" }) +
+    rect(41, 171, 234, 40, { r: 4, fill: C.white, stroke: "#d5dae1", sw: 2 }) + text(54, 196, "Cari Bisnis", { size: 14, fill: "#8d97a3" }) + iconX("search", 252, 191, 13, "#3b4350");
+  rows.forEach(({ name, cur, invite }, i) => {
+    const y = 227 + i * 66;
+    s += (cur ? rect(41, y, 234, 53, { r: 4, fill: "#f8fafc", stroke: SV.blue, sw: 2 }) : invite ? rect(41, y, 234, 53, { r: 4, fill: "#fff6e5" }) : "") +
+      (invite ? circle(66, y + 27, 12, { fill: C.white, stroke: "#e3e7ec" }) : "") + text(66, y + 31, name[0], { size: 12, weight: 700, fill: "#3b4350", anchor: "middle" }) +
+      text(86, y + 31, name, { size: 14, weight: 500, fill: SV.ink }) +
+      (invite ? circle(252, y + 27, 6.5, { stroke: "#e8a317", sw: 1.5 }) + rect(251.3, y + 23, 1.4, 4.5, { fill: "#e8a317" }) + circle(252, y + 30, 0.9, { fill: "#e8a317" }) : "");
+  });
+  return s + text(158, h + 91, "+ Buat Bisnis Baru", { size: 12, weight: 500, fill: SV.link, anchor: "middle" });
+}
 
 // ---- editor Settings tab -------------------------------------------------------------------------------------------
 // Settings tab (measured 14 Okt 2026): header row (version, status, Batalkan Penerbitan) and accordions.
@@ -292,7 +322,8 @@ const PAY_DLG = [497, 176, 431, 548], PAY_DLG_OPEN = [497, 134, 431, 632], ALLPA
 const payTicked = tick(839, 398, true) + rect(820, 155, 90, 20, { fill: C.white }) + tx(904, 163, "3 selected", 12, { fill: SVC.sub, anchor: "end" });
 
 export {
-  SV, bar, svBox, svBtn, check, SVC, tx, box2, tick, head, card, genericBody, LP_ROWS, lpPage, lpRow, lpScreen, CREATE, btnCreate,
+  SV, bar, svBox, svBtn, check, SVC, tx, box2, tick, head, card, genericBody, LP_ROWS, lpPage, lpRow, lpScreen, CREATE, btnCreate, CREATE_ROW, createMenu,
+  BIZ_BOX, BIZ_ROW, bizMenu,
   lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsPanel, settingsEd, SLUG, slugText, slugFocus, SLUG_LENS, DOMAIN_ACC,
   secContent, secPicker, securityPanel, SECURITY,
   settingsPage, subAt, subBox, SUBMENU, domainPage, TAMBAH, DOM_IN, DOM_SAVE, DOM_DLG, domainDlg, domTyped, domSaveOn, VERIFY, dnsTable, verified,
