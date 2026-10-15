@@ -42,7 +42,7 @@ function pageSketch(x, y, w, h, [bg, ac]) {
 
 // Invitation preview: the Mempelai section (ui/invitation.mjs) with the sample couple or Rani.
 const SAMPLE = { nick: "Ayu", full: "Ayu Lestari, S.Ked.", job: "Dokter", parents: "Putri pertama dari Bapak Hadi & Ibu Ratna" };
-const RANI = { nick: "Rani", full: "Rani Ayu, S.Psi.", job: "Psikolog", parents: "Putri kedua dari Bapak Ahmad & Almh. Ibu Siti" };
+const RANI = { nick: "Rani", full: "Rani Ayu, S.Psi.", job: "Psikolog", parents: "Putri kedua dari Bapak Ahmad & Ibu Siti" };
 
 // Dashboard pasangan gate (dash-gate-hp.png), card 358 wide; x = left of the 390 column, top = card top.
 function gate(x, top) {

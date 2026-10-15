@@ -19,9 +19,9 @@ import {
   securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, LP_ROWS, head, genericBody,
   CREATE, CREATE_ROW, createMenu, BIZ_BOX, BIZ_ROW, bizMenu
 } from "../ui/scalev.mjs";
-import { templatePanel, cardAt, kList, panelBody, panelBg, seg, htmlNote, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
+import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
 import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY } from "../ui/marketing.mjs";
-import { pvCover, pvForeign, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
+import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, accountChip, chipW } from "../ui/gate.mjs";
 import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen } from "../ui/pesanan.mjs";
@@ -465,13 +465,10 @@ const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, 
 const SB = "Sekali Bayar", CHX = 341 - chipW(SB), CHIP_K = [CHX, 108, chipW(SB), 28];
 const headK = (title, inbox) => rect(72, 92, 327, 61, { fill: C.white }) + text(88, 128, title, { size: 16, weight: 700, fill: C.strong }) +
   (inbox ? icon("inbox", CHX - 20, 122, 18, C.text) : "") + accountChip(CHX, 108, SB) + iconX("x", 368, 122, 18, C.text);
-// Template panel on a page with other HTML: the warning, the library under it, the rail locked but Template and Media.
-const tplForeign = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", false) + panelBody(panelBg(), seg(), htmlNote(), library(287)) + LOCKED;
-const HTML_NOTE = [88, 219, 279, 56], DASAR_CARD = [88, 405, 134, 167];
-// Dialog Ganti isi halaman (panels-style.jsx), as editor-pilih-template-ganti draws it.
-const GD = [540, 383, 360, 134], GANTI = [823, 461, 57, 36];
-const gantiDlg = shadow(540, 383, 360, 134, 8, 3) + rect(...GD, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Dasar?", { size: 14, weight: 600 }) +
-  text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 });
+// Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
+// and Media.
+const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
+const DASAR_CARD = [...cardAt(0, 337), 134, 167];
 // Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
 // before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
@@ -948,9 +945,9 @@ export const scenes = {
     els: {
       lp: { svg: krApp("Landing Pages") + lpPage(0), enter: "fade", skel: true },
       cmenu: { svg: createMenu(), enter: "pop", origin: [382, 84] },
-      ed: { svg: scalevEditor(0, 0, { tab: "Code" }) + pvForeign(), enter: "fade", skel: true },
+      ed: { svg: scalevEditor(0, 0, { tab: "Code" }) + pvBlank(), enter: "fade", skel: true },
       simpan: { svg: svSimpan(), skel: true },
-      set: { svg: scalevEditor(0, 0, { tab: "Settings" }) + settingsPanel({ pub: false }) + pvForeign(), enter: "fade", skel: true },
+      set: { svg: scalevEditor(0, 0, { tab: "Settings" }) + settingsPanel({ pub: false }) + pvBlank(), enter: "fade", skel: true },
       sf: { svg: slugFocus, enter: "fade" },
       slug: slugText(SLUG)
     },
@@ -977,14 +974,14 @@ export const scenes = {
     const cards = [acct.X + 16, acct.at.licCard[1], 360, acct.at.bizCard[1] + acct.at.bizCard[3] - acct.at.licCard[1]];
     return {
       title: "Masuk ke NikahKit sebagai Kreator Nikahin",
-      base: [win({ tabs: [TAB_ED], url: URL }), scalevEditor(0, CT, { tab: "Code" }), atY(CT, pvForeign())],
+      base: [win({ tabs: [TAB_ED], url: URL }), scalevEditor(0, CT, { tab: "Code" }), atY(CT, pvBlank())],
       els: {
         gate: { svg: gateEl(g), enter: "fade", skel: true },
         dim: { svg: DIM, enter: "fade" },
         chk: { svg: chk.svg, enter: "pop", origin: mid(chk.box) },
         out: { svg: out.svg, enter: "fade", delay: 1 },
         google: { svg: googleWin, enter: "pop", origin: [GG.x + GG.w / 2, GG.y + GG.h / 2], delay: 1.1 },
-        open: { svg: clipped(...LEFT, atY(CT, tplForeign())), enter: "fade", skel: true },
+        open: { svg: clipped(...LEFT, atY(CT, tplNew())), enter: "fade", skel: true },
         dim2: { svg: DIM, enter: "fade" },
         acct: { svg: acct.svg, enter: "pop", origin: mid(acct.box) }
       },
@@ -1003,15 +1000,12 @@ export const scenes = {
     };
   })(),
 
-  // Kreator Nikahin 5: catatan HTML lain, kartu Dasar, dialog Ganti, Media > Unggah foto, Simpan.
+  // Kreator Nikahin 5: kartu Dasar langsung terpasang (halaman baru dihitung kosong), Media > Unggah foto, Simpan.
   "gabung-kreator-template": {
     title: "Memilih template, mengunggah foto, dan menyimpan",
-    base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvForeign()],
+    base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvBlank()],
     els: {
-      tpl: { svg: tplForeign(), skel: true },
-      veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade", skel: true },
-      dlg: { svg: gantiDlg, enter: "fade", skel: true },
-      gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "fade", skel: true },
+      tpl: { svg: tplNew(), skel: true },
       picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
       pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true },
       media: { svg: mediaK([]), enter: "fade", skel: true },
@@ -1021,11 +1015,9 @@ export const scenes = {
       simpan: { svg: svSimpan(), skel: true }
     },
     steps: [
-      { caption: "Halaman berisi HTML lain? Panel Template memberi catatan kuning.", focus: [[0, 92, 399, 808]], at: [230, 247], mark: HTML_NOTE, lens: { src: [80, 161, 295, 122], at: [290, 70] }, dur: 3.6 },
-      { caption: "Klik kartu template, misalnya Dasar. Muncul dialog Ganti isi halaman.", focus: [GD], at: mid(DASAR_CARD), click: true, show: ["veil", "dlg", "gnt"], mark: { box: DASAR_CARD, r: 8 },
-        lens: { src: GD }, dur: 3.6 },
-      { caption: "Klik Ganti. HTML lama diganti template Dasar, menu lain terbuka.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(GANTI), click: true, press: "gnt",
-        hide: ["veil", "dlg", "gnt", "tpl"], show: ["picked", "pvD"], mark: GANTI, note: "Ganti", dur: 3.6 },
+      { caption: "Panel Template terbuka. Halaman baru masih kosong, jadi tanpa catatan.", focus: [[0, 92, 399, 808]], at: [230, 247], mark: [88, 169, 279, 38], lens: { src: [80, 161, 295, 122], at: [290, 70] }, dur: 3.4 },
+      { caption: "Klik kartu template, misalnya Dasar. Template langsung terpasang.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(DASAR_CARD), click: true,
+        hide: ["tpl"], show: ["picked", "pvD"], mark: { box: DASAR_CARD, r: 8 }, dur: 3.8 },
       { caption: "Klik Media di rail kiri. Isinya hanya foto unggahanmu: masih kosong.", focus: [[0, 92, 399, 808]], at: ED.rail.Media, click: true, show: ["media"], mark: { box: [0, ED.rail.Media[1] - 26, 71, 52], r: 0 },
         lens: { src: [0, 96, 384, 116], at: [300, 40] } },
       { caption: "Klik Unggah foto, lalu pilih foto di jendela file.", focus: [[72, 154, 327, 84], FW_BOX], at: mid(UNGGAH), click: true, show: ["win", "winSel"], mark: UNGGAH,

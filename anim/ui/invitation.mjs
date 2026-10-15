@@ -52,7 +52,7 @@ export function pvCover(names, o = {}) {
 }
 // Mempelai section (one partner): title, arch portrait, nickname in script, full name, job, parents line (wrapped), city
 // and Instagram pill (both optional), dock with Mempelai active. Defaults: the bride of the sample data.
-export function pvMempelai({ nick = "Rani", full = "Rani Ayu, S.Psi.", job = "Psikolog", parents = "Putri kedua dari Bapak Ahmad & Almh. Ibu Siti", city, ig, k = 2 } = {}) {
+export function pvMempelai({ nick = "Rani", full = "Rani Ayu, S.Psi.", job = "Psikolog", parents = "Putri kedua dari Bapak Ahmad & Ibu Siti", city, ig, k = 2 } = {}) {
   const lines = wrap(parents, 300, 14), py = 590 + lines.length * 20;
   return pvScreen(CREAM, bumps(SC.y + 20, 1), secTitle("Mempelai"), archPhoto("M852 450 V318 A70 70 0 0 1 992 318 V450 Z", 852, 248, 140, 202, k),
     text(CX, 506, nick, { size: 44, font: SCRIPT, fill: MAROON, anchor: "middle" }), sTxt(542, full, { size: 18, weight: 700, fill: INK }), sTxt(566, job, { size: 13 }),
@@ -76,6 +76,8 @@ export const pvGallery = () => pvScreen(CREAM, secTitle("Galeri"), sTxt(262, "Se
 // Amplop Digital with "Tampilkan lewat tombol Kirim Hadiah" on: title, intro and the button (accounts open after it).
 export const pvGift = () => pvScreen(CREAM, secTitle("Tanda Kasih"), sTxt(262, "Doa restu Anda sudah lebih dari"), sTxt(283, "cukup. Bila ingin memberi tanda"), sTxt(304, "kasih, dapat melalui:"),
   rect(837, 336, 170, 48, { r: 24, fill: MAROON }) + icon("gift", 866, 360, 16, C.white) + text(932, 365, "Kirim Hadiah", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }), dock("Hadiah"), disc());
+// A new HTML Sales Page: Scalev's empty skeleton shows as a blank screen; NikahKit treats it as an empty page.
+export const pvBlank = () => pvScreen(C.white);
 // Another landing page's HTML (before a template is picked): neutral blocks, no text.
 export const pvForeign = () => pvScreen(C.white, rect(SC.x, SC.y, SC.w, 56, { fill: "#1f2937" }), rect(SC.x + 20, SC.y + 20, 90, 16, { r: 3, fill: "#4b5563" }),
   rect(SC.x, SC.y + 56, SC.w, 250, { fill: "#e5e7eb" }), rect(SC.x + 40, SC.y + 130, 310, 22, { r: 4, fill: "#9ca3af" }), rect(SC.x + 70, SC.y + 166, 250, 14, { r: 4, fill: "#c4c8ce" }),

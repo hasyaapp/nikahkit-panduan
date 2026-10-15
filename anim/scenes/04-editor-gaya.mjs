@@ -444,7 +444,7 @@ const SCENES = {
     const [col, p] = column([{ label: "Judul", placeholder: "Mempelai" }, { label: "Urutan nama", value: "Wanita dulu", select: true }, { h3: "Mempelai Wanita" },
       { label: "Nama panggilan", value: "Rani", hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", value: "Rani Ayu, S.Psi." }, { label: "Profesi atau bio singkat (opsional)", value: "Psikolog" },
       { label: "Anak ke- (opsional)", value: "Putri kedua" }, { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" },
-      { toggle: "Ibu sudah wafat (Almh.)", on: true }, { photo: "Foto" }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." },
+      { toggle: "Ibu sudah wafat (Almh.)", on: false }, { photo: "Foto" }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." },
       { h3: "Mempelai Pria" }, { label: "Nama panggilan", key: "pria", value: "Dimas" }], ACC_X, accY + 58, ACC_W);
     const open = rect(72, 154, 314, 1800, { fill: C.white }) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi" }) + nkAcc(PX, accY, PW, "Mempelai", { badge: "Terisi", open: true }) +
       line(88, accY + 49.5, 367, accY + 49.5, { stroke: C.line }) + accFrame(accY, p.end + 20) + col;
@@ -701,7 +701,7 @@ const SCENES = {
   "editor-klik-aktif": (() => {
     const [kcol, p] = column([{ label: "Nama panggilan", value: "Rani", hint: "Tampil di sampul.", focus: true }, { label: "Nama lengkap dan gelar", value: "Rani Ayu, S.Psi." },
       { label: "Profesi atau bio singkat (opsional)", value: "Psikolog" }, { label: "Anak ke- (opsional)", value: "Putri kedua", hint: "Kosong: \"Putri dari\" / \"Putra dari\"." },
-      { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" }, { toggle: "Ibu sudah wafat (Almh.)", on: true }], ACC_X, 161, ACC_W);
+      { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" }, { toggle: "Ibu sudah wafat (Almh.)", on: false }], ACC_X, 161, ACC_W);
     const nY = p["Nama panggilan"] + 20, NICK = [ACC_X, nY, ACC_W, 36];
     const TAG = "Sampul · klik untuk mengisi";
     const salamTop = SC.y + 784 - PAGE_DY;

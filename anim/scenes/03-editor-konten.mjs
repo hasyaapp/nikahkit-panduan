@@ -3,7 +3,7 @@
 // Template and Konten panels come from ui/editor-panels (measured), the preview from ui/invitation (generic layout).
 import { C, rect, text, line, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
 import { ED, nkHead, nkRail, nkBtn, nkInput, nkAcc, nkBadgeBox, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
-import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
+import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvBlank, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
 import { ACCOUNT, P, PW, I, IW, hintL, typeIn, col, itemBar, itemBox, panelBg, panelBody, lid, LOCKED, kList, kListAt,
   fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillRsvp, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
   seg, htmlNote, chips, ALL_N, cards, library, GAL } from "../ui/editor-panels.mjs";
@@ -64,17 +64,17 @@ export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-pilih-template": {
     title: "Memilih template NikahKit pertama kali: kartu template",
-    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), pvForeign()],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), pvBlank()],
     els: {
       locked: { svg: LOCKED, skel: true },
-      cardsA: { svg: rect(72, 153, 327, 1000, { fill: C.white }) + seg() + htmlNote() + library(287), enter: "fade", skel: true },
+      cardsA: { svg: rect(72, 153, 327, 1000, { fill: C.white }) + seg() + library(219), enter: "fade", skel: true },
       lidT: { svg: lid("Template", { inbox: false }), skel: true }
     },
     steps: [
       { caption: "Klik Template di menu kiri. Panel Template terbuka.", focus: F.side, mark: railM("Template"), lens: { src: [0, 96, 399, 122], at: [290, 70] }, at: ED.rail.Template, click: true, show: ["cardsA"] },
       { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", focus: [80, 161, 295, 122], mark: [P, 169, PW, 38], lens: { src: [80, 161, 295, 122] }, at: [160, 188] },
       { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", focus: F.body, scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", mark: cardM(234, 405), lens: { src: [226, 398, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: [301, 488], click: true, dur: 3.6 }
+      { caption: "Klik kartu yang kamu suka, misalnya Folio.", mark: cardM(234, 337), lens: { src: [226, 330, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: [301, 420], click: true, dur: 3.6 }
     ]
   },
 
@@ -165,7 +165,7 @@ export const scenes = {
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-isi-mempelai": (() => {
-    const hold = { left: 5, link: "Ganti foto sampul", raw: true };
+    const hold = { left: 6, link: "Ganti foto sampul", raw: true };
     const v1 = kList({ open: "Mempelai", fill: fillMempelai(), raw: true });
     const v1b = kList({ ...hold, open: "Mempelai", fill: fillMempelai("Sinta") });
     const yM = v1.at.Mempelai, nickY = v1.f["Nama panggilan"] + 20, [clear, typed, ty] = typeIn(I, nickY, IW, "Sinta");
@@ -180,7 +180,7 @@ export const scenes = {
     const D8 = v3.at["Salam Pembuka"] - 420;
     const s0 = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam });
     const v4s = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam, dy: s0.at["Salam Pembuka"] - 420 });
-    const v5 = kList({ left: 5, link: "Ganti foto sampul" }), y5 = v5.at.Sampul;
+    const v5 = kList({ left: 6, link: "Ganti foto sampul" }), y5 = v5.at.Sampul;
     const sub = (id, D) => (D ? { scroll: { id, dy: D } } : {});
     return {
       title: "Mengisi Mempelai, Acara, Sampul, dan Salam di Konten",
@@ -220,7 +220,7 @@ export const scenes = {
   })(),
 
   "editor-isi-mempelai-pratinjau": (() => {
-    const hold = { left: 5, link: "Ganti foto sampul" };
+    const hold = { left: 6, link: "Ganti foto sampul" };
     const k = kList({ ...hold, open: "Mempelai", fill: fillMempelai("Sinta") }), nickY = k.f["Nama panggilan"] + 20;
     const shut = kList(hold), barA = shut.at["Acara & Tanggal"];
     return {
@@ -290,7 +290,7 @@ export const scenes = {
 
   "editor-tambah-acara-pratinjau": {
     title: "Acara baru di pratinjau",
-    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), kList({ left: 5, link: "Ganti foto sampul", open: "Acara & Tanggal", fill: fillAcara(EVS.slice(0, 2)) }).svg, pvEvents(["akad"])],
+    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), kList({ left: 6, link: "Ganti foto sampul", open: "Acara & Tanggal", fill: fillAcara(EVS.slice(0, 2)) }).svg, pvEvents(["akad"])],
     els: { pv2: { svg: pvEvents(["akad", "resepsi"]), enter: "fade", delay: 0.4, skel: true } },
     steps: [{ caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", focus: F.pv, mark: { box: [751, EV.resepsi.y, 342, EV.resepsi.h], r: 14 }, lens: { src: [745, EV.resepsi.y - 6, 354, EV.resepsi.h + 12] }, show: ["pv2"], at: [922, 640], dur: 3.6 }]
   },
