@@ -98,7 +98,7 @@ const GATE_EXP_BTN = gExpired.at.choose;
 const GATE_AREA = [...gExpired.area.slice(0, 3), 278 - gExpired.area[1]];
 // NikahKit account window (ext/pin.html, editor-akun.png): header, email + Keluar, Paket card, Bisnis Scalev card.
 const AW = { x: 500, y: 261, w: 440 };
-const AW_LIC = wrap("Langganan habis. Undangan tetap tampil, tetapi RSVP dan ucapan berhenti. Pilih paket.", 370, 14);
+const AW_LIC = wrap("Langganan habis. Undangan tetap tampil, RSVP dan ucapan berhenti.", 370, 14);
 const AW_PH = 16 + 16 + 8 + AW_LIC.length * 20 + 8 + 36 + 16, AW_BY = AW.y + 92 + AW_PH + 12, AW_H = AW_BY - AW.y + 122 + 16;
 function accountWindow() {
   const { x, y, w } = AW;
@@ -386,7 +386,7 @@ export const scenes = {
       steps: [
         { caption: "Baca baris versi: Versi, dengan tombol Cek update di kanan.", focus: ver, mark: sl.pos.version, lens: { src: helpLens(ver) } },
         { caption: "Baca baris status: 1 perlu perhatian. Muat ulang editor dulu.", dur: 3.4, focus: sl.pos.status, mark: sl.pos.status, lens: { src: helpLens(sl.pos.status, 0, 8) } },
-        { caption: "Baca tips Terbit tertahan: muat ulang, lalu Simpan & Terbitkan.", dur: 3.6, focus: sl.pos.tip, mark: sl.pos.tip,
+        { caption: "Baca tips not finished previewing: muat ulang, lalu terbitkan lagi.", dur: 3.6, focus: sl.pos.tip, mark: sl.pos.tip,
           lens: { src: [0, sl.pos.tip[1] - 6, 399, sl.pos.tip[3] + 7] } },
         { caption: "Periksa daftar cek. Tanda ! bermasalah, penyebabnya di bawah namanya.", dur: 3.8, focus: at(sl.pos.rows[BAD_ROW], SL1), mark: at(sl.pos.rows[BAD_ROW], SL1),
           scroll: { id: "body", dy: SL1 }, lens: { src: helpLens(sl.pos.rows[BAD_ROW], SL1, 1) } },

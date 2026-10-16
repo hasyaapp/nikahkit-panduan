@@ -94,7 +94,7 @@ function pinWindow(made) {
     btn(L + 17, y + 112, "Lihat PIN", { variant: "primary" }) + btn(L + 17 + bw("Lihat PIN") + 8, y + 112, "Buat PIN baru");
   y += ph + 12;
   s += card(L, y, W2, 120) + nkH3(L + 17, y + 28, "Bisnis Scalev") + text(L + 17, y + 55, "Rina WO (@rinawo)", { size: 14, fill: C.text }) + btn(L + 17, y + 68, "Hubungkan ulang");
-  if (made) s += rect(L, y + 132, W2, 38, { r: 4, fill: C.primarySoft }) + text(L + 12, y + 155, "PIN dibuat. Bisa dilihat lagi kapan saja lewat Lihat PIN.", { size: 12, fill: C.strong });
+  if (made) s += rect(L, y + 132, W2, 38, { r: 4, fill: C.primarySoft }) + text(L + 12, y + 155, "PIN dibuat. Lihat lagi kapan saja lewat Lihat PIN.", { size: 12, fill: C.strong });
   return s;
 }
 const PIN_CARD_A = [PL, pinY(false) + 236, PW, 116], BUAT_PIN = btnBox(PL + 17, pinY(false) + 236 + 64, "Buat PIN");
@@ -429,7 +429,7 @@ export const scenes = {
   "tamu-bagikan": {
     title: "Membagikan undangan dari panel Bagikan",
     // The dialog (with the unsaved note) is the base; the editor before the click is the element "pre".
-    base: [...editorBase(), shareTop(0), shareBtns(0), accessHead(539, false), coupleAll(657)],
+    base: [...editorBase(), shareTop(0), shareBtns(0), accessHead(ACC_Y + 66, false), coupleAll(COUPLE_Y + 66)],
     els: {
       pre: { svg: kontenPanel("Rani"), skel: true, enter: "fade" },
       nameClear: { svg: nkInput(16, 239, 366, "", { focus: true }), skel: true, enter: "fade" },
@@ -447,7 +447,7 @@ export const scenes = {
       { caption: "Kembali ke tab editor.", focus: [0, 365, 399, 160], hide: ["guest"], dur: 1.8 },
       { caption: "Klik Salin tautan tamu. Di bawah tombol muncul Tersalin.", focus: [0, 413, 399, 112], mark: shareBox("salin", 0), lens: { src: [0, 413, 399, 112] }, at: mid(shareBox("salin", 0)), click: true, show: ["copied"], dur: 3.4 },
       { caption: "Butuh tautan tanpa nama tamu? Klik Salin tautan umum.", focus: [0, 453, 399, 72], mark: shareBox("umum", 0), lens: { src: [0, 459, 399, 66] }, at: mid(shareBox("umum", 0)), click: true, hide: ["copied"], show: ["copied2"], dur: 3.2 },
-      { caption: "Di bawah ada Untuk pengantin: Kirim undangan dan Buka Dashboard.", focus: [0, 649, 399, 148], mark: [16, 681, 366, 80], lens: { src: [0, 649, 399, 143] }, at: [330, 743], hide: ["copied2"], dur: 3.6 }
+      { caption: "Di bawah ada Untuk pengantin: Kirim undangan dan Buka Dashboard.", focus: [0, COUPLE_Y + 58, 399, 148], mark: [16, COUPLE_Y + 90, 366, 80], lens: { src: [0, COUPLE_Y + 58, 399, 143] }, at: [330, COUPLE_Y + 152], hide: ["copied2"], dur: 3.6 }
     ]
   },
 
@@ -478,18 +478,18 @@ export const scenes = {
     els: {
       swOn: { svg: nkSwitch(...switchBox(ACC_Y).slice(0, 2), true), enter: "fade" },
       accLink: { svg: accessOn(ON_Y, "link"), skel: true, enter: "rise", delay: 0.1 },
-      menu: { svg: selectMenu(18, 607, 300, ["Tautan pribadi", "+ Kunci perangkat", "+ PIN untuk HP baru"], 1), enter: "pop", origin: [200, 621] },
+      menu: { svg: selectMenu(18, ON_Y + 24, 300, ["Tautan pribadi", "+ Kunci perangkat", "+ PIN untuk HP baru"], 1), enter: "pop", origin: [200, ON_Y + 38] },
       accDevice: { svg: accessOn(ON_Y, "device", 1), skel: true, enter: "fade" },
-      menu2: { svg: selectMenu(18, 612, 120, ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], 1), enter: "pop", origin: [80, 713] },
+      menu2: { svg: selectMenu(18, ON_Y + 29, 120, ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], 1), enter: "pop", origin: [80, ON_Y + 130] },
       accDevice2: { svg: accessOn(ON_Y, "device", 2), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Di panel Bagikan, gulir ke bagian Undangan khusus.", focus: [0, ACC_Y, 399, 108], mark: [16, ACC_Y + 2, 366, 96], lens: { src: [0, ACC_Y - 4, 399, 108] }, dur: 3 },
+      { caption: "Di panel Bagikan, gulir ke bagian Undangan khusus.", focus: [0, ACC_Y, 399, 92], mark: [16, ACC_Y + 2, 366, 80], lens: { src: [0, ACC_Y - 4, 399, 92] }, dur: 3 },
       { caption: "Klik sakelar Undangan khusus sampai menyala. Keamanan muncul.", focus: [0, ACC_Y, 399, ON_Y + 92 - ACC_Y], mark: { box: switchBox(ACC_Y), r: 10 }, lens: { src: [0, ON_Y - 7, 399, 88] }, at: mid(switchBox(ACC_Y)), click: true, show: ["swOn", "accLink"], dur: 3.6 },
       { caption: "Klik kotak Keamanan. Ada tiga mode.", focus: [0, ON_Y - 4, 399, 96], mark: keamananBox(ON_Y), lens: { src: [0, ON_Y - 1, 399, 114] }, at: mid(keamananBox(ON_Y)), click: true, show: ["menu"], dur: 3.2 },
-      { caption: "Pilih + Kunci perangkat. Muncul Perangkat per tamu.", focus: [0, ON_Y - 4, 399, 164], mark: menuItemBox(18, 607, 300, 1), lens: { src: [0, ON_Y + 91, 399, 90] }, at: mid(menuItemBox(18, 607, 300, 1)), click: true, hide: ["menu"], show: ["accDevice"], dur: 3.4 },
-      { caption: "Klik Perangkat per tamu. Pilihannya 1 sampai 10.", mark: devicesBox(ON_Y), lens: { src: [18, 612, 120, 268] }, at: mid(devicesBox(ON_Y)), click: true, show: ["menu2"], dur: 3.2 },
-      { caption: "Pilih 2.", mark: menuItemBox(18, 612, 120, 1), lens: { src: [0, ON_Y + 89, 399, 72] }, at: mid(menuItemBox(18, 612, 120, 1)), click: true, hide: ["menu2"], show: ["accDevice2"], dur: 2.6 }
+      { caption: "Pilih + Kunci perangkat. Muncul Perangkat per tamu.", focus: [0, ON_Y - 4, 399, 164], mark: menuItemBox(18, ON_Y + 24, 300, 1), lens: { src: [0, ON_Y + 91, 399, 90] }, at: mid(menuItemBox(18, ON_Y + 24, 300, 1)), click: true, hide: ["menu"], show: ["accDevice"], dur: 3.4 },
+      { caption: "Klik Perangkat per tamu. Pilihannya 1 sampai 10.", mark: devicesBox(ON_Y), lens: { src: [18, ON_Y + 29, 120, 268] }, at: mid(devicesBox(ON_Y)), click: true, show: ["menu2"], dur: 3.2 },
+      { caption: "Pilih 2.", mark: menuItemBox(18, ON_Y + 29, 120, 1), lens: { src: [0, ON_Y + 89, 399, 72] }, at: mid(menuItemBox(18, ON_Y + 29, 120, 1)), click: true, hide: ["menu2"], show: ["accDevice2"], dur: 2.6 }
     ]
   },
 
@@ -517,7 +517,7 @@ export const scenes = {
 
   "tamu-undangan-khusus-uji": {
     title: "Membuat tautan tamu dan menguji undangan khusus",
-    base: [...editorBase(), shareScrolled(200, "device", 2)],
+    base: [...editorBase(), shareScrolled(168, "device", 2)],
     els: { gate: { svg: gateTab(), skel: true, enter: "fade", delay: 0.2 } },
     steps: [
       { caption: "Di Untuk pengantin, klik Kirim undangan. Buat tautan per tamu di Dashboard.", focus: [0, 650, 399, 150], mark: [16, 691, 366, 36], lens: { src: [0, 660, 399, 116] }, at: [199, 709], dur: 3.8 },

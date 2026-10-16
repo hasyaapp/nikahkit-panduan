@@ -90,7 +90,7 @@ Tombol di setiap kolom tabel berubah sesuai keadaan akunmu:
 | **Ganti ke Bulanan** | Kamu sedang memakai Tahunan dan ingin pindah ke Bulanan. |
 
 - **Sisa masa aktif tetap terhitung.** Masa aktif baru ditambahkan setelah tanggal berakhir paket yang sedang berjalan. Contoh: paket Bulanan berakhir 10 hari lagi, lalu kamu membeli Tahunan. Masa aktif Tahunan dihitung mulai setelah 10 hari itu habis.
-- **Ganti ke Bulanan** memunculkan kotak konfirmasi dari Chrome: **Ganti ke paket Bulanan? Sisa masa aktif tetap terhitung. Template yang hanya untuk Tahunan dan Sekali Bayar tidak bisa dipilih.** Saat ini semua template bisa dipakai di semua paket. Klik tombol setuju (OK atau Oke) untuk lanjut, atau tombol batal untuk membatalkan.
+- **Ganti ke Bulanan** memunculkan kotak konfirmasi dari Chrome: **Ganti ke Bulanan? Template khusus Tahunan dan Sekali Bayar jadi terkunci.** Saat ini semua template bisa dipakai di semua paket. Klik tombol setuju (OK atau Oke) untuk lanjut, atau tombol batal untuk membatalkan.
 - Paket **Sekali Bayar** tidak perlu dan tidak bisa dibeli lagi.
 
 ## Saat masa aktif mau habis atau sudah habis
@@ -99,8 +99,8 @@ Tombol di setiap kolom tabel berubah sesuai keadaan akunmu:
 |---|---|
 | Aktif | Kartu **Paket**: "Paket Tahunan, aktif sampai [tanggal]." |
 | 7 hari terakhir | Di kartu Paket ada tambahan **Berakhir N hari lagi.** atau **Berakhir hari ini.** Di panel editor muncul **Langganan berakhir N hari lagi.** dengan tombol **Perpanjang**. Tombol paket di kanan atas panel berwarna peringatan. |
-| Masa tenggang (7 hari) | Kartu Paket: "... berakhir [tanggal]. Masa tenggang sampai [tanggal]: perpanjang sebelum itu supaya RSVP dan ucapan tetap jalan." Di panel editor: "Langganan berakhir. N hari lagi ucapan, RSVP, dan Dashboard berhenti." |
-| Habis | Kartu Paket: **Langganan habis. Undangan tetap tampil, tetapi RSVP dan ucapan berhenti. Pilih paket.** Panel editor terkunci dengan **Langganan NikahKit sudah habis.** **Undangan tayang tetap tampil.** |
+| Masa tenggang (7 hari) | Kartu Paket: "... berakhir [tanggal]. Perpanjang sebelum [tanggal + 7 hari] agar RSVP dan ucapan tetap jalan." Di panel editor: "Langganan berakhir. N hari lagi ucapan, RSVP, dan Dashboard berhenti." |
+| Habis | Kartu Paket: **Langganan habis. Undangan tetap tampil, RSVP dan ucapan berhenti.** Panel editor terkunci dengan **Langganan habis.** **Undangan tayang tetap tampil.** |
 
 <Warning>
 Setelah masa tenggang lewat, RSVP, ucapan, dan Dashboard pasangan berhenti untuk semua undangan di akunmu. Form pesanan di Landing page juga berhenti menerima pesanan. Halaman undangan tetap tampil. Perpanjang sebelum tanggal tenggang supaya klienmu tidak terganggu.
@@ -121,7 +121,7 @@ Setelah masa tenggang lewat, RSVP, ucapan, dan Dashboard pasangan berhenti untuk
   <Accordion title="Akun sudah paket Sekali Bayar.">
     Pesan ini muncul kalau akun Sekali Bayar mencoba membeli paket lagi. Tidak perlu membeli apa pun. Tutup dialog.
   </Accordion>
-  <Accordion title="Paket tidak dikenali. Tutup dialog ini, lalu buka lagi.">
+  <Accordion title="Paket tidak dikenali. Tutup, lalu buka lagi.">
     Jendela NikahKit mengirim paket yang tidak dikenal server. Tekan Esc untuk menutup jendela, lalu buka lagi dari panel NikahKit.
   </Accordion>
   <Accordion title="Status langganan tidak terbaca.">

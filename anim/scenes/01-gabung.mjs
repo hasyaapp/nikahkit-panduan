@@ -30,7 +30,7 @@ const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;
 const EMAIL = "rina.wo@gmail.com";
 const BIZ = "Rina Wedding Organizer (@rinawo)";
-const LIC_NONE = ["Belum berlangganan. Pilih paket untuk mulai", "membuat undangan."];
+const LIC_NONE = ["Belum berlangganan. Pilih paket untuk mulai."];
 const LIC_YEAR = ["Paket Tahunan, aktif sampai 14 Oktober 2027."];
 const LIC_ON = { license: LIC_YEAR, choose: "Perpanjang atau ganti paket", active: true };
 const PASANG_SERIF = "Gelica, Georgia, serif"; // pasang.html title font (measured)
@@ -522,7 +522,7 @@ export const scenes = {
     ["3. Pasang lewat Load unpacked", "Di chrome://extensions: Developer mode, Load unpacked, folder NikahKit.", PV.ext()],
     ["4. Masuk dengan Google", "Di tab NikahKit editor Scalev, klik Masuk dengan Google.", PV.gate(GATE_OUT(0), "google")],
     ["5. Bayar membership", "Klik Pilih paket, Pilih, bayar di Scalev, lalu Cek pembayaran.",
-      PV.dialog({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
+      PV.dialog({ paid: true, msg: ["Bayar di tab baru, lalu tekan Cek pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
     ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
   ]),
   "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 1 sampai 4.", [
@@ -785,8 +785,8 @@ export const scenes = {
   // Pilih paket, bayar di tab Scalev, Cek pembayaran, tutup, Periksa lagi.
   "gabung-bayar-paket": (() => {
     const gn = GATE_NONE(CT), t = table();
-    const d0 = dlg({}), d1 = dlg({ paid: true, msg: ["Halaman bayar terbuka di tab baru. Setelah bayar, tekan Cek", "pembayaran."] });
-    const d2 = dlg({ ...LIC_ON, msg: ["Langganan aktif. Tekan Periksa lagi di panel NikahKit."] });
+    const d0 = dlg({}), d1 = dlg({ paid: true, msg: ["Bayar di tab baru, lalu tekan Cek pembayaran."] });
+    const d2 = dlg({ ...LIC_ON, msg: ["Langganan aktif. Tekan Periksa lagi di panel."] });
     const tabs2 = crTop({ tabs: [TAB_ED, { title: "nikahin.myscalev.com", active: false, fav: favScalev }], url: URL });
     return {
       title: "Memilih paket dan membayar di Scalev",
@@ -820,7 +820,7 @@ export const scenes = {
 
   // Punya kode uji? (pin.js: prompt("Kode uji"), then "Kode diterima. ..."; the review code grants Bulanan for 30 days).
   "gabung-kode-uji": (() => {
-    const d0 = dlg({}), d1 = dlg({ license: ["Paket Bulanan, aktif sampai 13 November 2026."], choose: "Perpanjang atau ganti paket", active: true, msg: ["Kode diterima. Kembali ke editor Scalev, lalu Periksa lagi."] });
+    const d0 = dlg({}), d1 = dlg({ license: ["Paket Bulanan, aktif sampai 13 November 2026."], choose: "Perpanjang atau ganti paket", active: true, msg: ["Kode diterima. Tekan Periksa lagi di panel."] });
     const QW = 448, QX = (W - QW) / 2, QY = CT + 8, QH = 176, code = "KODE-UJI", Q = [QX, QY, QW, QH], INPUT = [QX + 24, QY + 80, 400, 36], OKE = [QX + 360, QY + 128, 64, 32];
     const prompt = shadow(QX, QY, QW, QH, 12, 3) + rect(QX, QY, QW, QH, { r: 12, fill: C.white }) + rect(QX + 24, QY + 24, 200, 10, { r: 5, fill: BAR }) +
       text(QX + 24, QY + 66, "Kode uji", { size: 14, fill: C.crText }) + rect(QX + 24.5, QY + 80.5, 399, 35, { r: 4, fill: C.white, stroke: C.crBlue, sw: 2 }) +
@@ -840,7 +840,7 @@ export const scenes = {
         { caption: "Ketik kode dari tim Nikahin di kotak Kode uji.", focus: [Q], at: [QX + 300, QY + 98], click: true, type: [{ id: "code", n: code.length, box: [QX + 36, QY + 87, tw(code, 14), 22] }], show: ["code"],
           mark: INPUT, lens: { src: [QX + 12, QY + 50, QW - 24, 74] } },
         { caption: "Klik Oke.", focus: [d1.box], at: mid(OKE), click: true, hide: ["prompt", "code", "d0"], show: ["d1"], mark: { box: OKE, r: 16 }, note: "Oke", dur: 3 },
-        { caption: "Muncul Kode diterima. Kembali ke editor Scalev, lalu Periksa lagi.", focus: [d1.box], mark: [{ box: d1.at.msg, r: 4 }, { box: d1.at.licCard, r: 8 }], lens: { src: [d1.X, d1.at.msg[1] - 12, 440, 64] }, dur: 3.8 }
+        { caption: "Muncul Kode diterima. Tekan Periksa lagi di panel.", focus: [d1.box], mark: [{ box: d1.at.msg, r: 4 }, { box: d1.at.licCard, r: 8 }], lens: { src: [d1.X, d1.at.msg[1] - 12, 440, 64] }, dur: 3.8 }
       ]
     };
   })(),

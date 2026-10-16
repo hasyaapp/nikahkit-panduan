@@ -26,9 +26,9 @@ export const SHARE = { lihat: ["Lihat sebagai tamu", 375, "primary", "eye"], sal
 export const shareBox = (k, d) => [16, d + SHARE[k][1], 366, 36];
 export const shareBtn = (k, d) => nkBtn(16, d + SHARE[k][1], SHARE[k][0], { w: 366, size: 14, variant: SHARE[k][2], icon: SHARE[k][3] });
 export const shareBtns = (d) => ["lihat", "salin", "umum"].map((k) => shareBtn(k, d)).join("");
-// Undangan khusus heading + switch row + hint (y = top of the H3 box).
+// Undangan khusus heading + switch row + one-line hint (y = top of the H3 box).
 export const accessHead = (y, on) => nkH3(16, y + 12, "Undangan khusus") + text(16, y + 49, "Undangan khusus", { size: 14, fill: C.text }) + nkSwitch(346, y + 34, on) +
-  para(16, y + 78, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 });
+  nkHint(16, y + 78, "Isi undangan hanya dikirim ke tamu dengan tautan sah.");
 export const switchBox = (y) => [346, y + 34, 36, 20];
 // Untuk pengantin + PIN dashboard (y = top of the "Untuk pengantin" H3 box). The buttons are exported on their own
 // for scenes that press them.
@@ -41,20 +41,20 @@ export const pinBtn = (y) => nkBtn(16, y + 172, "Kelola PIN dashboard", { w: 366
 export const pinHint = (y) => nkHint(16, y + 224, "PIN hanya tampil di jendela NikahKit.");
 export const coupleAll = (y) => forCouple(y) + pinBtn(y) + pinHint(y);
 // Access section when switched on (y = top of the Keamanan field, i.e. 12 px under the switch hint).
-export const MODES = { link: ["Tautan pribadi", "Hanya tamu dengan tautan dari Dashboard > Kirim."], device: ["+ Kunci perangkat", "Tautan yang diteruskan tidak terbuka di perangkat lain."] };
+export const MODES = { link: ["Tautan pribadi", "Hanya tamu dengan tautan dari Dashboard > Kirim."], device: ["+ Kunci perangkat", "Tautan yang diteruskan tidak terbuka di HP lain."] };
 export const keamananBox = (y) => [16, y + 20, 366, 36], devicesBox = (y) => [16, y + 112, 366, 36];
 export function accessOn(y, mode, devices) {
   let s = rect(0, y - 4, 399, 900 - y + 4, { fill: C.white }) + nkLabel(16, y + 12, "Keamanan") + nkInput(16, y + 20, 366, MODES[mode][0], { select: true }) + nkHint(16, y + 72, MODES[mode][1]);
   let at = y + 92;
   if (mode !== "link") { s += nkLabel(16, at + 12, "Perangkat per tamu") + nkInput(16, at + 20, 366, String(devices), { select: true }); at += 68; }
-  s += para(16, at + 16, ["Tamu tetap bisa memotret layar. Tombol WhatsApp di halaman", "pribadi memakai nomor konfirmasi hadiah."], { size: 12, fill: C.faint, lh: 16 });
-  at += 36;
+  s += nkHint(16, at + 16, "Tamu tetap bisa memotret layar.");
+  at += 20;
   s += rect(16, at, 366, 56, { r: 4, fill: C.warnSoft }) + para(28, at + 23, ["Tautan di atas tanpa token. Buat tautan tamu di", "Dashboard > Kirim."], { size: 12, fill: C.warnStrong, lh: 18 });
   at += 88;
   return s + coupleAll(at);
 }
-// The dialog without the unsaved note: its sections' y.
-export const ACC_Y = 473, COUPLE_Y = 591, ON_Y = 583;
+// The dialog without the unsaved note: its sections' y (measured with a two-line switch hint, now one line: 16 less).
+export const ACC_Y = 473, COUPLE_Y = 575, ON_Y = 567;
 // The whole dialog without the note. accessMode: null (Undangan khusus off), "link" or "device" (with devices).
 export const shareAll = (accessMode, devices) => shareTop(NO_NOTE) + shareBtns(NO_NOTE) + accessHead(ACC_Y, !!accessMode) + (accessMode ? accessOn(ON_Y, accessMode, devices) : coupleAll(COUPLE_Y));
 // The dialog with its body scrolled up by dy (the head stays); boxes inside move up by dy.

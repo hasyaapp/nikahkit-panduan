@@ -237,7 +237,7 @@ function huruf(o = {}) {
   pos.weight = y; s += text(PX, y + 12, "Ketebalan teks", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, o.bold ? "Tebal (700)" : "Normal (400)", { select: true }); y += 68;
   s += sample(y, hf, p[4]); y += 86;
   s += nkH3(PX, y + 12, "Custom") + (o.font ? changed(PX + 52, y + 12, "dipakai") : ""); y += 24;
-  s += para(PX, y + 12, ["Pilih font di Google Fonts, salin link halaman", "fontnya, lalu tempel di sini."], { size: 12, fill: C.faint, lh: 16 }); y += 44;
+  s += para(PX, y + 12, ["Salin link font dari Google Fonts, lalu", "tempel di sini."], { size: 12, fill: C.faint, lh: 16 }); y += 44;
   pos.gf = y; s += nkBtn(PX, y, "Buka Google Fonts", { variant: "ghost", w: PW, icon: "external-link" }); y += 48;
   pos.font = y;
   s += o.font === "done" ? text(PX, y + 12, "Font judul dan nama: ", { size: 12, weight: 500 }) + text(PX + 123, y + 12, "Playfair Display", { size: 12, weight: 700, font: PLAYFAIR }) : text(PX, y + 12, "Font judul dan nama", { size: 12, weight: 500 });

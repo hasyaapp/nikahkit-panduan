@@ -13,11 +13,11 @@ export const GATE_TEXT = {
   server: ["Server NikahKit tidak terjangkau.", "Periksa internet, lalu tekan Periksa lagi.", true],
   signedOut: ["Masuk ke NikahKit.", ""],
   noFeature: ["Akun belum punya akses desain.", "Hubungi tim Nikahin."],
-  expired: ["Langganan NikahKit sudah habis.", "Undangan tayang tetap tampil.", true],
+  expired: ["Langganan habis.", "Undangan tayang tetap tampil.", true],
   unlicensed: ["Akun belum berlangganan.", ""],
   other: ["Undangan ini milik akun NikahKit lain.", "Masuk dengan akun pemiliknya.", true],
-  unassigned: ["Hubungkan bisnis Scalev dulu.", "Hubungkan di akun NikahKit, lalu tekan Periksa lagi.", true],
-  notInScalev: ["Halaman belum ada di bisnis Scalev yang terhubung.", "Tekan Simpan, atau hubungkan bisnis pemilik halaman ini, lalu Periksa lagi.", true]
+  unassigned: ["Hubungkan bisnis Scalev dulu.", "Hubungkan lewat Akun, lalu Periksa lagi.", true],
+  notInScalev: ["Halaman belum ada di bisnis Scalev yang terhubung.", "Simpan dulu, atau hubungkan bisnis pemiliknya.", true]
 };
 const NO_CHIP = ["checking", "signedOut", "offline", "server"];
 

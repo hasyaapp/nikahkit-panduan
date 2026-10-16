@@ -117,7 +117,7 @@ export const EVS = [["Akad Nikah", "14/02/2027, 08.00", "", "Masjid Al-Ikhlas", 
   ["Resepsi", "14/02/2027, 11.00", "14/02/2027, 14.00", "Gedung Sejahtera", "Jl. Melati 10, Jakarta", "https://maps.google.com/?q=Kebayoran+Baru", "Parkir di basement"],
   ["Ngunduh Mantu", "21/02/2027, 10.00", "21/02/2027, 13.00", "Rumah Bpk. Budi", "Jl. Mawar 5, Depok", "https://maps.google.com/?q=Depok", "Acara keluarga"]];
 export const fillAcara = (list) => (c) => {
-  c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Tanggalnya dipakai sampul, Simpan", "Tanggal, Hitung Mundur, dan kalender."] });
+  c.field("Zona waktu", "WIB", { select: true }).field("Acara utama", "Akad Nikah", { select: true, hint: ["Tanggalnya jadi tanggal utama undangan."] });
   list.forEach((e, i) => item(c, e[0], (f) => f.field("Nama acara", e[0]).field("Mulai", e[1], { icon: "calendar" })
     .field("Selesai (opsional)", e[2] || "hh/bb/tttt, --.--", { icon: "calendar", placeholder: !e[2] }).field("Nama tempat atau gedung", e[3])
     .area("Alamat lengkap", [e[4]]).field("Tautan peta", e[5]).area("Catatan (opsional)", [e[6]]), i === 0, i === list.length - 1));
@@ -125,7 +125,7 @@ export const fillAcara = (list) => (c) => {
   c.add(quietBlock(I, c.y, IW, "Tambah acara", "plus"), 48).toggle("Tampilkan peta di kartu acara", true, ["Butuh tautan Google Maps dan alamat."]).lead("Hitung mundur memakai Acara utama.");
 };
 export const fillSampul = (c) => c.add(hintL(I, c.y, ["Nama dan tanggal diambil dari", "Mempelai dan Acara."]), 44).photo("Foto sampul", 6).photo("Foto slideshow (opsional, maks. 4)", 2, "Tambah foto");
-export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi pembuka, salam, pengantar, dan", "penutup. Tetap bisa diubah."] })
+export const fillSalam = (c) => c.field("Preset salam", "Islam", { select: true, hint: ["Mengisi teks salam. Tetap bisa diubah."] })
   .field("Kalimat pembuka (opsional)", "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", { hint: ["Mis. basmalah. Kosongkan bila tidak", "dipakai."] })
   .field("Salam", "Assalamu'alaikum Warahmatullahi Wabarakatuh").area("Kata pengantar", ["Dengan memohon rahmat dan rida", "Allah SWT, kami bermaksud", "menyelenggarakan pernikahan", "putra-putri kami. Merupakan", "kebahagiaan bagi kami apabila"], 5);
 // RSVP & Ucapan (sample: allowMaybe off, maxGuests 2, the four "Tanyakan juga" switches on), down to the QR switch.
@@ -140,8 +140,8 @@ export const fillRsvp = (c) => {
     .toggle("Tampilkan jumlah kehadiran", true, ["Mis. \"120 konfirmasi hadir\" di atas daftar", "ucapan."])
     .toggle("Pilihan \"Masih ragu\"", false, ["Mati: tamu hanya memilih Hadir atau Tidak", "hadir."]).h3("Tanyakan juga")
     .toggle("Tamu dari pihak mana", true).toggle("Acara yang dihadiri", true, ["Butuh minimal 2 acara."]).toggle("Perkiraan jam datang", true)
-    .toggle("Minta nomor WhatsApp tamu", true, ["Tamu mengisi nomornya sendiri di form (boleh", "kosong). Nomor tampil di Dashboard."]).lead("Jawaban tampil di Dashboard.")
-    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Untuk Undangan khusus (di Bagikan):", "tamu yang Hadir mendapat QR check-in."]);
+    .toggle("Minta nomor WhatsApp tamu", true, ["Boleh kosong. Nomornya tampil di", "Dashboard."]).lead("Jawaban tampil di Dashboard.")
+    .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Tamu yang Hadir mendapat QR check-in."]);
 };
 const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
 export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { placeholder: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
@@ -154,7 +154,7 @@ export const fillDress = (c) => { c.field("Judul", "Dress Code", { placeholder: 
   [["Olive", "#3F4232"], ["Terakota", "#A0522D"], ["Sage", "#5B7553"]].forEach(([n, hex], i) => item(c, n, (f) => swatch(f.field("Warna", hex), hex).field("Nama warna", n), i === 0, false)); };
 export const fillGifts = (c) => {
   c.field("Judul", "Tanda Kasih", { placeholder: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
-    .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat terbuka setelah tamu", "menekan tombol."]);
+    .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat tampil setelah", "tombol ditekan."]);
   [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Bank dan e-wallet yang dikenal", "tampil dengan logo."] })
     .field("Nomor rekening", n).field("Nama pemilik rekening", h).photo("Gambar QRIS (opsional)", null, "Pilih foto"), i === 0, i === 1));
   c.add(quietBlock(I, c.y, IW, "Tambah rekening", "plus"), 48).h3("Kirim kado (opsional)").field("Nama penerima", "Rani Ayu").area("Alamat", ["Jl. Melati 10, Jakarta 12110"], 3)
@@ -162,7 +162,7 @@ export const fillGifts = (c) => {
 };
 export const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { placeholder: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
   .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3);
-export const fillFooter = (c) => c.add(hintL(I, c.y, ["Branding Anda dari Profil merek. Kolom", "kosong tidak tampil."]), 44)
+export const fillFooter = (c) => c.add(hintL(I, c.y, ["Dari Profil merek. Kolom kosong tidak", "tampil."]), 44)
   .toggle(["Hak cipta (© tahun dan nama", "mempelai)"], true).photo("Logo (opsional)", null, "Pilih foto")
   .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit, atau", "tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true });
 // Rail on Konten + the whole Konten panel (head and body) with Mempelai open, nickname `nick`; o goes to kList.
@@ -224,7 +224,7 @@ export const seg = (active = "template") => rect(P + 0.5, 169.5, PW - 1, 37, { r
   rect(P + 1, 170, 138, 36, { r: 3, fill: C.primarySoft }) + icon("layout-grid", 129, 188, 16, C.action) + text(146, 192, "Template", { size: 12, weight: 600, fill: C.action }) + megaphone(297, C.text) :
   rect(P + 140, 170, 138, 36, { r: 3, fill: C.primarySoft }) + icon("layout-grid", 157, 188, 16, C.text) + megaphone(264, C.action) + text(279, 192, "Marketing", { size: 12, weight: 600, fill: C.action }));
 // Warning under the switch when the page holds other HTML (moves the library down by 68).
-export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Memilih template", "akan menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
+export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Template akan", "menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
 // Search box and category chips above the cards (panels-style.jsx TemplatePanel; categories from templates/base/categories.json,
 // counts from the build catalogue). Chips are 28 high, 6 apart, wrap at the panel width; widths measured in Chromium.
 const SEARCH_PH = "Cari: Jawa, bunga, atau tulis keinginan klien…";

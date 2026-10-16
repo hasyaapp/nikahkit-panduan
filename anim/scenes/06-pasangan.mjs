@@ -490,7 +490,7 @@ const SCENES = {
     steps: [
       { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", focus: [0, 92, 399, 62], mark: BAGIKAN_TOOL, note: "Bagikan",
         at: [36, 584], click: true, show: ["share", "kelola"] },
-      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, 586, 399, 244], mark: [12, 738, 374, 84], lens: { src: [0, 588, 399, 238] }, at: [200, 700], dur: 3.4 },
+      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, COUPLE_Y - 5, 399, 244], mark: [12, COUPLE_Y + 147, 374, 84], lens: { src: [0, COUPLE_Y - 3, 399, 238] }, at: [200, COUPLE_Y + 109], dur: 3.4 },
       { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", focus: [DLG_X, dlgTop(false), 440, 466], mark: KELOLA, note: "Kelola PIN dashboard",
         at: [KELOLA[0] + 183, KELOLA[1] + 18], click: true, press: "kelola", show: ["backdrop", "dlg"], dur: 3.6 }
     ]
@@ -509,7 +509,7 @@ const SCENES = {
       base: [...EDITOR_BASE, bagikan(), pinBtn(COUPLE_Y), dim(0, 0, WORLD.w, WORLD.h)],
       els: {
         dlgA: { svg: DLG_A.svg, skel: true },
-        dlgB: { svg: DLG_B.svg + pinNote("PIN aktif saat ini. Tetap berlaku sampai Anda membuat PIN baru."), enter: "fade", skel: true },
+        dlgB: { svg: DLG_B.svg + pinNote("PIN aktif. Berlaku sampai ada PIN baru."), enter: "fade", skel: true },
         tip: { svg: rect(hx - 150, hy + 24, 192, 24, { r: 4, fill: "#fff", stroke: "#c4c7c5" }) + text(hx - 54, hy + 40, "Salin pesan untuk pengantin", { size: 12, fill: C.crText, anchor: "middle" }), enter: "fade" },
         copied: { svg: pinNote("Pesan tersalin."), enter: "fade" },
         bubble: { svg: rect(bx, by + 2, 404, bh, { r: 8, fill: "rgba(0,0,0,.08)" }) + rect(bx, by, 404, bh, { r: 8, fill: T.soft }) +

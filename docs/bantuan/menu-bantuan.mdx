@@ -20,7 +20,7 @@ Tombol **Bantuan** hanya ada di rel NikahKit, yaitu deretan menu di kiri panel (
 
 <Image src="/assets/anim/bantuan-buka.svg" alt="Animasi: editor Scalev dengan rel NikahKit di kiri. Tombol Bantuan ada paling bawah rel, di bawah Kosongkan. Klik Bantuan, dialog Bantuan terbuka di atas panel." caption="Membuka Bantuan di editor" />
 
-<Image src="/assets/anim/bantuan-salin-laporan.svg" alt="Animasi: di dialog Bantuan, baris Versi dengan tombol Cek update, kotak status 1 perlu perhatian, dan tips Terbit tertahan. Daftar cek digulir: baris Penyimpanan ucapan dan RSVP bertanda seru dengan keterangan simpan halaman di Scalev dulu. Gulir ke tombol laporan, klik Salin laporan, tulisan kecil berubah menjadi Tersalin. Tombol Kirim lewat WhatsApp ada di bawahnya. Terakhir klik tanda silang untuk menutup Bantuan." caption="Membaca Bantuan dan menyalin laporan" />
+<Image src="/assets/anim/bantuan-salin-laporan.svg" alt="Animasi: di dialog Bantuan, baris Versi dengan tombol Cek update, kotak status 1 perlu perhatian, dan tips not finished previewing. Daftar cek digulir: baris Penyimpanan ucapan dan RSVP bertanda seru dengan keterangan simpan halaman di Scalev dulu. Gulir ke tombol laporan, klik Salin laporan, tulisan kecil berubah menjadi Tersalin. Tombol Kirim lewat WhatsApp ada di bawahnya. Terakhir klik tanda silang untuk menutup Bantuan." caption="Membaca Bantuan dan menyalin laporan" />
 
 <Steps>
 <Step title="Buka editor halaman undangan">
@@ -40,8 +40,8 @@ Di bawah versi ada kotak status:
 - **Semua berjalan normal.** berarti tidak ada masalah.
 - **N perlu perhatian. Muat ulang editor; bila tetap, kirim laporan.** (N = jumlah baris bermasalah). Muat ulang halaman editor dulu (tekan F5 atau Ctrl+R, di Mac Cmd+R), lalu buka Bantuan lagi.
 </Step>
-<Step title="Baca tips Terbit tertahan">
-Ada catatan kecil: **Terbit tertahan "not finished previewing"? Muat ulang editor, lalu tekan Simpan & Terbitkan.** Pakai tips ini kalau Scalev menolak terbit dengan pesan `not finished previewing`, misalnya tepat setelah halaman baru pertama kali disimpan.
+<Step title="Baca tips not finished previewing">
+Ada catatan kecil: **Muncul "not finished previewing"? Muat ulang editor, lalu terbitkan lagi.** Pakai tips ini kalau Scalev menolak terbit dengan pesan `not finished previewing`, misalnya tepat setelah halaman baru pertama kali disimpan.
 </Step>
 <Step title="Periksa daftar cek satu per satu">
 Setiap baris punya tanda di kiri:
@@ -79,7 +79,7 @@ Setelah kamu klik **Update**, pesan di bawah tombol bisa berupa:
 | Pesan | Artinya | Yang harus dilakukan |
 | --- | --- | --- |
 | **Ekstrak ZIP, timpa isi folder NikahKit, lalu klik ↻ di chrome://extensions.** | Unduhan dimulai. | Ikuti langkah di pesan itu, lalu muat ulang editor Scalev. |
-| **Unduhan sudah dimulai. Cek folder Unduhan, atau ulangi setelah 30 detik.** | Kamu menekan **Update** dua kali dalam 30 detik. | Cek folder Unduhan dulu. |
+| **Unduhan sudah dimulai. Cek folder Unduhan.** | Kamu menekan **Update** dua kali dalam 30 detik. | Cek folder Unduhan dulu. |
 | **Sesi habis. Masuk lagi, lalu tekan Update.** | Login NikahKit sudah berakhir. | Klik tautan **Masuk lagi** di pesan itu, masuk dengan Google, lalu klik **Update** lagi. |
 | **Khusus member aktif. Hubungi admin lewat WhatsApp.** | Akun belum berlangganan atau langganan sudah habis. | Perpanjang di [Masuk dan bayar](/gabung/masuk-dan-bayar), atau klik tautan WhatsApp di pesan itu. |
 | **Berkas update belum tersedia. Coba lagi nanti.** | Berkas versi baru belum siap di server. | Coba lagi beberapa saat kemudian. |
@@ -106,7 +106,7 @@ Urutan baris di layar sama dengan tabel ini. Baris yang bertanda **!** menampilk
 | **Versi editor Scalev** | **(nomor build): belum diuji. Aman bila baris lain berjalan.** | Tanda **i**, bukan masalah. Scalev memperbarui editornya. Selama baris lain **✓**, lanjutkan saja. |
 | **Data undangan terbaca** | **kode halaman diubah di luar NikahKit** | Kode di tab **Code** diubah manual. Lihat [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda). |
 | **Data undangan terbaca** | **belum ada undangan di halaman ini** | Halaman masih kosong. Pilih template dulu di [Pilih template](/editor/pilih-template). |
-| **Klik di pratinjau** | **pratinjau Scalev terkunci sandbox. Pakai tombol Inspect di rel.** | Pratinjau tidak bisa diklik langsung. Pakai tombol **Inspect** di rel. Lihat [Klik di pratinjau](/editor/klik-di-pratinjau). |
+| **Klik di pratinjau** | **pratinjau terkunci; pakai Inspect di rel** | Pratinjau tidak bisa diklik langsung. Pakai tombol **Inspect** di rel. Lihat [Klik di pratinjau](/editor/klik-di-pratinjau). |
 | **Klik di pratinjau** | **belum menjawab; tunggu beberapa detik** | Pratinjau masih memuat. Tunggu, lalu buka Bantuan lagi. |
 | **Kode halaman cocok dengan NikahKit** | **ada perubahan manual di tab Code; NikahKit dijeda** | Ada perubahan manual di tab **Code**. Pilih **Lihat di kode** atau **Timpa dengan NikahKit** di panel. Lihat [Edit manual dan NikahKit dijeda](/editor/edit-manual-dijeda). |
 | **Penyimpanan ucapan dan RSVP** | **simpan halaman di Scalev dulu** | Bagian RSVP aktif, tapi halaman belum punya ID yang tersimpan. Klik **Simpan** di Scalev, lalu buka Bantuan lagi. Lihat [Simpan dan terbitkan](/scalev/simpan-dan-terbitkan). |
