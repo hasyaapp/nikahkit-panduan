@@ -45,6 +45,8 @@ export function col(x, y, w) {
     },
     h3(t) { y += 12; s += text(x, y + 12, t, { size: 12, weight: 700 }); y += 24; return c; },
     lead(t) { s += text(x, y + 12, t, { size: 12, fill: C.faint }); y += 28; return c; },
+    // Link field (panel-content.jsx "link": nk-btn--ghost --block with external-link, margin-bottom 12).
+    link(l) { c.at[l] = y; s += nkBtn(x, y, l, { variant: "ghost", w, icon: "external-link" }); y += 48; return c; },
     // Photo field (nk-photo): label, 96px thumb, button (Ganti foto; Pilih foto when empty).
     photo(l, k, btn = "Ganti foto") { c.at[l] = y; s += lbl(x, y, l) + (k === null ? "" : photo(x, y + 20, 96, 96, k, 4)) + quietBlock(x, y + (k === null ? 20 : 124), w, btn, "image"); y += k === null ? 68 : 172; return c; }
   };

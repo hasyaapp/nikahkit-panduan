@@ -411,11 +411,12 @@ const QR_ROW = [I, RS_QR + RS_DY, IW, RS_END - 16 - RS_QR], QR_SW = [I + IW - 36
 const BK_Y = 280, BINGKAI = "Bingkai Story";
 const BK_LINK = "https://www.instagram.com/stories/rinawo/3712345678901234567";
 const BK_HINT = wrap("Story bingkai dengan stiker Add Yours di Instagram pembuat undangan. Caranya ada di Panduan, Bingkai Story IG.", IW, 12);
-const fillBingkai = (c) => c.field("Judul", "Bingkai Story", { placeholder: true }).field("Tautan Story Add Yours", "https://www.instagram.com/", { hint: BK_HINT })
+const CANVA = "Buka template di Canva";
+const fillBingkai = (c) => c.field("Judul", "Bingkai Story", { placeholder: true }).link(CANVA).field("Tautan Story Add Yours", "https://www.instagram.com/", { hint: BK_HINT })
   .area("Keterangan", wrap("Bagikan momen di Story Instagram dengan bingkai kami.", IW - 22, 14)).photo("Gambar pratinjau", 3);
 const BKL = kListAt(BINGKAI, BK_Y, { open: BINGKAI, fill: fillBingkai });
-const LINK_TOP = BKL.f["Tautan Story Add Yours"], KET_TOP = BKL.f["Keterangan"], FOTO_TOP = BKL.f["Gambar pratinjau"];
-const LINK_IN = [I, LINK_TOP + 20, IW, 36], KET_BOX = [I, KET_TOP, IW, 68], FOTO_BOX = [I, FOTO_TOP, IW, 160];
+const CANVA_TOP = BKL.f[CANVA], LINK_TOP = BKL.f["Tautan Story Add Yours"], KET_TOP = BKL.f["Keterangan"], FOTO_TOP = BKL.f["Gambar pratinjau"];
+const CANVA_BTN = [I, CANVA_TOP, IW, 36], LINK_IN = [I, LINK_TOP + 20, IW, 36], KET_BOX = [I, KET_TOP, IW, 68], FOTO_BOX = [I, FOTO_TOP, IW, 160];
 const linkPasted = nkInput(I, LINK_IN[1], IW, "", { focus: true }) +
   clipped(I + 10, LINK_IN[1] + 2, IW - 20, 32, text(I + 11, LINK_IN[1] + 23, BK_LINK, { size: 14, fill: C.strong }));
 const KONTEN = [72, 92, 327, 808], SCREEN = [ED.screen.x, ED.screen.y, ED.screen.w, ED.screen.h];
@@ -461,6 +462,7 @@ export const scenes = {
     },
     steps: [
       { caption: "Di menu Konten, klik Bingkai Story.", focus: KONTEN, mark: [88, BK_Y, 279, 50], lens: { src: [80, BK_Y - 8, 300, 60] }, at: [190, BK_Y + 25], click: true, show: ["open"] },
+      { caption: "Di bawah Judul ada Buka template di Canva: desain bingkai di Canva.", focus: KONTEN, mark: CANVA_BTN, lens: { src: [I - 8, CANVA_TOP - 26, IW + 16, 70] }, dur: 3.6 },
       { caption: "Ganti isi Tautan Story Add Yours dengan tautan Story bingkaimu.", focus: KONTEN, mark: LINK_IN, lens: { src: [I - 8, LINK_TOP - 6, IW + 16, 76 + BK_HINT.length * 16] },
         at: [I + 200, LINK_IN[1] + 18], click: true, show: ["link"], dur: 3.8 },
       { caption: "Isi Keterangan. Di Gambar pratinjau, pilih gambar bingkaimu.", focus: KONTEN, mark: [KET_BOX, FOTO_BOX], lens: { src: [I - 8, KET_TOP - 6, IW + 16, FOTO_TOP + 166 - KET_TOP] }, dur: 3.8 },
