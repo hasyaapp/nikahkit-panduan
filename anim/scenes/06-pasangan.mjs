@@ -490,7 +490,7 @@ const SCENES = {
     steps: [
       { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", focus: [0, 92, 399, 62], mark: BAGIKAN_TOOL, note: "Bagikan",
         at: [36, 584], click: true, show: ["share", "kelola"] },
-      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, 586, 399, 244], mark: [12, 738, 374, 84], lens: { src: [0, 588, 399, 238] }, at: [200, 700], dur: 3.4 },
+      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, 586, 399, 280], mark: [12, 774, 374, 84], lens: { src: [0, 588, 399, 274] }, at: [200, 700], dur: 3.4 },
       { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", focus: [DLG_X, dlgTop(false), 440, 466], mark: KELOLA, note: "Kelola PIN dashboard",
         at: [KELOLA[0] + 183, KELOLA[1] + 18], click: true, press: "kelola", show: ["backdrop", "dlg"], dur: 3.6 }
     ]

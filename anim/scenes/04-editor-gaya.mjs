@@ -296,7 +296,7 @@ function musik(o = {}) {
 // =====================================================================================================================
 // Lapisan (SectionPanel): rows of 50 from y 197.
 const SECS = ["Sampul", "Salam Pembuka", "Ayat / Kutipan", "Profil Mempelai", "Kisah Cinta", "Simpan Tanggal", "Hitung Mundur", "Galeri Foto", "Video", "Rangkaian Acara", "Dress Code",
-  "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
+  "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Bingkai Story", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
 const ROW0 = 197, rowY = (i) => ROW0 + i * 50;
 function secRow(i, name, o = {}) {
   const y = rowY(i);

@@ -75,7 +75,7 @@ const sampleNote = (left, link) => rect(P, 169, PW, 64, { r: 4, fill: C.warnSoft
   text(P + 12, 218, link, { size: 12, weight: 500, fill: C.strong, underline: true });
 // Konten groups in panel order (nikahkit/src/fields.js GROUPS, labels from model.js META).
 export const GRP = ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat / Kutipan", "Kisah Cinta", "Galeri Foto", "Video", "Dress Code", "Susunan Acara",
-  "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
+  "RSVP & Ucapan", "Siaran Langsung", "Bingkai Story", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
 // Konten panel body: the head (sample note, Bahasa undangan, Lapisan line) when from = 0, then the accordions from GRP[from];
 // open: title of the open group, fill(c) adds its fields to a col; todo: groups marked Belum diisi; dy: panel scrolled by dy;
 // raw: no clip (a scroll element under lid()). Returns the svg, each bar's y and the open group's field tops (f), all in
@@ -257,7 +257,7 @@ export const GAL = (() => {
     col(I, 303, IW).field("Judul", "Galeri", { placeholder: true }).area("Teks pengantar (opsional)", ["Sebagian momen yang ingin kami", "bagi bersama Anda."]).svg +
     lbl(I, 451, `Foto galeri (${n})`);
   const rest = (y) => quietBlock(I, y, IW, "Tambah foto", "image") + text(I, y + 60, "Foto pertama tampil paling besar.", { size: 12, fill: C.faint }) +
-    ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Filter Kamera"].map((t, i) => nkAcc(P, y + 85 + i * 58, PW, t, { badge: "Terisi" })).join("");
+    ["Video", "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Bingkai Story"].map((t, i) => nkAcc(P, y + 85 + i * 58, PW, t, { badge: "Terisi" })).join("");
   const cell = (i) => [16 + (i % 3) * 124, 291 + Math.floor(i / 3) * 124];
   const dlg = nkDialogHead(0, 0, "Pilih foto") + nkBtn(16, 169, "Unggah foto", { variant: "ghost", w: 366, icon: "upload" }) + lbl(16, 217, "Atau tempel tautan https") +
     nkInput(16, 237, 300, "https://...", { placeholder: true }) + `<g opacity=".5">${nkBtn(322, 237, "Pakai", { variant: "ghost", w: 60 })}</g>` +

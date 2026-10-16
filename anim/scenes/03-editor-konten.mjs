@@ -366,7 +366,7 @@ export const scenes = {
     const noteY = rs.at["Tersambung"], formY = rs.at["Isi form"] + 20, guestsY = rs.at["Jumlah tamu paling banyak per undangan"] + 20;
     const accY = rs.y + 8;
     const DY = accY + 2 * 58 - 169; // scroll so Amplop Digital's bar lands at y 169, where the opened group stays
-    const accs = ["Siaran Langsung", "Filter Kamera", "Amplop Digital", "Aturan Tamu", "Turut Mengundang"].map((t, i) => nkAcc(P, accY + i * 58, PW, t, { badge: "Terisi" })).join("");
+    const accs = ["Siaran Langsung", "Bingkai Story", "Amplop Digital", "Aturan Tamu", "Turut Mengundang"].map((t, i) => nkAcc(P, accY + i * 58, PW, t, { badge: "Terisi" })).join("");
     const rsvp = () => rect(72, 153, 327, 747 + DY, { fill: C.white }) + nkAcc(P, 111, PW, "Susunan Acara", { badge: "Terisi" }) + nkAcc(P, 169, PW, "RSVP & Ucapan", { badge: "Terisi", h: 1400 }) + rect(P + 1, accY - 9, PW - 2, 1400, { fill: C.white }) + line(P, accY - 8.5, P + PW, accY - 8.5) +
       rs.svg + accs;
     const ddMode = shadow(I, formY + 38, IW, 80, 6, 2) + rect(I, formY + 38, IW, 80, { r: 6, fill: C.white, stroke: C.field }) + rect(I + 4, formY + 42, IW - 8, 24, { r: 4, fill: C.primarySoft }) +

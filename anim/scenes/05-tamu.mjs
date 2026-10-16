@@ -9,10 +9,10 @@
 // its save dialog, the OS file picker and Chrome's confirm and download bubble.
 // Pattern: base = the state most steps discuss; other states are full-screen `skel` elements (skeleton outside the
 // step's focus, detail inside it), so each step's focus covers whatever state is on screen during that step.
-import { C, PHONE, icon, iconX, rect, text, para, line, circle, shadow, skeleton, tw, mid, grow } from "../lib.mjs";
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, shadow, skeleton, tw, mid, grow, clipped } from "../lib.mjs";
 import {
   BAGIKAN_TOOL as BAGIKAN, NOTE, nameBox, urlBox, shareTop, shareBox, shareBtns, accessHead, switchBox, pinBtn, pinBox, coupleAll, keamananBox, devicesBox,
-  accessOn, ACC_Y, COUPLE_Y, ON_Y, shareAll, shareScrolled
+  accessOn, ACC_Y, COUPLE_Y, ON_Y, shareAll, shareScrolled, bingkaiBtn, bingkaiBox
 } from "../ui/bagikan.mjs";
 import { I, IW, kontenPanel, kListAt, fillRsvp, lid } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvMempelai, pvCover, MAROON, SERIF, CREAM } from "../ui/invitation.mjs";
@@ -405,6 +405,51 @@ const RS = kListAt(RSVP, RSVP_Y, { open: RSVP, fill: fillRsvp, raw: true });
 const RS_QR = RS.f["Tampilkan QR masuk untuk tamu"], RS_END = RS.at["Siaran Langsung"], RS_DY = 820 - RS_END;
 const QR_ROW = [I, RS_QR + RS_DY, IW, RS_END - 16 - RS_QR], QR_SW = [I + IW - 36, RS_QR + 10 + RS_DY, 36, 20];
 
+// ---- Bingkai Story IG (server/pages/src/bingkai/index.html) in a new Chrome tab --------------------------------------
+// .wrap 880 wide centred (x 280..1160), grid 1fr + 290 with gap 28: form x 280..842, preview column x 870..1160.
+// Inputs 48 high, radius 12, border 1.5; .btn ink with white text, .btn.quiet white with ink text; labels 14/600.
+const BK = { ink: "#1c1b1a", muted: "#5f5b57", line: "#d8d3ce", x: 280, w: 562 };
+const BK_URL = `https://tokomu.myscalev.com/${PAGE}`;
+const bkInput = (x, y, w, val) => rect(x + 0.75, y + 0.75, w - 1.5, 46.5, { r: 12, fill: C.white, stroke: BK.line, sw: 1.5 }) + text(x + 14, y + 30, val, { size: 16, fill: BK.ink });
+const bkBtn = (b, label, quiet) => rect(b[0] + 0.75, b[1] + 0.75, b[2] - 1.5, b[3] - 1.5, { r: 12, fill: quiet ? C.white : BK.ink, stroke: BK.ink, sw: 1.5 }) +
+  text(b[0] + b[2] / 2, b[1] + 29, label, { size: 15, weight: 600, fill: quiet ? BK.ink : C.white, anchor: "middle" });
+const MUAT = [764, 224, 78, 48], URL_IN = [BK.x, 224, MUAT[0] - 8 - BK.x, 48];
+// Fields from the invitation: [label, value]; Hashtag has the small "Boleh dikosongkan." under its input.
+const BK_FIELDS = [["Nama pertama", "Rani"], ["Nama kedua", "Dimas"], ["Tanggal acara", "14/02/2027"], ["Hashtag", "#RaniDimas"], ["Kalimat bawah", "Terima kasih sudah ikut merayakan"]];
+const BK_TOP = BK_FIELDS.reduce((a, [l]) => [...a, a[a.length - 1] + 91 + (l === "Hashtag" ? 26 : 0)], [328]).slice(0, -1);
+const bkField = (i) => [BK.x, BK_TOP[i] + 27, BK.w, 48];
+// Preview .board 270x480 (9:16) on the transparent checkerboard, then Unduh PNG under it. The canvas is 1080x1920
+// drawn at 1/4: top band 32..540 and bottom band 1420..1888 in the invitation's surface colour (cream here).
+const BOARD = [880, 197, 270, 480], UNDUH = [880, 693, 270, 48], BAND_LO = [888, 552, 254, 117];
+function bkBoard() {
+  const [x, y, w, h] = BOARD, cx = x + w / 2, cells = [];
+  for (let r = 0; r < h / 10; r++) for (let c = 0; c < w / 10; c++) if ((r + c) % 2) cells.push(rect(x + c * 10, y + r * 10, 10, 10, { fill: "#e9e6e2" }));
+  const band = (top) => top
+    ? `<path d="M${x + 8} ${y + 135} V${y + 20} q0 -12 12 -12 H${x + 250} q12 0 12 12 V${y + 135} Z" fill="${CREAM}" fill-opacity=".95"/>`
+    : `<path d="M${x + 8} ${y + 355} H${x + 262} V${y + 460} q0 12 -12 12 H${x + 20} q-12 0 -12 -12 Z" fill="${CREAM}" fill-opacity=".95"/>`;
+  const gold = "#b08d57", body = "#5a4636";
+  return clipped(x, y, w, h, rect(x, y, w, h, { fill: C.white }), ...cells, band(true), band(false),
+    rect(x + 8, y + 135, 0.5, 220, { fill: gold, opacity: 0.6 }) + rect(x + 261.5, y + 135, 0.5, 220, { fill: gold, opacity: 0.6 }),
+    rect(x + 91.5, y + 74.5, 37.5, 0.5, { fill: gold }) + rect(x + 141, y + 74.5, 37.5, 0.5, { fill: gold }) +
+      `<path d="M${cx} ${y + 73.5} l1.5 1.5 l-1.5 1.5 l-1.5 -1.5 z" fill="${gold}"/>`,
+    text(cx, y + 90, "THE WEDDING OF", { size: 7.5, weight: 600, fill: body, anchor: "middle" }),
+    text(cx, y + 116, "Rani & Dimas", { size: 34, fill: MAROON, anchor: "middle", font: SERIF }),
+    text(cx, y + 131, "Minggu, 14 Februari 2027", { size: 9.5, fill: body, anchor: "middle" }),
+    text(cx, y + 372.5, "#RaniDimas", { size: 12.5, weight: 700, fill: gold, anchor: "middle" }),
+    text(cx, y + 387.5, "Terima kasih sudah ikut merayakan", { size: 8.5, fill: body, anchor: "middle" })) +
+    rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 14, stroke: BK.line });
+}
+const bingkaiTab = () => chrome(0, 0, 1440, 900, { tabs: [scalevTab(false), { title: "Bingkai Story IG", active: true }],
+  url: `nikahin.myscalev.com/bingkai?u=${encodeURIComponent(BK_URL)}` }) + rect(0, T, 1440, 900 - T, { fill: C.white }) +
+  text(BK.x, 142, "Bingkai Story IG", { size: 28, weight: 700, fill: BK.ink }) +
+  text(BK.x, 166, "Bingkai PNG 1080 x 1920 dari warna dan huruf undangan. Tengahnya bening untuk foto.", { size: 16, fill: BK.muted }) +
+  text(BK.x, 212, "Alamat undangan", { size: 14, weight: 600, fill: BK.ink }) + bkInput(...URL_IN.slice(0, 3), BK_URL) + bkBtn(MUAT, "Muat", true) +
+  BK_FIELDS.map(([l, v], i) => text(BK.x, BK_TOP[i] + 15, l, { size: 14, weight: 600, fill: BK.ink }) + bkInput(BK.x, BK_TOP[i] + 27, BK.w, v) +
+    (l === "Tanggal acara" ? iconX("calendar", BK.x + BK.w - 26, BK_TOP[i] + 51, 16, BK.ink) : "") +
+    (l === "Hashtag" ? text(BK.x, BK_TOP[i] + 96, "Boleh dikosongkan.", { size: 13, fill: BK.muted }) : "")).join("") +
+  bkBoard() + bkBtn(UNDUH, "Unduh PNG");
+const BK_DL = [1440 - 360 - 16, 8, 360, 76];
+
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
 const PANEL = [0, 92, 399, 808];
 const pill = (b) => ({ box: b, r: b[3] / 2 });
@@ -431,7 +476,32 @@ export const scenes = {
       { caption: "Kembali ke tab editor.", focus: [0, 365, 399, 160], hide: ["guest"], dur: 1.8 },
       { caption: "Klik Salin tautan tamu. Di bawah tombol muncul Tersalin.", focus: [0, 413, 399, 112], mark: shareBox("salin", 0), lens: { src: [0, 413, 399, 112] }, at: mid(shareBox("salin", 0)), click: true, show: ["copied"], dur: 3.4 },
       { caption: "Butuh tautan tanpa nama tamu? Klik Salin tautan umum.", focus: [0, 453, 399, 72], mark: shareBox("umum", 0), lens: { src: [0, 459, 399, 66] }, at: mid(shareBox("umum", 0)), click: true, hide: ["copied"], show: ["copied2"], dur: 3.2 },
-      { caption: "Di bawah ada Untuk pengantin: Kirim undangan dan Buka Dashboard.", focus: [0, 649, 399, 148], mark: [16, 681, 366, 80], lens: { src: [0, 649, 399, 143] }, at: [330, 743], hide: ["copied2"], dur: 3.6 }
+      { caption: "Untuk pengantin: Kirim undangan, Buka Dashboard, dan Bingkai Story IG.", focus: [0, 649, 399, 188], mark: [16, 681, 366, 140], lens: { src: [0, 649, 399, 182] }, at: [330, 743], hide: ["copied2"], dur: 3.8 }
+    ]
+  },
+
+  "tamu-bingkai-story": {
+    title: "Membuat Bingkai Story IG dari undangan",
+    base: [...editorBase(), shareAll(null)],
+    els: {
+      bkBtn: bingkaiBtn(COUPLE_Y),
+      page: { svg: bingkaiTab(), skel: true, enter: "fade", delay: 0.2 },
+      unduh: { svg: bkBtn(UNDUH, "Unduh PNG"), skel: true, enter: "fade", delay: 0.2 },
+      dl: { svg: crDownload(BK_DL[0], BK_DL[1], "bingkai-story-rani-dimas.png", { sub: "Selesai" }), enter: "pop", origin: [BK_DL[0] + 180, BK_DL[1]], delay: 0.1 }
+    },
+    steps: [
+      { caption: "Di panel Bagikan, klik Bingkai Story IG. Halamannya terbuka di tab baru.", focus: [[0, COUPLE_Y, 399, 172], [124, 46, 1184, 34], [270, 100, 900, 700]],
+        mark: bingkaiBox(COUPLE_Y), note: "Bingkai Story IG", at: mid(bingkaiBox(COUPLE_Y)), click: true, press: "bkBtn", show: ["page", "unduh"], dur: 3.8 },
+      { caption: "Alamat undangan sudah terisi. Ganti alamat? Tempel yang baru, klik Muat.", focus: [270, 190, 582, 92], mark: [URL_IN, MUAT],
+        lens: { src: [272, 196, 578, 80], zoom: 1.5 }, dur: 3.8 },
+      { caption: "Cek Nama pertama, Nama kedua, dan Tanggal acara dari undangan.", focus: [270, 320, 582, 275], mark: [bkField(0), bkField(1), bkField(2)],
+        lens: { src: [272, 324, 300, 266], zoom: 1.5 }, dur: 3.6 },
+      { caption: "Hashtag boleh dikosongkan. Kalimat bawah tampil di pita bawah.", focus: [[270, 595, 582, 205], [870, 190, 290, 490]], mark: [bkField(3), bkField(4), BAND_LO],
+        lens: { src: [878, 546, 274, 128], zoom: 1.75 }, dur: 3.8 },
+      { caption: "Pratinjau 9:16: nama dan tanggal di atas, tengahnya bening untuk foto.", focus: [870, 190, 290, 490], mark: { box: BOARD, r: 14 },
+        lens: { src: [880, 197, 270, 240], zoom: 1.5 }, dur: 3.8 },
+      { caption: "Klik Unduh PNG, lalu kirim bingkai-story-rani-dimas.png ke pengantin.", focus: [[870, 685, 290, 64], [1060, 0, 380, 92]], mark: UNDUH,
+        lens: { src: [BK_DL[0] - 6, BK_DL[1] - 6, BK_DL[2] + 12, BK_DL[3] + 6] }, at: mid(UNDUH), click: true, press: "unduh", show: ["dl"], dur: 4 }
     ]
   },
 
@@ -497,7 +567,7 @@ export const scenes = {
       win: { svg: pinWindow(false), enter: "pop", delay: 0.1 }
     },
     steps: [
-      { caption: "Buka panel Bagikan, lalu gulir ke PIN dashboard.", focus: [0, COUPLE_Y + 145, 399, 164], mark: [16, COUPLE_Y + 150, 366, 58], lens: { src: [0, COUPLE_Y + 140, 399, 112] }, dur: 2.8 },
+      { caption: "Buka panel Bagikan, lalu gulir ke PIN dashboard.", focus: [0, COUPLE_Y + 181, 399, 128], mark: [16, COUPLE_Y + 186, 366, 58], lens: { src: [0, COUPLE_Y + 176, 399, 112] }, dur: 2.8 },
       { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", mark: pinBox(COUPLE_Y), note: "Kelola PIN dashboard", at: mid(pinBox(COUPLE_Y)), click: true, press: "kelola", show: ["shade", "win"], dur: 3.6 }
     ]
   },

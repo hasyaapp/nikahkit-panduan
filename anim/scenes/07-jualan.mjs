@@ -111,7 +111,7 @@ const FEAT = [[20, 186.3, 212.8, ["Nama tamu di", "sampul"], ["Tiap tamu dapat l
   [20, 411.1, 192.5, ["Galeri dan", "video"], ["Foto prewedding,", "kisah kalian, dan", "video."]], [201, 411.1, 192.5, ["Musik latar"], ["Lagu pilihan kalian", "saat undangan", "dibuka."]],
   [20, 615.6, 212.8, ["Peta dan", "kalender"], ["Lokasi acara sekali", "ketuk, simpan", "tanggal ke kalender", "HP."]], [201, 615.6, 212.8, ["Hitung", "mundur"], ["Hari, jam, dan menit", "menuju acara."]],
   [20, 840.4, 192.5, ["Amplop digital"], ["Nomor rekening dan", "alamat kirim kado."]], [201, 840.4, 192.5, ["Siaran", "langsung"], ["Link YouTube atau", "Instagram untuk", "tamu yang jauh."]],
-  [20, 1044.8, 212.8, ["Filter", "Instagram"], ["Tamu ikut", "mengabadikan", "momen dengan filter", "kalian."]], [201, 1044.8, 212.8, ["Kirim lewat", "WhatsApp"], ["Dashboard pasangan", "untuk mengirim ke", "tiap tamu dan", "memantau RSVP."]],
+  [20, 1044.8, 212.8, ["Bingkai Story", "IG"], ["Tamu ikut berbagi", "momen di Story", "dengan bingkai", "kalian."]], [201, 1044.8, 212.8, ["Kirim lewat", "WhatsApp"], ["Dashboard pasangan", "untuk mengirim ke", "tiap tamu dan", "memantau RSVP."]],
   [20, 1269.6, 190, ["Check-in QR"], ["Penerima tamu", "memindai QR tamu", "di hari H."]], [201, 1269.6, 190, ["Dua bahasa"], ["Teks undangan", "dalam bahasa", "Indonesia atau", "Inggris."]]];
 const featIcon = (d, x, y) => `<g transform="translate(${x} ${y}) scale(${28 / 24})" fill="none" stroke="${LP.accent}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</g>`;
 // Pertanyaan (shared accordion .faq-list, all closed): [top below the section top, height, question lines]; plus icon
@@ -174,7 +174,7 @@ function landingTop(x0, y0, name) {
 const PESAN_LEDE = ["Data langsung terkirim ke kami. Yang belum", "siap boleh menyusul."];
 
 // Form card (#formCard): picked-now, progress, step panel, actions, status. Returns { svg, pos, bottom }.
-const FITUR = [["Siaran langsung"], ["Dua rekening dan alamat kirim", "kado"], ["Acara ngunduh mantu"], ["Warna, font, dan filter Instagram", "pilihan"], ["QR check-in tamu"], ["Hanya tamu yang diundang (link", "per tamu)"]];
+const FITUR = [["Siaran langsung"], ["Dua rekening dan alamat kirim", "kado"], ["Acara ngunduh mantu"], ["Warna, font, dan bingkai Story IG", "pilihan"], ["QR check-in tamu"], ["Hanya tamu yang diundang (link", "per tamu)"]];
 function lpField(x, y, w, label, value, o = {}) {
   const hh = o.area ? 112 : 48;
   return text(x, y + 16, label, { size: 14, weight: 700, fill: LP.cocoa }) + rect(x + 0.75, y + 28.75, w - 1.5, hh - 1.5, { r: 8, fill: LP.paper, stroke: o.bad ? LP.danger : LP.cocoa, sw: 1.5 }) +
@@ -582,7 +582,7 @@ export const scenes = {
     steps: [
       tabStep("Buka undangan klien di editor, tab NikahKit."),
       { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(...BAGIKAN_TOOL), note: "Bagikan", dur: 3.2 },
-      { caption: "Untuk pengantin: Kirim undangan dan Buka Dashboard.", mark: M(16, COUPLE_Y + 24, 366, 80), lens: { src: [12, COUPLE_Y - 3, 374, 136] }, dur: 3.4 },
+      { caption: "Untuk pengantin: Kirim undangan, Buka Dashboard, dan Bingkai Story IG.", mark: M(16, COUPLE_Y + 24, 366, 140), lens: { src: [12, COUPLE_Y - 3, 374, 172] }, dur: 3.6 },
       { caption: "Buka Check-in muncul bila Undangan khusus dan QR masuk menyala.", mark: M(16, ACC_Y - 5, 366, 106), lens: { src: [12, ACC_Y - 9, 374, 114] }, dur: 3.8 },
       { caption: "Klik Buka Dashboard: Kelola undangan terbuka di tab baru.", at: [199, COUPLE_Y + 86], click: true, press: "buka", show: ["tab"], mark: M(...dashboardBox(COUPLE_Y)),
         note: "Buka Dashboard", dur: 3.4 },

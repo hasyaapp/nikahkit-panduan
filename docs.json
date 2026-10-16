@@ -66,6 +66,7 @@
       "icon": "users",
       "pages": [
         { "title": "Bagikan undangan", "href": "/tamu/bagikan-undangan" },
+        { "title": "Bingkai Story IG", "href": "/tamu/bingkai-story" },
         { "title": "Undangan khusus", "href": "/tamu/undangan-khusus" },
         { "title": "PIN dashboard pasangan", "href": "/tamu/pin-dashboard" },
         { "title": "Buku Tamu di Scalev", "href": "/tamu/buku-tamu" },
