@@ -11,7 +11,7 @@ export const GATE_TEXT = {
   checking: ["Memeriksa akses...", ""],
   offline: ["Ekstensi tidak tersambung.", "Muat ulang halaman.", true],
   server: ["Server NikahKit tidak terjangkau.", "Periksa internet, lalu tekan Periksa lagi.", true],
-  signedOut: ["Masuk ke NikahKit.", ""],
+  signedOut: ["Masuk ke NikahKit.", "Pakai akun Google yang dipakai saat berlangganan."],
   noFeature: ["Akun belum punya akses desain.", "Hubungi tim Nikahin."],
   expired: ["Langganan habis.", "Undangan tayang tetap tampil.", true],
   unlicensed: ["Akun belum berlangganan.", ""],
@@ -32,7 +32,8 @@ export const chipW = (label) => tw(label, 12, 500) + 36;
 export const accountChip = (x, y, label, warn = false) => rect(x + 0.5, y + 0.5, chipW(label) - 1, 27, { r: 14, fill: warn ? C.warnSoft : C.white, stroke: warn ? "#fde7c7" : C.field }) +
   icon("circle-user-round", x + 15, y + 14, 16, warn ? C.warn : C.primary) + text(x + 27, y + 18, label, { size: 12, weight: 500, fill: warn ? C.warnStrong : C.strong });
 
-// Buttons per state: google (signedOut), choose (unlicensed, expired), connect (unassigned), pick, recheck (not checking).
+// Buttons per state: google (signedOut), choose (unlicensed, expired), connect (unassigned), pick, recheck (not checking,
+// not signedOut: signing in re-checks by itself).
 const BTN = { choose: ["Pilih paket", "primary"], connect: ["Hubungkan bisnis Scalev", "primary"], pick: ["Pilih template lain", "primary"], recheck: ["Periksa lagi", "quiet"] };
 // Note text: bold title then hint, wrapped greedily to the note's 343 px text width.
 function noteLines(title, hint) {
@@ -64,7 +65,7 @@ export function gate(o = {}, y = 0) {
   res.note = [16, ny, 367, nh];
   s += rect(16, ny, 367, nh, { r: 4, fill: warn ? C.warnSoft : C.primarySoft }) + lines.map((l, i) => text(28, ny + 23 + i * 18, l, { size: 12, fill: warn ? C.warnStrong : C.strong })).join("");
   const keys = [o.state === "signedOut" && "google", ["unlicensed", "expired"].includes(o.state) && "choose", o.state === "unassigned" && "connect",
-    o.pick && "pick", o.recheck !== false && o.state !== "checking" && "recheck"].filter(Boolean);
+    o.pick && "pick", o.recheck !== false && !["checking", "signedOut"].includes(o.state) && "recheck"].filter(Boolean);
   const rowH = keys.includes("google") ? 40 : 36, by = ny + nh + 12;
   let bx = 16;
   for (const k of keys) {

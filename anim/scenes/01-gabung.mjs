@@ -72,7 +72,13 @@ function pinDlg(X, Y, o = {}) {
   const card = (top, h) => rect(X + 16.5, top + 0.5, 407, h - 1, { r: 8, fill: C.white, stroke: C.line });
   const btn = (x, y, label, variant, key) => { const w = tw(label, 14, 500) + 24; at[key] = [x, y, w, 36]; return [nkBtn(x, y, label, { variant, size: 14, w }), w]; };
   if (st === "checking") { s += text(X + 16, Y + c + 16, "Memeriksa login...", { size: 12, fill: C.faint }); c += 20 + 12; }
-  if (st === "out") { s += card(Y + c, 74) + gBtn(X + 33, Y + c + 17, { disabled: o.gDisabled }); at.google = [X + 33, Y + c + 17, GBTN_W, 40]; c += 74 + 12; }
+  // #out card (pin.html): h3 "Masuk ke NikahKit", #outhint (o.hint: the waiting text while Google's window is open; the
+  // button then only carries aria-busy, so it stays at full strength), the Google button 12 below the hint.
+  if (st === "out") {
+    const top = Y + c, hint = o.hint ?? "Pakai akun Google yang dipakai saat berlangganan.";
+    s += card(top, 128) + text(X + 33, top + 28, "Masuk ke NikahKit", { size: 12, weight: 700 }) + text(X + 33, top + 54, hint, { size: 12, fill: C.faint }) + gBtn(X + 33, top + 71);
+    at.hint = [X + 33, top + 41, tw(hint, 12), 18]; at.google = [X + 33, top + 71, GBTN_W, 40]; c += 128 + 12;
+  }
   if (st === "in") {
     at.email = [X + 16, Y + c, tw(o.email ?? EMAIL, 12, 700), 16];
     s += text(X + 16, Y + c + 12, o.email ?? EMAIL, { size: 12, weight: 700, fill: C.faint }) + text(X + 424, Y + c + 12, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true });
@@ -107,6 +113,8 @@ function pinDlg(X, Y, o = {}) {
 }
 // The dialog centred in the page viewport (pin-frame: fixed, flex-centred).
 const dlg = (o) => pinDlg(W / 2 - 220, CT + Math.round((VIEW - pinDlg(0, 0, o).h) / 2), o);
+// pin.js: the #outhint text while Google's own window is open (Masuk dengan Google clicked).
+const WAIT_HINT = "Pilih akun di jendela Google yang terbuka.";
 
 // Wide dialog: "Pilih paket" comparison (pin.html #compare, body.wide = 760) at (X, Y), card height H (max 100vh - 32px).
 const PLAN_ROWS = [
@@ -728,7 +736,7 @@ export const scenes = {
   // Masuk dengan Google: editor, tab NikahKit, jendela NikahKit, jendela Google, masuk berhasil.
   "gabung-masuk-google": (() => {
     const g = GATE_OUT(CT);
-    const chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, gDisabled: true }), inn = dlg({});
+    const chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, hint: WAIT_HINT }), inn = dlg({});
     const { x: GX, y: GY, w: GW, h: GH } = GG, ACCT = GOOGLE_ACCT, google = googleWin;
     return {
       title: "Masuk ke NikahKit dengan akun Google",
@@ -744,8 +752,8 @@ export const scenes = {
       steps: [
         { caption: "Buka editor halaman Scalev yang memakai HTML Mode.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
         { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
-        { caption: "Klik Masuk dengan Google. Memeriksa login..., lalu jendela Google terbuka.", focus: "none", at: mid(g.at.google), click: true,
-          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: g.area }, dur: 4 },
+        { caption: "Klik Masuk dengan Google. Tertulis Pilih akun di jendela Google yang terbuka.", focus: "none", at: mid(g.at.google), click: true,
+          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [out.X + 8, out.at.hint[1] - 36, 424, 64] }, dur: 4.4 },
         { caption: "Pilih akun Google: klik akunmu. Jendela Google menutup sendiri.", focus: "none", at: mid(ACCT), click: true, hide: ["google", "chk", "out"], show: ["inn"],
           mark: ACCT, note: "Rina WO", dur: 3.6 },
         { caption: "Lihat jendela NikahKit: email Google-mu, Keluar, kartu Paket dan Bisnis.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X + 8, inn.Y + 56, 424, inn.at.licCard[1] + inn.at.licCard[3] + 8 - inn.Y - 56] }, dur: 3.6 },
@@ -968,7 +976,7 @@ export const scenes = {
 
   // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (Sekali Bayar aktif), chip, kartu Bisnis Scalev.
   "gabung-kreator-masuk": (() => {
-    const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, gDisabled: true });
+    const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, hint: WAIT_HINT });
     const acct = dlg({ license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true });
     const CHIP = [CHIP_K[0], CT + CHIP_K[1], CHIP_K[2], CHIP_K[3]], HEAD = [0, CT + 92, 400, 62];
     const cards = [acct.X + 16, acct.at.licCard[1], 360, acct.at.bizCard[1] + acct.at.bizCard[3] - acct.at.licCard[1]];
@@ -988,8 +996,8 @@ export const scenes = {
       steps: [
         { caption: "Buka editor halaman yang tadi kamu simpan di bisnis Nikahin.", focus: [TOOLBAR, [0, CT, W, 44]], at: mid(urlBox(URL)), mark: { box: urlBox(URL), r: 3 }, lens: { src: [0, 44, 480, 88] }, dur: 3 },
         { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
-        { caption: "Klik Masuk dengan Google. Jendela NikahKit, lalu jendela Google terbuka.", focus: "none", at: mid(g.at.google), click: true,
-          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: g.area }, dur: 4 },
+        { caption: "Klik Masuk dengan Google. Tertulis Pilih akun di jendela Google yang terbuka.", focus: "none", at: mid(g.at.google), click: true,
+          show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [out.X + 8, out.at.hint[1] - 36, 424, 64] }, dur: 4.4 },
         { caption: "Pilih akunmu. Paket Sekali Bayar sudah aktif: jendela menutup sendiri.", focus: [LEFT], at: mid(GOOGLE_ACCT), click: true, hide: ["google", "chk", "out", "dim"],
           show: ["open"], mark: GOOGLE_ACCT, note: "Rina WO", dur: 3.8 },
         { caption: "Editor NikahKit terbuka tanpa bayar. Chip akun bertuliskan Sekali Bayar.", at: mid(CHIP), mark: { box: CHIP, r: 14 }, lens: { src: HEAD }, dur: 3.6 },
