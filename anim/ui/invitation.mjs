@@ -76,6 +76,14 @@ export const pvGallery = () => pvScreen(CREAM, secTitle("Galeri"), sTxt(262, "Se
 // Amplop Digital with "Tampilkan lewat tombol Kirim Hadiah" on: title, intro and the button (accounts open after it).
 export const pvGift = () => pvScreen(CREAM, secTitle("Tanda Kasih"), sTxt(262, "Doa restu Anda sudah lebih dari"), sTxt(283, "cukup. Bila ingin memberi tanda"), sTxt(304, "kasih, dapat melalui:"),
   rect(837, 336, 170, 48, { r: 24, fill: MAROON }) + icon("gift", 866, 360, 16, C.white) + text(932, 365, "Kirim Hadiah", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }), dock("Hadiah"), disc());
+// Bingkai Story (templates/*/sections/filter.html with text and photo): title, Keterangan, the 9:16 preview image and
+// Buka Instagram (camera icon). The section shows only with a valid Tautan Story Add Yours (render.js linkOk).
+export const BINGKAI_BTN = [837, 543, 170, 48];
+export const pvBingkai = () => pvScreen(CREAM, secTitle("Bingkai Story"), sTxt(262, "Bagikan momen di Story Instagram"), sTxt(283, "dengan bingkai kami."),
+  photo(862, 306, 120, 213, 3, 10), rect(862, 306, 120, 213, { r: 10, stroke: MAROON, sw: 2 }), rect(872, 316, 100, 34, { r: 4, fill: "rgba(255,248,238,.9)" }),
+  text(CX, 338, "Rani & Dimas", { size: 15, font: SCRIPT, fill: MAROON, anchor: "middle" }), rect(872, 475, 100, 34, { r: 4, fill: "rgba(255,248,238,.9)" }),
+  text(CX, 496, "#RaniDimas", { size: 11, font: SERIF, fill: MAROON, anchor: "middle" }),
+  rect(...BINGKAI_BTN, { r: 24, fill: MAROON }) + icon("camera", 866, 567, 16, C.white) + text(934, 572, "Buka Instagram", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }), dock(), disc());
 // A new HTML Sales Page: Scalev's empty skeleton shows as a blank screen; NikahKit treats it as an empty page.
 export const pvBlank = () => pvScreen(C.white);
 // Another landing page's HTML (before a template is picked): neutral blocks, no text.

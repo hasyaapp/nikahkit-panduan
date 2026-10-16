@@ -31,16 +31,14 @@ export const accessHead = (y, on) => nkH3(16, y + 12, "Undangan khusus") + text(
   para(16, y + 78, ["Isi undangan tidak ada di kode halaman. Server Nikahin", "mengirimnya hanya ke tamu dengan tautan sah."], { size: 12, fill: C.faint, lh: 16 });
 export const switchBox = (y) => [346, y + 34, 36, 20];
 // Untuk pengantin + PIN dashboard (y = top of the "Untuk pengantin" H3 box). The buttons are exported on their own
-// for scenes that press them. Bingkai Story IG sits in its own row under the PIN hint (shown whenever the page has an
-// address), so PIN dashboard starts 36 px lower.
+// for scenes that press them.
 export const kirimBtn = (y) => nkBtn(16, y + 24, "Kirim undangan", { w: 366, size: 14, variant: "ghost", icon: "link" });
 export const dashboardBtn = (y) => nkBtn(16, y + 68, "Buka Dashboard", { w: 366, size: 14, variant: "quiet", icon: "layout-grid" });
-export const bingkaiBtn = (y) => nkBtn(16, y + 128, "Bingkai Story IG", { w: 366, size: 14, variant: "quiet", icon: "instagram" });
 export const forCouple = (y) => nkH3(16, y + 12, "Untuk pengantin") + kirimBtn(y) + dashboardBtn(y) +
-  nkHint(16, y + 120, "Masuk dengan PIN dashboard.") + bingkaiBtn(y) + nkH3(16, y + 196, "PIN dashboard");
-export const kirimBox = (y) => [16, y + 24, 366, 36], dashboardBox = (y) => [16, y + 68, 366, 36], bingkaiBox = (y) => [16, y + 128, 366, 36], pinBox = (y) => [16, y + 208, 366, 36];
-export const pinBtn = (y) => nkBtn(16, y + 208, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" });
-export const pinHint = (y) => nkHint(16, y + 260, "PIN hanya tampil di jendela NikahKit.");
+  nkHint(16, y + 120, "Masuk dengan PIN dashboard.") + nkH3(16, y + 160, "PIN dashboard");
+export const kirimBox = (y) => [16, y + 24, 366, 36], dashboardBox = (y) => [16, y + 68, 366, 36], pinBox = (y) => [16, y + 172, 366, 36];
+export const pinBtn = (y) => nkBtn(16, y + 172, "Kelola PIN dashboard", { w: 366, size: 14, icon: "lock" });
+export const pinHint = (y) => nkHint(16, y + 224, "PIN hanya tampil di jendela NikahKit.");
 export const coupleAll = (y) => forCouple(y) + pinBtn(y) + pinHint(y);
 // Access section when switched on (y = top of the Keamanan field, i.e. 12 px under the switch hint).
 export const MODES = { link: ["Tautan pribadi", "Hanya tamu dengan tautan dari Dashboard > Kirim."], device: ["+ Kunci perangkat", "Tautan yang diteruskan tidak terbuka di perangkat lain."] };

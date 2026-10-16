@@ -582,7 +582,7 @@ export const scenes = {
     steps: [
       tabStep("Buka undangan klien di editor, tab NikahKit."),
       { caption: "Klik Bagikan di rel kiri.", at: ED.tool.Bagikan, click: true, show: ["share", "buka"], focus: F.left, mark: M(...BAGIKAN_TOOL), note: "Bagikan", dur: 3.2 },
-      { caption: "Untuk pengantin: Kirim undangan, Buka Dashboard, dan Bingkai Story IG.", mark: M(16, COUPLE_Y + 24, 366, 140), lens: { src: [12, COUPLE_Y - 3, 374, 172] }, dur: 3.6 },
+      { caption: "Untuk pengantin: Kirim undangan dan Buka Dashboard.", mark: M(16, COUPLE_Y + 24, 366, 80), lens: { src: [12, COUPLE_Y - 3, 374, 136] }, dur: 3.4 },
       { caption: "Buka Check-in muncul bila Undangan khusus dan QR masuk menyala.", mark: M(16, ACC_Y - 5, 366, 106), lens: { src: [12, ACC_Y - 9, 374, 114] }, dur: 3.8 },
       { caption: "Klik Buka Dashboard: Kelola undangan terbuka di tab baru.", at: [199, COUPLE_Y + 86], click: true, press: "buka", show: ["tab"], mark: M(...dashboardBox(COUPLE_Y)),
         note: "Buka Dashboard", dur: 3.4 },
