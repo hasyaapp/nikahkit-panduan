@@ -267,11 +267,11 @@ function invitesCard(y, o) {
         .map((l, i) => text(BX + 30, y + 65 + i * 20, l, { size: 14, fill: C.text })).join("") +
       text(BX + 30, y + 143, "Baris yang dilewati:", { size: 14, fill: C.text }) +
       text(BX + 30, y + 165, "Baris 5: nomor WhatsApp tidak sah", { size: 12, fill: C.faint }) +
-      nkHint(BX + 30, y + 198, "Nama yang sudah ada diperbarui kategori, pax, dan nomornya; tautannya tetap sama.") +
+      nkHint(BX + 30, y + 198, "Nama yang sudah ada diperbarui, tautannya tetap.") +
       btn(BX + 30, y + 212, "Impor 3 tamu", { variant: "primary" }) + btn(BX + 30 + bw("Impor 3 tamu") + 8, y + 212, "Batal");
     y += 268;
   }
-  const ready = done ? 21 : 18, l1 = `Salin pengingat untuk ${ready} tamu di daftar ini yang belum RSVP`;
+  const ready = done ? 21 : 18, l1 = `Salin pengingat (${ready} tamu belum RSVP)`;
   s += btn(BX + 17, y, l1) + btn(BX + 17 + bw(l1) + 8, y, "Ubah pesan pengingat");
   y += 44;
   const rows = done ? [...NEW_GUESTS, ...INVITES] : INVITES;
@@ -288,7 +288,7 @@ function invitesCard(y, o) {
   return s;
 }
 // Staff penerima tamu body (x, y = top-left of the body inside the open details card). Returns { svg, h }.
-const STAFF_HINT = "Staff masuk ke halaman check-in dengan kode pribadinya, tanpa PIN dashboard. Kode hanya bisa dipakai untuk check-in tamu.";
+const STAFF_HINT = "Staff masuk check-in dengan kode sendiri, tanpa PIN dashboard.";
 const CODE_BTNS = ["Salin kode", "Kirim lewat WA", "Salin pesan"];
 function staffBody(x, y, st) {
   const w = BW2 - 34;
@@ -296,7 +296,7 @@ function staffBody(x, y, st) {
   if (st === "code") {
     s += rect(x + 0.5, y + 24.5, w - 1, 119, { r: 8, fill: C.mutedBg, stroke: C.line }) +
       text(x + 13, y + 51, ["Kode untuk Rina: ", { t: "K7PM3QXA", w: 700 }], { fill: C.text }) +
-      nkHint(x + 13, y + 82, "Kode hanya tampil sekali. Kirim sekarang; kalau hilang, cabut lalu buat kode baru.");
+      nkHint(x + 13, y + 82, "Kode hanya tampil sekali. Hilang? Cabut, lalu buat baru.");
     let bx = x + 13;
     for (const l of CODE_BTNS) { s += btn(bx, y + 96, l); bx += bw(l) + 8; }
     h = 144;
@@ -357,7 +357,7 @@ function phoneHariH() {
 // Chrome confirm dialog (450 wide, top centre of the viewport).
 const CF = 495, CONFIRM_OK = [CF + 357, 108, 72, 32];
 const confirmDlg = shadow(CF, 12, 450, 132, 12, 3) + rect(CF, 12, 450, 132, { r: 12, fill: C.white }) +
-  para(CF + 24, 48, ["Cabut kode Rina? Kode itu langsung tidak bisa dipakai", "check-in."], { size: 14, fill: C.crText, lh: 20 }) +
+  para(CF + 24, 48, ["Cabut kode Rina? Kodenya langsung tidak berlaku."], { size: 14, fill: C.crText, lh: 20 }) +
   rect(CF + 268.5, 108.5, 79, 31, { r: 16, fill: C.white, stroke: "#c4c7c5" }) + text(CF + 308, 129, "Batal", { size: 13, weight: 500, fill: C.crBlue, anchor: "middle" }) +
   rect(...CONFIRM_OK, { r: 16, fill: C.crBlue }) + text(CF + 393, 129, "OK", { size: 13, weight: 500, fill: C.white, anchor: "middle" });
 // Chrome's download bubble (kit crDownload, 360x76) at the top right, where it hangs under the toolbar.

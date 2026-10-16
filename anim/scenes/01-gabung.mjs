@@ -113,12 +113,12 @@ const PLAN_ROWS = [
   [["Masa aktif"], ["30 hari"], ["1 tahun"], ["Selama layanan", "Nikahin berjalan"]],
   [["Jumlah undangan"], ["Tanpa batas"], ["Tanpa batas"], ["Tanpa batas"]],
   [["Editor NikahKit di Scalev"], 1, 1, 1],
-  [[[{ t: "Buku Tamu Digital", w: 700, fill: C.strong }, ": RSVP, ucapan,"], "check-in QR. Tanpa kuota tamu", "dan event"], 1, 1, 1],
-  [["Akun staff penerima tamu (kode", "check-in, tanpa membagi PIN)"], 0, 1, 1],
-  [["Impor daftar tamu CSV (kategori,", "jumlah orang, WhatsApp)"], 0, 1, 1],
-  [["Undangan khusus: isi hanya terbuka", "lewat tautan pribadi tamu"], 0, 1, 1],
+  [[[{ t: "Buku Tamu Digital", w: 700, fill: C.strong }, ": RSVP, ucapan,"], "check-in QR, tanpa kuota"], 1, 1, 1],
+  [["Kode staff penerima tamu, tanpa", "membagi PIN"], 0, 1, 1],
+  [["Impor tamu dari CSV (kategori,", "jumlah, WhatsApp)"], 0, 1, 1],
+  [["Undangan khusus: hanya lewat", "tautan pribadi tamu"], 0, 1, 1],
   [["PIN dashboard dan tautan tamu"], 1, 1, 1],
-  [["Semua template yang tersedia", "saat ini"], 1, 1, 1],
+  [["Semua template saat ini"], 1, 1, 1],
   [["Saat masa aktif habis"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tidak perlu", "perpanjang"]]
 ];
 const PLANS = [["", "Bulanan", "Rp79.000", ["per 30 hari"], "ghost"], ["Paling hemat", "Tahunan", "Rp299.000", ["per tahun, setara", "Rp24.917/bulan"], "primary"], ["", "Sekali Bayar", "Rp699.000", ["sekali bayar, tanpa", "perpanjang"], "ghost"]];
@@ -147,7 +147,7 @@ function planDlg(X, Y, H) {
     r.slice(1).forEach((v, j) => (body += v === 1 ? yesIc(col(j) + 21, y + 22) : v === 0 ? noIc(col(j) + 21, y + 22) : para(col(j) + 12, y + 27, v, { size: 14, weight: 500, fill: C.strong, lh: 20 })));
     y += rowsH[i];
   });
-  body += text(tx, t0 + tH + 20, "Harga belum termasuk biaya layanan pembayaran Scalev. Perpanjang kapan saja: sisa masa aktif tetap terhitung.", { size: 12, fill: C.faint });
+  body += text(tx, t0 + tH + 20, "Belum termasuk biaya layanan Scalev. Perpanjang kapan saja, sisa masa aktif tetap dihitung.", { size: 12, fill: C.faint });
   const svg = shadow(X, Y, Wd, H, 8, 3) + rect(X, Y, Wd, H, { r: 8, fill: C.white }) + clipped(X, Y, Wd, H, body) + iconX("x", X + Wd - 30, Y + 30, 18, C.text);
   return { svg, X, Y, H, box: [X, Y, Wd, H], col, pc, t0, tx, rowY, rowsH, btns, back };
 }
@@ -775,7 +775,7 @@ export const scenes = {
         { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", focus: [t.box], at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table"], mark: d0.at.choose, note: "Pilih paket", dur: 3.4 },
         { caption: "Baca tabelnya: Bulanan Rp79.000, Tahunan Rp299.000, Sekali Bayar Rp699.000.", focus: [t.box], at: [t.col(1) + 60, t.t0 + 70],
           mark: [t.col(0) + 8, t.t0 + 58, 3 * t.pc - 16, 26], lens: { src: [t.col(0), t.t0 + 34, 3 * t.pc, 86] }, dur: 3.8 },
-        { caption: "Tanda silang: akun staff dan impor CSV tidak ada di Bulanan.", at: [t.col(0) + 21, t.rowY[4] + 22],
+        { caption: "Tanda silang: kode staff dan impor CSV tidak ada di Bulanan.", at: [t.col(0) + 21, t.rowY[4] + 22],
           mark: [t.tx + 4, t.rowY[4] + 2, 720, t.rowsH[4] + t.rowsH[5] - 4], lens: { src: [t.tx, t.rowY[4] - 4, 728, t.rowsH[4] + t.rowsH[5] + 8], zoom: 1.5 }, dur: 3.8 },
         { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", focus: [PAY_CARD], at: mid(t.btns[1]), click: true, hide: ["table", "dim"], show: ["pay"], mark: t.btns[1], note: "Pilih", dur: 4 }
       ]
