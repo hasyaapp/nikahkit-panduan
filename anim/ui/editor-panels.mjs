@@ -70,7 +70,7 @@ export const lid = (rail, o = {}) => clipped(72, 0, 327, 153, scalevEditor(0, 0,
 export const LOCKED = [160, 216, 328, 384].map((y) => rect(0, y, 71, 52, { fill: C.page, opacity: 0.62 })).join("") + rect(0, 560, 71, 50, { fill: C.page, opacity: 0.62 }) + rect(0, 750, 71, 46, { fill: C.page, opacity: 0.62 });
 
 // ---- Konten panel --------------------------------------------------------------------------------------------------
-// Sample-data warning at the top of Konten (sampleFields: 7 checks, the button names the first left).
+// Sample-data warning at the top of Konten (sampleFields: 8 checks, the button names the first left).
 const sampleNote = (left, link) => rect(P, 169, PW, 64, { r: 4, fill: C.warnSoft }) + text(P + 12, 192, `${left} isian masih contoh. Ganti sebelum terbit.`, { size: 12, fill: C.warnStrong }) +
   text(P + 12, 218, link, { size: 12, weight: 500, fill: C.strong, underline: true });
 // Konten groups in panel order (nikahkit/src/fields.js GROUPS, labels from model.js META).
@@ -80,7 +80,7 @@ export const GRP = ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "A
 // open: title of the open group, fill(c) adds its fields to a col; todo: groups marked Belum diisi; dy: panel scrolled by dy;
 // raw: no clip (a scroll element under lid()). Returns the svg, each bar's y and the open group's field tops (f), all in
 // scrolled coordinates.
-export function kList({ from = 0, top = 169, left = 7, link = "Ganti nama mempelai wanita", open, fill, todo = [], dy = 0, raw = false } = {}) {
+export function kList({ from = 0, top = 169, left = 8, link = "Ganti nama mempelai wanita", open, fill, todo = [], dy = 0, raw = false } = {}) {
   let s = "", y = top;
   if (!from) {
     const c = col(P, left ? 245 : 169, PW);

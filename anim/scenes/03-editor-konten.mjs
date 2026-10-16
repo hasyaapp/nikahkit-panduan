@@ -165,7 +165,7 @@ export const scenes = {
 
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-isi-mempelai": (() => {
-    const hold = { left: 6, link: "Ganti foto sampul", raw: true };
+    const hold = { left: 7, link: "Ganti foto sampul", raw: true };
     const v1 = kList({ open: "Mempelai", fill: fillMempelai(), raw: true });
     const v1b = kList({ ...hold, open: "Mempelai", fill: fillMempelai("Sinta") });
     const yM = v1.at.Mempelai, nickY = v1.f["Nama panggilan"] + 20, [clear, typed, ty] = typeIn(I, nickY, IW, "Sinta");
@@ -180,7 +180,7 @@ export const scenes = {
     const D8 = v3.at["Salam Pembuka"] - 420;
     const s0 = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam });
     const v4s = kList({ ...hold, open: "Salam Pembuka", fill: fillSalam, dy: s0.at["Salam Pembuka"] - 420 });
-    const v5 = kList({ left: 6, link: "Ganti foto sampul" }), y5 = v5.at.Sampul;
+    const v5 = kList({ left: 7, link: "Ganti foto sampul" }), y5 = v5.at.Sampul;
     const sub = (id, D) => (D ? { scroll: { id, dy: D } } : {});
     return {
       title: "Mengisi Mempelai, Acara, Sampul, dan Salam di Konten",
@@ -220,7 +220,7 @@ export const scenes = {
   })(),
 
   "editor-isi-mempelai-pratinjau": (() => {
-    const hold = { left: 6, link: "Ganti foto sampul" };
+    const hold = { left: 7, link: "Ganti foto sampul" };
     const k = kList({ ...hold, open: "Mempelai", fill: fillMempelai("Sinta") }), nickY = k.f["Nama panggilan"] + 20;
     const shut = kList(hold), barA = shut.at["Acara & Tanggal"];
     return {
@@ -290,7 +290,7 @@ export const scenes = {
 
   "editor-tambah-acara-pratinjau": {
     title: "Acara baru di pratinjau",
-    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), kList({ left: 6, link: "Ganti foto sampul", open: "Acara & Tanggal", fill: fillAcara(EVS.slice(0, 2)) }).svg, pvEvents(["akad"])],
+    base: [...editor("Konten"), nkHead(0, 0, "Konten", { account: ACCOUNT }), kList({ left: 7, link: "Ganti foto sampul", open: "Acara & Tanggal", fill: fillAcara(EVS.slice(0, 2)) }).svg, pvEvents(["akad"])],
     els: { pv2: { svg: pvEvents(["akad", "resepsi"]), enter: "fade", delay: 0.4, skel: true } },
     steps: [{ caption: "Acara baru tampil di pratinjau, lengkap dengan jamnya.", focus: F.pv, mark: { box: [751, EV.resepsi.y, 342, EV.resepsi.h], r: 14 }, lens: { src: [745, EV.resepsi.y - 6, 354, EV.resepsi.h + 12] }, show: ["pv2"], at: [922, 640], dur: 3.6 }]
   },
