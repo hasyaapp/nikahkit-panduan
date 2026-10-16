@@ -134,10 +134,19 @@ const thumb = (x, y, s) => {
     text(cx, y + 118 * k, "RANI", { size: 46 * k, fill: ink, anchor: "middle", font: SERIF }) + text(cx, y + 160 * k, "&", { size: 30 * k, fill: ink, anchor: "middle", font: SERIF, italic: true }) +
     text(cx, y + 210 * k, "DIMAS", { size: 46 * k, fill: ink, anchor: "middle", font: SERIF }) + text(cx, y + 252 * k, "14 . 02 . 2027", { size: 17 * k, fill: ink, anchor: "middle", font: SERIF });
 };
-// SEO & PAGE IDENTITY open (Domain collapsed above). o: { judul, desc, img }.
+// SEO & PAGE IDENTITY open (Domain collapsed above). o: { judul, desc, img }. On invitation pages NikahKit adds Buat
+// thumbnail di Canva 8 px under the Pratinjau di Sosial Media card (main.jsx ensureThumbCanva), above Favicon.
+const seoE = (o) => 727 + (o.img ? 299 : 164); // bottom of the image or upload box
+const canvaBtnY = (o) => seoE(o) + 81 + 8;
+const CANVA_LABEL = "Buat thumbnail di Canva";
+function canvaBtn(y) {
+  const lw = tw(CANVA_LABEL, 14, 500), x0 = 34 + (315 - (16 + 8 + lw)) / 2;
+  return rect(34.5, y + 0.5, 314, 35, { r: 6, fill: C.white, stroke: "#d5dae1" }) + icon("external-link", x0 + 8, y + 18, 16, "#0f161e") +
+    text(x0 + 24, y + 23, CANVA_LABEL, { size: 14, weight: 500, fill: "#0f161e" });
+}
 function seoContent(o = {}) {
-  const E = 727 + (o.img ? 299 : 164); // bottom of the image or upload box
-  const F = E + 97; // Favicon label row
+  const E = seoE(o);
+  const F = canvaBtnY(o) + 36 + 16; // Favicon label row
   let s = accGrad + rect(0, 154, 399, 1500, { fill: C.white }) + acc(170, 0) + rect(17, 247, 364, F + 340 - 246, { r: 8, fill: C.white, stroke: "#e8ebef", sw: 2 }) +
     rect(18, 248, 362, 58, { r: 6, fill: "#eef2f6" }) + rect(30, 260, 32, 32, { r: 8, fill: "url(#svAcc)" }) + lu(ACC_ICON.search, 46, 276, 16, C.white) +
     text(72, 281, ACC[1][0], { size: 12, weight: 700, fill: "#344157" }).replace("<text", '<text letter-spacing="0.96"') + icon("chevron-up", 359, 276, 14, "#7c899b") +
@@ -150,7 +159,7 @@ function seoContent(o = {}) {
   s += o.img ? clipped(42, 727, 299, 299, thumb(42, 727, 299)) :
     rect(53, 738, 277, 142, { r: 4, stroke: "#e8ebef", sw: 2 }) + icon("upload", 191, 790, 22, C.primary) +
     text(191, 826, "Upload Meta Gambar", { size: 14, weight: 500, fill: C.primary, anchor: "middle" }) + text(191, 846, ".jpg, .jpeg, .png, .webp", { size: 12, fill: "#5b6675", anchor: "middle" });
-  s += (o.judul ? text(42, E + 23, JUDUL, { size: 14, weight: 500, fill: "#0f161e" }) : "") + (o.desc ? text(42, E + 45, DESC.join(" "), { size: 12, fill: "#545454" }) : "") +
+  s += canvaBtn(canvaBtnY(o)) + (o.judul ? text(42, E + 23, JUDUL, { size: 14, weight: 500, fill: "#0f161e" }) : "") + (o.desc ? text(42, E + 45, DESC.join(" "), { size: 12, fill: "#545454" }) : "") +
     text(42, E + 67, PUB_URL, { size: 12, fill: "#8d97a3" }) +
     text(34, F, "Favicon", { size: 12, weight: 500, fill: C.strong }) + rect(34, F + 15, 315, 164, { r: 4, fill: "#f6f9fc" }) + rect(45, F + 26, 293, 142, { r: 4, stroke: "#e8ebef", sw: 2 }) +
     icon("upload", 191, F + 70, 20, C.primary) + text(191, F + 106, "Upload Favicon", { size: 14, weight: 500, fill: C.primary, anchor: "middle" }) +
@@ -163,6 +172,7 @@ function seoContent(o = {}) {
 const SEO_DY = 480; // scroll so Pratinjau di Sosial Media sits under the header row
 const IMG = { x: 42, y: 727 - SEO_DY, s: 299 };
 const UPLOAD = [53, 738 - SEO_DY, 277, 142];
+const CANVA_BTN = [34, canvaBtnY({}) - SEO_DY, 315, 36];
 const seoAfter = (o) => clipCss(o.id, 0, 154, 399, 746) + (o.dy ? `<g transform="translate(0 ${-o.dy})">${seoContent(o)}</g>` : seoContent(o));
 const PENCIL = [129, IMG.y + 133, 34, 34];
 const imgHover = rect(IMG.x, IMG.y, IMG.s, IMG.s, { r: 4, fill: "rgba(65,64,66,.4)" }) +
@@ -720,6 +730,8 @@ export const scenes = {
       { caption: "Isi Meta Description: tanggal dan ucapan singkat.", at: [190, 496], click: true, show: ["dFocus", "desc", "gDesc"], hide: ["jFocus"], type: [{ id: "desc", n: 24 }], dur: 3.6,
         mark: [34, 433, 315, 126], lens: { src: [26, 578, 340, 118], at: [320, 330] } },
       { caption: "Gulir ke Pratinjau di Sosial Media.", show: ["down"], hide: ["dFocus"], scroll: { id: "down", dy: SEO_DY }, dur: 2.8, mark: [34, 700 - SEO_DY, 315, 30], lens: { src: [26, 700 - SEO_DY - 6, 340, 40] } },
+      { caption: "Belum punya gambar? Buat thumbnail di Canva membuka template undangan Canva.", dur: 3.8, mark: { box: CANVA_BTN, r: 6 }, at: [322, CANVA_BTN[1] + 18],
+        lens: { src: [26, CANVA_BTN[1] - 8, 340, 52] } },
       { caption: "Klik Upload Meta Gambar, pilih gambar dari Canva.", at: [191, UPLOAD[1] + 71], click: true, show: ["img"], dur: 3.4, mark: UPLOAD, lens: { src: [34, IMG.y + 302, 320, 80], at: [320, 330] } },
       { caption: "Sudah ada gambar? Arahkan kursor ke gambar, klik pensil.", at: [146, IMG.y + 150], show: ["hover"], dur: 3.4, mark: PENCIL, lens: { src: [112, IMG.y + 122, 200, 56] } }
     ]

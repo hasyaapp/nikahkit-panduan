@@ -24,7 +24,7 @@ import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY } from "../ui/marketi
 import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, accountChip, chipW } from "../ui/gate.mjs";
-import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen } from "../ui/pesanan.mjs";
+import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA } from "../ui/pesanan.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
 const ID = "365671", SLUG = "rani-dimas", PAGE = "Undangan Rani & Dimas", URL = "app.scalev.com/pages/" + ID;
@@ -512,7 +512,7 @@ export const scenes = {
     ["5. Serahkan: tautan, Dashboard, PIN", "Serahkan ke pasangan: tautan undangan, Dashboard, dan PIN.", pv(pinCard(0, 0), -180, -240, PIN_FIELD, { more: [[PIN_MSG_IC]], lens: [0, 8, 408, 104] })],
     ["6. Tamu: tautan pribadi, RSVP", "Tamu membuka undangan lewat tautan pribadi berisi namanya.", pv(pvCover("Rani & Dimas", { guest: "Andi" }), 538, 106, [802, 619, 240, 26], { lens: [762, 596, 320, 54] })],
     ["7. Hari-H: check-in tamu", "Hari-H: tamu dicatat lewat check-in di Dashboard pasangan.", pv(scanScreen(0, 0), -189, 0, [16, 80, 358, 40], { r: 20, lens: [0, 0, 390, 136] })],
-    ["8. Jualan: landing page, pesanan", "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", pv(clipped(0, 92, 399, 808, ordersDlg), -184, 92, [16, 189, 366, 114], { lens: [8, 162, 382, 149] })]
+    ["8. Jualan: landing page, pesanan", "Jualan: landing page milikmu, pesanan klien masuk ke NikahKit.", pv(clipped(0, 92, 399, 808, ordersDlg), -184, 92, [16, LIST_Y, 366, 114], { lens: [8, 162, 382, LIST_Y + 122 - 162] })]
   ]),
 
   // /mulai/alur-lengkap, one checklist per Bagian; rows = the page's step titles.
@@ -555,9 +555,9 @@ export const scenes = {
     ["1. Isi Profil merek", "Template > Marketing: isi Profil merek, nama bisnis dan WhatsApp.", pv(edLeft(marketing({ open: true })), -184, 92, [101, 300, 253, 104], { lens: [93, 274, 269, 138] })],
     ["2. Pasang Landing page jualan", "Pasang salah satu Landing page (Klasik, Etalase, Langit) di Marketing.", pv(edLeft(marketing()), -184, 92, [...cardXY("landing"), 134, 167], { lens: [cardXY("landing")[0] - 8, MKY - 8, 150, 245] })],
     ["3. Bagikan form data klien dan proses Pesanan masuk", "Kirim link form ke klien. Pesanannya masuk ke Pesanan masuk.",
-      pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, SALIN_BOX, { lens: [8, 369, 382, 217] })],
+      pv(clipped(0, 92, 399, 808, ordersDlg + linkOpen + salinBtn), -184, 92, SALIN_BOX, { lens: [8, LINK_Y - 8, 382, SALIN_BOX[1] + 44 - LINK_Y + 8] })],
     ["4. Ikuti alur kerja dengan klien", "Tempel data pesanan dari WhatsApp klien, lalu klik Isi undangan.",
-      pv(clipped(0, 92, 399, 808, ordersDlg + pasteOpen(true)), -184, 92, nkBtnBox(28, 488, "Isi undangan"), { lens: [20, 373, 358, 160] })]
+      pv(clipped(0, 92, 399, 808, ordersDlg + pasteOpen(true)), -184, 92, nkBtnBox(28, ISI_Y, "Isi undangan"), { lens: [20, PASTE_AREA[1] - 8, 358, 160] })]
   ]),
 
   // Istilah: ID undangan (address bar), slug (Settings), tab NikahKit, then the terms (guide card over the preview).

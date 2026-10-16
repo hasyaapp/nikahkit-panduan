@@ -10,7 +10,7 @@
 // diagram and the checklist are guide graphics, not product screens.
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw, textWidth, mid } from "../lib.mjs";
 import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkH3, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
-import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
+import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, ISI_Y, PASTE_AREA, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL } from "../ui/editor-panels.mjs";
@@ -764,18 +764,18 @@ export const scenes = {
     base: kontenEd("Undangan Rani & Dimas", SAMPLE),
     els: {
       inbox: { svg: ordersDlg, enter: "fade" },
-      link: { svg: rect(16, 372, 366, 260, { fill: C.white }) + linkOpen, enter: "fade" },
+      link: { svg: rect(16, LINK_Y - 5, 366, 260, { fill: C.white }) + linkOpen, enter: "fade" },
       salin: { svg: salinBtn, enter: "fade" },
-      ok: { svg: nkHint(SALIN_BOX[0] + SALIN_BOX[2] + 8, 557, "Tersalin."), enter: "fade", delay: 0.15 }
+      ok: { svg: nkHint(SALIN_BOX[0] + SALIN_BOX[2] + 8, SALIN_BOX[1] + 23, "Tersalin."), enter: "fade", delay: 0.15 }
     },
     steps: [
       tabStep("Buka panel NikahKit di halaman undangan.", 2.6),
       { caption: "Klik ikon kotak masuk di kepala panel. Pesanan masuk terbuka.", at: ED.inbox, click: true, show: ["inbox"], focus: F.left, mark: INBOX,
         lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
-      { caption: "Klik Link form klien (opsional). Alamat link form tampil.", at: [200, 402], click: true, show: ["link", "salin"], mark: M(16, 377, 366, 50),
-        lens: { src: [12, 372, 374, 212] }, dur: 3.4 },
+      { caption: "Klik Link form klien (opsional). Alamat link form tampil.", at: [200, LINK_Y + 25], click: true, show: ["link", "salin"], mark: M(16, LINK_Y, 366, 50),
+        lens: { src: [12, LINK_Y - 5, 374, 220] }, dur: 3.4 },
       { caption: "Klik Salin link form: Tersalin. Tempel di chat WhatsApp klien.", at: mid(SALIN_BOX), click: true, press: "salin", show: ["ok"],
-        mark: M(...SALIN_BOX), lens: { src: [12, 472, 374, 108] }, dur: 3.6 }
+        mark: M(...SALIN_BOX), lens: { src: [12, SALIN_BOX[1] - 62, 374, 108] }, dur: 3.6 }
     ]
   },
 
@@ -793,8 +793,8 @@ export const scenes = {
       { caption: "Angka merah di ikon kotak masuk: ada pesanan yang belum diisi.", focus: F.left, mark: INBOX, lens: { src: [150, 96, 240, 52] }, dur: 3 },
       { caption: "Klik ikonnya. Layar Pesanan masuk terbuka, terbaru di atas.", at: ED.inbox, click: true, show: ["inbox"], mark: INBOX, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
       { caption: "Baru: belum dipakai. Sudah diisi: sudah pernah kamu klik.", mark: [M(...nkBadgeBox(331, ROW1 + 19, "Baru", { end: true }), 9),
-        M(...nkBadgeBox(331, ROW2 + 19, "Sudah diisi", { end: true }), 9)], lens: { src: [12, 186, 374, 120] }, dur: 3.2 },
-      { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, 182, 374, 70] }, dur: 3 },
+        M(...nkBadgeBox(331, ROW2 + 19, "Sudah diisi", { end: true }), 9)], lens: { src: [12, LIST_Y - 3, 374, 120] }, dur: 3.2 },
+      { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3 },
       { caption: "Semua kolom terisi sesuai paketnya. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
         mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
@@ -810,18 +810,18 @@ export const scenes = {
       inbox: { svg: ordersDlg, enter: "fade" },
       paste: { svg: pasteOpen(false), enter: "fade" },
       pasted: { svg: pasteOpen(true), enter: "fade" },
-      isi: { svg: nkBtn(28, 488, "Isi undangan"), enter: "fade" },
+      isi: { svg: nkBtn(28, ISI_Y, "Isi undangan"), enter: "fade" },
       ...filled({ toast: 0.3 })
     },
     steps: [
       { caption: "Di WhatsApp, salin seluruh pesan klien, termasuk baris #data-undangan.", show: ["wa"], focus: F.left, mark: M(24, 300, 352, 200, 10),
         lens: { src: [24, 300, 352, 200] }, dur: 3.6 },
       { caption: "Buka Pesanan masuk lewat ikon kotak masuk.", at: ED.inbox, click: true, hide: ["wa"], show: ["inbox"], mark: INBOX, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
-      { caption: "Klik Tempel data pesanan. Kotak teks muncul.", at: [200, 344], click: true, show: ["paste"], mark: M(16, 319, 366, 50), lens: { src: [12, 314, 374, 220] }, dur: 3.2 },
-      { caption: "Klik di kotak, tekan Ctrl+V (Windows) atau Cmd+V (Mac).", at: [200, 428], click: true, show: ["pasted", "isi"], mark: M(28, 381, 341, 95),
-        lens: { src: [20, 372, 358, 160] }, dur: 3.4 },
-      { caption: "Klik Isi undangan: panel pindah ke Konten, ada tombol Urungkan.", at: [70, 506], click: true, press: "isi", hide: ["inbox", "paste", "pasted", "isi"],
-        show: ["konten", "t1"], mark: M(...nkBtnBox(28, 488, "Isi undangan")), lens: toastLens(DATA_TOAST), dur: 4 }
+      { caption: "Klik Tempel data pesanan. Kotak teks muncul.", at: [200, PASTE_Y + 25], click: true, show: ["paste"], mark: M(16, PASTE_Y, 366, 50), lens: { src: [12, PASTE_Y - 5, 374, 220] }, dur: 3.2 },
+      { caption: "Klik di kotak, tekan Ctrl+V (Windows) atau Cmd+V (Mac).", at: [200, PASTE_AREA[1] + 47], click: true, show: ["pasted", "isi"], mark: M(...PASTE_AREA),
+        lens: { src: [20, PASTE_AREA[1] - 9, 358, 160] }, dur: 3.4 },
+      { caption: "Klik Isi undangan: panel pindah ke Konten, ada tombol Urungkan.", at: [70, ISI_Y + 18], click: true, press: "isi", hide: ["inbox", "paste", "pasted", "isi"],
+        show: ["konten", "t1"], mark: M(...nkBtnBox(28, ISI_Y, "Isi undangan")), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
   },
 
@@ -835,9 +835,9 @@ export const scenes = {
     },
     steps: [
       { caption: "Klik ikon tempat sampah di baris pesanan. Muncul Hapus? merah.", at: [357, ROW2 + 28], click: true, show: ["row", "hapus"], focus: F.left,
-        mark: M(345, ROW2 + 16, 24, 24), lens: { src: [12, 182, 374, 134] }, dur: 3.4 },
+        mark: M(345, ROW2 + 16, 24, 24), lens: { src: [12, LIST_Y - 7, 374, 134] }, dur: 3.4 },
       { caption: "Klik Hapus? untuk memastikan. Pesanan hilang dari daftar.", at: mid(HAPUS_BOX), click: true, press: "hapus", hide: ["row", "hapus"],
-        show: ["gone"], mark: M(...HAPUS_BOX), lens: { src: [12, 182, 374, 134] }, dur: 3.6 }
+        show: ["gone"], mark: M(...HAPUS_BOX), lens: { src: [12, LIST_Y - 7, 374, 134] }, dur: 3.6 }
     ]
   },
 
