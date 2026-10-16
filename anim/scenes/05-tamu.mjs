@@ -410,7 +410,7 @@ const QR_ROW = [I, RS_QR + RS_DY, IW, RS_END - 16 - RS_QR], QR_SW = [I + IW - 36
 // input shows the start of the pasted Story link (the input scrolls back after the paste).
 const BK_Y = 280, BINGKAI = "Bingkai Story";
 const BK_LINK = "https://www.instagram.com/stories/rinawo/3712345678901234567";
-const BK_HINT = wrap("Story bingkai dengan stiker Add Yours di Instagram pembuat undangan. Caranya ada di Panduan, Bingkai Story IG.", IW, 12);
+const BK_HINT = wrap("Story dari Instagram kamu. Caranya di Panduan.", IW, 12);
 const CANVA = "Buka template di Canva";
 const fillBingkai = (c) => c.field("Judul", "Bingkai Story", { placeholder: true }).link(CANVA).field("Tautan Story Add Yours", "https://www.instagram.com/", { hint: BK_HINT })
   .area("Keterangan", wrap("Bagikan momen di Story Instagram dengan bingkai kami.", IW - 22, 14)).photo("Gambar pratinjau", 3);

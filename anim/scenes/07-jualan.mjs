@@ -414,7 +414,7 @@ const pubStep = (caption) => ({ caption, at: ED.terbitkan, click: true, focus: F
 // Konten with every group closed (the panel the order data fills); editor-panels kontenPanel has Mempelai open.
 const kontenClosed = head("Konten") + kList({ left: 0 }).svg;
 const kontenEd = (page, p) => [...shell({ page, rail: "Konten" }), kontenClosed, pvMempelai(p)];
-const DATA_TOAST = ["Data pesanan dimasukkan.", "Foto tetap; ganti foto", "contoh bila masih ada."];
+const DATA_TOAST = ["Undangan terisi. Ganti", "foto contohnya."];
 const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + kontenClosed + pvMempelai(RANI), enter: "fade" },
   t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: o.toast ?? 0.3 } });
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
@@ -772,8 +772,8 @@ export const scenes = {
       tabStep("Buka panel NikahKit di halaman undangan.", 2.6),
       { caption: "Klik ikon kotak masuk di kepala panel. Pesanan masuk terbuka.", at: ED.inbox, click: true, show: ["inbox"], focus: F.left, mark: INBOX,
         lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
-      { caption: "Klik Link form klien (opsional). Alamat link form tampil.", at: [200, LINK_Y + 25], click: true, show: ["link", "salin"], mark: M(16, LINK_Y, 366, 50),
-        lens: { src: [12, LINK_Y - 5, 374, 220] }, dur: 3.4 },
+      { caption: "Klik Link form klien. Alamat link form tampil.", at: [200, LINK_Y + 25], click: true, show: ["link", "salin"], mark: M(16, LINK_Y, 366, 50),
+        lens: { src: [12, LINK_Y - 5, 374, 204] }, dur: 3.4 },
       { caption: "Klik Salin link form: Tersalin. Tempel di chat WhatsApp klien.", at: mid(SALIN_BOX), click: true, press: "salin", show: ["ok"],
         mark: M(...SALIN_BOX), lens: { src: [12, SALIN_BOX[1] - 62, 374, 108] }, dur: 3.6 }
     ]
@@ -795,7 +795,7 @@ export const scenes = {
       { caption: "Baru: belum dipakai. Sudah diisi: sudah pernah kamu klik.", mark: [M(...nkBadgeBox(331, ROW1 + 19, "Baru", { end: true }), 9),
         M(...nkBadgeBox(331, ROW2 + 19, "Sudah diisi", { end: true }), 9)], lens: { src: [12, LIST_Y - 3, 374, 120] }, dur: 3.2 },
       { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3 },
-      { caption: "Semua kolom terisi sesuai paketnya. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
+      { caption: "Undangan terisi. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
         mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
     ]
   },
