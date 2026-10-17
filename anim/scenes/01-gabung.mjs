@@ -10,7 +10,7 @@
 // extension version numbers: the banner and the ZIP names keep their place, the number is left out. Not measured
 // (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows, Windows Explorer, the
 // Chrome download bubble, folder picker, extension menu and prompt box.
-import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, mid, grow } from "../lib.mjs";
+import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
   svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan
@@ -20,7 +20,7 @@ import {
   CREATE, CREATE_ROW, createMenu, BIZ_BOX, BIZ_ROW, bizMenu
 } from "../ui/scalev.mjs";
 import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
-import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY } from "../ui/marketing.mjs";
+import { brandClosed, brandOpen, mkCards, BOX, MKY, cardXY, SEG, MARKETING_BOX } from "../ui/marketing.mjs";
 import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, accountChip, chipW } from "../ui/gate.mjs";
@@ -514,6 +514,29 @@ const bukuTamuK = () => {
     rect(x + 0.5, 150.5, w - 1, 73, { r: 8, fill: C.white, stroke: C.line }) + text(x + 17, 181, [{ t: n, w: 700 }, ` /${ID} · Belum terbit`], { fill: C.text }) +
     text(x + 17, 201, "Ucapan 0 (tampil 0) · Hadir 0 orang · Tidak 0 · Ragu 0", { size: 14, fill: C.text }) + text(x, 252, "Menampilkan 1–1 dari 1", { size: 12, fill: C.faint });
 };
+// Template > Marketing for an active Kreator in the Nikahin business (panels-style.jsx TemplatePanel + KatalogCard): no
+// cards (Dashboard: the business has one; Landing: hidden for an active Kreator), the team-member hint, then the Katalog
+// Nikahin card (.nk-card: no border, flex column gap 6; description clamped at two lines). st: null | "busy" | "done" |
+// "copied". KAT holds the boxes the steps mark.
+const KAT_URL = "https://nikahin.myscalev.com/katalog-rina-wo";
+const KAT_HINT = wrap("Dashboard tidak perlu dipasang. Bisnis ini sudah punya.", 279, 12, 400, textWidth);
+const KAT_Y = 289 + KAT_HINT.length * 16 + 12;
+const KAT_DESC = clamp("Halaman katalog atas nama merekmu di Nikahin. Klien bayar ke toko Nikahin, kamu dapat komisi 60%.", 279, 2, 12);
+const KAT_BTN = (label) => nkBtnBox(88, KAT_Y + 70, label);
+const KAT = { card: [88, KAT_Y, 279, 106], terbit: KAT_BTN("Terbitkan katalog Nikahin"), perbarui: KAT_BTN("Perbarui katalog"),
+  url: [88, KAT_Y + 116, textWidth(KAT_URL, 12) + 2, 16], salin: nkBtnBox(88, KAT_Y + 136, "Salin", { variant: "quiet" }) };
+function katalogCard(st) {
+  const y = KAT_Y, label = st === "busy" ? "Menerbitkan…" : st ? "Perbarui katalog" : "Terbitkan katalog Nikahin";
+  let s = text(88, y + 15, "Katalog Nikahin", { size: 14, weight: 500 }) + para(88, y + 36, KAT_DESC, { size: 12, fill: C.faint, lh: 16 }) +
+    (st === "busy" ? group({ opacity: 0.6 }, nkBtn(88, y + 70, label)) : nkBtn(88, y + 70, label));
+  if (st === "done" || st === "copied") {
+    s += text(88, y + 128, KAT_URL, { size: 12, fill: C.action, underline: true }) + nkBtn(88, y + 136, "Salin", { variant: "quiet" }) +
+      (st === "copied" ? text(KAT.salin[0] + KAT.salin[2] + 4, y + 158, "Tersalin.", { size: 12, fill: C.faint }) : "");
+  }
+  return s;
+}
+const mkKreator = (st) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) +
+  panelBody(panelBg(), seg("marketing"), brandClosed(BOX), para(88, 301, KAT_HINT, { size: 12, fill: C.faint, lh: 16 }), katalogCard(st));
 
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
 export const scenes = {
@@ -1059,6 +1082,33 @@ export const scenes = {
         mark: krMenuBox("Buku Tamu"), lens: { src: [0, 150, 256, 100], at: [520, 330] }, dur: 3.4 },
       { caption: "Undanganmu tampil: Undangan Rani & Dimas /365671 · Belum terbit.", focus: [[BT.x - 8, 92, BT.w + 16, 180]], at: [760, 186], mark: { box: BT_CARD, r: 8 },
         lens: { src: [BT.x, 144, 560, 86] }, dur: 3.8 }
+    ]
+  },
+
+  // Kreator Nikahin 7: Template > Marketing, kartu Katalog Nikahin (tanpa kartu Landing), Terbitkan, alamat dan Salin.
+  "gabung-kreator-katalog": {
+    title: "Menerbitkan Katalog Nikahin sebagai Kreator",
+    base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvDasar(),
+      nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar"))],
+    els: {
+      mk: { svg: mkKreator(null), enter: "fade", skel: true },
+      busy: { svg: mkKreator("busy"), skel: true },
+      done: { svg: mkKreator("done"), enter: "fade", delay: 0.8, skel: true },
+      copied: { svg: mkKreator("copied"), skel: true }
+    },
+    steps: [
+      { caption: "Buka halaman undanganmu di bisnis Nikahin, tab NikahKit, lalu Template.", focus: [[0, 92, 399, 808]], at: ED.rail.Template, mark: { box: [0, 104, 71, 52], r: 0 },
+        lens: { src: [0, 96, 384, 116], at: [300, 40] }, dur: 3.2 },
+      { caption: "Di Kategori, klik Marketing. Profil merek harus berlabel Terisi.", focus: [[72, 153, 327, 747]], at: SEG.marketing, click: true, show: ["mk"],
+        mark: [{ box: MARKETING_BOX, r: 4 }, { box: [88, BOX, 279, 50], r: 4 }], lens: { src: [80, 161, 295, 116] }, dur: 3.6 },
+      { caption: "Kartu Landing tidak tampil untuk Kreator. Ada kartu Katalog Nikahin.", mark: { box: grow(KAT.card, 4), r: 6 }, lens: { src: grow(KAT.card, 8), at: [430, 200] }, dur: 3.8 },
+      { caption: "Klik Terbitkan katalog Nikahin. Tombol menulis Menerbitkan… sebentar.", at: mid(KAT.terbit), click: true, show: ["busy"], mark: KAT.terbit,
+        lens: { src: grow(KAT.card, 8), at: [430, 200] }, dur: 3.4 },
+      { caption: "Katalog terbit: alamatnya tampil, tombol menjadi Perbarui katalog.", show: ["done"], mark: [KAT.perbarui, { box: KAT.url, r: 2 }],
+        lens: { src: [80, KAT_Y - 8, 295, 190], at: [430, 200] }, dur: 4 },
+      { caption: "Klik Salin, lalu kirim alamat katalog ke klien. Tertulis Tersalin.", at: mid(KAT.salin), click: true, show: ["copied"], mark: KAT.salin,
+        lens: { src: [80, KAT_Y - 8, 295, 190], at: [430, 200] }, dur: 3.6 },
+      { caption: "Profil merek berubah? Klik Perbarui katalog: alamatnya tetap sama.", at: mid(KAT.perbarui), mark: KAT.perbarui, lens: { src: [80, KAT_Y - 8, 295, 190], at: [430, 200] }, dur: 3.6 }
     ]
   },
 
