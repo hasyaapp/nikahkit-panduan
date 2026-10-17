@@ -127,7 +127,7 @@ const PLAN_ROWS = [
   [["Undangan khusus: hanya lewat", "tautan pribadi tamu"], 0, 1, 1],
   [["PIN dashboard dan tautan tamu"], 1, 1, 1],
   [["Semua template saat ini"], 1, 1, 1],
-  [[[{ t: "Custom", w: 700, fill: C.strong }, ": desain Canva-mu jadi"], "template eksklusif"], ["1 desain"], ["15 desain"], ["50 desain"]],
+  [[[{ t: "Custom", w: 700, fill: C.strong }, ": kesempatan request"], "desain"], ["1 kali"], ["15 kali"], ["50 kali"]],
   [["Saat masa aktif habis"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tidak perlu", "perpanjang"]]
 ];
 const PLANS = [["", "Bulanan", "Rp99.000", ["per 30 hari"], "ghost"], ["Paling hemat", "Tahunan", "Rp349.000", ["per tahun, setara", "Rp29.083/bulan"], "primary"], ["", "Sekali Bayar", "Rp799.000", ["sekali bayar, tanpa", "perpanjang"], "ghost"]];
@@ -156,7 +156,7 @@ function planDlg(X, Y, H) {
     r.slice(1).forEach((v, j) => (body += v === 1 ? yesIc(col(j) + 21, y + 22) : v === 0 ? noIc(col(j) + 21, y + 22) : para(col(j) + 12, y + 27, v, { size: 14, weight: 500, fill: C.strong, lh: 20 })));
     y += rowsH[i];
   });
-  body += para(tx, t0 + tH + 20, wrap("Desain custom tambahan Rp50.000 per desain. Belum termasuk biaya layanan Scalev. Perpanjang kapan saja, sisa masa aktif tetap dihitung.", tw0, 12), { size: 12, fill: C.faint, lh: 16 });
+  body += para(tx, t0 + tH + 20, wrap("Request desain custom tambahan Rp50.000 per request. Belum termasuk biaya layanan Scalev. Perpanjang kapan saja, sisa masa aktif tetap dihitung.", tw0, 12), { size: 12, fill: C.faint, lh: 16 });
   const frame = shadow(X, Y, Wd, H, 8, 3) + rect(X, Y, Wd, H, { r: 8, fill: C.white }), close = iconX("x", X + Wd - 30, Y + 30, 18, C.text);
   const svg = frame + clipped(X, Y, Wd, H, body) + close;
   // The window scrolls when the table is taller than it (Custom sits low): frame and body as separate elements, the body
@@ -792,7 +792,7 @@ export const scenes = {
           mark: [t.col(0) + 8, t.t0 + 58, 3 * t.pc - 16, 26], lens: { src: [t.col(0), t.t0 + 34, 3 * t.pc, 86] }, dur: 3.8 },
         { caption: "Tanda silang: kode staff dan impor CSV tidak ada di Bulanan.", at: [t.col(0) + 21, t.rowY[4] + 22],
           mark: [t.tx + 4, t.rowY[4] + 2, 720, t.rowsH[4] + t.rowsH[5] - 4], lens: { src: [t.tx, t.rowY[4] - 4, 728, t.rowsH[4] + t.rowsH[5] + 8], zoom: 1.5 }, dur: 3.8 },
-        { caption: "Gulir ke bawah. Custom: desain Canva-mu jadi template eksklusif.", focus: [t.box], scroll: { id: "tableBody", dy: t.end },
+        { caption: "Gulir ke bawah. Custom: kesempatan request desain, 1, 15, atau 50 kali.", focus: [t.box], scroll: { id: "tableBody", dy: t.end },
           at: [t.col(1) + 40, t.rowY[9] - t.end + 27], mark: [t.tx + 4, t.rowY[9] - t.end + 2, 720, t.rowsH[9] - 4],
           lens: { src: [t.tx, t.rowY[9] - t.end - 4, 728, t.rowsH[9] + 8], zoom: 1.5 }, dur: 4.2 },
         { caption: "Gulir ke atas lagi ke baris harga dan tombol Pilih.", focus: [t.box], scroll: { id: "tableBody", dy: -t.end },
