@@ -99,7 +99,7 @@ function pinDlg(X, Y, o = {}) {
     const biz = o.biz ? [o.biz] : ["Belum terhubung."], bt = Y + c;
     const bL = bt + 40 + 20 * biz.length + 8;
     at.bizCard = [X + 16, bt, 408, bL + 36 + 17 - bt];
-    s += card(bt, bL + 36 + 17 - bt) + text(X + 33, bt + 28, "Bisnis Scalev", { size: 12, weight: 700 }) + para(X + 33, bt + 55, biz, { size: 14, fill: C.text, lh: 20 }) +
+    s += card(bt, bL + 36 + 17 - bt) + text(X + 33, bt + 28, "Bisnis yang dihubungkan", { size: 12, weight: 700 }) + para(X + 33, bt + 55, biz, { size: 14, fill: C.text, lh: 20 }) +
       btn(X + 33, bL, o.biz ? "Hubungkan ulang" : "Hubungkan bisnis Scalev", "quiet", "connect")[0];
     c = bL + 36 + 17 - Y + 12;
   }
@@ -311,9 +311,9 @@ function pinCard(x, y) {
     rect(x + 17, y + 166, 374, 32, { r: 4, fill: C.primarySoft }) + text(x + 29, y + 187, "Pesan tersalin.", { size: 12, fill: C.strong });
 }
 const PIN_MSG_IC = [363, 72, 24, 24], PIN_FIELD = [17, 64, 296, 40], PIN_COPIED = [17, 166, 374, 32];
-// Bisnis Scalev card (linked) over the Landing Pages row of the undangan.
+// Bisnis yang dihubungkan card (linked) over the Landing Pages row of the undangan.
 function lpRowCard(x, y) {
-  return rect(x, y + 10, 408, 121, { r: 8, fill: C.white, stroke: C.line }) + text(x + 16, y + 38, "Bisnis Scalev", { size: 12, weight: 700 }) +
+  return rect(x, y + 10, 408, 121, { r: 8, fill: C.white, stroke: C.line }) + text(x + 16, y + 38, "Bisnis yang dihubungkan", { size: 12, weight: 700 }) +
     text(x + 16, y + 65, BIZ, { size: 14, fill: C.text }) + nkBtn(x + 16, y + 81, "Hubungkan ulang", { variant: "quiet", size: 14, w: tw("Hubungkan ulang", 14, 500) + 24 }) +
     rect(x, y + 160, 408, 120, { r: 6, fill: C.white, stroke: "#e6e8ec" }) + rect(x, y + 160, 408, 34, { r: 6, fill: "#f5f6f8" }) + text(x + 14, y + 182, "Nama Landing Page", { size: 12, fill: "#5b6675" }) + text(x + 294, y + 182, "Mode", { size: 12, fill: "#5b6675" }) +
     text(x + 14, y + 228, PAGE, { size: 14, weight: 500, fill: C.primary }) + rect(x + 294, y + 210, 83, 28, { r: 4, fill: "#e6f4fb" }) + text(x + 335, y + 228, "HTML Mode", { size: 12, weight: 600, fill: "#1f86c2", anchor: "middle" });
@@ -560,7 +560,7 @@ export const scenes = {
     ["4. Masuk dengan Google", "Di tab NikahKit editor Scalev, klik Masuk dengan Google.", PV.gate(GATE_OUT(0), "google")],
     ["5. Bayar membership", "Klik Pilih paket, Pilih, bayar di Scalev, lalu Cek pembayaran.",
       PV.dialog({ paid: true, msg: ["Bayar di tab baru, lalu tekan Cek pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
-    ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis Scalev, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
+    ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis yang dihubungkan, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
   ]),
   "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 1 sampai 4.", [
     ["1. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
@@ -889,7 +889,7 @@ export const scenes = {
     };
   })(),
 
-  // Hubungkan bisnis Scalev: editor, gate, jendela NikahKit, kartu Bisnis Scalev, jendela Scalev, Hubungkan ulang, tutup, Periksa lagi.
+  // Hubungkan bisnis Scalev: editor, gate, jendela NikahKit, kartu Bisnis yang dihubungkan, jendela Scalev, Hubungkan ulang, tutup, Periksa lagi.
   "gabung-hubungkan-scalev": (() => {
     const gb = GATE_BIZ(CT);
     const d1 = dlg(LIC_ON), d2 = dlg({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }), SWR = [SW.x, SW.y, SW.w, SW.h];
@@ -910,7 +910,7 @@ export const scenes = {
         { caption: "Klik tab NikahKit. Panel: Hubungkan bisnis Scalev dulu.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, gb.area[1] + gb.area[3] - CT - 44] } },
         { caption: "Klik Hubungkan bisnis Scalev di panel. Jendela NikahKit muncul.", focus: [d1.box], at: mid(gb.at.connect), click: true, show: ["dim", "d1"],
           mark: gb.at.connect, lens: { src: gb.area }, dur: 3.4 },
-        { caption: "Cari kartu Bisnis Scalev, paling bawah: Belum terhubung.", focus: [d1.box], at: [d1.X + 360, d1.at.bizCard[1] + 30], mark: { box: d1.at.bizCard, r: 8 }, lens: { src: grow(d1.at.bizCard, 8) } },
+        { caption: "Cari kartu Bisnis yang dihubungkan, paling bawah: Belum terhubung.", focus: [d1.box], at: [d1.X + 360, d1.at.bizCard[1] + 30], mark: { box: d1.at.bizCard, r: 8 }, lens: { src: grow(d1.at.bizCard, 8) } },
         { caption: "Klik Hubungkan bisnis Scalev di kartu itu. Jendela Scalev terbuka.", focus: [d1.box], at: mid(d1.at.connect), click: true, show: ["login"], mark: d1.at.connect, lens: { src: grow(d1.at.bizCard, 8) }, dur: 3.4 },
         { caption: "Masuk ke Scalev bila diminta, dengan akun pemilik bisnis halamanmu.", at: mid(SW_BTN), click: true, hide: ["login"], show: ["consent"],
           mark: [{ box: SW_BTN, r: 6 }, { box: SW_BIZ, r: 8 }], dur: 3.4 },
@@ -1010,7 +1010,7 @@ export const scenes = {
     ]
   },
 
-  // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (Sekali Bayar aktif), chip, kartu Bisnis Scalev.
+  // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (Sekali Bayar aktif), chip, kartu Bisnis yang dihubungkan.
   "gabung-kreator-masuk": (() => {
     const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, hint: WAIT_HINT });
     const acct = dlg({ license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true });
@@ -1038,7 +1038,7 @@ export const scenes = {
           show: ["open"], mark: GOOGLE_ACCT, note: "Rina WO", dur: 3.8 },
         { caption: "Editor NikahKit terbuka tanpa bayar. Chip akun bertuliskan Sekali Bayar.", at: mid(CHIP), mark: { box: CHIP, r: 14 }, lens: { src: HEAD }, dur: 3.6 },
         { caption: "Klik Sekali Bayar. Jendela akun NikahKit terbuka.", focus: [acct.box], at: mid(CHIP), click: true, show: ["dim2", "acct"], mark: { box: CHIP, r: 14 }, lens: { src: HEAD } },
-        { caption: "Bisnis Scalev: Belum terhubung. Itu normal untuk Kreator, jangan diklik.", mark: [{ box: acct.at.licCard, r: 8 }, { box: acct.at.bizCard, r: 8 }], lens: { src: cards, zoom: 1.3 }, dur: 4.2 },
+        { caption: "Bisnis yang dihubungkan: Belum terhubung. Normal untuk Kreator, jangan diklik.", mark: [{ box: acct.at.licCard, r: 8 }, { box: acct.at.bizCard, r: 8 }], lens: { src: cards, zoom: 1.3 }, dur: 4.2 },
         { caption: "Tutup jendela NikahKit: klik ×, tekan Esc, atau klik area gelap.", focus: [LEFT], at: mid(acct.at.close), click: true, hide: ["acct", "dim2"], mark: acct.at.close, note: "Tutup" }
       ]
     };

@@ -96,7 +96,7 @@ const GATE_EXP_BTN = gExpired.at.choose;
 // The gate's message and buttons (gate area), ending at 278: above the Konten text the gate covers (a focus edge
 // through text under it lets a sliver of that text through the anti-aliased edge).
 const GATE_AREA = [...gExpired.area.slice(0, 3), 278 - gExpired.area[1]];
-// NikahKit account window (ext/pin.html, editor-akun.png): header, email + Keluar, Paket card, Bisnis Scalev card.
+// NikahKit account window (ext/pin.html, editor-akun.png): header, email + Keluar, Paket card, Bisnis yang dihubungkan card.
 const AW = { x: 500, y: 261, w: 440 };
 const AW_LIC = wrap("Langganan habis. Undangan tetap tampil, RSVP dan ucapan berhenti.", 370, 14);
 const AW_PH = 16 + 16 + 8 + AW_LIC.length * 20 + 8 + 36 + 16, AW_BY = AW.y + 92 + AW_PH + 12, AW_H = AW_BY - AW.y + 122 + 16;
@@ -108,7 +108,7 @@ function accountWindow() {
     text(x + 16, y + 76, "rina.wo@gmail.com", { size: 12, weight: 700, fill: C.faint }) + text(x + w - 16, y + 76, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
     rect(x + 16.5, y + 92.5, w - 33, AW_PH, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, y + 92 + 28, "Paket") +
     para(x + 33, y + 92 + 54, AW_LIC, { size: 14, fill: C.warnStrong, lh: 20 }) + nkBtn(x + 33, y + 92 + 40 + AW_LIC.length * 20 + 8, "Pilih paket", { size: 14 }) +
-    rect(x + 16.5, AW_BY + 0.5, w - 33, 121, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, AW_BY + 28, "Bisnis Scalev") +
+    rect(x + 16.5, AW_BY + 0.5, w - 33, 121, { r: 4, fill: C.white, stroke: C.line }) + nkH3(x + 33, AW_BY + 28, "Bisnis yang dihubungkan") +
     text(x + 33, AW_BY + 54, "Rina WO", { size: 14, fill: C.text }) + nkBtn(x + 33, AW_BY + 70, "Hubungkan ulang", { variant: "quiet", size: 14 });
 }
 

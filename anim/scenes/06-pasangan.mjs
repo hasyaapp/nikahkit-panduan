@@ -463,7 +463,7 @@ function pinDialog(revealed) {
   const lihat = nkBtnBox(x + 32, by, "Lihat PIN", { size: 14 });
   s += nkBtn(x + 32, by, "Lihat PIN", { size: 14 }) + nkBtn(x + 32 + lihat[2] + 8, by, "Buat PIN baru", { size: 14, variant: "quiet" });
   const bc = pc + ph2 + 12;
-  s += card(bc, 121) + nkH3(x + 32, bc + 28, "Bisnis Scalev") + text(x + 32, bc + 54, "Rina WO (@rinawo)", { size: 14, fill: C.text }) + nkBtn(x + 32, bc + 70, "Hubungkan ulang", { size: 14, variant: "quiet" });
+  s += card(bc, 121) + nkH3(x + 32, bc + 28, "Bisnis yang dihubungkan") + text(x + 32, bc + 54, "Rina WO (@rinawo)", { size: 14, fill: C.text }) + nkBtn(x + 32, bc + 70, "Hubungkan ulang", { size: 14, variant: "quiet" });
   return { svg: s, lihat, pinCard: [x + 16, pc, 408, ph2], noteY: bc + 133, handover: [x + 390, pc + 80] };
 }
 const DLG_A = pinDialog(false), DLG_B = pinDialog(true);

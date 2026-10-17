@@ -93,7 +93,7 @@ function pinWindow(made) {
     icon("copy", L + 333, y + 84, 18, C.text) + icon("message-circle", L + 373, y + 84, 18, C.text) +
     btn(L + 17, y + 112, "Lihat PIN", { variant: "primary" }) + btn(L + 17 + bw("Lihat PIN") + 8, y + 112, "Buat PIN baru");
   y += ph + 12;
-  s += card(L, y, W2, 120) + nkH3(L + 17, y + 28, "Bisnis Scalev") + text(L + 17, y + 55, "Rina WO (@rinawo)", { size: 14, fill: C.text }) + btn(L + 17, y + 68, "Hubungkan ulang");
+  s += card(L, y, W2, 120) + nkH3(L + 17, y + 28, "Bisnis yang dihubungkan") + text(L + 17, y + 55, "Rina WO (@rinawo)", { size: 14, fill: C.text }) + btn(L + 17, y + 68, "Hubungkan ulang");
   if (made) s += rect(L, y + 132, W2, 38, { r: 4, fill: C.primarySoft }) + text(L + 12, y + 155, "PIN dibuat. Lihat lagi kapan saja lewat Lihat PIN.", { size: 12, fill: C.strong });
   return s;
 }
