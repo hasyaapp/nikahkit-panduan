@@ -127,9 +127,10 @@ const PLAN_ROWS = [
   [["Undangan khusus: hanya lewat", "tautan pribadi tamu"], 0, 1, 1],
   [["PIN dashboard dan tautan tamu"], 1, 1, 1],
   [["Semua template saat ini"], 1, 1, 1],
+  [[[{ t: "Custom", w: 700, fill: C.strong }, ": desain Canva-mu jadi"], "template eksklusif"], ["1 desain"], ["15 desain"], ["50 desain"]],
   [["Saat masa aktif habis"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tenggang 7 hari,", "undangan tetap", "tampil"], ["Tidak perlu", "perpanjang"]]
 ];
-const PLANS = [["", "Bulanan", "Rp79.000", ["per 30 hari"], "ghost"], ["Paling hemat", "Tahunan", "Rp299.000", ["per tahun, setara", "Rp24.917/bulan"], "primary"], ["", "Sekali Bayar", "Rp699.000", ["sekali bayar, tanpa", "perpanjang"], "ghost"]];
+const PLANS = [["", "Bulanan", "Rp99.000", ["per 30 hari"], "ghost"], ["Paling hemat", "Tahunan", "Rp349.000", ["per tahun, setara", "Rp29.083/bulan"], "primary"], ["", "Sekali Bayar", "Rp799.000", ["sekali bayar, tanpa", "perpanjang"], "ghost"]];
 function planDlg(X, Y, H) {
   const Wd = 760, tx = X + 16, tw0 = 728, fc = 247, pc = (tw0 - fc) / 3, col = (i) => tx + fc + i * pc;
   const t0 = Y + 112;
@@ -155,9 +156,14 @@ function planDlg(X, Y, H) {
     r.slice(1).forEach((v, j) => (body += v === 1 ? yesIc(col(j) + 21, y + 22) : v === 0 ? noIc(col(j) + 21, y + 22) : para(col(j) + 12, y + 27, v, { size: 14, weight: 500, fill: C.strong, lh: 20 })));
     y += rowsH[i];
   });
-  body += text(tx, t0 + tH + 20, "Belum termasuk biaya layanan Scalev. Perpanjang kapan saja, sisa masa aktif tetap dihitung.", { size: 12, fill: C.faint });
-  const svg = shadow(X, Y, Wd, H, 8, 3) + rect(X, Y, Wd, H, { r: 8, fill: C.white }) + clipped(X, Y, Wd, H, body) + iconX("x", X + Wd - 30, Y + 30, 18, C.text);
-  return { svg, X, Y, H, box: [X, Y, Wd, H], col, pc, t0, tx, rowY, rowsH, btns, back };
+  body += para(tx, t0 + tH + 20, wrap("Desain custom tambahan Rp50.000 per desain. Belum termasuk biaya layanan Scalev. Perpanjang kapan saja, sisa masa aktif tetap dihitung.", tw0, 12), { size: 12, fill: C.faint, lh: 16 });
+  const frame = shadow(X, Y, Wd, H, 8, 3) + rect(X, Y, Wd, H, { r: 8, fill: C.white }), close = iconX("x", X + Wd - 30, Y + 30, 18, C.text);
+  const svg = frame + clipped(X, Y, Wd, H, body) + close;
+  // The window scrolls when the table is taller than it (Custom sits low): frame and body as separate elements, the body
+  // clipped to the window (clip on the element, so a scroll step moves only the content); end = scroll to the bottom.
+  const clip = (id) => `<style>.e-${id}{clip-path:url(#cl-${id})}</style><defs><clipPath id="cl-${id}"><rect x="${X}" y="${Y}" width="${Wd}" height="${H}"/></clipPath></defs>`;
+  const end = Math.max(0, 112 + tH + 40 - H);
+  return { svg, frame: frame + close, body, clip, end, X, Y, H, box: [X, Y, Wd, H], col, pc, t0, tx, rowY, rowsH, btns, back };
 }
 const table = () => planDlg((W - 760) / 2, CT + 16, VIEW - 32);
 
@@ -255,7 +261,7 @@ const LP_NAME = (y) => [585, y + 358, tw(LP_ROWS[0][0], 14, 500), 18]; // first 
 const LP_ALL = (y) => [297, y + 328, 207, 36];
 const SLUG_FIELD = (T) => [SLUG_BOX[0], T + SLUG_BOX[1], SLUG_BOX[2], SLUG_BOX[3]];
 const settingsP = () => settingsPanel({}) + slugText(SLUG);
-// Scalev PayLink invoice page (nikahin.myscalev.com/pay/…, labels as seen live), Tahunan Rp299.000, in the viewport.
+// Scalev PayLink invoice page (nikahin.myscalev.com/pay/…, labels as seen live), Tahunan Rp349.000, in the viewport.
 const PAY = { x: W / 2 - 250, w: 500 }, PAY_BTN = [PAY.x + 24, CT + 500, PAY.w - 48, 48], PAY_CARD = [PAY.x, CT + 30, PAY.w, 560];
 const payPage = () => {
   const L = PAY.x + 24, R = PAY.x + PAY.w - 24, f = { size: 14, fill: C.strong }, sm = { size: 12, fill: C.faint }, rule = (y) => line(PAY.x, y + 0.5, PAY.x + PAY.w, y + 0.5, { stroke: "#eef0f3" });
@@ -264,8 +270,8 @@ const payPage = () => {
   return rect(0, CT, W, VIEW, { fill: "#f5f6f8" }) + rect(PAY.x, CT + 30, PAY.w, 560, { r: 10, fill: C.white, stroke: "#e6e8ec" }) +
     text(cx, CT + 66, "Nikahin", { size: 18, weight: 700, fill: C.strong, anchor: "middle" }) + rule(CT + 86) +
     text(L, CT + 112, "RINGKASAN PESANAN", { ...sm, weight: 700 }) + text(R, CT + 112, "Invoice #261014KXRWQPT", { ...sm, anchor: "end" }) +
-    text(L, CT + 138, "NikahKit Membership - Tahunan", f) + text(R, CT + 138, "Rp299.000", { ...f, anchor: "end" }) + text(L, CT + 156, "1 x Rp299.000", sm) +
-    text(L, CT + 184, "Total Tagihan", { ...f, weight: 700 }) + text(R, CT + 184, "Rp299.000", { size: 16, weight: 700, fill: C.strong, anchor: "end" }) + rule(CT + 200) +
+    text(L, CT + 138, "NikahKit Membership - Tahunan", f) + text(R, CT + 138, "Rp349.000", { ...f, anchor: "end" }) + text(L, CT + 156, "1 x Rp349.000", sm) +
+    text(L, CT + 184, "Total Tagihan", { ...f, weight: 700 }) + text(R, CT + 184, "Rp349.000", { size: 16, weight: 700, fill: C.strong, anchor: "end" }) + rule(CT + 200) +
     text(L, CT + 224, "BAYAR SEBELUM 17 OKT 2026, 09.30", { size: 12, weight: 700, fill: C.strong }) + text(R, CT + 224, "Sisa waktu 71:58:43", { ...sm, anchor: "end" }) +
     text(L, CT + 254, "PILIH METODE PEMBAYARAN", { ...sm, weight: 700 }) + opt(L, CT + 266, PAY.w - 48, "QRIS") +
     text(L, CT + 326, "Virtual Account", { ...sm, weight: 700 }) + opt(L, CT + 338, half, "BCA") + opt(L + half + 10, CT + 338, half, "BNI") +
@@ -772,7 +778,8 @@ export const scenes = {
         gate: { svg: gateEl(g), enter: "fade", skel: true },
         dim: { svg: DIM, enter: "fade" },
         d0: { svg: d0.svg, enter: "pop", origin: mid(d0.box) },
-        table: { svg: t.svg, enter: "pop", origin: mid(t.box) },
+        table: { svg: t.frame, enter: "pop", origin: mid(t.box) },
+        tableBody: { svg: t.clip("tableBody") + t.body, enter: "pop", origin: mid(t.box) },
         pay: { svg: payTab(), enter: "fade", skel: true }
       },
       steps: [
@@ -780,12 +787,18 @@ export const scenes = {
         { caption: "Klik tab NikahKit di samping Settings. Panel NikahKit terbuka.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
         { caption: "Akun belum berlangganan? Klik Pilih paket. Muncul kartu Paket.", focus: [d0.box], at: mid(g.at.choose), click: true, show: ["dim", "d0"],
           mark: g.at.choose, lens: { src: g.area }, dur: 3.4 },
-        { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", focus: [t.box], at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table"], mark: d0.at.choose, note: "Pilih paket", dur: 3.4 },
-        { caption: "Baca tabelnya: Bulanan Rp79.000, Tahunan Rp299.000, Sekali Bayar Rp699.000.", focus: [t.box], at: [t.col(1) + 60, t.t0 + 70],
+        { caption: "Klik Pilih paket di kartu Paket. Tabel Pilih paket muncul.", focus: [t.box], at: mid(d0.at.choose), click: true, hide: ["d0"], show: ["table", "tableBody"], mark: d0.at.choose, note: "Pilih paket", dur: 3.4 },
+        { caption: "Baca tabelnya: Bulanan Rp99.000, Tahunan Rp349.000, Sekali Bayar Rp799.000.", focus: [t.box], at: [t.col(1) + 60, t.t0 + 70],
           mark: [t.col(0) + 8, t.t0 + 58, 3 * t.pc - 16, 26], lens: { src: [t.col(0), t.t0 + 34, 3 * t.pc, 86] }, dur: 3.8 },
         { caption: "Tanda silang: kode staff dan impor CSV tidak ada di Bulanan.", at: [t.col(0) + 21, t.rowY[4] + 22],
           mark: [t.tx + 4, t.rowY[4] + 2, 720, t.rowsH[4] + t.rowsH[5] - 4], lens: { src: [t.tx, t.rowY[4] - 4, 728, t.rowsH[4] + t.rowsH[5] + 8], zoom: 1.5 }, dur: 3.8 },
-        { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", focus: [PAY_CARD], at: mid(t.btns[1]), click: true, hide: ["table", "dim"], show: ["pay"], mark: t.btns[1], note: "Pilih", dur: 4 }
+        { caption: "Gulir ke bawah. Custom: desain Canva-mu jadi template eksklusif.", focus: [t.box], scroll: { id: "tableBody", dy: t.end },
+          at: [t.col(1) + 40, t.rowY[9] - t.end + 27], mark: [t.tx + 4, t.rowY[9] - t.end + 2, 720, t.rowsH[9] - 4],
+          lens: { src: [t.tx, t.rowY[9] - t.end - 4, 728, t.rowsH[9] + 8], zoom: 1.5 }, dur: 4.2 },
+        { caption: "Gulir ke atas lagi ke baris harga dan tombol Pilih.", focus: [t.box], scroll: { id: "tableBody", dy: -t.end },
+          at: mid(t.btns[1]), mark: [t.col(0) + 8, t.t0 + 112, 3 * t.pc - 16, 56], dur: 3 },
+        { caption: "Klik Pilih di kolom paket yang kamu mau. Halaman bayar terbuka di tab baru.", focus: [PAY_CARD], at: mid(t.btns[1]), click: true,
+          hide: ["table", "tableBody", "dim"], show: ["pay"], mark: t.btns[1], note: "Pilih", dur: 4 }
       ]
     };
   })(),
