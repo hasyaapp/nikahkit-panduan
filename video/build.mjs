@@ -27,7 +27,7 @@ let key = null, billed = 0;
 async function tts(text) {
   const file = path.join(CACHE, crypto.createHash("sha256").update(JSON.stringify([VOICE, MODEL, LANG, text])).digest("hex").slice(0, 16) + ".mp3");
   if (fs.existsSync(file)) return file;
-  key ??= run("security", ["find-generic-password", "-s", "nikahin-elevenlabs", "-a", "api", "-w"]).trim();
+  key ??= run("security", ["find-generic-password", "-s", process.env.ELEVEN_KEYCHAIN || "nikahin-elevenlabs", "-a", "api", "-w"]).trim();
   const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE}`, { method: "POST",
     headers: { "xi-api-key": key, "content-type": "application/json" }, body: JSON.stringify({ text, model_id: MODEL, language_code: LANG }) });
   if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${(await res.text()).slice(0, 300)}`);
