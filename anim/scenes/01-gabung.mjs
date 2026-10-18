@@ -780,7 +780,7 @@ export const scenes = {
           show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [out.X + 8, out.at.hint[1] - 36, 424, 64] }, dur: 4.4 },
         { caption: "Pilih akun Google: klik akunmu. Jendela Google menutup sendiri.", focus: "none", at: mid(ACCT), click: true, hide: ["google", "chk", "out"], show: ["inn"],
           mark: ACCT, note: "Rina WO", dur: 3.6 },
-        { caption: "Lihat jendela NikahKit: email Google-mu, Keluar, kartu Paket dan Bisnis.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X + 8, inn.Y + 56, 424, inn.at.licCard[1] + inn.at.licCard[3] + 8 - inn.Y - 56] }, dur: 3.6 },
+        { caption: "Lihat jendela NikahKit: email, Keluar, kartu Paket dan Bisnis yang dihubungkan.", focus: [inn.box], mark: inn.at.email, lens: { src: [inn.X + 8, inn.Y + 56, 424, inn.at.licCard[1] + inn.at.licCard[3] + 8 - inn.Y - 56] }, dur: 3.6 },
         { caption: "Di bawah kartu tertulis Sudah masuk. Kembali ke editor Scalev.", mark: inn.at.msg, lens: { src: [inn.X, inn.at.msg[1] - 12, 440, 62] }, dur: 3.4 }
       ]
     };

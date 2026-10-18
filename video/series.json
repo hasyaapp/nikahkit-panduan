@@ -14,5 +14,24 @@
     ],
     "intro": "Halo, selamat datang di panduan Kreator Nikahin. Di video ini kita mulai dari menerima undangan Scalev, membuat undangan dengan NikahKit, sampai klien memesan dan membayar di halaman jualanmu.",
     "outro": "Selesai. Sekarang halaman jualanmu siap dibagikan, dan setiap pesanan lunas tercatat untuk komisimu. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan. Sampai jumpa di video berikutnya."
+  },
+  {
+    "slug": "panduan-member-nikahkit",
+    "title": "Member NikahKit: dari masuk sampai undangan pertama terbit",
+    "chapters": [
+      ["gabung-masuk-google", "Masuk ke NikahKit"],
+      ["gabung-bayar-paket", "Pilih paket dan bayar"],
+      ["gabung-hubungkan-scalev", "Hubungkan bisnis Scalev"],
+      ["scalev-buat-halaman-html", "Buka Landing Pages"],
+      ["scalev-lp-html", "Buat halaman HTML Mode"],
+      ["scalev-slug-isi", "Isi slug"],
+      ["scalev-slug-simpan", "Simpan halaman"],
+      ["editor-pilih-template", "Pilih template"],
+      ["editor-isi-mempelai-pratinjau", "Isi Konten"],
+      ["scalev-terbitkan", "Simpan & Terbitkan"],
+      ["scalev-bagikan-salin", "Salin tautan undangan"]
+    ],
+    "intro": "Halo, ini panduan member NikahKit. Pastikan NikahKit sudah terpasang di Chrome komputermu. Kita mulai dari masuk sampai undangan pertamamu terbit.",
+    "outro": "Selesai. Undangan pertamamu sudah terbit dan siap dibagikan. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan."
   }
 ]
