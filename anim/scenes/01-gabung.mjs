@@ -475,11 +475,11 @@ const tawaran = () => {
 const VF = { x: 520, y: 290, w: 400, h: 300 }, VF_BOX = [VF.x, VF.y, VF.w, VF.h];
 const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, fill: C.white }) + circle(720, VF.y + 70, 28, { fill: "#25d366" }) + iconX("message-circle", 720, VF.y + 70, 26, C.white) +
   bars(560, VF.y + 126, [320]) + bars(600, VF.y + 152, [240]) + bars(580, VF.y + 178, [280]) + rect(VF.x + 40, VF.y + 226, VF.w - 80, 44, { r: 6, fill: "#25d366" }) + rect(640, VF.y + 243, 160, 10, { r: 5, fill: "rgba(255,255,255,.6)" });
-// NikahKit panel head for a Kreator: the plan chip reads Sekali Bayar (wider than kit nkHead's fixed chip); the inbox icon
-// only once the page holds an invitation (App.jsx: ready).
-const SB = "Sekali Bayar", CHX = 341 - chipW(SB), CHIP_K = [CHX, 108, chipW(SB), 28];
+// NikahKit panel head for a Kreator: the account chip reads Kreator for an active Kreator seat (App.jsx AccountChip); the
+// inbox icon only once the page holds an invitation (App.jsx: ready).
+const KR_CHIP = "Kreator", CHX = 341 - chipW(KR_CHIP), CHIP_K = [CHX, 108, chipW(KR_CHIP), 28];
 const headK = (title, inbox) => rect(72, 92, 327, 61, { fill: C.white }) + text(88, 128, title, { size: 16, weight: 700, fill: C.strong }) +
-  (inbox ? icon("inbox", CHX - 20, 122, 18, C.text) : "") + accountChip(CHX, 108, SB) + iconX("x", 368, 122, 18, C.text);
+  (inbox ? icon("inbox", CHX - 20, 122, 18, C.text) : "") + accountChip(CHX, 108, KR_CHIP) + iconX("x", 368, 122, 18, C.text);
 // Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
 // and Media.
 const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
@@ -1005,7 +1005,7 @@ export const scenes = {
     ]
   },
 
-  // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (Sekali Bayar aktif), chip, kartu Bisnis yang dihubungkan.
+  // Kreator Nikahin 4: tab NikahKit, Masuk dengan Google, jendela menutup sendiri (paket aktif), chip Kreator, kartu Bisnis yang dihubungkan.
   "gabung-kreator-masuk": (() => {
     const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, hint: WAIT_HINT });
     const acct = dlg({ license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true });
@@ -1029,11 +1029,11 @@ export const scenes = {
         { caption: "Klik tab NikahKit. Panel menampilkan Masuk ke NikahKit.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
         { caption: "Klik Masuk dengan Google. Tertulis Pilih akun di jendela Google yang terbuka.", focus: "none", at: mid(g.at.google), click: true,
           show: ["dim", "chk", "out", "google"], mark: g.at.google, lens: { src: [out.X + 8, out.at.hint[1] - 36, 424, 64] }, dur: 4.4 },
-        { caption: "Pilih akunmu. Paket Sekali Bayar sudah aktif: jendela menutup sendiri.", focus: [LEFT], at: mid(GOOGLE_ACCT), click: true, hide: ["google", "chk", "out", "dim"],
+        { caption: "Pilih akunmu. Paketmu sudah aktif, jadi jendela menutup sendiri.", focus: [LEFT], at: mid(GOOGLE_ACCT), click: true, hide: ["google", "chk", "out", "dim"],
           show: ["open"], mark: GOOGLE_ACCT, note: "Rina WO", dur: 3.8 },
-        { caption: "Editor NikahKit terbuka tanpa bayar. Chip akun bertuliskan Sekali Bayar.", at: mid(CHIP), mark: { box: CHIP, r: 14 }, lens: { src: HEAD }, dur: 3.6 },
-        { caption: "Klik Sekali Bayar. Jendela akun NikahKit terbuka.", focus: [acct.box], at: mid(CHIP), click: true, show: ["dim2", "acct"], mark: { box: CHIP, r: 14 }, lens: { src: HEAD } },
-        { caption: "Bisnis yang dihubungkan: Belum terhubung. Normal untuk Kreator, jangan diklik.", mark: [{ box: acct.at.licCard, r: 8 }, { box: acct.at.bizCard, r: 8 }], lens: { src: cards, zoom: 1.3 }, dur: 4.2 },
+        { caption: "Editor NikahKit terbuka tanpa bayar. Chip akun bertuliskan Kreator.", at: mid(CHIP), mark: { box: CHIP, r: 14 }, lens: { src: HEAD }, dur: 3.6 },
+        { caption: "Klik Kreator. Jendela akun NikahKit terbuka.", focus: [acct.box], at: mid(CHIP), click: true, show: ["dim2", "acct"], mark: { box: CHIP, r: 14 }, lens: { src: HEAD } },
+        { caption: "Paket Sekali Bayar aktif. Bisnis yang dihubungkan: Belum terhubung, biarkan.", mark: [{ box: acct.at.licCard, r: 8 }, { box: acct.at.bizCard, r: 8 }], lens: { src: cards, zoom: 1.3 }, dur: 4.2 },
         { caption: "Tutup jendela NikahKit: klik ×, tekan Esc, atau klik area gelap.", focus: [LEFT], at: mid(acct.at.close), click: true, hide: ["acct", "dim2"], mark: acct.at.close, note: "Tutup" }
       ]
     };

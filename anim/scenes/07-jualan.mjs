@@ -503,31 +503,53 @@ const fy = (v) => v - FY0;
 const fieldBox = (y) => [41.5, fy(y), 307, 48];
 const btnBox = (y) => [41.5, fy(y), 307, 52];
 
-// Landing Kreator's pay card (#payCard, central mode) on a phone: picks, contact, Cara bayar and the bayar button, then
-// the QRIS panel (#payBox) on the same page. Labels from server/pages/src/landing/index.html; amounts are example data.
+// Landing Kreator's pay card (#payCard, central mode) on a phone: Paket and Tambahan from shared/paket.json, Desain,
+// contact, Cara bayar and the bayar button (one tall page, PAY_Y2 = the view scrolled to the contact fields), then the
+// QRIS panel (#payBox) on the same page, then /order?k=&paket= (Data undangan) after payment. Labels from
+// server/pages/src/landing/index.html, src/order and shared/order-form.js; the service fee is example data.
 const payField = (y, label, val) => text(20, y, label, { size: 14, weight: 700, fill: LP.cocoa }) +
   rect(20, y + 8, 350, 44, { r: 10, fill: LP.paper, stroke: LP.line, sw: 1.5 }) + text(34, y + 36, val, { size: 15, fill: LP.ink });
-const payPick = (y, name, price, on) => rect(20, y, 350, 46, { r: 12, fill: on ? LP.tint : LP.paper, stroke: on ? LP.cocoa : LP.line, sw: on ? 2 : 1.5 }) +
-  circle(42, y + 23, 8, { fill: on ? LP.cocoa : LP.paper, stroke: LP.cocoa, sw: 1.5 }) + text(60, y + 28, name, { size: 15, weight: 700, fill: LP.cocoa }) +
-  text(354, y + 28, price, { size: 15, fill: LP.muted, anchor: "end" });
-const PAY_BTN = [20, 560, 350, 52];
-const payForm = body(rect(0, 0, 390, 844, { fill: LP.paper }), h(20, 44, "Pesan undangan", 26, { weight: 600 }),
-  text(20, 86, "Paket", { size: 14, weight: 700, fill: LP.cocoa }), payPick(96, "Paket Basic", "Rp150.000", true), payPick(150, "Paket Premium", "Rp350.000", false),
-  text(20, 228, "Pilihan kalian: desain Dasar", { size: 14, fill: LP.muted }),
-  payField(262, "Nama pemesan", "Rani Ayu"), payField(336, "Nomor WhatsApp", "081234567890"), payField(410, "Email", "rani@contoh.com"),
-  payField(484, "Cara bayar", "QRIS"), lpBtn(PAY_BTN[0], PAY_BTN[1], "bayar Rp151.050", { solid: true, w: 350 }),
-  text(20, 640, "Termasuk biaya layanan Rp1.050.", { size: 14, fill: LP.muted }), text(20, 668, "Sesudah lunas, form data undangan langsung terbuka.", { size: 13, fill: LP.muted }));
+// .pick: input, name, price (b) at the right; a checked pick takes the tint and the accent border.
+const payPick = (y, name, price, on, box) => rect(20, y, 350, 48, { r: 12, fill: on ? LP.tint : LP.paper, stroke: on ? LP.accent : LP.line, sw: on ? 2 : 1.5 }) +
+  (box ? rect(32, y + 14, 20, 20, { r: 4, fill: LP.paper, stroke: LP.muted, sw: 1.5 })
+    : circle(42, y + 24, 9, { fill: LP.paper, stroke: on ? LP.accent : LP.muted, sw: 1.5 }) + (on ? circle(42, y + 24, 5, { fill: LP.accent }) : "")) +
+  text(60, y + 29, name, { size: 15, fill: LP.ink }) + text(358, y + 29, price, { size: 15, weight: 700, fill: LP.ink, anchor: "end" });
+const PAY_PLANS = [["Undangan Inti", "Rp129.000"], ["Paket Lengkap", "Rp229.000"], ["Paket Istimewa", "Rp379.000"]];
+const PAY_ADDONS = [["Live streaming & video", 35], ["Kado & rekening tambahan", 25], ["Ngunduh mantu", 35], ["Warna, font & bingkai Story IG", 35],
+  ["QR check-in & layar sapa", 50], ["Undangan khusus", 35], ["Tayang selama Nikahin aktif", 50], ["Dibantu sampai jadi (1x24 jam)", 75]];
+const PAY_TOP = 120, PAY_ADD = 320, PAY_DESIGN = 780, PAY_FIELDS = 852, PAY_Y2 = 760;
+const PAY_BTN = [20, 1146, 350, 52];
+const payForm = body(rect(0, 0, 390, PAY_Y2 + 844, { fill: LP.paper }), h(20, 44, "Pesan dan bayar", 26, { weight: 600 }),
+  text(20, 72, "Bayar online, lalu isi data undangan.", { size: 14, fill: LP.muted }),
+  text(20, PAY_TOP - 10, "Paket", { size: 14, weight: 700, fill: LP.cocoa }), PAY_PLANS.map(([n, p], i) => payPick(PAY_TOP + i * 56, n, p, i === 0)).join(""),
+  text(20, PAY_ADD - 10, "Tambahan", { size: 14, weight: 700, fill: LP.cocoa }), PAY_ADDONS.map(([n, k], i) => payPick(PAY_ADD + i * 56, n, `+Rp${k}.000`, false, true)).join(""),
+  rect(20, PAY_DESIGN, 350, 44, { r: 12, fill: LP.tint }), text(34, PAY_DESIGN + 28, "Desain: Dasar", { size: 15, weight: 700, fill: LP.ink }),
+  payField(PAY_FIELDS, "Nama pemesan", "Rani Ayu"), payField(PAY_FIELDS + 74, "Nomor WhatsApp", "081234567890"), payField(PAY_FIELDS + 148, "Email", "rani@contoh.com"),
+  payField(PAY_FIELDS + 222, "Cara bayar", "QRIS"), lpBtn(PAY_BTN[0], PAY_BTN[1], "bayar Rp129.903", { solid: true, w: 350 }),
+  text(20, 1224, "Termasuk biaya layanan Rp903.", { size: 14, fill: LP.muted }), text(20, 1252, "Sesudah lunas, form data undangan langsung terbuka.", { size: 13, fill: LP.muted }));
 const qrDots = (x, y, n, c) => { let d = ""; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (((i * 7 + j * 13 + i * j) % 5) < 2) d += `M${x + j * c} ${y + i * c}h${c}v${c}h-${c}z`;
   const eye = (ex, ey) => rect(ex, ey, c * 7, c * 7, { fill: LP.ink }) + rect(ex + c, ey + c, c * 5, c * 5, { fill: "#fff" }) + rect(ex + c * 2, ey + c * 2, c * 3, c * 3, { fill: LP.ink });
   return rect(x - 4, y - 4, n * c + 8, n * c + 8, { fill: "#fff" }) + `<path d="${d}" fill="${LP.ink}"/>` + rect(x, y, c * 8, c * 8, { fill: "#fff" }) + rect(x + (n - 8) * c, y, c * 8, c * 8, { fill: "#fff" }) +
     rect(x, y + (n - 8) * c, c * 8, c * 8, { fill: "#fff" }) + eye(x, y) + eye(x + (n - 7) * c, y) + eye(x, y + (n - 7) * c); };
-const QR_SAVE = [95, 334, 200, 46], PAY_TOTAL = [20, 404, 350, 40], PAY_WAIT = [20, 560, 350, 80];
-const payBox = body(rect(0, 0, 390, 844, { fill: LP.paper }), h(20, 44, "Pesan undangan", 26, { weight: 600 }), qrDots(85, 80, 29, 7.5),
+const QR_SAVE = [95, 334, 200, 46], PAY_TOTAL = [20, 404, 350, 40], PAY_WAIT = [20, 588, 350, 80];
+const payBox = body(rect(0, 0, 390, 844, { fill: LP.paper }), h(20, 44, "Pesan dan bayar", 26, { weight: 600 }), qrDots(85, 80, 29, 7.5),
   lpBtn(QR_SAVE[0], QR_SAVE[1], "simpan gambar QR", { small: true, w: QR_SAVE[2] }),
-  text(20, 418, "Total bayar", { size: 14, fill: LP.muted }), h(20, 444, "Rp151.050", 26, { weight: 600 }), text(20, 476, "Termasuk biaya layanan Rp1.050.", { size: 14, fill: LP.muted }),
+  text(20, 418, "Total bayar", { size: 14, fill: LP.muted }), h(20, 444, "Rp129.903", 26, { weight: 600 }), text(20, 476, "Termasuk biaya layanan Rp903.", { size: 14, fill: LP.muted }),
   para(20, 504, ["1. Buka m-banking atau dompet digital, pilih", "bayar dengan QRIS.", "2. Pindai kode ini. Bayar dari HP ini? Simpan", "gambarnya, lalu unggah dari galeri."], { size: 12, fill: LP.ink, lh: 13 }),
-  circle(28, 582, 5, { fill: LP.accent }), text(42, 587, "Menunggu pembayaran", { size: 15, weight: 700, fill: LP.cocoa }),
-  text(20, 614, "Sesudah lunas, halaman ini pindah sendiri ke form data", { size: 13, fill: LP.muted }), text(20, 632, "undangan.", { size: 13, fill: LP.muted }));
+  text(20, 574, ["Bayar sebelum ", { t: "19 Okt 2026, 15.30", w: 700 }], { size: 13, fill: LP.muted }),
+  circle(28, 607, 5, { fill: LP.accent }), text(42, 612, "Menunggu pembayaran", { size: 15, weight: 700, fill: LP.cocoa }),
+  text(20, 639, "Sesudah lunas, halaman ini pindah sendiri ke form data", { size: 13, fill: LP.muted }), text(20, 657, "undangan.", { size: 13, fill: LP.muted }));
+// /order?k=<kode>&paket=inti&desain=Dasar: Nikahin header, Data undangan, step 1 of 10 (Pesanan) with the paid plan.
+const ORDER_PAID = [20, 388, 350, 28];
+const orderPaid = body(rect(0, 0, 390, 844, { fill: LP.paper }), h(20, 52, "Nikahin", 24, { weight: 700 }), dash(0, 74, 390),
+  h(20, 140, "Data undangan", 34, { weight: 600 }),
+  para(20, 172, ["Isi data untuk pesanan yang sudah dibayar. Yang", "belum siap boleh dikosongkan dan dilengkapi", "lewat WhatsApp."], { size: 15, fill: LP.muted, lh: 22 }),
+  rect(20, 248, 350, 260, { r: 16, fill: LP.paper, stroke: LP.line, sw: 1.5 }),
+  Array.from({ length: 10 }, (_, i) => rect(36 + i * 32, 270, 28, 6, { r: 3, fill: i ? LP.dash : "#ff6f1e" })).join(""),
+  text(36, 296, "Langkah 1 dari 10 · Pesanan", { size: 13, weight: 600, fill: LP.muted }),
+  h(36, 340, "Pesanan", 22, { weight: 600 }), text(36, 366, "Sesuai pembayaran kalian.", { size: 15, fill: LP.muted }),
+  text(36, 408, "Undangan Inti, desain Dasar", { size: 15, weight: 700, fill: LP.ink }),
+  lpBtn(36, 436, "lanjut", { w: 120 }));
 
 export const scenes = {
   // ---------------------------------------------------------------- alur-dengan-klien
@@ -627,16 +649,21 @@ export const scenes = {
     title: "Klien membayar di Landing Kreator",
     base: phBase(payForm),
     els: {
+      v2: { svg: onPhone(scr(PAY_Y2, payForm)), enter: "fade", delay: 0.1 },
       box: { svg: onPhone(payBox), enter: "fade", delay: 0.2 },
-      f2: { svg: onPhone(scr(FORM_Y, LAND, F2.svg)), enter: "fade", delay: 0.2 }
+      order: { svg: onPhone(orderPaid), enter: "fade", delay: 0.2 }
     },
     steps: [
-      { caption: "Klien memilih paket. Pilihan desainnya ikut tercatat.", focus: PHF, mark: QM(20, 96, 350, 46, 12), lens: lensBy(QR(14, 76, 362, 160), "l", 1.2), dur: 3.2 },
-      { caption: "Isi Nama pemesan, Nomor WhatsApp, Email, dan Cara bayar.", mark: QM(14, 246, 362, 296, 10), lens: lensBy(QR(14, 246, 362, 296), "l", 1), dur: 3.6 },
-      { caption: "Klik bayar: total sudah termasuk biaya layanan.", at: Q(195, 586), click: true, mark: QM(...PAY_BTN, 20), lens: lensBy(QR(14, 552, 362, 96), "r", 1.4), dur: 3.4 },
-      { caption: "Kode QRIS tampil di halaman yang sama, dengan simpan gambar QR.", show: ["box"], mark: QM(80, 75, 230, 310, 10), lens: lensBy(QR(80, 75, 230, 310), "l", 1), dur: 3.6 },
-      { caption: "Total bayar dan Menunggu pembayaran. Virtual account: salin nomor.", mark: [QM(...PAY_TOTAL, 6), QM(...PAY_WAIT, 6)], lens: lensBy(QR(14, 400, 362, 236), "r", 1.2), dur: 4 },
-      { caption: "Sesudah lunas, form data undangan terbuka sendiri.", hide: ["box"], show: ["f2"], mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 12, 320, 94), "r", 1.4), dur: 3.6 }
+      { caption: "Klien memilih paket dan tambahan. Harganya tampil di tiap pilihan.", focus: PHF, mark: QM(20, PAY_TOP - 30, 350, 190, 12),
+        lens: lensBy(QR(14, PAY_TOP - 34, 362, 198), "l", 1.1), dur: 3.4 },
+      { caption: "Desain dari katalog tertulis. Isi nama, WhatsApp, Email, dan Cara bayar.", show: ["v2"],
+        mark: [QM(20, PAY_DESIGN - PAY_Y2, 350, 44, 12), QM(14, PAY_FIELDS - PAY_Y2 - 20, 362, 296, 10)], lens: lensBy(QR(14, PAY_DESIGN - PAY_Y2 - 6, 362, 352), "l", 1), dur: 3.8 },
+      { caption: "Klik bayar: total sudah termasuk biaya layanan.", at: Q(195, PAY_BTN[1] - PAY_Y2 + 26), click: true, mark: QM(PAY_BTN[0], PAY_BTN[1] - PAY_Y2, PAY_BTN[2], PAY_BTN[3], 20),
+        lens: lensBy(QR(14, PAY_BTN[1] - PAY_Y2 - 8, 362, 96), "r", 1.4), dur: 3.4 },
+      { caption: "Kode QRIS tampil di halaman yang sama, dengan simpan gambar QR.", hide: ["v2"], show: ["box"], mark: QM(80, 75, 230, 310, 10), lens: lensBy(QR(80, 75, 230, 310), "l", 1), dur: 3.6 },
+      { caption: "Total bayar, batas bayar, dan Menunggu pembayaran. VA: salin nomor.", mark: [QM(...PAY_TOTAL, 6), QM(...PAY_WAIT, 6)], lens: lensBy(QR(14, 400, 362, 268), "r", 1.1), dur: 4 },
+      { caption: "Sesudah lunas, halaman pindah ke form Data undangan sesuai paketnya.", hide: ["box"], show: ["order"], mark: QM(...ORDER_PAID, 6),
+        lens: lensBy(QR(20, 310, 350, 120), "r", 1.4), dur: 3.8 }
     ]
   },
 
