@@ -69,5 +69,55 @@
     ],
     "intro": "Halo, ini panduan Dashboard pasangan. Pertama member memasang dashboardnya, lalu pengantin masuk dengan PIN, mengirim undangan ke tamu, membalas ucapan, dan mencatat tamu yang datang di hari H.",
     "outro": "Selesai. Dengan Dashboard pasangan, pengantin bisa mengirim undangan dan memantau tamu dari HP. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan."
+  },
+  {
+    "slug": "kreator-minta-kursi",
+    "title": "Kreator Nikahin: Minta kursi",
+    "chapters": [
+      ["gabung-kreator-kursi-minta", "Minta kursi"],
+      ["gabung-kreator-kursi-milikmu", "Pakai dan lepas kursi"]
+    ],
+    "intro": "Halo, Kreator Nikahin. Di video ini kita minta kursi Kreator di papan, memakainya, lalu melepasnya.",
+    "outro": "Selesai. Sekarang kamu tahu cara minta, memakai, dan melepas kursi Kreator."
+  },
+  {
+    "slug": "kreator-komisi",
+    "title": "Kreator Nikahin: Penjualan dan komisi",
+    "chapters": [
+      ["gabung-kreator-komisi", "Penjualan katalog"]
+    ],
+    "intro": "Halo, Kreator Nikahin. Di video ini kita lihat penjualan dan komisi 60 persen dari Landing-mu.",
+    "outro": "Komisi ditransfer per pesanan, dua hari kerja setelah klien membayar, ke rekening komisi yang kamu daftarkan."
+  },
+  {
+    "slug": "kreator-proses-pesanan",
+    "title": "Kreator Nikahin: Proses pesanan klien",
+    "chapters": [
+      ["gabung-kreator-landing-bayar", "Klien membayar di Landing"],
+      ["gabung-kreator-pesanan", "Isi undangan dari Pesanan masuk"],
+      ["jualan-pesanan-terbit", "Ganti foto dan terbitkan"]
+    ],
+    "intro": "Halo, Kreator Nikahin. Di video ini pesanan klien dari Landing-mu kita jadikan undangan.",
+    "outro": "Selesai. Undangan klienmu sudah terisi dan siap diterbitkan."
+  },
+  {
+    "slug": "kreator-dashboard-hp",
+    "title": "Kreator Nikahin: Kelola undangan dari HP",
+    "chapters": [
+      ["gabung-kreator-dashboard", "Dashboard Kreator"]
+    ],
+    "intro": "Halo, Kreator Nikahin. Di video ini kita buka daftar undanganmu dari HP, lalu ambil PIN pasangan.",
+    "outro": "Selesai. Undanganmu bisa dicek dari HP kapan saja."
+  },
+  {
+    "slug": "kreator-template-canva",
+    "title": "Kreator Nikahin: Ajukan template dari Canva",
+    "chapters": [
+      ["gabung-kreator-canva-desain", "Siapkan desain di Canva"],
+      ["gabung-kreator-canva-ajukan", "Kirim dan tunggu"],
+      ["gabung-kreator-canva-bonus", "Bonus pemakaian template"]
+    ],
+    "intro": "Halo, Kreator Nikahin. Di video ini kita siapkan template undangan di Canva, mengajukannya, dan melihat bonusnya.",
+    "outro": "Selesai. Templatemu hanya untukmu, dan tiap pesanan yang memakainya memberi bonus."
   }
 ]

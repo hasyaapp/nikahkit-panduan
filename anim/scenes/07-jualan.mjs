@@ -10,7 +10,9 @@
 // diagram and the checklist are guide graphics, not product screens.
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw, textWidth, mid } from "../lib.mjs";
 import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkH3, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
-import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, ISI_Y, PASTE_AREA, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete } from "../ui/pesanan.mjs";
+import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, ISI_Y, PASTE_AREA, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete,
+  kreatorOrders, SALES_AT } from "../ui/pesanan.mjs";
+import { kreatorHead, KR_INBOX } from "../ui/gate.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL } from "../ui/editor-panels.mjs";
@@ -416,8 +418,13 @@ const pubStep = (caption) => ({ caption, at: ED.terbitkan, click: true, focus: F
 const kontenClosed = head("Konten") + kList({ left: 0 }).svg;
 const kontenEd = (page, p) => [...shell({ page, rail: "Konten" }), kontenClosed, pvMempelai(p)];
 const DATA_TOAST = ["Undangan terisi. Ganti", "foto contohnya."];
-const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + kontenClosed + pvMempelai(RANI), enter: "fade" },
+const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + (o.panel ?? kontenClosed) + pvMempelai(RANI), enter: "fade" },
   t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: o.toast ?? 0.3 } });
+// Kreator: an invitation page in bisnis Nikahin, the head with the Kreator chip (ui/gate), Pesanan masuk with Penjualan
+// katalog (ui/pesanan kreatorOrders).
+const krKonten = kreatorHead("Konten", true) + kList({ left: 0 }).svg;
+const krEd = [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvMempelai(SAMPLE)];
+const KR_INBOX_M = M(KR_INBOX[0] - 18, 104, 36, 36, 8);
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
 function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
@@ -667,6 +674,44 @@ export const scenes = {
         lens: lensBy(QR(20, 310, 350, 120), "r", 1.4), dur: 3.8 }
     ]
   },
+
+  // Kreator: the paid Landing order in Pesanan masuk, filled into a new invitation in bisnis Nikahin.
+  "gabung-kreator-pesanan": {
+    title: "Mengisi undangan dari pesanan Landing Kreator",
+    base: [...krEd, inboxCount("1", KR_INBOX[0])],
+    els: {
+      inbox: { svg: kreatorOrders, enter: "fade" },
+      memuat: { svg: rect(270, ROW1 + 16, 64, 24, { fill: C.white }) + badgeAt(331, ROW1 + 19, "Memuat…", "off"), enter: "fade" },
+      ...filled({ panel: krKonten })
+    },
+    steps: [
+      tabStep("Buka halaman undangan klien di editor, tab NikahKit.", 2.6),
+      { caption: "Angka merah di ikon kotak masuk: ada pesanan yang belum diisi.", focus: F.left, mark: KR_INBOX_M, lens: { src: [150, 96, 240, 52] }, dur: 3 },
+      { caption: "Klik ikonnya. Layar Pesanan masuk terbuka, terbaru di atas.", at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
+      { caption: "Data dari form klienmu masuk ke sini, berlabel Baru.", mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3.2 },
+      { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3 },
+      { caption: "Undangan terisi. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
+        mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
+    ]
+  },
+
+  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Buka /slug).
+  "gabung-kreator-komisi": (() => {
+    const { box, total, lead, list, buka } = SALES_AT;
+    return {
+      title: "Melihat penjualan dan komisi Kreator",
+      base: krEd,
+      els: { inbox: { svg: kreatorOrders, enter: "fade" } },
+      steps: [
+        { caption: "Di editor halamanmu, klik ikon kotak masuk.", focus: F.left, at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3 },
+        { caption: "Di bawah daftar pesanan ada kotak Penjualan katalog.", mark: M(...box), lens: { src: [box[0] - 6, box[1] - 6, box[2] + 12, box[3] + 12], zoom: 1.2 }, dur: 3.2 },
+        { caption: "Total komisimu tertulis di judul kotak.", mark: M(...total, 9), lens: { src: [20, box[1] + 2, 358, 46] }, dur: 3 },
+        { caption: "Komisi 60% dari harga paket setelah diskon, hanya yang lunas.", mark: M(...lead), lens: { src: [24, lead[1] - 6, 350, lead[3] + 12] }, dur: 3.6 },
+        { caption: "Tiap baris: nama klien, paket, tanggal, dan komisinya.", mark: M(...list), lens: { src: [24, list[1] - 4, 350, list[3] + 8], zoom: 1.5 }, dur: 3.6 },
+        { caption: "Buka /rina-wo membuka halaman Landing-mu.", at: mid(buka), mark: M(...buka), lens: { src: [24, buka[1] - 6, 350, 48] }, dur: 3 }
+      ]
+    };
+  })(),
 
   "jualan-landing-page": {
     title: "Isi Landing page member di HP klien",

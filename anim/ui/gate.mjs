@@ -31,6 +31,11 @@ export const gBtn = (x, y, o = {}) => group({ opacity: o.disabled ? 0.38 : 1 }, 
 export const chipW = (label) => tw(label, 12, 500) + 36;
 export const accountChip = (x, y, label, warn = false) => rect(x + 0.5, y + 0.5, chipW(label) - 1, 27, { r: 14, fill: warn ? C.warnSoft : C.white, stroke: warn ? "#fde7c7" : C.field }) +
   icon("circle-user-round", x + 15, y + 14, 16, warn ? C.warn : C.primary) + text(x + 27, y + 18, label, { size: 12, weight: 500, fill: warn ? C.warnStrong : C.strong });
+// Panel head of an active Kreator seat (App.jsx AccountChip reads Kreator): title, inbox icon (only once the page holds
+// an invitation, App.jsx: ready), chip, close. KR_CHIP_BOX: the chip; KR_INBOX: the inbox icon's centre.
+export const KR_CHIP_BOX = [341 - chipW("Kreator"), 108, chipW("Kreator"), 28], KR_INBOX = [KR_CHIP_BOX[0] - 20, 122];
+export const kreatorHead = (title, inbox) => rect(72, 92, 327, 61, { fill: C.white }) + text(88, 128, title, { size: 16, weight: 700, fill: C.strong }) +
+  (inbox ? icon("inbox", ...KR_INBOX, 18, C.text) : "") + accountChip(KR_CHIP_BOX[0], 108, "Kreator") + iconX("x", 368, 122, 18, C.text);
 
 // Buttons per state: google (signedOut), choose (unlicensed, expired), connect (unassigned), pick, recheck (not checking,
 // not signedOut: signing in re-checks by itself).

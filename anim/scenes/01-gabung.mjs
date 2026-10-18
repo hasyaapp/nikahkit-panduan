@@ -23,7 +23,7 @@ import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED,
 import { brandClosed, brandOpen, mkCards, mkCard, dipakaiAt, BOX, MKY, cardXY, SEG, MARKETING_BOX } from "../ui/marketing.mjs";
 import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
-import { gate, gLogo, gBtn, GBTN_W, accountChip, chipW } from "../ui/gate.mjs";
+import { gate, gLogo, gBtn, GBTN_W, kreatorHead, KR_CHIP_BOX } from "../ui/gate.mjs";
 import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA } from "../ui/pesanan.mjs";
 import { landingTop } from "./07-jualan.mjs";
 
@@ -381,14 +381,13 @@ const PV = {
 };
 
 // ---- Google account chooser (generic): a popup at the right, Rina WO's account first ---------------------------------
+// googleCard: its content at (GX, GY), GW wide; the account row at [GX + 32, GY + 204, GW - 64, 66].
+const googleCard = (GX, GY, GW) => gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
+  line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
+  text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
+  circle(GX + 52, GY + 304, 14, { stroke: C.crSub }) + text(GX + 80, GY + 309, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(GX + 32, GY + 336.5, GX + GW - 32, GY + 336.5, { stroke: "#e3e3e3" });
 const GG = { x: 960, y: 130, w: 440, h: 560 }, GOOGLE_ACCT = [GG.x + 32, GG.y + 204, GG.w - 64, 66];
-const googleWin = (() => {
-  const { x: GX, y: GY, w: GW, h: GH } = GG;
-  return popup(GX, GY, GW, GH, "accounts.google.com") + gLogo(GX + 32, GY + 70, 24) + text(GX + 32, GY + 140, "Pilih akun", { size: 26, fill: "#1f1f1f" }) +
-    line(GX + 32, GY + 200.5, GX + GW - 32, GY + 200.5, { stroke: "#e3e3e3" }) + circle(GX + 52, GY + 236, 16, { fill: "#7cacf8" }) + text(GX + 52, GY + 241, "R", { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
-    text(GX + 80, GY + 231, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) + text(GX + 80, GY + 250, EMAIL, { size: 12, fill: C.crSub }) + line(GX + 32, GY + 272.5, GX + GW - 32, GY + 272.5, { stroke: "#e3e3e3" }) +
-    circle(GX + 52, GY + 304, 14, { stroke: C.crSub }) + text(GX + 80, GY + 309, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(GX + 32, GY + 336.5, GX + GW - 32, GY + 336.5, { stroke: "#e3e3e3" });
-})();
+const googleWin = popup(GG.x, GG.y, GG.w, GG.h, "accounts.google.com") + googleCard(GG.x, GG.y, GG.w);
 
 // ---- Kreator Nikahin (docs/Panduan Kreator.md; screens observed 15 Okt 2026) -----------------------------------------
 // Measured from docs/gambar/kreator: the Terms dialog (ketentuan.jpg, 468 x 741, centred), Pilih Bisnis Kamu and the
@@ -475,20 +474,15 @@ const tawaran = () => {
 const VF = { x: 520, y: 290, w: 400, h: 300 }, VF_BOX = [VF.x, VF.y, VF.w, VF.h];
 const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, fill: C.white }) + circle(720, VF.y + 70, 28, { fill: "#25d366" }) + iconX("message-circle", 720, VF.y + 70, 26, C.white) +
   bars(560, VF.y + 126, [320]) + bars(600, VF.y + 152, [240]) + bars(580, VF.y + 178, [280]) + rect(VF.x + 40, VF.y + 226, VF.w - 80, 44, { r: 6, fill: "#25d366" }) + rect(640, VF.y + 243, 160, 10, { r: 5, fill: "rgba(255,255,255,.6)" });
-// NikahKit panel head for a Kreator: the account chip reads Kreator for an active Kreator seat (App.jsx AccountChip); the
-// inbox icon only once the page holds an invitation (App.jsx: ready).
-const KR_CHIP = "Kreator", CHX = 341 - chipW(KR_CHIP), CHIP_K = [CHX, 108, chipW(KR_CHIP), 28];
-const headK = (title, inbox) => rect(72, 92, 327, 61, { fill: C.white }) + text(88, 128, title, { size: 16, weight: 700, fill: C.strong }) +
-  (inbox ? icon("inbox", CHX - 20, 122, 18, C.text) : "") + accountChip(CHX, 108, KR_CHIP) + iconX("x", 368, 122, 18, C.text);
 // Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
 // and Media.
-const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
+const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
 const DASAR_CARD = [...cardAt(0, 337), 134, 167];
 // Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
 // before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
 const UNGGAH = [88, 169, 279, 36];
-const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Media", true) + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
+const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Media", true) + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
   text(88, 223, "Atau seret ke sini.", { size: 12, fill: C.faint }) +
   (ks.length ? ks.map((k, i) => mTile(i, k)).join("") : text(88, 255, "Belum ada foto.", { size: 12, fill: C.faint })) +
   nkBtn(88, ks.length ? 239 + Math.ceil(ks.length / 3) * (MS + 6) + 4 : 271, "Muat lainnya", { variant: "quiet", w: 279 });
@@ -523,7 +517,7 @@ const klXY = (id, on) => [KL_AT[id][0], MKY + KL_AT[id][1] + (KL_AT[id][1] && on
 const KL_HINT = wrap("Landing memakai paket dan harga Nikahin pusat. Klien bayar online ke toko Nikahin, kamu dapat komisi 60%.", 279, 12, 400, textWidth);
 const klHintY = (on) => klXY("langit", on)[1] + 249;
 const KL = { card: [88, MKY, 134, 167], hint: (on) => [88, klHintY(on) - 12, 279, KL_HINT.length * 16 + 2] };
-const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) +
+const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) +
   panelBody(panelBg(), seg("marketing"), brandClosed(BOX), KL_IDS.map((id) => mkCard(...klXY(id, on), id, on === id)).join(""),
     para(88, klHintY(on), KL_HINT, { size: 12, fill: C.faint, lh: 16 }));
 // Pasang dialog (panels-style.jsx nk-confirm) and the toast after it (store.js applyMarketing).
@@ -532,6 +526,162 @@ const klDlg = rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }) + shadow(
   text(560, 418, "Pasang Landing Klasik di halaman ini?", { size: 14, weight: 600 }) + text(560, 442, "Seluruh isi halaman diganti. Bisa diurungkan.", { size: 12, fill: C.faint }) +
   nkBtn(745, 461, "Batal", { variant: "quiet", w: 63 }) + nkBtn(816, 461, "Pasang", { w: 64 });
 const KL_TOAST = ["Landing Klasik dipasang. Tekan", "Simpan di Scalev."];
+
+// ---- Papan Kursi Kreator (server/pages/src/kreator-nikahin/index.html + shared/header.html, Chrome at 1440) ----------
+// Geometry from the page CSS: header (shell 1024: 24 + nav 54 + 18, dashed line 2), main 760 wide from 64 below it,
+// eyebrow 13/800 caps, h1 Gelica 68, intro 18, the Kursimu card (.me: 24 padding, h2 24, text 16/1.6, one .btn 48 high,
+// then the .more links 14/600 underlined in a 44 row, 20 apart), .stats (3 columns, Gelica 34 + 14), the .board tables
+// (th 13/700, td 15 with 16 padding, name + masked email), Aturan (28 px numbers, 16/1.6). Assumed, not in the page CSS:
+// the 16 px body text and its 1.5 line height. Texts per state from renderMe/render. Other seat holders stay grey bars
+// (no example names for them); four seats, as the worker's default. Chrome's confirm() box is drawn generic.
+const KB = { cocoa: "#2b1a07", ink: "#171717", muted: "#6f675f", mark: "#b8460d", tint: "#f7efe9", line: "rgba(43,26,7,.28)", you: "#fff3e8" };
+const KX = 340, KW = 760, KT = CT + 162, KURSI_URL = "nikahin.myscalev.com/kreator-nikahin";
+const TAB_KURSI = { title: "Kursi Kreator · Nikahin", active: true, fav: favScalev };
+const serif = (x, y, s, size, o = {}) => text(x, y, s, { size, fill: KB.cocoa, font: PASANG_SERIF, ...o });
+// Rich text wrapped greedily at a Mac's widths: parts [{ t, w?, u? }] -> lines of runs for text().
+function richLines(parts, width, size) {
+  const words = parts.flatMap((p) => p.t.split(" ").map((t) => ({ ...p, t })));
+  const lines = [[]], sp = textWidth(" ", size);
+  let used = 0;
+  for (const wd of words) {
+    const ww = textWidth(wd.t, size, wd.w ?? 400);
+    if (used && used + sp + ww > width) { lines.push([]); used = 0; }
+    lines.at(-1).push(wd); used += (used ? sp : 0) + ww;
+  }
+  // Neighbouring words of one style become one run, so an underline spans its spaces.
+  return lines.map((l) => l.reduce((runs, wd, i) => { const last = runs.at(-1), t = (i ? " " : "") + wd.t;
+    if (last && last.w === wd.w && last.u === wd.u) last.t += t; else runs.push({ t, w: wd.w, u: wd.u });
+    return runs; }, []));
+}
+const runsWidth = (l, size) => l.reduce((a, r) => a + textWidth(r.t, size, r.w ?? 400), 0);
+const kBtn = (x, y, label, quiet) => { const w = textWidth(label, 15, 700) + 44;
+  return { w, svg: rect(x + 0.9, y + 0.9, w - 1.8, 46.2, { r: 14, fill: quiet ? C.white : KB.cocoa, stroke: KB.cocoa, sw: 1.8 }) + text(x + w / 2, y + 29, label, { size: 15, weight: 700, fill: quiet ? KB.cocoa : C.white, anchor: "middle" }) }; };
+const pill = (x, y, on) => { const l = on ? "Aktif" : "Diundang", w = textWidth(l, 13, 700) + 24; return rect(x, y, w, 26, { r: 13, fill: on ? "#e3f4e8" : "#fff0d6" }) + text(x + w / 2, y + 18, l, { size: 13, weight: 700, fill: on ? "#1d6b34" : "#8a4b00", anchor: "middle" }); };
+// renderMe per seat state: the card text, the main button (none: Minta kursi + Ganti akun buttons), the .more links,
+// and the stats (kursi terpakai, orang antre, kursi kosong) and seat holders (you: [active, Terakhir aktif, Bisa digantikan]).
+const ME = {
+  out: { text: [{ t: "Email mitra terdaftar langsung antre." }], main: "Minta kursi dengan Google", stats: ["4 / 4", "0", "0"], others: 4 },
+  queued: { text: [{ t: "Antre nomor 1.", w: 700 }, { t: "Masuk ±25 menit (10.45 WIB)." }], more: ["Keluar antrean", "Ganti akun"], stats: ["4 / 4", "1", "0"], others: 4, queue: true },
+  invited: { text: [{ t: "Undangan terkirim.", w: 700 }, { t: "Cek email Scalev", w: 700, u: true }, { t: "dan klik Terima Undangan. Di Scalev, klik kotak bisnis di kiri atas, pilih Nikahin, lalu Bergabung ke Bisnis. Sisa waktu" }, { t: "4:52.", w: 700 }],
+    main: "Buka Gmail", more: ["Keluar dari bisnis", "Ganti akun"], stats: ["4 / 4", "0", "0"], others: 3, you: [false, "belum mulai", "4:52"] },
+  active: { text: [{ t: "Kursi milikmu.", w: 700 }, { t: "Buat undangan sekarang." }], main: "Buka Landing Pages", more: ["Kelola undangan", "Pasang NikahKit", "Keluar dari bisnis", "Ganti akun"],
+    stats: ["4 / 4", "0", "0"], others: 3, you: [true, "baru saja", "bila ada antrean"] },
+  none: { text: [{ t: "Belum memegang kursi.", w: 700 }, { t: "Minta sekarang, masuk antrean." }], main: "Minta kursi", quiet: "Ganti akun", stats: ["3 / 4", "0", "1"], others: 3 }
+};
+// The Kursimu card at top: { svg, h, at: { text, main, quiet, more: { label: box } } }.
+function meCard(st, top) {
+  const s = ME[st], X = KX + 24, lines = richLines(s.text, KW - 48, 16), at = { more: {} };
+  let y = top + 60, svg = serif(X, top + 44, "Kursimu", 24) + lines.map((l, i) => text(X, y + 18 + i * 25.6, l, { size: 16, fill: KB.ink })).join("");
+  at.text = [X, y, Math.max(...lines.map((l) => runsWidth(l, 16))), lines.length * 25.6];
+  y += lines.length * 25.6 + 20;
+  if (s.main) {
+    const b = kBtn(X, y, s.main); svg += b.svg; at.main = [X, y, b.w, 48];
+    if (s.quiet) { const q = kBtn(X + b.w + 12, y, s.quiet, true); svg += q.svg; at.quiet = [X + b.w + 12, y, q.w, 48]; }
+    y += 48 + (s.more ? 12 : 0);
+  }
+  let lx = X;
+  for (const l of s.more ?? []) { const w = textWidth(l, 14, 600); at.more[l] = [lx, y + 10, w, 24]; svg += text(lx, y + 27, l, { size: 14, weight: 600, fill: KB.muted, underline: true }); lx += w + 20; }
+  if (s.more) y += 44;
+  const h = y + 24 - top;
+  return { svg: rect(KX + 0.9, top + 0.9, KW - 1.8, h - 1.8, { r: 16, fill: KB.tint, stroke: KB.cocoa, sw: 1.8 }) + svg, h, at };
+}
+// A table (.list): head row, then rows of cells [x offset, (x, row top) => markup], rows 75.6 high (name + email), or
+// the empty line. Returns { svg, h }.
+const COLS = { holders: [["Kreator", 12], ["Status", 292], ["Terakhir aktif", 432], ["Bisa digantikan", 592]], queue: [["No.", 12], ["Kreator", 72], ["Antre sejak", 352], ["Perkiraan masuk", 532]] };
+const who = (x, y, you) => you ? text(x, y + 32, "Rina WO (kamu)", { size: 15, weight: 700, fill: KB.cocoa }) + text(x, y + 54, "ri***@gmail.com", { size: 13, fill: KB.muted })
+  : rect(x, y + 22, 120, 11, { r: 5.5, fill: BAR }) + rect(x, y + 44, 150, 9, { r: 4.5, fill: BAR });
+function kTable(top, cols, rows, empty) {
+  let svg = cols.map(([l, x]) => text(KX + x, top + 24, l, { size: 13, weight: 700, fill: KB.muted })).join("") + rect(KX, top + 38, KW, 1.5, { fill: KB.cocoa });
+  let y = top + 39.5;
+  if (!rows.length) return { svg: svg + text(KX + 12, y + 35, empty, { size: 15, fill: KB.muted }) + line(KX, y + 64.5, KX + KW, y + 64.5, { stroke: KB.line }), h: 39.5 + 65 };
+  for (const r of rows) {
+    svg += (r.you ? rect(KX, y, KW, 75.6, { fill: KB.you }) : "") + r.cells.map(([x, f]) => f(KX + x, y)).join("") + line(KX, y + 75.6, KX + KW, y + 75.6, { stroke: KB.line });
+    y += 76.6;
+  }
+  return { svg, h: y - top };
+}
+const RULES = ["4 kursi. Antre sesuai waktu masuk.", "Kursi kosong langsung diisi lewat email undangan Scalev.", "Ada antrean? Kursi yang diam 30 menit pindah.",
+  "Undangan tidak diterima 5 menit? Kursinya pindah ke antrean.", "Undanganmu tetap tayang walau kursi pindah."];
+// The whole page for a seat state, Chrome page at CT: { svg, me, at: { rules: [box per rule] } }.
+function kursiPage(st) {
+  const s = ME[st], mt = KT + 159, me = meCard(st, mt), sy = mt + me.h + 32, cw = (KW - 24) / 3;
+  const hl = (txt) => (x, y) => text(x, y + 32, txt, { size: 15, fill: KB.ink });
+  const holders = [...(s.you ? [{ you: true, cells: [[12, (x, y) => who(x, y, true)], [292, (x, y) => pill(x, y + 16, s.you[0])], [432, hl(s.you[1])], [592, (x, y) => text(x, y + 32, s.you[2], { size: 15, weight: s.you[0] ? 400 : 700, fill: KB.ink })]] }] : []),
+    ...["hari ini 09.10 WIB", "12 menit lalu", "hari ini 08.40 WIB", "baru saja"].slice(0, s.others).map((t, i) => ({ cells: [[12, (x, y) => who(x, y)], [292, (x, y) => pill(x, y + 16, true)], [432, hl(t)],
+      [592, hl(s.queue ? ["±25 menit (10.45 WIB)", "±40 menit (11.00 WIB)", "±55 menit (11.15 WIB)", "±1 jam (11.20 WIB)"][i] : "bila ada antrean")]] }))];
+  const queue = s.queue ? [{ you: true, cells: [[12, (x, y) => circle(x + 16, y + 32, 16, { fill: KB.tint }) + text(x + 16, y + 37, "1", { size: 15, weight: 800, fill: KB.cocoa, anchor: "middle" })],
+    [72, (x, y) => who(x, y, true)], [352, hl("baru saja")], [532, hl("±25 menit (10.45 WIB)")]] }] : [];
+  const b1 = sy + 99 + 56, t1 = kTable(b1 + 62, COLS.holders, holders), b2 = b1 + 62 + t1.h + 56, t2 = kTable(b2 + 62, COLS.queue, queue, "Kosong. Minta sekarang, langsung diundang."), b3 = b2 + 62 + t2.h + 56;
+  const rules = RULES.map((_, i) => [KX, b3 + 62 + i * 42, KW, 28]);
+  const svg = rect(0, CT, W, b3 + 1400 - CT, { fill: C.white }) + // white below the page too, for a scrolled state over another
+    serif(208, CT + 61, "Nikahin", 28, { weight: 700 }) + rect(1232 - 166, CT + 33, 166, 36, { r: 14, fill: C.white, stroke: KB.cocoa, sw: 1.8 }) + icon("mail", 1232 - 166 + 22, CT + 51, 16, KB.cocoa) +
+    text(1232 - 166 + 38, CT + 56, "Pesan undangan", { size: 14, weight: 600, fill: KB.cocoa }) + line(208, CT + 97, 1232, CT + 97, { stroke: "#d2bbad", sw: 2 }).replace("/>", ' stroke-dasharray="6 6"/>') +
+    text(KX, KT + 15, "KREATOR NIKAHIN", { size: 13, weight: 800, fill: KB.mark }).replace("<text", '<text letter-spacing="1.3"') + serif(KX, KT + 86, "Jadi Kreator Nikahin", 68) +
+    text(KX, KT + 119, "Bikin undangan di bisnis Nikahin. Tanpa akun Scalev sendiri.", { size: 18, fill: KB.muted }) + me.svg +
+    [["kursi terpakai", s.stats[0]], ["orang antre", s.stats[1]], ["kursi kosong", s.stats[2]]].map(([l, v], i) => { const x = KX + i * (cw + 12);
+      return rect(x + 0.75, sy + 0.75, cw - 1.5, 97.5, { r: 16, fill: C.white, stroke: KB.line, sw: 1.5 }) + serif(x + 20, sy + 47, v, 34, { weight: 700 }) + text(x + 20, sy + 74, l, { size: 14, fill: KB.muted }); }).join("") +
+    serif(KX, b1 + 31, "Sedang memegang kursi", 38) + t1.svg + serif(KX, b2 + 31, "Antrean", 38) + t2.svg + serif(KX, b3 + 31, "Aturan", 38) +
+    RULES.map((r, i) => circle(KX + 14, b3 + 76 + i * 42, 14, { fill: KB.tint }) + text(KX + 14, b3 + 80.5 + i * 42, String(i + 1), { size: 13, weight: 800, fill: KB.cocoa, anchor: "middle" }) +
+      text(KX + 40, b3 + 82 + i * 42, r, { size: 16, fill: KB.ink })).join("") + text(KX, b3 + 62 + 196 + 37, "Diperbarui baru saja.", { size: 13, fill: KB.muted });
+  return { svg: `<g font-family="Nunito,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">${svg}</g>`, me: { ...me, top: mt }, at: { rules } };
+}
+const KP = Object.fromEntries(Object.keys(ME).map((k) => [k, kursiPage(k)]));
+const kursiTop = (url = KURSI_URL, tabs = [TAB_KURSI]) => crTop({ tabs, url });
+// Google's chooser in the same tab (the page sends the whole tab to accounts.google.com), card centred.
+const GT = { x: 500, y: CT + 60, w: 440 }, GT_ACCT = [GT.x + 32, GT.y + 204, GT.w - 64, 66];
+const googleTab = kursiTop("accounts.google.com", [{ title: "accounts.google.com", active: true }]) + vp(rect(0, CT, W, VIEW, { fill: "#f0f4f9" }) +
+  rect(GT.x, GT.y, GT.w, 420, { r: 28, fill: C.white }) + googleCard(GT.x, GT.y, GT.w));
+// Chrome's confirm() for Keluar dari bisnis: generic box under the toolbar (origin line and buttons as bars), the
+// message from the page.
+const CF = { x: 495, y: CT + 8, w: 450 }, CF_MSG = wrap("Keluar dari bisnis Nikahin? Undangan Scalev dibatalkan atau kamu dikeluarkan dari tim, dan kursimu diberikan ke antrean berikutnya. Undangan pernikahan yang sudah kamu buat tetap tayang.", 402, 14, 400, textWidth);
+const CF_H = 98 + CF_MSG.length * 20, CF_OK = [CF.x + CF.w - 24 - 76, CF.y + CF_H - 56, 76, 36];
+const confirmBox = shadow(CF.x, CF.y, CF.w, CF_H, 10, 4) + rect(CF.x, CF.y, CF.w, CF_H, { r: 10, fill: C.white }) + rect(CF.x + 24, CF.y + 24, 200, 11, { r: 5.5, fill: BAR }) +
+  para(CF.x + 24, CF.y + 66, CF_MSG, { size: 14, fill: C.crText, lh: 20 }) + rect(CF_OK[0] - 84.5, CF_OK[1] + 0.5, 75, 35, { r: 18, fill: C.white, stroke: "#c4c7c5" }) + rect(CF_OK[0] - 70, CF_OK[1] + 13, 46, 10, { r: 5, fill: BAR }) +
+  rect(...CF_OK, { r: 18, fill: C.crBlue }) + rect(CF_OK[0] + 18, CF_OK[1] + 13, 40, 10, { r: 5, fill: "rgba(255,255,255,.6)" });
+
+// ---- Ajukan template dari Canva (gabung/ajukan-template-canva.mdx): guide graphics in the guide's own words ----------
+// The process runs in Canva and WhatsApp, outside our UI, so these are infographics (guide colours, 20-24 px text so
+// they read without a lens), not product screens.
+const SECTIONS = ["Sampul", "Salam Pembuka", "Ayat / Kutipan", "Profil Mempelai", "Kisah Cinta", "Simpan Tanggal", "Hitung Mundur", "Galeri Foto", "Video", "Rangkaian Acara",
+  "Dress Code", "Susunan Acara", "RSVP & Ucapan", "Siaran Langsung", "Bingkai Story", "Amplop Digital", "Aturan Tamu", "Turut Mengundang", "Salam Penutup", "Kaki Halaman"];
+const infoCard = (x, y, w, h) => shadow(x, y, w, h, 14, 2) + rect(x, y, w, h, { r: 14, fill: C.white });
+// A card with an icon tile, a bold title and a line or two under it.
+const factCard = (x, y, w, h, ic, title, sub = []) => infoCard(x, y, w, h) + rect(x + 20, y + 22, 50, 50, { r: 12, fill: C.tint }) + iconX(ic, x + 45, y + 47, 26, C.accent) +
+  text(x + 88, y + 50, title, { size: 24, weight: 700, fill: C.ink }) + para(x + 88, y + 84, sub, { size: 21, fill: C.text, lh: 28 });
+const secRow = (i) => { const c = i < 10 ? 0 : 1, x = 70 + c * 330, y = 322 + (i % 10) * 52;
+  return circle(x + 18, y, 18, { fill: C.tint }) + text(x + 18, y + 7, String(i + 1), { size: 18, weight: 700, fill: C.accent, anchor: "middle" }) + text(x + 48, y + 8, SECTIONS[i], { size: 22, fill: C.ink }); };
+const SEC_BOX = [40, 236, 700, 600];
+const secHead = infoCard(...SEC_BOX) + text(70, 284, "20 bagian standar, berurutan", { size: 24, weight: 700, fill: C.ink });
+// HP: one column of the 20 sections; laptop 60/40: the stage (cover photo, names) left, the same column right.
+const colBars = (x, y, w, n, gap) => Array.from({ length: n }, (_, k) => rect(x, y + k * gap, w * [1, 0.7, 0.85, 0.6][k % 4], 8, { r: 4, fill: "#e6d6c8" })).join("");
+const devices = infoCard(780, 100, 620, 410) + group({ transform: "translate(0 -116)" }, 
+  rect(820, 250, 150, 300, { r: 18, fill: C.white, stroke: C.ink, sw: 3 }) + colBars(840, 280, 110, 12, 21) + text(895, 584, "HP", { size: 22, weight: 700, fill: C.ink, anchor: "middle" }) +
+  rect(1010, 250, 380, 240, { r: 12, fill: C.white, stroke: C.ink, sw: 3 }) + rect(1013, 253, 225, 234, { fill: "#e9d8c9" }) + circle(1125, 345, 34, { fill: "#d2bbad" }) +
+  text(1125, 420, "Rani & Dimas", { size: 20, weight: 700, fill: C.accent, anchor: "middle" }) + colBars(1252, 270, 120, 8, 24) + rect(1180, 490, 40, 22, { fill: C.ink }) + rect(1120, 510, 160, 8, { r: 4, fill: C.ink }) +
+  text(1125, 470, "60%", { size: 18, weight: 700, fill: C.ink, anchor: "middle" }) + text(1312, 470, "40%", { size: 18, weight: 700, fill: C.ink, anchor: "middle" }) +
+  text(1200, 584, "Tampilan laptop 60/40", { size: 22, weight: 700, fill: C.ink, anchor: "middle" }));
+const DEV_BOX = [780, 100, 620, 410];
+// Cara mengajukan, steps 3 to 6, as cards in a 2 x 2 grid with arrows.
+const AJ = [["share-2", "Bagikan tautan", ["Akses: siapa pun yang punya", "tautan bisa mengedit. Salin."]], ["message-circle", "Kirim lewat WhatsApp", ["Ke admin Nikahin: nama template,", "dua font, Gmail NikahKit."]],
+  ["timer", "Tim Nikahin memeriksa", ["Paling lama 7 hari, bisa lebih", "cepat."]], ["layout-grid", "Template siap dipakai", ["Di menu Template akunmu saja,", "dan di Landing page milikmu."]]];
+const AJ_XY = [[60, 120], [760, 120], [60, 390], [760, 390]], AJ_W = 620, AJ_H = 160;
+const ajArrow = (i) => { const [x1, y1] = AJ_XY[i], [x2, y2] = AJ_XY[i + 1];
+  if (y1 === y2) return line(x1 + AJ_W + 12, y1 + AJ_H / 2, x2 - 12, y2 + AJ_H / 2, { stroke: C.accent, sw: 3, cap: "round" }) + `<path d="M${x2 - 22} ${y2 + AJ_H / 2 - 8} L${x2 - 12} ${y2 + AJ_H / 2} L${x2 - 22} ${y2 + AJ_H / 2 + 8}" fill="none" stroke="${C.accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<path d="M${x1 + AJ_W / 2} ${y1 + AJ_H + 10} V${y1 + AJ_H + 45} H${x2 + AJ_W / 2} V${y2 - 10}" fill="none" stroke="${C.accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="M${x2 + AJ_W / 2 - 8} ${y2 - 20} L${x2 + AJ_W / 2} ${y2 - 10} L${x2 + AJ_W / 2 + 8} ${y2 - 20}" fill="none" stroke="${C.accent}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; };
+const AJ_WARN = [60, 620, 1320, 90];
+const ajWarn = rect(...AJ_WARN, { r: 14, fill: C.warnSoft, stroke: C.warn, sw: 2 }) + text(100, 675, "Jangan ubah atau hapus desain Canva selama pengajuan diproses.", { size: 24, weight: 600, fill: C.warnStrong });
+// Bonus: the 10% card with the example, and the facts beside it.
+const BONUS_CARD = [60, 120, 600, 660];
+const bonusCard = infoCard(...BONUS_CARD) + rect(100, 160, 64, 64, { r: 16, fill: C.tint }) + iconX("gift", 132, 192, 34, C.accent) +
+  text(100, 330, "10%", { size: 96, weight: 700, fill: C.accent }) + para(100, 380, ["dari harga paket setelah diskon,", "untuk setiap pesanan lunas dari", "Landing-mu yang memilih templatemu."], { size: 24, fill: C.text, lh: 34 });
+const BONUS_EX = [100, 500, 520, 240];
+const bonusEx = rect(...BONUS_EX, { r: 12, fill: C.tint }) + text(130, 548, "Contoh", { size: 22, weight: 700, fill: C.accent }) + text(130, 596, "Paket Lengkap tanpa diskon", { size: 24, fill: C.ink }) +
+  text(590, 596, "Rp229.000", { size: 24, fill: C.ink, anchor: "end" }) + line(130, 626, 590, 626, { stroke: "#e6d6c8", sw: 2 }) + text(130, 680, "Bonusmu, 10%", { size: 26, weight: 700, fill: C.ink }) +
+  text(590, 680, "Rp22.900", { size: 30, weight: 700, fill: C.accent, anchor: "end" });
+const BONUS_FACTS = [["landmark", "Ditransfer bersama komisi", ["Per pesanan, 2 hari kerja setelah klien", "membayar, ke rekening komisi yang", "kamu daftarkan."]], ["heart", "Di luar komisi 60%", ["Bonus ditambah ke komisi pesanan", "yang sama."]],
+  ["palette", "Desain tetap milikmu", ["Boleh dipakai atau dijual di luar", "Nikahin. Di NikahKit hanya untukmu."]]];
+const BF_XY = (i) => [720, 120 + i * 226], BF_W = 680, BF_H = 200;
 
 // ---- Scenes ---------------------------------------------------------------------------------------------------------
 export const scenes = {
@@ -1009,7 +1159,7 @@ export const scenes = {
   "gabung-kreator-masuk": (() => {
     const g = GATE_OUT(CT), chk = dlg({ state: "checking", msg: null }), out = dlg({ state: "out", msg: null, hint: WAIT_HINT });
     const acct = dlg({ license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true });
-    const CHIP = [CHIP_K[0], CT + CHIP_K[1], CHIP_K[2], CHIP_K[3]], HEAD = [0, CT + 92, 400, 62];
+    const CHIP = [KR_CHIP_BOX[0], CT + KR_CHIP_BOX[1], KR_CHIP_BOX[2], KR_CHIP_BOX[3]], HEAD = [0, CT + 92, 400, 62];
     const cards = [acct.X + 16, acct.at.licCard[1], 360, acct.at.bizCard[1] + acct.at.bizCard[3] - acct.at.licCard[1]];
     return {
       title: "Masuk ke NikahKit sebagai Kreator Nikahin",
@@ -1045,7 +1195,7 @@ export const scenes = {
     base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvBlank()],
     els: {
       tpl: { svg: tplNew(), skel: true },
-      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
+      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
       pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true },
       media: { svg: mediaK([]), enter: "fade", skel: true },
       win: { svg: fileWin(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },
@@ -1085,7 +1235,7 @@ export const scenes = {
   "gabung-kreator-landing": {
     title: "Memasang Landing sebagai Kreator Nikahin",
     base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template", page: "Landing Rina WO" }), pvBlank(),
-      nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + headK("Template", true) + panelBody(panelBg(), seg(), library(219, null))],
+      nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, null))],
     els: {
       mk: { svg: mkKreator(null), enter: "fade", skel: true },
       dlg: { svg: klDlg, enter: "pop", origin: KL_DLG_O },
@@ -1106,6 +1256,118 @@ export const scenes = {
       { caption: "Klik Simpan di kanan atas editor Scalev.", at: ED.simpan, click: true, focus: [[1180, 44, 260, 48]], mark: { box: ED.simpanBox, r: 4 }, lens: { src: [1180, 44, 260, 50] }, dur: 3 },
       { caption: "Klik Terbitkan, lalu kirim alamat halamannya ke klien.", at: ED.terbitkan, click: true, focus: [[1180, 44, 260, 48]], mark: { box: ED.terbitkanBox, r: 4 },
         lens: { src: [1180, 44, 260, 50] }, dur: 3.4 }
+    ]
+  },
+
+  // Papan Kursi Kreator 1: Minta kursi dengan Google (Google in the same tab), antre, undangan terkirim, Buka Gmail.
+  "gabung-kreator-kursi-minta": (() => {
+    const [P0, PQ, PI] = [KP.out, KP.queued, KP.invited], meBox = (p) => [KX - 24, p.me.top - 8, KW + 48, p.me.h + 16];
+    const SAT = (p) => [KX - 24, p.me.top + p.me.h + 24, KW + 48, 115]; // the stats row
+    return {
+      title: "Meminta kursi Kreator di papan Kursi Kreator",
+      base: [win({ tabs: [TAB_KURSI], url: KURSI_URL }), vp(P0.svg)],
+      els: {
+        google: { svg: googleTab, enter: "fade", skel: true },
+        queued: { svg: vp(PQ.svg), enter: "fade", skel: true },
+        invited: { svg: vp(PI.svg), enter: "fade", skel: true }
+      },
+      steps: [
+        { caption: "Buka halaman papan Kursi Kreator.", focus: [TOOLBAR, [KX - 24, CT + 100, KW + 48, P0.me.top + P0.me.h - CT - 92]], at: mid(urlBox(KURSI_URL)),
+          mark: { box: urlBox(KURSI_URL), r: 3 }, lens: { src: [0, 44, 520, 88] }, dur: 3 },
+        { caption: "Klik Minta kursi dengan Google.", focus: [meBox(P0), [GT.x, GT.y, GT.w, 420]], at: mid(P0.me.at.main), click: true, show: ["google"],
+          mark: { box: P0.me.at.main, r: 14 }, note: "Minta kursi dengan Google", dur: 3 },
+        { caption: "Pilih akunmu. Kursi penuh? Kamu antre dengan nomornya.", focus: [meBox(PQ), SAT(PQ)], at: mid(GT_ACCT), click: true, hide: ["google"], show: ["queued"],
+          mark: GT_ACCT, lens: { src: grow(PQ.me.at.text, 12), zoom: 1.6 }, dur: 3.8 },
+        { caption: "Kursi kosong: undangan Scalev terkirim, dengan sisa waktu.", focus: [meBox(PI)], hide: ["queued"], show: ["invited"],
+          mark: { box: grow(PI.me.at.text, 6), r: 6 }, lens: { src: grow(PI.me.at.text, 12), zoom: 1.15 }, dur: 4 },
+        { caption: "Klik Buka Gmail, lalu terima undangan dari Scalev.", at: mid(PI.me.at.main), click: true, mark: { box: PI.me.at.main, r: 14 },
+          lens: { src: [KX, PI.me.at.main[1] - 10, 440, 112] }, dur: 3.4 }
+      ]
+    };
+  })(),
+
+  // Papan Kursi Kreator 2: Kursi milikmu, Buka Landing Pages, Kelola undangan, Keluar dari bisnis, aturan 30 menit.
+  "gabung-kreator-kursi-milikmu": (() => {
+    const [PA, PN] = [KP.active, KP.none], at = PA.me.at, more = at.more, D = PN.at.rules[0][1] - 62 - (CT + 140);
+    const meBox = (p) => [KX - 24, p.me.top - 8, KW + 48, p.me.h + 16], rule = (i) => { const [x, y, , h] = PN.at.rules[i]; return [x - 6, y - D - 6, textWidth(RULES[i], 16) + 52, h + 12]; };
+    return {
+      title: "Memakai dan melepas kursi Kreator",
+      base: [win({ tabs: [TAB_KURSI], url: KURSI_URL })],
+      els: {
+        page: { svg: PA.svg, skel: true },
+        none: { svg: PN.svg, enter: "fade", skel: true },
+        top: { svg: kursiTop(), skel: true },
+        cf: { svg: confirmBox, enter: "pop", origin: [720, CF.y + 20] }
+      },
+      steps: [
+        { caption: "Sudah bergabung? Papan menulis Kursi milikmu.", focus: [meBox(PA)], at: [at.text[0] + 160, at.text[1] + 40], mark: { box: grow(at.text, 4), r: 4 },
+          lens: { src: [KX, PA.me.top, 480, 100], zoom: 1.6 }, dur: 3 },
+        { caption: "Klik Buka Landing Pages untuk membuat undangan.", at: mid(at.main), click: true, mark: { box: at.main, r: 14 }, lens: { src: [KX, at.main[1] - 10, 460, 68] }, dur: 3 },
+        { caption: "Kelola undangan dan Pasang NikahKit ada di bawahnya.", at: mid(more["Kelola undangan"]), mark: [grow(more["Kelola undangan"], 4), grow(more["Pasang NikahKit"], 4)],
+          lens: { src: [KX, more["Kelola undangan"][1] - 10, 560, 44] }, dur: 3.2 },
+        { caption: "Selesai? Klik Keluar dari bisnis, lalu setujui.", focus: [meBox(PA), [CF.x, CF.y, CF.w, CF_H]], at: mid(more["Keluar dari bisnis"]), click: true, show: ["cf"],
+          mark: grow(more["Keluar dari bisnis"], 4), lens: { src: [CF.x, CF.y, CF.w, CF_H], zoom: 1.1 }, dur: 3.4 },
+        { caption: "Kursi dilepas. Undangan yang sudah kamu buat tetap tayang.", focus: [meBox(PN)], at: mid(CF_OK), click: true, hide: ["cf"], show: ["none"],
+          mark: { box: CF_OK, r: 18 }, lens: { src: [KX, PN.me.top + 8, 480, 84], zoom: 1.6 }, dur: 3.8 },
+        { caption: "Aturan papan: ada antrean? Kursi yang diam 30 menit pindah.", focus: [[KX - 24, CT + 120, KW + 48, 300]], scroll: { id: "none", dy: D },
+          mark: [rule(2), rule(3)], lens: { src: [KX - 8, rule(2)[1] - 8, 560, 100], zoom: 1.4 }, dur: 4 }
+      ]
+    };
+  })(),
+
+  // Ajukan template dari Canva 1: Situs Web, 20 bagian, Tampilan laptop 60/40, font (infographic).
+  "gabung-kreator-canva-desain": {
+    title: "Menyiapkan template undangan di Canva",
+    bg: C.tint,
+    base: [rect(0, 0, 1440, 900, { fill: C.tint }), text(60, 70, "Siapkan template di Canva", { size: 34, weight: 700, fill: C.ink })],
+    els: {
+      web: { svg: factCard(40, 100, 700, 116, "monitor", "Desain baru jenis Situs Web", ["Di Canva: Situs Web (Website)."]), enter: "pop", origin: [390, 158] },
+      secs: { svg: secHead, enter: "fade" },
+      ...Object.fromEntries(SECTIONS.map((_, i) => [`s${i}`, { svg: secRow(i), enter: "rise", delay: 0.15 + i * 0.07 }])),
+      dev: { svg: devices, enter: "pop", origin: [1090, 305] },
+      font: { svg: factCard(780, 540, 620, 150, "type", "Font dari Google Fonts", ["Paling banyak 2: judul dan isi."]), enter: "pop", origin: [1090, 615] }
+    },
+    steps: [
+      { caption: "Di Canva, buat desain baru jenis Situs Web.", focus: "all", show: ["web"], mark: { box: [40, 100, 700, 116], r: 14 }, dur: 3 },
+      { caption: "Susun 20 bagian standar, dari Sampul sampai Kaki Halaman.", show: ["secs", ...SECTIONS.map((_, i) => `s${i}`)], mark: { box: SEC_BOX, r: 14 }, dur: 4 },
+      { caption: "Tambahkan halaman Tampilan laptop 60/40.", show: ["dev"], mark: { box: DEV_BOX, r: 14 }, dur: 3.4 },
+      { caption: "Pakai paling banyak 2 font dari Google Fonts.", show: ["font"], mark: { box: [780, 540, 620, 150], r: 14 }, dur: 3.2 }
+    ]
+  },
+
+  // Ajukan template dari Canva 2: bagikan tautan, kirim lewat WhatsApp, diperiksa paling lama 7 hari, template siap.
+  "gabung-kreator-canva-ajukan": {
+    title: "Mengajukan template Canva ke tim Nikahin",
+    bg: C.tint,
+    base: [rect(0, 0, 1440, 900, { fill: C.tint }), text(60, 76, "Kirim dan tunggu", { size: 34, weight: 700, fill: C.ink })],
+    els: {
+      ...Object.fromEntries(AJ.map(([ic, t, sub], i) => [`c${i}`, { svg: factCard(...AJ_XY[i], AJ_W, AJ_H, ic, t, sub), enter: "pop", origin: [AJ_XY[i][0] + AJ_W / 2, AJ_XY[i][1] + AJ_H / 2] }])),
+      ...Object.fromEntries([0, 1, 2].map((i) => [`a${i}`, { svg: ajArrow(i), enter: "fade", delay: 0.2 }])),
+      warn: { svg: ajWarn, enter: "rise", delay: 0.3 }
+    },
+    steps: [
+      { caption: "Klik Bagikan, ubah akses tautan ke bisa mengedit, lalu salin.", focus: "all", show: ["c0"], mark: { box: [...AJ_XY[0], AJ_W, AJ_H], r: 14 }, dur: 3.6 },
+      { caption: "Kirim lewat WhatsApp: nama template, dua font, dan Gmail NikahKit.", show: ["a0", "c1"], mark: { box: [...AJ_XY[1], AJ_W, AJ_H], r: 14 }, dur: 4 },
+      { caption: "Tim Nikahin memeriksa, paling lama 7 hari. Jangan ubah desainnya.", show: ["a1", "c2", "warn"], mark: [{ box: [...AJ_XY[2], AJ_W, AJ_H], r: 14 }, { box: AJ_WARN, r: 14 }], dur: 4 },
+      { caption: "Templatemu muncul hanya di akunmu dan Landing-mu.", show: ["a2", "c3"], mark: { box: [...AJ_XY[3], AJ_W, AJ_H], r: 14 }, dur: 3.4 }
+    ]
+  },
+
+  // Ajukan template dari Canva 3: bonus 10%, contoh, transfer bersama komisi, kepemilikan.
+  "gabung-kreator-canva-bonus": {
+    title: "Bonus pemakaian template Kreator",
+    bg: C.tint,
+    base: [rect(0, 0, 1440, 900, { fill: C.tint }), text(60, 76, "Bonus pemakaian template", { size: 34, weight: 700, fill: C.ink })],
+    els: {
+      card: { svg: bonusCard, enter: "pop", origin: [360, 300] },
+      ex: { svg: bonusEx, enter: "rise", delay: 0.1 },
+      ...Object.fromEntries(BONUS_FACTS.map(([ic, t, sub], i) => [`f${i}`, { svg: factCard(...BF_XY(i), BF_W, BF_H, ic, t, sub), enter: "pop", origin: [BF_XY(i)[0] + BF_W / 2, BF_XY(i)[1] + BF_H / 2] }]))
+    },
+    steps: [
+      { caption: "Tiap pesanan lunas yang memilih templatemu: bonus 10%.", focus: "all", show: ["card"], mark: { box: [80, 248, 560, 236], r: 12 }, dur: 3.6 },
+      { caption: "Contoh: Paket Lengkap Rp229.000, bonusmu Rp22.900.", show: ["ex"], mark: { box: BONUS_EX, r: 12 }, dur: 3.6 },
+      { caption: "Bonus ditransfer bersama komisi, dua hari kerja setelah klien bayar.", show: ["f0", "f1"], mark: { box: [...BF_XY(0), BF_W, BF_H], r: 14 }, dur: 4 },
+      { caption: "Desain tetap milikmu dan boleh dipakai di luar Nikahin.", show: ["f2"], mark: { box: [...BF_XY(2), BF_W, BF_H], r: 14 }, dur: 3.4 }
     ]
   },
 

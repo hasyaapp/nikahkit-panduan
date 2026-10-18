@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { C, WORLD, PHONE, rect, text, line, circle, para, group, textWidth, wrap, clamp, icon, iconX, skeleton, clipped } from "../lib.mjs";
 import { BAGIKAN_TOOL, NO_NOTE, ACC_Y, COUPLE_Y, shareTop, shareBtns, accessHead, forCouple, pinBtn, pinHint, pinBox } from "../ui/bagikan.mjs";
 import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk, onPhone } from "../ui/kit.mjs";
+import { gLogo } from "../ui/gate.mjs";
 
 // ---- Sumber asli ------------------------------------------------------------------------------------------------------
 const SRC = (p) => fs.readFileSync(fileURLToPath(new URL(`../../../server/pages/src/${p}`, import.meta.url)), "utf8");
@@ -121,8 +122,9 @@ const QUICK = [["external-link", "Lihat undangan", "Sebagai tamu"], ["send", "Ki
 const TREND = [0, 1, 0, 2, 3, 1, 4, 2, 0, 5, 3, 8, 12, 2]; // RSVP per hari, contoh
 const LIHAT_DAFTAR = [40, 350, 144, 36]; // tombol Lihat daftar tamu (lokal)
 // Ukuran dari dashboard di Chromium 390x844 (19 Okt): kartu angka 436..628, tombol cepat 73px tiap 81px dari 652,
-// grafik RSVP 910..1102, Kabar terbaru 1135.
-function homeContent() {
+// grafik RSVP 910..1102, Kabar terbaru 1135. quick: tombol cepat yang tampil (Kreator hanya Lihat undangan: Kirim dan
+// Scan disembunyikan tabOpen di dashboard/index.html); bagian sesudahnya naik 81px per tombol yang hilang.
+function homeContent(quick = QUICK) {
   let s = rect(0, 64, 390, 1420, { fill: T.wash }) + text(16, 103, "Ringkasan undangan", { size: 22, fill: T.text }) +
     para(16, 131, ["45 hari lagi · Akad Nikah, Sabtu, 28 November", "2026 pukul 08.00"], { size: 16, fill: T.sub, lh: 24 });
   // Kartu Estimasi tamu hadir + komposisi jawaban
@@ -137,20 +139,50 @@ function homeContent() {
     return text(x, y + 12, l, { size: 12, fill: T.sub }) + text(x, y + 40, v, { size: 24, weight: 500, fill: T.text }) + text(x, y + 60, n, { size: 12, fill: T.sub });
   }).join("");
   // Tombol cepat
-  s += QUICK.map(([ic, a, b], i) => { const y = 652 + i * 81; return rect(16, y, 358, 73, { r: 16, fill: "#fff" }) + circle(52, y + 36, 20, { fill: T.soft }) + wa(ic, 52, y + 36, 24, T.strong) + text(84, y + 32, a, { size: 16, weight: 500, fill: T.text }) + text(84, y + 53, b, { size: 12, fill: T.sub }); }).join("");
+  s += quick.map(([ic, a, b], i) => { const y = 652 + i * 81; return rect(16, y, 358, 73, { r: 16, fill: "#fff" }) + circle(52, y + 36, 20, { fill: T.soft }) + wa(ic, 52, y + 36, 24, T.strong) + text(84, y + 32, a, { size: 16, weight: 500, fill: T.text }) + text(84, y + 53, b, { size: 12, fill: T.sub }); }).join("");
+  let tail = "";
   // Grafik RSVP masuk, 14 hari terakhir
   const top = Math.max(...TREND);
-  s += rect(16, 910, 358, 192, { r: 16, fill: "#fff" }) + text(36, 947, "RSVP masuk, 14 hari terakhir", { size: 16, weight: 500, fill: T.text }) +
+  tail += rect(16, 910, 358, 192, { r: 16, fill: "#fff" }) + text(36, 947, "RSVP masuk, 14 hari terakhir", { size: 16, weight: 500, fill: T.text }) +
     TREND.map((n, i) => { const h = Math.max(3, Math.round((96 * n) / top)); return rect(36 + i * 23, 1062 - h, 19, h, { r: 2, fill: T.accent }); }).join("") +
     text(36, 1079, "14 hari lalu", { size: 11, fill: T.sub }) + text(354, 1079, "Hari ini", { size: 11, fill: T.sub, anchor: "end" });
   // Kabar terbaru
-  s += text(16, 1158, "Kabar terbaru", { size: 16, weight: 500, fill: T.text }) + text(317, 1158, "Lihat semua", { size: 14, weight: 500, fill: T.strong, anchor: "middle" }) +
+  tail += text(16, 1158, "Kabar terbaru", { size: 16, weight: 500, fill: T.text }) + text(317, 1158, "Lihat semua", { size: 14, weight: 500, fill: T.strong, anchor: "middle" }) +
     rect(16, 1179, 358, 152, { r: 16, fill: "#fff" }) +
     row(1183, { x0: 24, right: 351, name: "Dewi Lestari", ini: iniR("Dewi Lestari"), time: "12 Okt", parts: [{ icon: "check", t: "Hadir", fill: T.strong }, { t: "· Selamat ya Rani & Dimas, semoga…" }] }) +
     row(1255, { x0: 24, right: 351, name: "Rudi Hartono", ini: iniR("Rudi Hartono"), time: "11 Okt", parts: [{ icon: "x", t: "Tidak hadir", fill: "#555" }, { t: "· Maaf belum bisa datang" }] });
-  return s;
+  const dy = (quick.length - QUICK.length) * 81;
+  return s + (dy ? group({ transform: `translate(0 ${dy})` }, tail) : tail);
 }
 const HOME_STATIC = homeContent() + head("Beranda") + tabbar("beranda");
+
+// ---- Dashboard Kreator (/dashboard?kreator, HP): panel/index.html dengan peran kreator ------------------------------
+// Gerbang #kreatorGate (kartu .card 358 lebar, padding 24/20, judul 22/28, teks 14/20, .btn 40 hijau, .msg 20 di bawah;
+// gembok tersembunyi), Google di tab yang sama (generik, label seperti di adegan lain), daftar #chats (bar 64, cari,
+// baris 72 dengan nama, waktu, ringkasan preview(), Tanpa PIN), lalu Beranda alat rekap. Tab bawah dibagi rata
+// (justify-content: space-around) di 382px: tab 64, lingkaran 32 + margin 8; ROLES.kreator: sebelum undangan dibuka
+// hanya Undangan, sesudahnya Undangan, Beranda, Tamu, Ucapan (Pelacakan khusus laptop). Isi undangan contoh.
+const KR_TABS = [["kirim", "Undangan"], ["beranda", "Beranda"], ["tamu", "Tamu"], ["ucapan", "Ucapan"]];
+const krTabX = (n) => { const m = (382 - n * 64 - 48) / (n + 1); return { tabs: KR_TABS.slice(0, n).map((_, i) => 4 + m / 2 + 32 + i * (64 + m)), me: 4 + m / 2 + n * (64 + m) + 24 }; };
+const krTabbar = (active, n, ini) => { const { tabs, me } = krTabX(n);
+  return rect(0, 773, 390, 71, { fill: "#fff" }) + line(0, 773.5, 390, 773.5, { stroke: T.line }) + KR_TABS.slice(0, n).map(([k, l], i) => (k === active ? rect(tabs[i] - 32, 784, 64, 32, { r: 16, fill: T.soft }) : "") +
+    wa(k, tabs[i], 800, 24, k === active ? T.strong : T.text) + text(tabs[i], 833, l, { size: 12, weight: 500, fill: T.text, anchor: "middle" })).join("") +
+    circle(me, 809, 16, { fill: T.soft }) + text(me, 813.5, ini, { size: 13, fill: T.strong, anchor: "middle" }); };
+const KG_LINES = wrap("Kreator hanya melihat undangan buatannya sendiri.", 318, 14, 400, textWidth), KG_H = 24 + 28 + 8 + KG_LINES.length * 20 + 24 + 40 + 12 + 20 + 24;
+const KG = { top: (844 - KG_H) / 2, h: KG_H, btn: (844 - KG_H) / 2 + 84 + KG_LINES.length * 20 };
+const krGate = rect(0, 0, 390, 844, { fill: T.wash }) + rect(16, KG.top, 358, KG.h, { r: 24, fill: "#fff" }) + text(195, KG.top + 45, "Masuk sebagai Kreator", { size: 22, fill: T.text, anchor: "middle" }) +
+  para(195, KG.top + 75, KG_LINES, { size: 14, fill: T.sub, anchor: "middle", lh: 20 }) + rect(36, KG.btn, 318, 40, { r: 20, fill: T.accent }) +
+  text(195, KG.btn + 25, "Masuk dengan Google", { size: 15, weight: 500, fill: "#fff", anchor: "middle" });
+const KR_ACCT = PB(24, 182, 342, 66);
+const krGoogle = rect(0, 0, 390, 844, { fill: "#fff" }) + gLogo(24, 48, 24) + text(24, 118, "Pilih akun", { size: 26, fill: "#1f1f1f" }) + line(24, 178.5, 366, 178.5, { stroke: "#e3e3e3" }) +
+  circle(44, 214, 16, { fill: "#7cacf8" }) + text(44, 219, "R", { size: 14, weight: 600, fill: "#fff", anchor: "middle" }) + text(72, 209, "Rina WO", { size: 14, weight: 500, fill: "#1f1f1f" }) +
+  text(72, 228, "rina.wo@gmail.com", { size: 12, fill: T.sub }) + line(24, 250.5, 366, 250.5, { stroke: "#e3e3e3" }) + circle(44, 282, 14, { stroke: T.sub }) +
+  text(72, 287, "Gunakan akun lain", { size: 14, weight: 500, fill: "#1f1f1f" }) + line(24, 314.5, 366, 314.5, { stroke: "#e3e3e3" });
+const KR_LIST = [["Undangan Rani & Dimas", "10.20", "61 RSVP · 47 ucapan · 140/180 tamu membuka"], ["Undangan Ayu & Fajar", "Kemarin", "Belum ada aktivitas", true]];
+const krList = rect(0, 0, 390, 844, { fill: "#fff" }) + text(20, 40, "Undangan", { size: 22, fill: T.accent }) + text(370, 40, "2", { size: 14, fill: T.sub, anchor: "end" }) + search(66, "Cari undangan") +
+  KR_LIST.map(([name, time, pv, nopin], i) => row(114 + i * 72, { x0: 0, right: 375, name, ini: iniR(name), time, parts: [{ t: pv }] }) +
+    (nopin ? text(375, 114 + i * 72 + 54, "Tanpa PIN", { size: 12, weight: 500, fill: T.danger, anchor: "end" }) : "")).join("") + krTabbar("kirim", 1, "K");
+const krHome = homeContent(QUICK.slice(0, 1)) + head("Beranda") + krTabbar("beranda", 4, "RD");
 
 // ---- Tamu dan Ucapan (HP) --------------------------------------------------------------------------------------------
 const GUESTS = [
@@ -846,6 +878,39 @@ const SCENES = {
           at: P(195, 488), click: true, show: ["on", "tOn"], dur: 3.6 },
         { caption: "Ketuk lagi untuk kembali khusus tamu. Status kembali Mati.", mark: open, lens: { src: PB(8, 452, 374, 72), zoom: 1.25 },
           at: P(195, 488), click: true, hide: ["tOn"], show: ["off2", "tOff"], dur: 3.6 }
+      ]
+    };
+  })(),
+
+  // Kreator: /dashboard?kreator di HP. Masuk dengan Google, daftar undangan sendiri, Beranda, PIN pasangan dari menu akun.
+  "gabung-kreator-dashboard": (() => {
+    const MX = 80, MW = 302, MY = 768 - 243, card = PB(16, KG.top, 358, KG.h), btn = { box: PB(36, KG.btn, 318, 40), r: 20 }, ME_K = P(krTabX(4).me, 809);
+    const menu = menuBox(MX, MY, MW, 243) + text(MX + 20, MY + 34, "Undangan Rani & Dimas", { size: 16, weight: 500, fill: T.text }) +
+      text(MX + 20, MY + 52, "https://nikahin.myscalev.com/rani-dimas", { size: 13, fill: T.sub }) + line(MX + 8, MY + 68.5, MX + MW - 8, MY + 68.5, { stroke: T.line }) +
+      menuItem(MX + 8, MY + 75, "pelacakan", "Pelacakan") + menuItem(MX + 8, MY + 115, "akun", "Pengaturan undangan") + menuItem(MX + 8, MY + 155, "lock", "Lihat PIN pasangan") +
+      menuItem(MX + 8, MY + 195, "keluar", "Keluar", true);
+    return {
+      title: "Mengelola undangan Kreator dari HP",
+      base: [phoneDesk(onPhone(krGate), { screen: T.wash })],
+      els: {
+        google: { svg: onPhone(krGoogle), enter: "fade", skel: true },
+        list: { svg: onPhone(krList), enter: "fade", skel: true },
+        home: { svg: onPhone(krHome), enter: "fade", skel: true },
+        menu: { svg: onPhone(menu), enter: "pop", origin: ME_K },
+        pin: onPhone(rect(MX + 50, MY + 160, MW - 60, 32, { fill: "#fff" }), text(MX + 54, MY + 180, "PIN pasangan: 482190 (tersalin)", { size: 15, fill: T.text }))
+      },
+      steps: [
+        { caption: "Buka dashboard Kreator di HP.", focus: card, mark: { box: card, r: 24 }, lens: { src: [card[0] - 8, card[1] - 8, card[2] + 16, card[3] + 16], zoom: 1.25 }, at: P(195, 240), dur: 2.8 },
+        { caption: "Ketuk Masuk dengan Google.", focus: [card, PB(0, 0, 390, 330)], at: P(195, KG.btn + 20), click: true, show: ["google"], mark: btn, note: "Masuk dengan Google", dur: 2.8 },
+        { caption: "Pilih akun Google yang sama dengan undangan Scalev.", focus: PB(0, 0, 390, 300), at: P(195, 215), click: true, hide: ["google"], show: ["list"], mark: { box: KR_ACCT, r: 4 },
+          lens: { src: PB(0, 60, 390, 200), zoom: 1.3 }, dur: 3.4 },
+        { caption: "Daftar Undangan hanya berisi undangan buatanmu.", mark: { box: PB(0, 114, 390, 144), r: 12 }, lens: { src: PB(0, 0, 390, 262), zoom: 1.3 }, dur: 3.2 },
+        { caption: "Ketuk undanganmu: Beranda terbuka, dengan tab Tamu dan Ucapan.", focus: PB(0, 0, 390, 844), at: P(195, 150), click: true, show: ["home"], mark: { box: PB(0, 114, 390, 72), r: 12 },
+          lens: { src: PB(0, 773, 390, 71), zoom: 1.5 }, dur: 3.8 },
+        { caption: "Ketuk lingkaran inisial, lalu Lihat PIN pasangan.", focus: [PB(0, 773, 390, 71), PB(MX, MY, MW, 243)], at: ME_K, click: true, show: ["menu"],
+          mark: { box: [ME_K[0] - 16, ME_K[1] - 16, 32, 32], r: 16 }, lens: { src: PB(MX - 4, MY - 4, MW + 8, 251), zoom: 1.3 }, dur: 3.4 },
+        { caption: "PIN tersalin. Kirim ke pengantin untuk Kirim dan Hari-H.", at: P(MX + 150, MY + 175), click: true, show: ["pin"], mark: { box: PB(MX + 8, MY + 155, MW - 16, 40), r: 10 },
+          lens: { src: PB(MX, MY + 150, MW, 50), zoom: 1.6 }, dur: 3.8 }
       ]
     };
   })()
