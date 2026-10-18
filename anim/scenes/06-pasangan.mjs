@@ -500,14 +500,15 @@ const bagikan = () => shareTop(NO_NOTE) + shareBtns(NO_NOTE) + accessHead(ACC_Y,
 const KELOLA = pinBox(COUPLE_Y);
 // pin.html dalam dialog Scalev (src/pin-frame.js): kartu 440px, sudut 8px, di tengah editor. revealed = setelah Lihat PIN.
 const DLG_X = 500;
-const dlgTop = (revealed) => 450 - (revealed ? 282 : 233);
+const dlgTop = (revealed) => 450 - (revealed ? 300 : 250);
 function pinDialog(revealed) {
-  const x = DLG_X, y = dlgTop(revealed), h = revealed ? 564 : 466, card = (cy, ch) => rect(x + 16.5, cy + 0.5, 407, ch - 1, { r: 8, fill: "#fff", stroke: C.line });
+  const x = DLG_X, y = dlgTop(revealed), h = revealed ? 599 : 501, card = (cy, ch) => rect(x + 16.5, cy + 0.5, 407, ch - 1, { r: 8, fill: "#fff", stroke: C.line });
   let s = rect(x - 2, y + 4, 444, h + 2, { r: 10, fill: "rgba(16,24,40,.10)" }) + rect(x, y, 440, h, { r: 8, fill: C.page }) +
     nkLogo(x + 32, y + 36, 32) + text(x + 58, y + 34, "NikahKit", { size: 16, weight: 700, fill: C.strong }) + text(x + 58, y + 54, "ID 365671", { size: 12, fill: C.faint }) + iconX("x", x + 410, y + 30, 20, C.text) +
     text(x + 16, y + 90, "rina.wo@gmail.com", { size: 12, weight: 700, fill: C.strong }) + text(x + 424, y + 90, "Keluar", { size: 12, weight: 500, fill: C.strong, anchor: "end", underline: true }) +
-    card(y + 108, 85) + nkH3(x + 32, y + 136, "Paket") + text(x + 32, y + 162, "Paket Tahunan, aktif sampai 14 Oktober 2027.", { size: 14, fill: C.text });
-  const pc = y + 205, ph2 = revealed ? 160 : 112;
+    card(y + 108, 120) + nkH3(x + 32, y + 136, "Paket") + text(x + 32, y + 162, "Paket Tahunan, aktif sampai 14 Oktober 2027.", { size: 14, fill: C.text }) +
+    nkBtn(x + 32, y + 176, "Perpanjang atau ganti paket", { size: 14 });
+  const pc = y + 240, ph2 = revealed ? 160 : 112;
   s += card(pc, ph2) + nkH3(x + 32, pc + 28, "PIN dashboard") + nkHint(x + 32, pc + 50, "PIN aktif (versi 1). Lupa? Lihat lagi kapan saja.");
   const by = pc + (revealed ? 108 : 60);
   if (revealed) s += rect(x + 32, pc + 60, 296, 40, { r: 4, fill: C.mutedBg }) + text(x + 44, pc + 86, "4 8 2 9 1 3", { size: 16, weight: 700, fill: C.strong, mono: true }) +
@@ -543,7 +544,7 @@ const SCENES = {
       { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", focus: [0, 92, 399, 62], mark: BAGIKAN_TOOL, note: "Bagikan",
         at: [36, 584], click: true, show: ["share", "kelola"] },
       { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, COUPLE_Y - 5, 399, 244], mark: [12, COUPLE_Y + 147, 374, 84], lens: { src: [0, COUPLE_Y - 3, 399, 238] }, at: [200, COUPLE_Y + 109], dur: 3.4 },
-      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", focus: [DLG_X, dlgTop(false), 440, 466], mark: KELOLA, note: "Kelola PIN dashboard",
+      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", focus: [DLG_X, dlgTop(false), 440, 501], mark: KELOLA, note: "Kelola PIN dashboard",
         at: [KELOLA[0] + 183, KELOLA[1] + 18], click: true, press: "kelola", show: ["backdrop", "dlg"], dur: 3.6 }
     ]
   },
@@ -569,9 +570,9 @@ const SCENES = {
       },
       steps: [
         { caption: "Di jendela NikahKit, bagian PIN dashboard, klik Lihat PIN. PIN 6 angka tampil.", focus: pinCard, mark: DLG_A.lihat,
-          lens: { src: [524, 474, 240, 52], at: [16, 230] }, at: [DLG_A.lihat[0] + DLG_A.lihat[2] / 2, DLG_A.lihat[1] + 18], click: true, show: ["dlgB"], dur: 3.4 },
+          lens: { src: [524, DLG_A.lihat[1] - 8, 240, 52], at: [16, 230] }, at: [DLG_A.lihat[0] + DLG_A.lihat[2] / 2, DLG_A.lihat[1] + 18], click: true, show: ["dlgB"], dur: 3.4 },
         { caption: "Klik ikon balon chat: Salin pesan untuk pengantin. Muncul Pesan tersalin.", focus: [pinCard, [516, DLG_B.noteY - 2, 408, 42]], mark: [hx - 12, hy - 12, 24, 24],
-          lens: { src: [524, 425, 412, 100], zoom: 1.5, at: [530, 476] },
+          lens: { src: [524, hy - 28, 412, 100], zoom: 1.5, at: [530, 476] },
           at: DLG_B.handover, click: true, hover: "tip", show: ["copied"], dur: 3.6 },
         { caption: "Pesan berisi link undangan, link kelola undangan, dan PIN. Tempel di WA.", focus: [bx, by, 404, bh + 2], mark: { box: [bx, by, 404, bh], r: 8 },
           lens: { src: [bx - 8, by - 8, 420, bh + 18], zoom: 1.5 }, show: ["bubble"], dur: 4.4 }

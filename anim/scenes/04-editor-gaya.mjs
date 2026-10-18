@@ -216,7 +216,8 @@ const ff = (name, cat = "serif") => `'${name}',${cat}`;
 const PLAYFAIR = ff("Playfair Display");
 // Kencana font pairs (template.json options.fontPairs; model.js FONT_PAIRS): [name, heading, body, heading css, body css].
 const PAIRS = [["Walnut", "MonteCarlo", "Tinos", SCRIPT, SERIF], ["Romantis", "Great Vibes", "Lora", ff("Great Vibes", "cursive"), ff("Lora")],
-  ["Tradisi", "Rochester", "Nunito", ff("Rochester", "cursive"), ff("Nunito", "sans-serif")], ["Anggun", "Dynalight", "Nunito", ff("Dynalight", "cursive"), ff("Nunito", "sans-serif")]];
+  ["Tradisi", "Rochester", "Nunito", ff("Rochester", "cursive"), ff("Nunito", "sans-serif")], ["Anggun", "Dynalight", "Nunito", ff("Dynalight", "cursive"), ff("Nunito", "sans-serif")],
+  ["Keraton", "Forum", "Lora", ff("Forum"), ff("Lora")], ["Klasik", "Cormorant Garamond", "Lato", ff("Cormorant Garamond"), ff("Lato", "sans-serif")]];
 const sample = (y, hf, bf = SERIF, size = 26) => rect(PX + 0.5, y + 0.5, PW - 1, 77, { r: 4, fill: C.white, stroke: C.line }) +
   text(PX + 12, y + 38, "Rani & Dimas", { size, fill: C.strong, font: hf }) + text(PX + 12, y + 62, "Minggu, 14 Februari 2027 pukul 08.00 WIB", { size: 12, fill: C.text, font: bf });
 const pairCard = (y, [n, h, b, hf, bf], on, def) => rect(PX + 0.5, y + 0.5, PW - 1, 107, { r: 4, fill: C.white, stroke: on ? C.primary : C.line, sw: on ? 2 : 1 }) +
@@ -227,20 +228,21 @@ const FONT_LINK = "https://fonts.google.com/specimen/Playfair+Display";
 // pair (index), font ("check" while weights are probed, "done" after). Returns [svg, positions].
 function huruf(o = {}) {
   let y = BY + 54, s = rect(72, BY + 38, 314, 1600, { fill: C.white }); const pos = {};
-  const p = PAIRS[o.pair ?? 0], hf = o.font === "done" ? PLAYFAIR : p[3];
+  const p = PAIRS[o.pair ?? 0], hf = o.font ? PLAYFAIR : p[3];
   if (o.big || o.bold || o.font) { s += resetBox(y); y += 62; }
   s += nkH3(PX, y + 12, "Ukuran teks") + (o.big ? changed(PX + 76, y + 12) : ""); y += 24;
   pos.scale = y; s += segIcons(PX, y, PW, [{ label: "Kecil", svg: TYPE, size: 14 }, { label: "Normal", svg: TYPE }, { label: "Besar", svg: TYPE, size: 24 }], o.big ? 2 : 1); y += 58;
   s += nkH3(PX, y + 12, "Ketebalan") + (o.bold ? changed(PX + 66, y + 12) : ""); y += 24;
   s += para(PX, y + 12, ["Hanya ketebalan yang dimiliki font yang", "dipakai."], { size: 12, fill: C.faint, lh: 16 }); y += 44;
-  if (o.font === "done") { s += text(PX, y + 12, "Ketebalan judul", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, "Normal (400)", { select: true }); y += 68; }
+  // Custom Playfair Display: its weights are in the catalogue, so Ketebalan judul shows while the link is still checked.
+  if (o.font) { s += text(PX, y + 12, "Ketebalan judul", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, "Normal (400)", { select: true }); y += 68; }
   pos.weight = y; s += text(PX, y + 12, "Ketebalan teks", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, o.bold ? "Tebal (700)" : "Normal (400)", { select: true }); y += 68;
   s += sample(y, hf, p[4]); y += 86;
   s += nkH3(PX, y + 12, "Custom") + (o.font ? changed(PX + 52, y + 12, "dipakai") : ""); y += 24;
   s += para(PX, y + 12, ["Salin link font dari Google Fonts, lalu", "tempel di sini."], { size: 12, fill: C.faint, lh: 16 }); y += 44;
   pos.gf = y; s += nkBtn(PX, y, "Buka Google Fonts", { variant: "ghost", w: PW, icon: "external-link" }); y += 48;
   pos.font = y;
-  s += o.font === "done" ? text(PX, y + 12, "Font judul dan nama: ", { size: 12, weight: 500 }) + text(PX + 123, y + 12, "Playfair Display", { size: 12, weight: 700, font: PLAYFAIR }) : text(PX, y + 12, "Font judul dan nama", { size: 12, weight: 500 });
+  s += o.font ? text(PX, y + 12, "Font judul dan nama: ", { size: 12, weight: 500 }) + text(PX + 123, y + 12, "Playfair Display", { size: 12, weight: 700, font: PLAYFAIR }) : text(PX, y + 12, "Font judul dan nama", { size: 12, weight: 500 });
   s += o.font ? nkInput(PX, y + 20, PW, "", {}) + clipped(PX + 10, y + 20, PW - 20, 36, text(PX + 10, y + 43, FONT_LINK, { size: 14 })) : nkInput(PX, y + 20, PW, "Tempel link Google Fonts", { placeholder: true });
   y += 56; if (o.font === "check") { s += text(PX, y + 20, "Memeriksa ketebalan yang tersedia…", { size: 12, fill: C.faint }); y += 20; } y += 12;
   s += text(PX, y + 12, "Font teks", { size: 12, weight: 500 }) + nkInput(PX, y + 20, PW, "Tempel link Google Fonts", { placeholder: true }); y += 68;
@@ -269,9 +271,12 @@ const SEG = (row, diff) => BY + 54 + (diff ? 62 : 0) + 24 + row * 82 + 19;
 // =====================================================================================================================
 // Musik (panels-structure.jsx AudioPanel); the panel does not scroll here, so the body is 294 wide.
 const AW = 294;
+// A new invitation starts with the sample song (model.js SAMPLE_AUDIO, newInvitation): o.sample.
+const SAMPLE_SONG = "https://www.youtube.com/watch?v=viW0M5R2BLo";
 function musik(o = {}) {
   let y = BY, s = rect(72, 154, 327, 746, { fill: C.white });
-  s += text(PX, y + 12, "Tautan lagu", { size: 12, weight: 500 }) + nkInput(PX, y + 20, AW, o.link ? (o.linkVal ? "https://youtu.be/AbCdEf12345" : "") : "https://youtu.be/...", { placeholder: !o.linkVal, focus: o.focusLink }) +
+  s += text(PX, y + 12, "Tautan lagu", { size: 12, weight: 500 }) + (o.sample ? nkInput(PX, y + 20, AW, "", {}) + clipped(PX + 10, y + 20, AW - 20, 36, text(PX + 10, y + 43, SAMPLE_SONG, { size: 14 }))
+    : nkInput(PX, y + 20, AW, o.link ? (o.linkVal ? "https://youtu.be/AbCdEf12345" : "") : "https://youtu.be/...", { placeholder: !o.linkVal, focus: o.focusLink })) +
     text(PX, y + 76, "YouTube, atau .mp3 dari hosting lain.", { size: 12, fill: C.faint });
   y += 92;
   s += text(PX, y + 12, "Mulai dari", { size: 12, weight: 500 }) + nkInput(PX, y + 20, AW, o.start ? (o.startVal ? "1:05" : "") : "0:00", { placeholder: !o.startVal, focus: o.focusStart });
@@ -280,7 +285,7 @@ function musik(o = {}) {
     s += rect(PX + 0.5, y + 0.5, AW - 1, 217, { r: 8, fill: C.page, stroke: C.line });
     s += o.playing ? rect(PX + 1, y + 1, AW - 2, 164, { fill: "#0f0f0f" }) + rect(PX + 12, y + 150, AW - 24, 3, { r: 1.5, fill: "rgba(255,255,255,.3)" }) + rect(PX + 12, y + 150, 64, 3, { r: 1.5, fill: "#ff0033" }) + circle(PX + 76, y + 151.5, 5, { fill: "#ff0033" }) +
       [0, 1, 2, 3, 4].map((i) => rect(PX + AW / 2 - 22 + i * 10, y + 70 - [10, 22, 16, 28, 12][i] / 2, 6, [10, 22, 16, 28, 12][i], { r: 2, fill: "rgba(255,255,255,.8)" })).join("")
-      : clipped(PX + 1, y + 1, AW - 2, 164, photo(PX + 1, y + 1, AW - 2, 164, 6), rect(PX + 1, y + 1, AW - 2, 164, { fill: "rgba(34,53,72,.35)" })) +
+      : clipped(PX + 1, y + 1, AW - 2, 164, photo(PX + 1, y + 1, AW - 2, 164, o.sample ? 2 : 6), rect(PX + 1, y + 1, AW - 2, 164, { fill: "rgba(34,53,72,.35)" })) +
         rect(PX + AW / 2 - 30, y + 62, 60, 42, { r: 12, fill: "rgba(0,0,0,.6)" }) + `<path d="M${PX + AW / 2 - 7} ${y + 73} l18 10 l-18 10 z" fill="#fff"/>`;
     const label = o.playing ? "Hentikan" : `Coba putar dari ${o.start ? "1:05" : "0:00"}`;
     s += nkBtn(PX + 11, y + 173, label, { icon: o.playing ? "close" : "play" });
@@ -440,15 +445,17 @@ const SCENES = {
 
   // ------------------------------------------------------------------------------------------- Media B: Pilih foto di form
   "editor-media-pilih-foto": (() => {
+    // A new invitation already shows a sample photo (model.js SAMPLE, newInvitation), so the button reads Ganti foto.
     const accY = GROUPS_Y + 58, FOTO_AT = 170; // Mempelai bar; the Foto label lands at the top of the panel body after scrolling
     const [col, p] = column([{ label: "Judul", placeholder: "Mempelai" }, { label: "Urutan nama", value: "Wanita dulu", select: true }, { h3: "Mempelai Wanita" },
       { label: "Nama panggilan", value: "Rani", hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", value: "Rani Ayu, S.Psi." }, { label: "Profesi atau bio singkat (opsional)", value: "Psikolog" },
-      { label: "Anak ke- (opsional)", value: "Putri kedua" }, { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" },
-      { toggle: "Ibu sudah wafat (Almh.)", on: false }, { photo: "Foto" }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." },
-      { h3: "Mempelai Pria" }, { label: "Nama panggilan", key: "pria", value: "Dimas" }], ACC_X, accY + 58, ACC_W);
+      { label: "Anak ke- (opsional)", value: "Putri kedua", hint: "Kosong: \"Putri dari\" / \"Putra dari\"." }, { label: "Nama ayah", value: "Bapak Ahmad" }, { toggle: "Ayah sudah wafat (Alm.)", on: false }, { label: "Nama ibu", value: "Ibu Siti" },
+      { toggle: "Ibu sudah wafat (Almh.)", on: false }, { photo: "Foto", url: 2 }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." },
+      { h3: "Mempelai Pria" }, { label: "Nama panggilan", key: "pria", value: "Dimas", hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", key: "priaFull", value: "Dimas Pratama, S.T." },
+      { label: "Profesi atau bio singkat (opsional)", key: "priaJob", value: "Arsitek" }], ACC_X, accY + 58, ACC_W);
     const open = rect(72, 154, 314, 1800, { fill: C.white }) + kontenTop() + nkAcc(PX, GROUPS_Y, PW, "Sampul", { badge: "Terisi" }) + nkAcc(PX, accY, PW, "Mempelai", { badge: "Terisi", open: true }) +
       line(88, accY + 49.5, 367, accY + 49.5, { stroke: C.line }) + accFrame(accY, p.end + 20) + col;
-    const dy = p.photo - FOTO_AT;
+    const dy = p.photo - FOTO_AT, BTN = p.photoBtn - dy; // Ganti foto after scrolling
     const [col2, p2] = column([{ photo: "Foto", url: 6 }, { label: "Kota asal", value: "Jakarta" }, { label: "Media sosial", value: "@rani.ayu", hint: "@nama dibuka di Instagram." }, { h3: "Mempelai Pria" },
       { label: "Nama panggilan", value: "Dimas", hint: "Tampil di sampul." }, { label: "Nama lengkap dan gelar", value: "Dimas Pratama, S.T." }, { label: "Profesi atau bio singkat (opsional)", value: "Arsitek" }], ACC_X, FOTO_AT, ACC_W);
     const picked = rect(72, 154, 314, 746, { fill: C.white }) + accFrame(154, 900) + col2;
@@ -464,12 +471,12 @@ const SCENES = {
     const ALT = "Rani tersenyum di taman";
     const [atasW] = segW(ACC_W - 20, FOCUS.map((f) => f[0]), 1);
     return {
-      title: "Memasang foto lewat tombol Pilih foto",
+      title: "Memasang foto lewat jendela Pilih foto",
       base: [shell("Konten", "Konten"), rect(72, 154, 327, 746, { fill: C.white }), kontenTop(), accTitles(GROUPS_Y), scrollbar(157, 300), cover()],
       els: {
         open: { svg: open, enter: "fade" },
         hdr: clipped(72, 0, 327, 154, scalevEditor(0, 0, { rail: "Konten" })) + nkHead(0, 0, "Konten") + line(72, 153, 399, 153, { stroke: C.line }),
-        dlg: { svg: dlg + pakai(false), enter: "pop", origin: [150, FOTO_AT + 38] },
+        dlg: { svg: dlg + pakai(false), enter: "pop", origin: [150, BTN + 18] },
         sel: { svg: rect(selX + 1, selY + 1, gs - 2, gs - 2, { r: 4, stroke: C.primary, sw: 2 }) + circle(selX + gs - 12, selY + 12, 8, { fill: C.action }) + iconX("check", selX + gs - 12, selY + 12, 10, C.white, 3) + pakai(true), enter: "fade" },
         picked: { svg: picked, enter: "fade" },
         alt: { svg: text(ACC_X + 20, p2.alt + 23, ALT, { size: 14 }), enter: "fade" },
@@ -478,10 +485,10 @@ const SCENES = {
       },
       steps: [
         { caption: "Di Konten, klik kelompok yang punya foto, misalnya Mempelai.", focus: PANELF, at: [200, accY + 25], click: true, show: ["open", "hdr"], mark: [PX, accY, PW, 50], lens: { src: [80, GROUPS_Y - 10, 302, 121] } },
-        { caption: "Gulir ke Foto, lalu klik Pilih foto. Jendela Pilih foto terbuka.", focus: LEFT, at: [150, FOTO_AT + 38], scroll: { id: "open", dy }, click: true, show: ["dlg"],
-          mark: nkBtnBox(ACC_X, FOTO_AT + 20, "Pilih foto", { icon: "image" }), lens: { src: [8, 213, 370, 76] }, dur: 3.6 },
+        { caption: "Gulir ke Foto. Ada foto contoh: klik Ganti foto, jendela Pilih foto terbuka.", focus: LEFT, at: [150, BTN + 18], scroll: { id: "open", dy }, click: true, show: ["dlg"],
+          mark: nkBtnBox(ACC_X, BTN, "Ganti foto", { icon: "image" }), lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 144] }, dur: 3.8 },
         { caption: "Klik satu foto di grid. Foto itu diberi tanda terpilih.", show: ["sel"], at: [selX + gs / 2, selY + gs / 2], click: true, mark: [selX, selY, gs, gs], note: "Foto terpilih", dur: 3.4 },
-        { caption: "Klik Pakai foto. Foto terpasang dan tombolnya menjadi Ganti foto.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 144] }, dur: 3.6 },
+        { caption: "Klik Pakai foto. Fotomu menggantikan foto contoh di form.", at: [200, 870], click: true, hide: ["dlg", "sel"], show: ["picked"], mark: [DX, 852, 367, 36], lens: { src: [ACC_X - 8, FOTO_AT - 6, 270, 144] }, dur: 3.6 },
         { caption: "Klik Deskripsi foto, lalu tulis kalimat pendek tentang isi foto.", focus: PANELF, at: [230, p2.alt + 18], click: true, show: ["alt", "altFocus"], type: [typed("alt", ACC_X + 20, p2.alt + 8, ALT)],
           mark: [ACC_X + 10, p2.alt, ACC_W - 20, 36], lens: { src: [ACC_X - 8, p2.alt - 34, ACC_W + 16, 78] }, dur: 3.8 },
         { caption: "Wajah terpotong di undangan? Di Titik fokus, klik Atas.", at: [ACC_X + 10 + atasW / 2, p2.focus + 19], click: true, show: ["top"], mark: [ACC_X + 10, p2.focus, atasW, 38],
@@ -492,7 +499,7 @@ const SCENES = {
 
   // ------------------------------------------------------------------------------------------- Musik
   "editor-musik-youtube": (() => {
-    const [A] = musik(), [B] = musik({ link: true, linkVal: true, focusLink: true }), [Cc] = musik({ link: true, linkVal: true, start: true, focusStart: true }), [D, t1] = musik({ link: true, linkVal: true, start: true, startVal: true, playing: true });
+    const [A] = musik({ link: true, sample: true }), [B] = musik({ link: true, linkVal: true, focusLink: true }), [Cc] = musik({ link: true, linkVal: true, start: true, focusStart: true }), [D, t1] = musik({ link: true, linkVal: true, start: true, startVal: true, playing: true });
     const base = [shell("Template", "Template"), templatePanel(null), scrollbar(157, 360), cover()];
     return {
       title: "Memasang musik dari YouTube",
@@ -516,7 +523,7 @@ const SCENES = {
           mark: { box: SALIN_BOX, r: 18 }, lens: { src: [476, 462, 500, 136], at: [150, 16] }, dur: 3.8 },
         { caption: "Kembali ke editor Scalev. Klik Audio di rel kiri, panel Musik terbuka.", focus: LEFT, at: ED.rail.Audio, click: true, hide: ["yt", "copied"], show: ["tabs", "musik"],
           mark: railBox("Audio"), lens: { src: [0, 96, 384, 232], at: [300, 40] }, dur: 3.4 },
-        { caption: "Klik Tautan lagu, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, hide: ["ed"], show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.6 },
+        { caption: "Klik Tautan lagu, hapus link lagu contoh, lalu tekan Ctrl+V (Mac: Cmd+V).", focus: PANELF, at: [240, BY + 38], click: true, hide: ["ed"], show: ["b", "clear", "link"], mark: [PX, BY + 20, AW, 36], lens: { src: [80, BY - 6, 310, 100] }, dur: 3.8 },
         { caption: "Isi Mulai dari, contoh 1:05 atau 65 (detik).", at: [200, BY + 130], click: true, show: ["c", "start"], type: [typed("start", PX + 10, BY + 119, "1:05")],
           mark: [PX, BY + 112, AW, 36], lens: { src: [80, BY + 86, 310, 70] }, dur: 3.4 },
         { caption: "Klik Coba putar dari 1:05 untuk mendengar. Klik Hentikan untuk berhenti.", at: [180, BY + 351], click: true, show: ["d"],
@@ -577,8 +584,10 @@ const SCENES = {
   "editor-gaya-huruf": (() => {
     const [H0, P0] = huruf(), [H1, P1] = huruf({ big: true }), [HP] = huruf({ big: true, pair: 1 }), [HB] = huruf({ big: true, pair: 1, bold: true });
     const DY = P1.pairs - 300, wy = P1.weight + 56;
-    const wpop = shadow(PX, wy, PW, 72, 4, 2) + rect(PX, wy, PW, 72, { r: 4, fill: C.white, stroke: "#c4c7c5" }) + text(PX + 12, wy + 23, "Normal (400)", { size: 14 }) +
-      rect(PX + 1, wy + 36, PW - 2, 32, { fill: C.crBlue }) + text(PX + 12, wy + 57, "Tebal (700)", { size: 14, fill: C.white });
+    // Ketebalan teks of Romantis (Lora 400, 500, 600, 700; model.js FONTS, WEIGHT_NAME), Tebal (700) highlighted.
+    const WOPT = ["Normal (400)", "Sedang (500)", "Semi tebal (600)", "Tebal (700)"], wh = WOPT.length * 32 + 8;
+    const wpop = shadow(PX, wy, PW, wh, 4, 2) + rect(PX, wy, PW, wh, { r: 4, fill: C.white, stroke: "#c4c7c5" }) + rect(PX + 1, wy + 4 + 3 * 32, PW - 2, 32, { fill: C.crBlue }) +
+      WOPT.map((w, i) => text(PX + 12, wy + 25 + i * 32, w, { size: 14, fill: i === 3 ? C.white : C.strong })).join("");
     return {
       title: "Mengatur ukuran teks, pasangan font, dan ketebalan",
       base: [shell("Gaya", "Gaya"), subtabs(0), warnaA(), scrollbar(157, 380), cover()],
@@ -600,7 +609,7 @@ const SCENES = {
         { caption: "Gulir ke Pasangan font, lalu klik yang kamu suka, misalnya Romantis.", focus: [[72, 296, 327, 232], PREVF], at: [230, 470], scroll: { id: "pane", dy: DY }, click: true, show: ["paneP", "pair"],
           mark: [PX, 416, PW, 108], lens: { src: [80, 412, 302, 116], at: [12, 24] }, dur: 4.2 },
         { caption: "Di Ketebalan, pilih Ketebalan teks, misalnya Tebal (700).", focus: PANELF, at: [230, P1.weight + 38], scroll: { id: "paneP", dy: -DY }, click: true, show: ["wpop", "paneB"],
-          mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 302, 160] }, dur: 4.2 }
+          mark: [PX, P1.weight + 20, PW, 36], lens: { src: [80, P1.weight - 6, 302, 200] }, dur: 4.2 }
       ]
     };
   })(),
@@ -631,7 +640,7 @@ const SCENES = {
           mark: [{ box: OMNI, r: 17 }, { box: GF_ROW0, r: 12 }], lens: { src: [118, 44, 560, 40], at: [100, 92] }, dur: 4.2 },
         { caption: "Kembali ke Scalev. Tempel link di Font judul dan nama.", focus: PANELF, at: [230, P0.font + 38], click: true, hide: ["gf", "spec", "sel"], show: ["chk", "tabs1", "bar"],
           mark: [PX, P0.font + 20, PW, 36], lens: { src: [80, PC.font - 8, 302, 96] }, dur: 3.4 },
-        { caption: "Tunggu Memeriksa ketebalan... Lalu nama font tampil di label kolom.", at: [230, PD.font + 12], hide: ["ed"], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
+        { caption: "Nama font langsung tampil di label kolom. Tunggu Memeriksa ketebalan selesai.", at: [230, PD.font + 12], hide: ["ed"], show: ["done"], mark: { box: [PX, PD.font, PW, 16], r: 2 },
           lens: { src: [80, PD.font - 8, 302, 72] }, dur: 3.8 },
         { caption: "Klik Kembali ke pasangan bawaan untuk membuang font Custom.", at: [PX + 90, PD.back - SDY + 18], scroll: { id: "done", dy: SDY }, click: true, hide: ["chk", "done", "tabs1", "bar"],
           mark: nkBtnBox(PX, PD.back - SDY, "Kembali ke pasangan bawaan"), note: "Kembali ke pasangan bawaan", dur: 3.8 }

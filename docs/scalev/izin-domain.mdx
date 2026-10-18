@@ -31,10 +31,10 @@ Ada juga **Worker Sources**, tetapi NikahKit tidak memakainya. Sumber: [Cara Mem
 
 Setiap kali undangan ditulis, NikahKit menambahkan izin yang dipakai undangan, bila Scalev mengizinkan:
 
-- Ucapan dan RSVP Nikahin (`connect_src`).
-- Musik YouTube (`script_src` dan `frame_src`) dan video YouTube (`frame_src`, plus gambar thumbnail `img_src`).
+- Ucapan dan RSVP Nikahin (`connect_src https://wedding-guestbook.nikahin.workers.dev`).
+- Musik YouTube (`script_src` dan `frame_src https://www.youtube.com`) dan video YouTube (`frame_src https://www.youtube-nocookie.com`, plus gambar thumbnail `img_src https://i.ytimg.com`).
 - Peta Google Maps (`frame_src https://www.google.com`).
-- Foto dari luar Media Scalev (`img_src`) dan file musik dari luar Media Scalev (`media_src`).
+- Foto dari luar Media Scalev (`img_src`, domain foto itu) dan file musik dari luar Media Scalev (`media_src`, domain file itu).
 
 Google Fonts sudah diizinkan Scalev di semua halaman, jadi tidak perlu ditambah. Di daftar Bantuan, barisnya tampil sebagai **Sudah diizinkan**.
 

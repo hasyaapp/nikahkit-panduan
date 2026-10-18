@@ -119,5 +119,373 @@
     ],
     "intro": "Halo, Kreator Nikahin. Di video ini kita siapkan template undangan di Canva, mengajukannya, dan melihat bonusnya.",
     "outro": "Selesai. Templatemu hanya untukmu, dan tiap pesanan yang memakainya memberi bonus."
+  },
+  {
+    "slug": "nk-pasang-ekstensi",
+    "title": "NikahKit: Unduh, ekstrak, dan pasang lewat Load unpacked",
+    "chapters": [
+      ["gabung-ekstrak-zip", "Unduh NikahKit dan ekstrak ZIP"],
+      ["pasang-load-unpacked", "Load unpacked"],
+      ["gabung-tab-nikahkit-muncul", "Tab NikahKit di editor Scalev"]
+    ],
+    "intro": "Cara memasang NikahKit di Chrome komputer.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-masuk-google",
+    "title": "NikahKit: Masuk dengan Google",
+    "chapters": [["gabung-masuk-google", "Masuk dengan Google"]],
+    "intro": "Cara masuk ke NikahKit dengan akun Google.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-pilih-paket",
+    "title": "NikahKit: Pilih paket membership",
+    "chapters": [["gabung-pilih-paket", "Pilih paket"]],
+    "intro": "Cara membuka dan membaca tabel Pilih paket.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-bayar-membership",
+    "title": "NikahKit: Bayar membership",
+    "chapters": [["gabung-bayar-paket", "Bayar dan Cek pembayaran"]],
+    "intro": "Cara membayar membership NikahKit.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-hubungkan-scalev",
+    "title": "NikahKit: Hubungkan bisnis Scalev",
+    "chapters": [["gabung-hubungkan-scalev", "Hubungkan bisnis Scalev"]],
+    "intro": "Cara menghubungkan bisnis Scalev ke NikahKit.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-buat-halaman",
+    "title": "NikahKit: Buat halaman undangan di Scalev",
+    "chapters": [
+      ["scalev-buat-halaman-html", "Buka Landing Pages"],
+      ["scalev-lp-html", "Buat halaman HTML Mode"],
+      ["scalev-slug-isi", "Isi slug"],
+      ["scalev-slug-simpan", "Simpan halaman"]
+    ],
+    "intro": "Cara membuat halaman undangan di Scalev.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-simpan-terbitkan",
+    "title": "NikahKit: Simpan dan Simpan & Terbitkan",
+    "chapters": [
+      ["scalev-simpan-terbitkan", "Tersimpan, tapi belum di Scalev"],
+      ["scalev-terbitkan", "Simpan & Terbitkan"]
+    ],
+    "intro": "Beda tersimpan di NikahKit dan terbit di Scalev.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-ubah-slug",
+    "title": "NikahKit: Atur alamat undangan (slug)",
+    "chapters": [
+      ["scalev-ubah-slug", "Slug URL di tab Settings"],
+      ["scalev-terbitkan", "Simpan & Terbitkan"],
+      ["scalev-bagikan-salin", "Salin tautan umum"]
+    ],
+    "intro": "Cara mengganti slug alamat undangan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-domain-sendiri",
+    "title": "NikahKit: Pakai domain sendiri",
+    "chapters": [
+      ["scalev-domain-beli", "Beli domain"],
+      ["scalev-domain-cloudflare", "Pindahkan DNS ke Cloudflare"],
+      ["scalev-custom-domain", "+ Tambah Domain di Scalev"],
+      ["scalev-domain-verifikasi", "Add Record dan Verifikasi"]
+    ],
+    "intro": "Cara memakai domain sendiri untuk undangan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-izin-domain",
+    "title": "NikahKit: Izin domain (CSP) di tab Security",
+    "chapters": [
+      ["scalev-security-csp", "Izin domain (CSP) dan tab Security"],
+      ["scalev-terbitkan", "Simpan & Terbitkan"],
+      ["scalev-periksa-ulang", "Periksa ulang"]
+    ],
+    "intro": "Cara mengecek dan menambah izin domain.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-kenali-editor",
+    "title": "NikahKit: Kenali editor",
+    "chapters": [
+      ["editor-peta", "Tab NikahKit"],
+      ["editor-peta-simpan", "Pratinjau dan Simpan"]
+    ],
+    "intro": "Letak menu, panel, dan pratinjau editor NikahKit.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-pilih-template",
+    "title": "NikahKit: Pilih template",
+    "chapters": [
+      ["editor-pilih-template", "Template"],
+      ["editor-pilih-template-dipakai", "Dipakai"]
+    ],
+    "intro": "Cara memilih template pertama untuk undangan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-isi-mempelai-acara",
+    "title": "NikahKit: Isi sampul, mempelai, dan acara",
+    "chapters": [
+      ["editor-isi-mempelai", "Mempelai, Acara & Tanggal, Sampul"],
+      ["editor-isi-mempelai-pratinjau", "Pratinjau"],
+      ["editor-tambah-acara", "Tambah acara"],
+      ["editor-tambah-acara-pratinjau", "Acara baru di pratinjau"]
+    ],
+    "intro": "Cara mengisi sampul, mempelai, dan acara.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-isi-cerita-galeri",
+    "title": "NikahKit: Isi galeri foto, kisah cinta, dan video",
+    "chapters": [
+      ["editor-galeri-pilih-foto", "Tambah foto"],
+      ["editor-galeri-pratinjau", "Pratinjau"],
+      ["editor-isi-galeri", "Galeri Foto, Kisah Cinta, Video"]
+    ],
+    "intro": "Cara mengisi galeri foto, kisah cinta, dan video.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-isi-rsvp-hadiah",
+    "title": "NikahKit: Isi RSVP, Amplop Digital, dan penutup",
+    "chapters": [["editor-rsvp-hadiah", "RSVP & Ucapan dan Amplop Digital"]],
+    "intro": "Cara mengatur RSVP, hadiah, dan kaki halaman.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-foto-dan-media",
+    "title": "NikahKit: Unggah dan pasang foto",
+    "chapters": [
+      ["editor-media-unggah", "Unggah foto"],
+      ["editor-media-pilih-foto", "Ganti foto"]
+    ],
+    "intro": "Cara mengunggah foto lalu memasangnya.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-musik",
+    "title": "NikahKit: Pasang musik dari YouTube",
+    "chapters": [["editor-musik-youtube", "Tautan lagu"]],
+    "intro": "Cara memasang lagu latar dari YouTube.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-gaya",
+    "title": "NikahKit: Atur warna, huruf, dan bentuk",
+    "chapters": [
+      ["editor-gaya-palet", "Palet"],
+      ["editor-gaya-warna", "Warna Custom"],
+      ["editor-gaya-huruf", "Huruf"],
+      ["editor-gaya-font", "Font dari Google Fonts"],
+      ["editor-gaya-bentuk", "Bentuk"]
+    ],
+    "intro": "Cara mengubah warna, huruf, dan bentuk.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-lapisan",
+    "title": "NikahKit: Atur urutan bagian di Lapisan",
+    "chapters": [["editor-lapisan-urutan", "Lapisan"]],
+    "intro": "Cara mengatur urutan dan menyembunyikan bagian.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-terbitkan-cek-hp",
+    "title": "NikahKit: Simpan & Terbitkan, lalu cek di HP",
+    "chapters": [
+      ["scalev-terbitkan", "Simpan & Terbitkan"],
+      ["scalev-bagikan-salin", "Salin tautan umum"],
+      ["scalev-buka-di-hp", "Buka di HP"]
+    ],
+    "intro": "Cara menerbitkan undangan dan mengeceknya di HP.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-bagikan-undangan",
+    "title": "NikahKit: Cek tampilan tamu lewat Bagikan",
+    "chapters": [["tamu-bagikan", "Bagikan dan Lihat sebagai tamu"]],
+    "intro": "Cara mencoba undangan sebagai tamu.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-pasang-dashboard",
+    "title": "NikahKit: Pasang Dashboard pasangan",
+    "chapters": [
+      ["jualan-pasang-dashboard", "Pilih Dashboard pasangan"],
+      ["jualan-pasang-dashboard-dialog", "Pasang Dashboard pasangan"],
+      ["jualan-pasang-dashboard-hasil", "Dashboard pasangan dipasang"],
+      ["jualan-pasang-dashboard-terbit", "Terbitkan Dashboard pasangan"],
+      ["jualan-bagikan-pengantin", "Buka Dashboard dari Bagikan"]
+    ],
+    "intro": "Cara memasang Dashboard pasangan, cukup sekali.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-pin-dashboard",
+    "title": "NikahKit: Buat PIN dashboard",
+    "chapters": [
+      ["tamu-pin", "Kelola PIN dashboard"],
+      ["tamu-pin-salin", "Buat PIN dan Salin pesan"]
+    ],
+    "intro": "Cara membuat PIN dashboard untuk pengantin.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-serahkan-ke-pasangan",
+    "title": "NikahKit: Serahkan undangan ke pengantin",
+    "chapters": [
+      ["pasangan-kelola-pin", "Kelola PIN dashboard"],
+      ["pasangan-salin-pesan", "Salin pesan untuk pengantin"],
+      ["jualan-checklist", "Checklist serah undangan"]
+    ],
+    "intro": "Cara mengirim link dan PIN ke pengantin.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-dashboard-pengantin",
+    "title": "NikahKit: Dashboard pasangan untuk pengantin",
+    "chapters": [
+      ["pasangan-masuk", "Masuk dengan PIN"],
+      ["pasangan-beranda", "Kenali Beranda"],
+      ["pasangan-kirim", "Kirim undangan lewat WhatsApp"],
+      ["pasangan-tamu", "Lihat daftar tamu"],
+      ["pasangan-ucapan", "Balas ucapan"]
+    ],
+    "intro": "Yang dilakukan pengantin di Dashboard pasangan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-hari-h",
+    "title": "NikahKit: Check-in tamu di hari-H",
+    "chapters": [["pasangan-hari-h", "Check-in di Hari-H"]],
+    "intro": "Cara mencatat tamu yang datang di hari-H.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-staff-penerima-tamu",
+    "title": "NikahKit: Kode staff penerima tamu",
+    "chapters": [["tamu-staff", "Staff penerima tamu"]],
+    "intro": "Cara memberi kode check-in untuk staff.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-profil-merek",
+    "title": "NikahKit: Isi Profil merek",
+    "chapters": [["jualan-profil-merek", "Isi Profil merek"]],
+    "intro": "Cara mengisi Profil merek untuk jualan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-landing-page",
+    "title": "NikahKit: Pasang Landing page jualan",
+    "chapters": [
+      ["jualan-pasang-landing", "Pilih Landing Klasik"],
+      ["jualan-pasang-landing-dialog", "Pasang Landing page"],
+      ["jualan-pasang-landing-hasil", "Landing page dipasang"],
+      ["jualan-pasang-landing-terbit", "Terbitkan Landing page"],
+      ["jualan-landing-page", "Klien memesan di Landing page"]
+    ],
+    "intro": "Cara memasang Landing page untuk jualan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-form-data-klien",
+    "title": "NikahKit: Bagikan form data klien",
+    "chapters": [
+      ["jualan-link-form", "Link form klien"],
+      ["jualan-form-klien", "Klien mengisi form"]
+    ],
+    "intro": "Cara klien mengirim data undangannya.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-pesanan-masuk",
+    "title": "NikahKit: Proses Pesanan masuk",
+    "chapters": [
+      ["jualan-pesanan-masuk", "Buka Pesanan masuk"],
+      ["jualan-pesanan-terbit", "Ganti foto dan terbitkan"],
+      ["jualan-tempel-pesanan", "Pesanan dari WhatsApp"]
+    ],
+    "intro": "Cara mengubah pesanan klien jadi undangan.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "nk-alur-kerja-klien",
+    "title": "NikahKit: Alur kerja dengan klien",
+    "chapters": [["jualan-alur", "Alur kerja vendor"]],
+    "intro": "Alur kerja dari pesanan sampai hari-H.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-terima-undangan",
+    "title": "Kreator Nikahin: Terima undangan Scalev",
+    "chapters": [["gabung-kreator-terima-undangan", "Terima Undangan"]],
+    "intro": "Cara menerima undangan Scalev dari Nikahin.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-bergabung",
+    "title": "Kreator Nikahin: Bergabung ke bisnis Nikahin",
+    "chapters": [["gabung-kreator-bergabung", "Bergabung ke Bisnis"]],
+    "intro": "Cara bergabung ke bisnis Nikahin di Scalev.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-buat-halaman",
+    "title": "Kreator Nikahin: Buat halaman undangan",
+    "chapters": [["gabung-kreator-buat-halaman", "HTML Sales Page"]],
+    "intro": "Cara membuat halaman undangan di bisnis Nikahin.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-masuk",
+    "title": "Kreator Nikahin: Masuk ke NikahKit",
+    "chapters": [["gabung-kreator-masuk", "Masuk dengan Google"]],
+    "intro": "Cara masuk ke NikahKit sebagai Kreator.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-template",
+    "title": "Kreator Nikahin: Pilih template dan unggah foto",
+    "chapters": [["gabung-kreator-template", "Template, Media, Simpan"]],
+    "intro": "Cara memilih template dan mengunggah foto.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-buku-tamu",
+    "title": "Kreator Nikahin: Cek Buku Tamu",
+    "chapters": [["gabung-kreator-buku-tamu", "Buku Tamu"]],
+    "intro": "Cara melihat undanganmu di Buku Tamu.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-landing",
+    "title": "Kreator Nikahin: Pasang Landing",
+    "chapters": [["gabung-kreator-landing", "Landing Klasik"]],
+    "intro": "Cara memasang Landing atas nama merekmu.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-serahkan",
+    "title": "Kreator Nikahin: Serahkan undangan ke pengantin",
+    "chapters": [
+      ["gabung-kreator-pin", "Kelola PIN dashboard"],
+      ["gabung-kreator-pin-salin", "Salin pesan untuk pengantin"]
+    ],
+    "intro": "Cara mengirim Dashboard dan PIN ke pengantin.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
   }
 ]

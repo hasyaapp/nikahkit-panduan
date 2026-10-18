@@ -345,10 +345,10 @@ const phField = (y, h, v) => rect(PX + 24, y, 342, h, { r: 6, fill: C.white, str
 const phLabel = (y, s) => text(PX + 24, y, s, { size: 13, weight: 700, fill: "#1f1f1f" });
 const phSecs = (y0) => rect(PX, y0, 390, 900, { fill: CREAM }) + rect(PX + 20, y0 + 20, 350, 197, { r: 6, fill: "#111" }) +
   rect(PX + 161, y0 + 94, 68, 48, { r: 12, fill: "#ff0000" }) + `<path d="M${PX + 188} ${y0 + 107} l18 11 -18 11 z" fill="#fff"/>` +
-  text(PX + 195, y0 + 290, "Ucapan & RSVP", { size: 28, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
-  phLabel(y0 + 330, "Nama") + phField(y0 + 340, 42, "Tamu Undangan") + phLabel(y0 + 408, "Kehadiran") +
-  pill(PX + 24, y0 + 418, 104, "Hadir", true) + pill(PX + 136, y0 + 418, 112, "Tidak hadir") + pill(PX + 256, y0 + 418, 110, "Masih ragu") +
-  phLabel(y0 + 486, "Ucapan") + phField(y0 + 496, 90, "Selamat menempuh hidup baru!") +
+  text(PX + 195, y0 + 290, "Ucapan & Kehadiran", { size: 28, fill: MAROON, anchor: "middle", font: SERIF, italic: true }) +
+  phLabel(y0 + 330, "Nama") + phField(y0 + 340, 42, "Tamu Undangan") + phLabel(y0 + 408, "Konfirmasi kehadiran") +
+  pill(PX + 24, y0 + 418, 104, "Hadir", true) + pill(PX + 136, y0 + 418, 110, "Masih ragu") + pill(PX + 254, y0 + 418, 112, "Tidak hadir") +
+  phLabel(y0 + 486, "Ucapan & doa") + phField(y0 + 496, 90, "Selamat menempuh hidup baru!") +
   rect(PX + 24, y0 + 604, 342, 46, { r: 23, fill: MAROON }) + icon("send", PX + 168, y0 + 627, 16, C.white) + text(PX + 204, y0 + 632, "Kirim", { size: 15, fill: C.white, anchor: "middle" });
 const phoneWeb = rect(PX, PY, 390, PH, { r: 12, fill: C.white }) + rect(PX + 14, PY + 14, 330, 36, { r: 18, fill: C.crOmni }) + icon("lock", PX + 34, PY + 32, 13, C.crIcon) +
   text(PX + 48, PY + 37, "tokomu.myscalev.com/rani-dimas", { size: 14, fill: C.crText }) + iconX("more-vertical", PX + 366, PY + 32, 18, C.crIcon) + line(PX, PY + 62.5, PX + 390, PY + 62.5, { stroke: "#e3e3e3" });

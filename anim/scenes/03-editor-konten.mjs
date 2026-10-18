@@ -376,8 +376,8 @@ export const scenes = {
     const [waClear, waTyped, waTy] = typeIn(I, waY, IW, "081298765432");
     const turutY = gifts.at["Turut Mengundang"] - D6;
     const vF = kListAt("Turut Mengundang", turutY, { open: "Turut Mengundang", fill: fillFamilies, raw: true });
-    const D8 = vF.at["Kaki Halaman"] - 330;
-    const vKaki = kListAt("Kaki Halaman", 330, { open: "Kaki Halaman", fill: fillFooter }), brandY = vKaki.f["Nama brand"] + 20;
+    const D8 = vF.at["Kaki Halaman"] - 169;
+    const vKaki = kListAt("Kaki Halaman", 169, { open: "Kaki Halaman", fill: fillFooter }), brandY = vKaki.f["Nama brand"] + 20, footWaY = vKaki.f["WhatsApp pemesanan"] + 20;
     return {
       title: "Mengatur RSVP, Amplop Digital, dan bagian penutup",
       base: [...editor("Konten"), kListAt("RSVP & Ucapan", 169).svg, pvCover("Rani & Dimas")],
@@ -407,8 +407,8 @@ export const scenes = {
         { caption: "Masih di Amplop Digital, isi WhatsApp konfirmasi dengan nomor klien.", focus: F.body, mark: [I, waY, IW, 36], lens: { src: [93, waY - 28, 270, 72] }, hide: ["list1", "list2"], scroll: { id: "gifts", dy: D6 },
           at: [230, waY + 18], click: true, show: ["waClear", "waTyped"], type: [{ id: "waTyped", ...waTy }], dur: 3.8 },
         { caption: "Isi Turut Mengundang dan Salam Penutup.", focus: [72, turutY - 8, 327, 908 - turutY], mark: accM(turutY), lens: { src: [80, turutY - 8, 295, 120] }, at: [190, turutY + 25], click: true, show: ["vF"], dur: 3.4 },
-        { caption: "Periksa Kaki Halaman: nama brand dan WhatsApp pemesanan milik usahamu.", focus: F.body, mark: accM(330), lens: { src: [93, 322, 270, brandY + 44 - 322] },
-          hide: ["gifts", "waClear", "waTyped"], scroll: { id: "vF", dy: D8 }, at: [190, 355], click: true, show: ["vKaki"], dur: 3.8 },
+        { caption: "Periksa Kaki Halaman: nama brand dan WhatsApp pemesanan milik usahamu.", focus: F.body, mark: [{ box: accM(169), r: 4 }, { box: [I, brandY, IW, 36], r: 4 }, { box: [I, footWaY, IW, 36], r: 4 }], lens: { src: [93, brandY - 28, 270, footWaY - brandY + 72], zoom: 1.2 },
+          hide: ["gifts", "waClear", "waTyped"], scroll: { id: "vF", dy: D8 }, at: [190, 194], click: true, show: ["vKaki"], dur: 3.8 },
         { caption: "Simpan: tunggu status Tersimpan, lalu klik Simpan di Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, hide: ["vF"], at: ED.simpan, press: "sBtn" }
       ]
     };

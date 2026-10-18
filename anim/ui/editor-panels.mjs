@@ -144,14 +144,20 @@ export const fillRsvp = (c) => {
     .toggle(["Tampilkan QR masuk untuk tamu", "undangan khusus"], false, ["Tamu yang Hadir mendapat QR check-in."]);
 };
 const story = (when, place, title, lines, k) => (f) => f.field("Waktu", when).field("Lokasi (opsional)", place).field("Judul", title).area("Cerita", lines, 4).photo("Foto (opsional)", k);
-export const fillKisah = (c) => { c.field("Judul", "Kisah Cinta", { placeholder: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
-  item(c, "Menjalin Hubungan", story("Agustus 2022", "Jakarta", "Menjalin Hubungan", ["Setelah sekian lama berteman,", "kami memutuskan untuk", "melangkah bersama."], 3), false, false); };
+export const fillKisah = (c) => { c.field("Judul", "Kisah Kami", { placeholder: true }); item(c, "Pertama Bertemu", story("Maret 2021", "Bandung", "Pertama Bertemu", ["Kami bertemu di sebuah acara", "kampus dan mulai saling", "mengenal."], 1), true, false);
+  item(c, "Menjalin Hubungan", story("Agustus 2022", "Jakarta", "Menjalin Hubungan", ["Setelah sekian lama berteman,", "kami memutuskan untuk", "melangkah bersama."], 3), false, false);
+  item(c, "Lamaran", story("Juni 2026", "Jakarta", "Lamaran", ["Dengan restu kedua keluarga,", "kami bertunangan dan", "merencanakan hari bahagia."], 4), false, false);
+  item(c, "Menikah", story("Februari 2027", "Jakarta", "Menikah", ["Kami mengikat janji suci di", "hadapan keluarga dan", "sahabat."], 5), false, true);
+  c.add(quietBlock(I, c.y, IW, "Tambah momen", "plus"), 48); };
 export const fillVideo = (c) => { c.field("Judul", "Video", { placeholder: true }).area("Keterangan", ["Saksikan perjalanan kami dalam", "video berikut."]);
   item(c, "Prewedding", (f) => f.field("Tautan YouTube", "https://www.youtube.com/watch?v=boRd_GXsYWA").field("Judul video (opsional)", "Prewedding"), true, true);
   c.add(quietBlock(I, c.y, IW, "Tambah video", "plus"), 48); };
 const swatch = (f, hex) => f.add(rect(I + IW - 52, f.y - 40, 20, 20, { r: 3, fill: hex, stroke: C.field }));
+// Six sample colours, the list's maximum, so there is no Tambah warna button.
 export const fillDress = (c) => { c.field("Judul", "Dress Code", { placeholder: true });
-  [["Olive", "#3F4232"], ["Terakota", "#A0522D"], ["Sage", "#5B7553"]].forEach(([n, hex], i) => item(c, n, (f) => swatch(f.field("Warna", hex), hex).field("Nama warna", n), i === 0, false)); };
+  [["Olive", "#3F4232"], ["Terakota", "#A0522D"], ["Sage", "#5B7553"], ["Blush", "#E2C3C9"], ["Krem", "#F4F1EA"], ["Cokelat", "#6B4A3A"]]
+    .forEach(([n, hex], i, all) => item(c, n, (f) => swatch(f.field("Warna", hex), hex).field("Nama warna", n), i === 0, i === all.length - 1));
+  c.area("Catatan", ["Contoh palet, tidak harus sama", "persis."]).field("Larangan warna (opsional)", "Mohon hindari busana berwarna putih."); };
 export const fillGifts = (c) => {
   c.field("Judul", "Tanda Kasih", { placeholder: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
     .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat tampil setelah", "tombol ditekan."]);
@@ -161,10 +167,13 @@ export const fillGifts = (c) => {
     .field("Tautan peta alamat (opsional)", "https://maps.google.com/?q=Kebayoran+Baru").toggle("Tampilkan peta alamat", true, ["Butuh tautan Google Maps dan alamat."]).field("WhatsApp konfirmasi", "081234567890");
 };
 export const fillFamilies = (c) => c.field("Judul", "Turut Mengundang", { placeholder: true }).field("Judul grup wanita", "Keluarga Bpk. Ahmad").area("Keluarga mempelai wanita", ["Kel. Bpk. Hasan", "Kel. Ibu Aminah", "Kel. Bpk. Rahmat"], 3)
-  .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3);
+  .field("Judul grup pria", "Keluarga Bpk. Budi").area("Keluarga mempelai pria", ["Kel. Bpk. Hartono", "Kel. Ibu Sri", "Kel. Bpk. Joko"], 3)
+  .field("Judul grup lain (opsional)", "Rekan Kerja").area("Grup lain", ["PT Sejahtera", "Tim Arsitek"], 3);
 export const fillFooter = (c) => c.add(hintL(I, c.y, ["Dari Profil merek. Kolom kosong tidak", "tampil."]), 44)
   .toggle(["Hak cipta (© tahun dan nama", "mempelai)"], true).photo("Logo (opsional)", null, "Pilih foto")
-  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit, atau", "tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true });
+  .field("Nama brand", "Rina WO", { hint: ["Mengisi {{Brand}} di Kredit, atau", "tampil sendiri di bawah logo."] }).field("Tautan brand (opsional)", "https://...", { placeholder: true, hint: ["Logo dan nama brand bisa diklik ke", "sini."] })
+  .field("Kredit", "Designed by {{Brand}}", { hint: ["{{Brand}} diganti Nama brand."] }).field("Tautan kredit (opsional)", "https://...", { placeholder: true, hint: ["Diisi: kredit bisa diklik. Kosong: teks", "biasa."] })
+  .field("WhatsApp pemesanan", "081234567890", { hint: ["Kosong: tombol tidak tampil."] }).field("Teks tombol", "Pesan Undangan").area("Pesan awal WhatsApp", ["Halo, saya ingin membuat", "undangan digital."]);
 // Rail on Konten + the whole Konten panel (head and body) with Mempelai open, nickname `nick`; o goes to kList.
 export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Konten", { account: ACCOUNT }) + kList({ ...o, open: "Mempelai", fill: fillMempelai(nick) }).svg;
 

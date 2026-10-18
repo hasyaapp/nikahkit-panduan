@@ -10,10 +10,10 @@
 // extension version numbers: the banner and the ZIP names keep their place, the number is left out. Not measured
 // (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows, Windows Explorer, the
 // Chrome download bubble, folder picker, extension menu and prompt box.
-import { C, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow } from "../lib.mjs";
+import { C, PHONE, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
-  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast
+  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk
 } from "../ui/kit.mjs";
 import {
   securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, LP_ROWS, head, genericBody,
@@ -22,7 +22,7 @@ import {
 import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
 import { brandClosed, brandOpen, mkCards, mkCard, dipakaiAt, BOX, MKY, cardXY, SEG, MARKETING_BOX } from "../ui/marketing.mjs";
 import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
-import { shareTop, shareBtns, shareBox, NO_NOTE } from "../ui/bagikan.mjs";
+import { shareTop, shareBtns, shareBox, NO_NOTE, urlBox as shareUrlBox, BAGIKAN_TOOL, accessHead, forCouple, pinBtn, pinBox, pinHint, ACC_Y, COUPLE_Y } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, kreatorHead, KR_CHIP_BOX } from "../ui/gate.mjs";
 import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA } from "../ui/pesanan.mjs";
 import { landingTop } from "./07-jualan.mjs";
@@ -65,7 +65,9 @@ const guideCard = (x, y, w, h, title) => rect(x + 3, y + 5, w, h, { r: 12, fill:
   (title ? text(x + 28, y + 44, title, { size: 22, weight: 700, fill: C.accent }) : "");
 
 // ---- NikahKit account dialog (pin.html framed by src/pin-frame.js) ---------------------------------------------------
-// Opened from the gate or the account chip ("openLogin"): no ID, so no "ID" line and no PIN dashboard card.
+// Opened from the gate or the account chip ("openLogin"): no ID, so no "ID" line and no PIN dashboard card. o.pin ("none" |
+// "made"): opened from Bagikan > Kelola PIN dashboard ("openPin" with the ID): ID line and the PIN dashboard card (pin.js
+// showState: Buat PIN, or the PIN with Salin PIN, Salin pesan untuk pengantin, Lihat PIN and Buat PIN baru).
 // Returns { svg, h, at, X, Y, box } with the dialog at (X, Y), 440 wide. at.* = element rects [x, y, w, h].
 function pinDlg(X, Y, o = {}) {
   const st = o.state ?? "in", at = {};
@@ -97,6 +99,22 @@ function pinDlg(X, Y, o = {}) {
     at.licCard = [X + 16, top, 408, L + 17 - top];
     s += card(top, L + 17 - top) + inner;
     c = L + 17 - Y + 12;
+    if (o.pin) {
+      const pt = Y + c, made = o.pin === "made", ph = made ? 164 : 116;
+      at.pinCard = [X + 16, pt, 408, ph];
+      let p = text(X + 33, pt + 28, "PIN dashboard", { size: 12, weight: 700 }) +
+        text(X + 33, pt + 52, made ? "PIN aktif (versi 1). Lupa? Lihat lagi kapan saja." : "Undangan ini belum punya PIN.", { size: 12, fill: C.faint });
+      // .pin: the output (flex 1), then the 36 px icon buttons Salin PIN and Salin pesan untuk pengantin, 4 px apart.
+      if (made) {
+        at.pinField = [X + 33, pt + 64, 294, 40]; at.copyPin = [X + 331, pt + 66, 36, 36]; at.handover = [X + 371, pt + 66, 36, 36];
+        p += rect(...at.pinField, { r: 4, fill: C.mutedBg }) + text(X + 45, pt + 91, "482913", { size: 16, weight: 700, fill: C.strong, mono: true }).replace("<text", '<text letter-spacing="6"') +
+          icon("copy", X + 349, pt + 84, 18, C.text) + icon("message-circle", X + 389, pt + 84, 18, C.text);
+        const [b, w] = btn(X + 33, pt + 112, "Lihat PIN", "primary", "reveal");
+        p += b + btn(X + 33 + w + 8, pt + 112, "Buat PIN baru", "quiet", "regen")[0];
+      } else p += btn(X + 33, pt + 64, "Buat PIN", "primary", "create")[0];
+      s += card(pt, ph) + p;
+      c += ph + 12;
+    }
     const biz = o.biz ? [o.biz] : ["Belum terhubung."], bt = Y + c;
     const bL = bt + 40 + 20 * biz.length + 8;
     at.bizCard = [X + 16, bt, 408, bL + 36 + 17 - bt];
@@ -109,7 +127,8 @@ function pinDlg(X, Y, o = {}) {
   else c += 4;
   const h = c;
   at.close = [X + 392, Y + 12, 36, 36];
-  const head = shadow(X, Y, 440, h, 8, 3) + rect(X, Y, 440, h, { r: 8, fill: C.white }) + nkLogo(X + 32, Y + 32, 32) + text(X + 58, Y + 38, "NikahKit", { size: 16, weight: 700 }) + iconX("x", X + 410, Y + 30, 18, C.text);
+  const head = shadow(X, Y, 440, h, 8, 3) + rect(X, Y, 440, h, { r: 8, fill: C.white }) + nkLogo(X + 32, Y + 32, 32) + text(X + 58, Y + (o.pin ? 34 : 38), "NikahKit", { size: 16, weight: 700 }) +
+    (o.pin ? text(X + 58, Y + 52, "ID " + ID, { size: 12, fill: C.faint }) : "") + iconX("x", X + 410, Y + 30, 18, C.text);
   return { svg: head + s, h, at, X, Y, box: [X, Y, 440, h] };
 }
 // The dialog centred in the page viewport (pin-frame: fixed, flex-centred).
@@ -526,6 +545,30 @@ const klDlg = rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }) + shadow(
   text(560, 418, "Pasang Landing Klasik di halaman ini?", { size: 14, weight: 600 }) + text(560, 442, "Seluruh isi halaman diganti. Bisa diurungkan.", { size: 12, fill: C.faint }) +
   nkBtn(745, 461, "Batal", { variant: "quiet", w: 63 }) + nkBtn(816, 461, "Pasang", { w: 64 });
 const KL_TOAST = ["Landing Klasik dipasang. Tekan", "Simpan di Scalev."];
+// Handover in the Nikahin business (App.jsx ShareDialog + ResellerPin, ext/pin.html + pin.js): the invitation's editor with
+// the Kreator chip, Bagikan with the page's nikahin.myscalev.com address and Untuk pengantin (the business's Dashboard, so
+// no "Pasang Dashboard pasangan dulu"), then pin.html with the Kreator's account (Paket Sekali Bayar without a button, no
+// business linked). The handover message links nikahin.myscalev.com/dashboard (server buku-tamu.mjs dashboardFor).
+const HO_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvDasar(), nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Konten", true) + kList().svg];
+const hoShare = rect(0, 92, 399, 808, { fill: C.white }) + shareTop(NO_NOTE) + shareUrlBox(NO_NOTE + 311, [`https://nikahin.myscalev.com/${SLUG}?`, "to=Nama+Tamu"]) + shareBtns(NO_NOTE) +
+  accessHead(ACC_Y, false) + forCouple(COUPLE_Y) + pinHint(COUPLE_Y);
+const hoDlg = (pin, msg) => {
+  const o = { license: ["Paket Sekali Bayar, aktif selama layanan Nikahin", "berjalan."], choose: "", active: true, pin, msg };
+  return pinDlg(W / 2 - 220, Math.round((900 - pinDlg(0, 0, o).h) / 2), o);
+};
+const HO_A = hoDlg("none", null), HO_B = hoDlg("made", ["PIN dibuat. Lihat lagi kapan saja lewat Lihat PIN."]), HO_C = hoDlg("made", ["Pesan tersalin."]);
+// The pasted message on a phone (WhatsApp-like chat, not captured: no labels beyond the message, wrapped as on a phone).
+const HO_WA = [["Undangan siap:", 0], [`https://nikahin.myscalev.com/${SLUG}`, 1], ["Kelola undangan (kirim ke tamu, RSVP,", 0], ["ucapan, check-in):", 0],
+  ["https://nikahin.myscalev.com/dashboard?", 1], [`w=${ID}&link=https%3A%2F%2Fnikahin.`, 1], [`myscalev.com%2F${SLUG}`, 1], ["PIN: 482913", 0]];
+const HO_BUBBLE = [PHONE.x + 60, PHONE.y + 100, 318, 24 + HO_WA.length * 20];
+const hoWa = () => {
+  const { x, y, h } = PHONE, [bx, by, bw, bh] = HO_BUBBLE;
+  return rect(x, y, 390, h, { fill: "#efeae2" }) + rect(x, y, 390, 64, { fill: "#f0f2f5" }) + iconX("arrow-left", x + 20, y + 32, 20, "#54656f") + circle(x + 58, y + 32, 18, { fill: "#c8d0d6" }) +
+    rect(x + 86, y + 25, 90, 12, { r: 6, fill: "#d6dbe0" }) + rect(bx, by, bw, bh, { r: 8, fill: C.waSoft }) +
+    HO_WA.map(([l, link], i) => text(bx + 12, by + 24 + i * 20, l, { size: 14, fill: link ? "#027eb5" : "#111b21", underline: !!link })).join("") +
+    text(bx + bw - 12, by + bh - 8, "10.02", { size: 11, fill: "#667781", anchor: "end" }) + rect(x, y + h - 64, 390, 64, { fill: "#f0f2f5" }) +
+    rect(x + 12, y + h - 54, 310, 42, { r: 21, fill: C.white }) + circle(x + 354, y + h - 33, 21, { fill: C.wa }) + icon("send", x + 353, y + h - 33, 18, C.white);
+};
 
 // ---- Papan Kursi Kreator (server/pages/src/kreator-nikahin/index.html + shared/header.html, Chrome at 1440) ----------
 // Geometry from the page CSS: header (shell 1024: 24 + nav 54 + 18, dashed line 2), main 760 wide from 64 below it,
@@ -699,11 +742,11 @@ export const scenes = {
 
   // /mulai/alur-lengkap, one checklist per Bagian; rows = the page's step titles.
   "mulai-alur-gabung": checklist("Bagian 1: gabung dan pasang", "Bagian 1: Gabung dan pasang", "Langkah 1 sampai 6.", [
-    ["1. Pilih paket membership", "Pilih paket: Bulanan, Tahunan, atau Sekali Bayar.", PV.plans()],
-    ["2. Unduh dan ekstrak ZIP NikahKit", "Unduh dan ekstrak ZIP: folder NikahKit berisi manifest.json.", PV.files()],
-    ["3. Pasang lewat Load unpacked", "Di chrome://extensions: Developer mode, Load unpacked, folder NikahKit.", PV.ext()],
-    ["4. Masuk dengan Google", "Di tab NikahKit editor Scalev, klik Masuk dengan Google.", PV.gate(GATE_OUT(0), "google")],
-    ["5. Bayar membership", "Klik Pilih paket, Pilih, bayar di Scalev, lalu Cek pembayaran.",
+    ["1. Unduh dan ekstrak ZIP NikahKit", "Unduh (masuk Google dulu), lalu ekstrak: folder NikahKit berisi manifest.json.", PV.files()],
+    ["2. Pasang lewat Load unpacked", "Di chrome://extensions: Developer mode, Load unpacked, folder NikahKit.", PV.ext()],
+    ["3. Masuk dengan Google", "Di tab NikahKit editor Scalev, klik Masuk dengan Google.", PV.gate(GATE_OUT(0), "google")],
+    ["4. Pilih paket membership", "Klik Pilih paket: Bulanan, Tahunan, atau Sekali Bayar.", PV.plans()],
+    ["5. Bayar membership", "Klik Pilih, bayar di Scalev, lalu Cek pembayaran.",
       PV.dialog({ paid: true, msg: ["Bayar di tab baru, lalu tekan Cek pembayaran."] }, "paid", (d) => grow(d.at.licCard, 8))],
     ["6. Hubungkan bisnis Scalev", "Di kartu Bisnis yang dihubungkan, klik Hubungkan bisnis Scalev dan setujui.", PV.dialog({ ...LIC_ON, biz: BIZ, msg: ["Bisnis Scalev terhubung."] }, "bizCard", (d) => grow(d.at.bizCard, 8))]
   ]),
@@ -782,9 +825,14 @@ export const scenes = {
     const ST = [["Unduh dan ekstrak", "Windows: klik kanan ZIP, Extract All.", "Mac: klik dua kali."], ["Buka chrome://extensions", "Ketik di kolom alamat Chrome, lalu", "Enter."],
       ["Nyalakan Developer mode", "Tombol geser di kanan atas."], ["Klik Load unpacked", "Pilih folder NikahKit yang berisi", "manifest.json, lalu Select."],
       ["NikahKit terpasang", "Jangan hapus atau pindahkan", "foldernya."], ["Masuk di editor Scalev", "Halaman HTML Mode, tab NikahKit,", "Masuk dengan Google."]];
+    // The 14px meta line under the button (.meta, right-aligned): text, a grey bar for the date or version, text.
+    const meta = (y0, [a, bw, b]) => {
+      const xr = 1280 - tw(b, 14), xb = xr - 6 - bw, xa = xb - 6 - tw(a, 14);
+      return text(xa, y0 + 142, a, { size: 14, fill: "#6f675f" }) + rect(xb, y0 + 132, bw, 11, { r: 5.5, fill: "#e6e1dc" }) + text(xr, y0 + 142, b, { size: 14, fill: "#6f675f" });
+    };
     let page = rect(0, y, W, VIEW, { fill: C.white }) + text(160, y + 104, "Cara pasang NikahKit", { size: 60, fill: C.cocoa, font: PASANG_SERIF }) +
       text(160, y + 148, "Untuk Google Chrome di komputer Windows atau Mac.", { size: 18, fill: "#6f675f" }) +
-      text(1014, y + 148, "Rilis", { size: 18, fill: "#6f675f" }) + rect(1062, y + 136, 92, 12, { r: 6, fill: "#e6e1dc" }) + text(1280, y + 148, "· ZIP ±120 KB", { size: 18, fill: "#6f675f", anchor: "end" }) +
+      meta(y, ["Rilis", 76, "· ZIP ±350 KB · masuk dengan Google"]) +
       rect(...DL, { r: 16, fill: C.cocoa }) + text(1038, y + 97, "Unduh NikahKit", { size: 16, weight: 800, fill: C.white }) + rect(1169, y + 87, 52, 9, { r: 4.5, fill: "rgba(255,255,255,.35)" });
     ST.forEach(([b, ...t], i) => {
       const top = y + LI[i][0];
@@ -796,11 +844,17 @@ export const scenes = {
       rect(518, y + 207, 185, 27, { r: 6, fill: C.white }) + text(530, y + 224, "Tab baru", { size: 11, fill: "#3c4043" }) + [528, 550, 572].map((dx) => circle(dx, y + 250, 5, { fill: "#c4c7c5" })).join("") +
       rect(597, y + 239, 594, 22, { r: 11, fill: "#f1f3f4" }) + line(509, y + 266.5, 1279, y + 266.5, { stroke: "#e3e3e3" }) + text(541, y + 300, "Tab baru", { size: 12, fill: "#5f6368" })) +
       rect(1155, y + 650, 112, 23, { r: 6, fill: "rgba(255,255,255,.9)" }) + text(1163, y + 666, "Simulasi tampilan", { size: 12, fill: "#5f6368" });
+    // Unduh NikahKit sends the page to Google's account chooser (same tab), then back here, where the meta line becomes
+    // "Unduhan NikahKit <versi> dimulai." and the ZIP downloads (pasang.html: /reseller/session, /install/download).
+    const GPX = (W - 440) / 2, GPY = CT + 90, GP_ACCT = [GPX + 32, GPY + 204, 376, 66];
+    const gPage = crTop({ tabs: [{ title: "Masuk - Akun Google", active: true }], url: "accounts.google.com" }) + vp(rect(0, CT, W, VIEW, { fill: C.white }) +
+      rect(GPX + 0.5, GPY + 0.5, 439, 399, { r: 28, fill: C.white, stroke: "#dadce0" }) + googleCard(GPX, GPY, 440));
+    const started = rect(880, y + 126, 410, 24, { fill: C.white }) + meta(y, ["Unduhan NikahKit", 44, "dimulai."]);
     const DLI = [1300, 63], DLI_BOX = [1286, 49, 28, 28];
     const dlIcon = rect(1270, 44, 62, 38, { fill: C.white }) + rect(1244, 46, 34, 34, { r: 17, fill: C.crOmni }) + iconX("download", DLI[0], DLI[1], 18, C.crBlue) + circle(DLI[0], DLI[1], 14, { stroke: C.crBlue, sw: 2 });
     // Chrome's download bubble (kit crDownload, 360x76) under the download icon, with the folder button at its right.
     const BX = 1032, BY = 90, FOLDER = [BX + 330, BY + 38], FOLDER_BOX = [FOLDER[0] - 11, FOLDER[1] - 11, 22, 22];
-    const bubble = crDownload(BX, BY, "nikahkit-….zip", { sub: "120 KB" }) + iconX("folder", FOLDER[0], FOLDER[1], 18, C.crIcon);
+    const bubble = crDownload(BX, BY, "nikahkit-….zip", { sub: "350 KB" }) + iconX("folder", FOLDER[0], FOLDER[1], 18, C.crIcon);
     const EX = 200, EY = 150, EW = 1040, EH = 620, IX = EX + 220, IY = EY + 110, menuY = IY + 40, XWIN = [EX, EY, EW, EH];
     const content = (path) => rect(EX + 181, EY + 81, EW - 182, EH - 82, { fill: C.white }) + rect(EX + 72, EY + 44, EW - 92, 28, { r: 4, fill: C.white, stroke: "#dcdcdc" }) + text(EX + 84, EY + 63, path, { size: 13, fill: "#1f1f1f" });
     const EXTRACT = [EX + 520, EY + 368, 96, 32], MENU_ROW = [IX + 76, menuY + 46, 208, 30], MAC = [EX + 240, EY + 400, 640, 110];
@@ -808,6 +862,8 @@ export const scenes = {
       title: "Mengunduh dan mengekstrak ZIP NikahKit",
       base: [win({ tabs: [{ title: "Cara pasang NikahKit · Nikahin", active: true }], url: PURL }), page],
       els: {
+        google: { svg: gPage, enter: "fade", skel: true },
+        started: { svg: started, enter: "fade" },
         dlIcon: { svg: dlIcon, enter: "pop", origin: DLI },
         bubble: { svg: bubble, enter: "pop", origin: [DLI[0], 90] },
         files: { svg: explorer(EX, EY, EW, EH, { title: "Unduhan", path: "Unduhan", side: "Unduhan" }) + zipIcon(IX, IY, "nikahkit-….zip", true), enter: "pop", origin: mid(XWIN) },
@@ -826,7 +882,9 @@ export const scenes = {
       },
       steps: [
         { caption: "Buka halaman Cara pasang NikahKit di Chrome komputer.", focus: [TOOLBAR, [140, CT + 40, 1160, 140]], at: mid(urlBox(PURL)), mark: { box: urlBox(PURL), r: 3 }, lens: { src: [150, 46, 480, 36], at: [120, 200] }, dur: 3 },
-        { caption: "Klik Unduh NikahKit. Chrome mengunduh ZIP NikahKit, sekitar 120 KB.", focus: [[990, CT + 50, 310, 120], [1230, 41, 210, 44]], at: mid(DL), click: true, show: ["dlIcon"], mark: { box: DL, r: 16 }, lens: { src: [1004, CT + 55, 290, 110] }, dur: 3.4 },
+        { caption: "Klik Unduh NikahKit. Halaman Google terbuka: klik akunmu.", focus: [[GPX, GPY, 440, 400]], at: mid(DL), click: true, show: ["google"], mark: { box: DL, r: 16 }, lens: { src: [GPX, GPY + 100, 440, 180] }, dur: 3.4 },
+        { caption: "Unduhan dimulai: ZIP NikahKit, sekitar 350 KB.", focus: [[880, CT + 50, 420, 120], [1230, 41, 210, 44]], at: mid(GP_ACCT), click: true, hide: ["google"], show: ["started", "dlIcon"],
+          mark: GP_ACCT, note: "Rina WO", lens: { src: [880, CT + 50, 420, 110] }, dur: 3.4 },
         { caption: "Buka folder Unduhan: klik ikon unduhan di kanan atas Chrome.", focus: [[BX, 41, 1440 - BX, 44]], at: DLI, click: true, show: ["bubble"], mark: { box: DLI_BOX, r: 14 }, lens: { src: [BX, BY, 360, 76] } },
         { caption: "Klik ikon folder di sebelah nama file. Folder Unduhan terbuka.", focus: [[BX, 41, 1440 - BX, 44], XWIN], at: FOLDER, click: true, show: ["files"], mark: FOLDER_BOX, lens: { src: [BX + 8, BY + 12, 344, 52] }, dur: 3.4 },
         { caption: "Ekstrak ZIP (Windows): klik kanan file ZIP.", focus: [XWIN], at: [IX + 32, IY + 36], click: true, hide: ["bubble"], show: ["menu"], mark: SEL(IX, IY), lens: { src: [IX - 30, IY - 16, 340, 232] } },
@@ -1227,6 +1285,48 @@ export const scenes = {
         mark: krMenuBox("Buku Tamu"), lens: { src: [0, 150, 256, 100], at: [520, 330] }, dur: 3.4 },
       { caption: "Undanganmu tampil: Undangan Rani & Dimas /365671 · Belum terbit.", focus: [[BT.x - 8, 92, BT.w + 16, 180]], at: [760, 186], mark: { box: BT_CARD, r: 8 },
         lens: { src: [BT.x, 144, 560, 86] }, dur: 3.8 }
+    ]
+  },
+
+  // Kreator Nikahin, serah terima: Bagikan > Kelola PIN dashboard, then Buat PIN and Salin pesan untuk pengantin. Captions
+  // are the member scenes' own (pasangan-kelola-pin 1-3, tamu-pin-salin 1-4), word for word: the steps are the same and
+  // the narration is shared; only the screens differ (Kreator account, nikahin.myscalev.com links).
+  "gabung-kreator-pin": {
+    title: "Membuka Kelola PIN dashboard sebagai Kreator Nikahin",
+    base: HO_BASE,
+    els: {
+      share: { svg: hoShare, enter: "fade", skel: true },
+      kelola: { svg: pinBtn(COUPLE_Y), enter: "fade" },
+      backdrop: { svg: dim(0, 0, W, 900), enter: "fade" },
+      dlg: { svg: HO_A.svg, enter: "pop", origin: mid(HO_A.box) }
+    },
+    steps: [
+      { caption: "Di editor undangan, klik Bagikan di lajur kiri NikahKit.", focus: [0, 92, 399, 808], mark: BAGIKAN_TOOL, note: "Bagikan", at: mid(BAGIKAN_TOOL), click: true, show: ["share", "kelola"] },
+      { caption: "Di bawah Untuk pengantin ada bagian PIN dashboard.", focus: [0, COUPLE_Y - 5, 399, 244], mark: [12, COUPLE_Y + 147, 374, 84], lens: { src: [0, COUPLE_Y - 3, 399, 238] },
+        at: [200, COUPLE_Y + 109], dur: 3.4 },
+      { caption: "Klik Kelola PIN dashboard. Jendela NikahKit terbuka di atas editor.", focus: [HO_A.box], mark: pinBox(COUPLE_Y), note: "Kelola PIN dashboard", at: mid(pinBox(COUPLE_Y)),
+        click: true, press: "kelola", show: ["backdrop", "dlg"], dur: 3.6 }
+    ]
+  },
+
+  "gabung-kreator-pin-salin": {
+    title: "Membuat PIN dan menyalin pesan untuk pengantin sebagai Kreator Nikahin",
+    base: [...HO_BASE, hoShare, pinBtn(COUPLE_Y), dim(0, 0, W, 900)],
+    els: {
+      dlgA: { svg: HO_A.svg, skel: true },
+      dlgB: { svg: HO_B.svg, enter: "fade", skel: true },
+      copied: { svg: HO_C.svg, enter: "fade", skel: true },
+      wa: { svg: phoneDesk(hoWa()), enter: "fade", delay: 0.1, skel: true }
+    },
+    steps: [
+      { caption: "Jendela NikahKit terbuka. Baca status PIN: Undangan ini belum punya PIN.", focus: [HO_A.box], mark: { box: HO_A.at.pinCard, r: 8 },
+        lens: { src: [HO_A.X + 16, HO_A.at.pinCard[1] + 8, 408, 100] }, dur: 3.4 },
+      { caption: "Klik Buat PIN. PIN 6 angka langsung tampil.", focus: [HO_B.at.pinCard, HO_B.at.msg], mark: HO_A.at.create, lens: { src: [HO_B.X + 16, HO_B.at.pinCard[1], 408, 108] },
+        at: mid(HO_A.at.create), click: true, hide: ["dlgA"], show: ["dlgB"], dur: 3.6 },
+      { caption: "Klik ikon Salin pesan untuk pengantin. Muncul Pesan tersalin.", mark: HO_B.at.handover, lens: { src: [HO_B.X + 16, HO_B.at.pinField[1] - 8, 408, 56], zoom: 1.5 },
+        at: mid(HO_B.at.handover), click: true, show: ["copied"], dur: 3.6 },
+      { caption: "Tempel di WhatsApp pengantin: undangan, tautan kelola, dan PIN.", focus: grow(HO_BUBBLE, 8), mark: { box: HO_BUBBLE, r: 8 }, lens: { src: grow(HO_BUBBLE, 6) },
+        at: [PHONE.x + 160, PHONE.y + PHONE.h - 33], show: ["wa"], dur: 4.2 }
     ]
   },
 

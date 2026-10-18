@@ -43,7 +43,7 @@ export const pasteOpen = (filled) => rect(16, PASTE_Y - 4, 366, 300, { fill: C.w
 const LT = LINK_Y + 70 - LEAD_UP, LU = LINK_Y + 99 + D - 16;
 export const linkOpen = rect(16.5, LINK_Y + 0.5, 365, LU + 102 - LINK_Y, { r: 4, fill: C.white, stroke: C.line }) + icon("chevron-down", 38, LINK_Y + 25, 18, C.strong) + text(59, LINK_Y + 30, "Link form klien", { size: 14, weight: 500 }) +
   para(28, LT, ["Kirim ke klien. Isiannya masuk ke daftar ini."], { size: 12, fill: C.faint, lh: 16 }) +
-  rect(28, LU, 341, 52, { r: 4, fill: C.mutedBg }) + text(38, LU + 22, "https://nikahin.myscalev.com/order?", { size: 12, mono: true }) + text(38, LU + 40, "k=AB12CD34", { size: 12, mono: true });
+  rect(28, LU, 341, 52, { r: 4, fill: C.mutedBg }) + text(38, LU + 22, "https://nikahin.myscalev.com/order?", { size: 12, mono: true }) + text(38, LU + 40, "k=rn7kq4mx", { size: 12, mono: true });
 export const SALIN_Y = LU + 58;
 export const salinBtn = nkBtn(28, SALIN_Y, "Salin link form", { variant: "quiet", icon: "copy" }), SALIN_BOX = nkBtnBox(28, SALIN_Y, "Salin link form", { icon: "copy" });
 // Hapus: the trash of row 2 becomes a red Hapus? button (nk-btn--danger, HAPUS_BOX) and the badge moves left of it;
