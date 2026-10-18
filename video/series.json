@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "panduan-kreator-nikahin",
+    "title": "Kreator Nikahin: dari gabung sampai klien bayar",
+    "chapters": [
+      ["gabung-kreator-terima-undangan", "Terima undangan Scalev"],
+      ["gabung-kreator-bergabung", "Bergabung ke bisnis Nikahin"],
+      ["gabung-kreator-buat-halaman", "Buat halaman undangan"],
+      ["gabung-kreator-masuk", "Masuk ke NikahKit"],
+      ["gabung-kreator-template", "Pilih template"],
+      ["gabung-kreator-buku-tamu", "Buka Buku Tamu"],
+      ["gabung-kreator-landing", "Pasang halaman jualan"],
+      ["gabung-kreator-landing-bayar", "Klien memesan dan membayar"]
+    ],
+    "intro": "Halo, selamat datang di panduan Kreator Nikahin. Di video ini kita mulai dari menerima undangan Scalev, membuat undangan dengan NikahKit, sampai klien memesan dan membayar di halaman jualanmu.",
+    "outro": "Selesai. Sekarang halaman jualanmu siap dibagikan, dan setiap pesanan lunas tercatat untuk komisimu. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan. Sampai jumpa di video berikutnya."
+  }
+]
