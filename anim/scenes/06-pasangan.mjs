@@ -116,11 +116,14 @@ const detailGroup = (x, y, w, lines, lh = 52, size = 14) => rect(x, y, w, 8 + li
   lines.map(([dt, dd], i) => text(x + 16, y + 4 + i * lh + lh / 2 + 5, dt, { size, fill: T.text }) + text(x + w - 16, y + 4 + i * lh + lh / 2 + 5, dd, { size, fill: T.sub, anchor: "end" })).join("");
 
 // ---- Beranda (HP), dengan data contoh --------------------------------------------------------------------------------
-const STATS = [["Konfirmasi diterima", "61", ["4 masih ragu · 5 tidak", "hadir"]], ["Sudah datang", "0", ["tamu check-in di lokasi"]], ["Ucapan & doa", "47", ["dari tamu undangan"]], ["Tamu membuka", "140", ["312 kali undangan dibuka"]]];
+const STATS = [["Konfirmasi diterima", "61", "4 masih ragu · 5 tidak hadir"], ["Sudah datang", "0", "tamu check-in di lokasi"], ["Ucapan & doa", "47", "dari tamu undangan"], ["Tamu membuka", "140", "312 kali undangan dibuka"]];
 const QUICK = [["external-link", "Lihat undangan", "Sebagai tamu"], ["send", "Kirim undangan", "Tautan per tamu"], ["scan-line", "Scan tamu datang", "Di lokasi acara"]];
+const TREND = [0, 1, 0, 2, 3, 1, 4, 2, 0, 5, 3, 8, 12, 2]; // RSVP per hari, contoh
 const LIHAT_DAFTAR = [40, 350, 144, 36]; // tombol Lihat daftar tamu (lokal)
+// Ukuran dari dashboard di Chromium 390x844 (19 Okt): kartu angka 436..628, tombol cepat 73px tiap 81px dari 652,
+// grafik RSVP 910..1102, Kabar terbaru 1135.
 function homeContent() {
-  let s = rect(0, 64, 390, 1100, { fill: T.wash }) + text(16, 103, "Ringkasan undangan", { size: 22, fill: T.text }) +
+  let s = rect(0, 64, 390, 1420, { fill: T.wash }) + text(16, 103, "Ringkasan undangan", { size: 22, fill: T.text }) +
     para(16, 131, ["45 hari lagi · Akad Nikah, Sabtu, 28 November", "2026 pukul 08.00"], { size: 16, fill: T.sub, lh: 24 });
   // Kartu Estimasi tamu hadir + komposisi jawaban
   s += rect(16, 180, 358, 230, { r: 16, fill: "#fff" }) + text(40, 217, "Estimasi tamu hadir", { size: 14, fill: T.sub }) + text(38, 262, "128", { size: 40, fill: T.text }) +
@@ -129,17 +132,22 @@ function homeContent() {
     [["Hadir", "52", T.accent, 40], ["Ragu", "4", T.amber, 120], ["Tidak hadir", "5", T.grey, 190]].map(([l, n, c, x]) => circle(x + 4, 326, 4, { fill: c }) + text(x + 14, 330, [l + " ", { t: n, w: 600, fill: T.text }], { size: 12, fill: T.sub })).join("") +
     rect(40.5, 350.5, 143, 35, { r: 18, fill: "#fff", stroke: T.outline }) + text(112, 373, "Lihat daftar tamu", { size: 14, weight: 500, fill: T.strong, anchor: "middle" });
   // Empat angka
-  s += rect(16, 434, 358, 207, { r: 16, fill: "#fff" }) + STATS.map(([l, v, n], i) => {
-    const x = i % 2 ? 200 : 36, y = 434 + (i > 1 ? 104 : 0);
-    return text(x, y + 28, l, { size: 12, fill: T.sub }) + text(x, y + 61, v, { size: 24, weight: 500, fill: T.text }) + para(x, y + 80, n, { size: 12, fill: T.sub, lh: 16 });
+  s += rect(16, 436, 358, 192, { r: 16, fill: "#fff" }) + STATS.map(([l, v, n], i) => {
+    const x = i % 2 ? 207 : 36, y = 456 + (i > 1 ? 88 : 0);
+    return text(x, y + 12, l, { size: 12, fill: T.sub }) + text(x, y + 40, v, { size: 24, weight: 500, fill: T.text }) + text(x, y + 60, n, { size: 12, fill: T.sub });
   }).join("");
   // Tombol cepat
-  s += QUICK.map(([ic, a, b], i) => { const y = 665 + i * 73; return rect(16, y, 358, 65, { r: 16, fill: "#fff" }) + circle(52, y + 33, 20, { fill: T.soft }) + wa(ic, 52, y + 33, 24, T.strong) + text(88, y + 32, a, { size: 16, weight: 500, fill: T.text }) + text(88, y + 52, b, { size: 12, fill: T.sub }); }).join("");
+  s += QUICK.map(([ic, a, b], i) => { const y = 652 + i * 81; return rect(16, y, 358, 73, { r: 16, fill: "#fff" }) + circle(52, y + 36, 20, { fill: T.soft }) + wa(ic, 52, y + 36, 24, T.strong) + text(84, y + 32, a, { size: 16, weight: 500, fill: T.text }) + text(84, y + 53, b, { size: 12, fill: T.sub }); }).join("");
+  // Grafik RSVP masuk, 14 hari terakhir
+  const top = Math.max(...TREND);
+  s += rect(16, 910, 358, 192, { r: 16, fill: "#fff" }) + text(36, 947, "RSVP masuk, 14 hari terakhir", { size: 16, weight: 500, fill: T.text }) +
+    TREND.map((n, i) => { const h = Math.max(3, Math.round((96 * n) / top)); return rect(36 + i * 23, 1062 - h, 19, h, { r: 2, fill: T.accent }); }).join("") +
+    text(36, 1079, "14 hari lalu", { size: 11, fill: T.sub }) + text(354, 1079, "Hari ini", { size: 11, fill: T.sub, anchor: "end" });
   // Kabar terbaru
-  s += text(16, 923, "Kabar terbaru", { size: 16, weight: 500, fill: T.text }) + text(362, 923, "Lihat semua", { size: 14, weight: 500, fill: T.strong, anchor: "end" }) +
-    rect(16, 944, 358, 152, { r: 16, fill: "#fff" }) +
-    row(948, { x0: 24, right: 351, name: "Dewi Lestari", ini: iniR("Dewi Lestari"), time: "12 Okt", parts: [{ icon: "check", t: "Hadir", fill: T.strong }, { t: "· Selamat ya Rani & Dimas, semoga…" }] }) +
-    row(1020, { x0: 24, right: 351, name: "Rudi Hartono", ini: iniR("Rudi Hartono"), time: "11 Okt", parts: [{ icon: "x", t: "Tidak hadir", fill: "#555" }, { t: "· Maaf belum bisa datang" }] });
+  s += text(16, 1158, "Kabar terbaru", { size: 16, weight: 500, fill: T.text }) + text(317, 1158, "Lihat semua", { size: 14, weight: 500, fill: T.strong, anchor: "middle" }) +
+    rect(16, 1179, 358, 152, { r: 16, fill: "#fff" }) +
+    row(1183, { x0: 24, right: 351, name: "Dewi Lestari", ini: iniR("Dewi Lestari"), time: "12 Okt", parts: [{ icon: "check", t: "Hadir", fill: T.strong }, { t: "· Selamat ya Rani & Dimas, semoga…" }] }) +
+    row(1255, { x0: 24, right: 351, name: "Rudi Hartono", ini: iniR("Rudi Hartono"), time: "11 Okt", parts: [{ icon: "x", t: "Tidak hadir", fill: "#555" }, { t: "· Maaf belum bisa datang" }] });
   return s;
 }
 const HOME_STATIC = homeContent() + head("Beranda") + tabbar("beranda");
@@ -156,39 +164,54 @@ const tamuChips = (active) => chips(116, [["Semua", 4], ["Hadir", 2], ["Masih ra
 const TAMU_CHIP_AT = tamuChips(0).at;
 // Kolom cari yang sedang diisi (placeholder hilang, tanda silang Hapus pencarian di kanan).
 const searchOn = (y) => rect(20, y, 350, 40, { r: 20, fill: T.hi }) + wa("search", 46, y + 20, 20, T.sub) + wa("x", 344, y + 20, 20, T.sub);
+// Halaman daftar di HP (#paginationBar, 390 lebar): keterangan 20px di bawah baris terakhir, tombol mundur/maju 44px
+// mengapit "Hal. 1 / 1", lalu baris Per hal dengan 10 terpilih. top = sisi bawah baris terakhir.
+const pagM = (top, n) => text(20, top + 32, `Menampilkan 1 - ${n} dari ${n} tamu`, { size: 12, fill: T.sub }) +
+  [42, 154].map((cx, i) => circle(cx, top + 69, 21.5, { fill: "#fff", stroke: "rgba(0,0,0,.2)" }) + `<g opacity=".5">${chev(cx, top + 69, i ? -1 : 1)}</g>`).join("") +
+  text(74, top + 73, "Hal. 1 / 1", { size: 12, fill: T.sub }) + text(20, top + 129, "Per hal:", { size: 12, fill: T.sub }) + circle(194, top + 125, 22, { fill: T.soft }) +
+  [["10", 194], ["25", 242], ["50", 290], ["Semua", 343]].map(([l, x], i) => text(x, top + 129, l, { size: 12, weight: i ? 400 : 500, fill: i ? T.sub : T.strong, anchor: "middle" })).join("");
 function tamuList(o = {}) {
   const rows = o.rows ?? GUESTS;
   return rect(0, 0, 390, 844, { fill: "#fff" }) + head("Tamu") + (o.q ? searchOn(66) : search(66, "Cari nama, ucapan, atau nomor HP")) +
     `<svg x="0" y="100" width="370" height="60" viewBox="0 100 370 60" overflow="hidden">${tamuChips(o.active ?? 0).svg}</svg>` +
     text(20, 171, "Kehadiran dan ucapan.", { size: 13, fill: T.sub }) + text(370, 171, `${rows.length} tamu`, { size: 13, weight: 500, fill: T.sub, anchor: "end" }) +
-    groupLabel(203, "Oktober 2026") + rows.map((g, i) => row(TAMU_ROW0 + i * 72, { ...g, ini: iniR(g.name) })).join("") + tabbar("tamu");
+    groupLabel(203, "Oktober 2026") + rows.map((g, i) => row(TAMU_ROW0 + i * 72, { ...g, ini: iniR(g.name) })).join("") + pagM(TAMU_ROW0 + rows.length * 72, rows.length) + tabbar("tamu");
 }
-// Tab Ucapan: kotak centang (.pick-box 20px di HP) di kiri tiap baris; bar massal (hitungan + grid 2x2 tombol 44px) di atas daftar.
+// Tab Ucapan (diukur di Chromium 390x844, 19 Okt): di bawah kolom cari ada baris Pilih semua di halaman ini (44px), kotak
+// centang (.pick-box 20px) di kiri tiap baris; bar massal (hitungan + grid 2x2 tombol 36px, Batal tanpa garis) muncul di
+// atas tulisan Ucapan dan doa., jadi daftar turun 112px.
 const UCAPAN = [["Dewi Lestari", "12 Okt", "· Selamat ya Rani & Dimas, semoga sakinah"], ["Rudi Hartono", "11 Okt", "· Maaf belum bisa datang"], ["Bapak Andi & Ibu Rina", "9 Okt", "· Barakallahu lakuma"]];
-const BULK_H = 136;
-const ucapanRowY = (i, picked = []) => 174 + (picked.length ? BULK_H : 0) + i * 72;
-const pickBox = (y, on) => on
-  ? rect(22, y, 20, 20, { r: 5, fill: T.accent }) + `<path d="M26.5 ${y + 10} l3.8 3.8 l7.2 -7.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`
-  : rect(22.75, y + 0.75, 18.5, 18.5, { r: 5, fill: "#fff", stroke: T.border, sw: 1.5 });
+const BULK_H = 112;
+const ucapanRowY = (i, picked = []) => 222 + (picked.length ? BULK_H : 0) + i * 72;
+const pickBox = (y, on, x = 22) => on === "some"
+  ? rect(x, y, 20, 20, { r: 5, fill: T.accent }) + rect(x + 5.25, y + 9, 9.5, 2, { r: 1, fill: "#fff" })
+  : on
+  ? rect(x, y, 20, 20, { r: 5, fill: T.accent }) + `<path d="M${x + 4.5} ${y + 10} l3.8 3.8 l7.2 -7.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`
+  : rect(x + 0.75, y + 0.75, 18.5, 18.5, { r: 5, fill: "#fff", stroke: T.border, sw: 1.5 });
 function ucapanList(o = {}) {
-  const picked = o.picked ?? [];
+  const picked = o.picked ?? [], ctx = picked.length ? 295 : 183;
   let s = rect(0, 0, 390, 844, { fill: "#fff" }) + head("Ucapan") + search(66, "Cari nama, ucapan, atau nomor HP") +
-    text(20, 129, "Ucapan dan doa.", { size: 13, fill: T.sub }) + text(370, 129, "3 ucapan", { size: 13, weight: 500, fill: T.sub, anchor: "end" });
-  if (picked.length) s += rect(20.5, 140.5, 349, 123, { r: 12, fill: "#fff", stroke: "rgba(0,0,0,.12)" }) + text(36, 159, `${picked.length} dipilih`, { size: 12, weight: 500, fill: T.sub }) +
-    [["Tampilkan"], ["Sembunyikan"], ["Hapus", true], ["Batal"]].map(([l, d], i) => { const x = i % 2 ? 197 : 24.5, y = i > 1 ? 216 : 168;
-      return rect(x + 0.5, y + 0.5, 167.5, 43, { r: 22, fill: "#fff", stroke: T.outline }) + text(x + 84, y + 27, l, { size: 14, weight: 500, fill: d ? T.danger : T.strong, anchor: "middle" }); }).join("");
+    pickBox(128, picked.length === UCAPAN.length || (picked.length ? "some" : false), 20) + text(48, 142, "Pilih semua di halaman ini", { size: 12, fill: T.sub }) +
+    text(20, ctx, "Ucapan dan doa.", { size: 13, fill: T.sub }) + text(370, ctx, "3 ucapan", { size: 13, weight: 500, fill: T.sub, anchor: "end" });
+  if (picked.length) s += rect(20.5, 172.5, 349, 105, { r: 12, fill: "#fff", stroke: "rgba(0,0,0,.12)" }) + text(41, 189, `${picked.length} dipilih`, { size: 12, weight: 500, fill: T.sub }) +
+    [["Tampilkan"], ["Sembunyikan"], ["Hapus", true], ["Batal", false, true]].map(([l, d, ghost], i) => { const x = i % 2 ? 197 : 25, y = i > 1 ? 237 : 197;
+      return (ghost ? "" : rect(x + 0.5, y + 0.5, 167, 35, { r: 18, fill: "#fff", stroke: T.outline })) + text(x + 84, y + 23, l, { size: 14, weight: 500, fill: d ? T.danger : T.strong, anchor: "middle" }); }).join("");
   s += groupLabel(ucapanRowY(0, picked) - 8, "Oktober 2026") + UCAPAN.map(([n, t, c], i) => { const y = ucapanRowY(i, picked);
     return pickBox(y + 26, picked.includes(i)) + row(y, { x0: 54, name: n, ini: iniR(n), time: t, parts: [{ t: i === 0 && o.replied ? "Sudah dibalas" : "Belum dibalas" }, { t: c }] }); }).join("");
-  return s + tabbar("ucapan");
+  return s + pagM(ucapanRowY(UCAPAN.length, picked), UCAPAN.length) + tabbar("ucapan");
 }
-// Detail tamu Dewi Lestari (HP): gelembung ucapan, Info tamu, penyusun balasan.
+const DEWI_INFO = [["Kehadiran", "Hadir"], ["Jumlah tamu", "2 orang"], ["Pihak keluarga", "Mempelai wanita"], ["Perkiraan datang", "Belum diisi"], ["Check-in", "Belum datang"]];
+const DEWI_TRACK = [["Status", "Sudah dibuka"], ["Dibuka", "3 kali"], ["Pertama dibuka", "3 Okt 2026 · 20.11"], ["Terakhir dibuka", "12 Okt 2026 · 19.40"], ["Perangkat", "1/2"], ["Tautan dibuat", "2 Okt 2026 · 14.30"], ["Kode tamu", "K7Q2MX"]];
+// Detail tamu Dewi Lestari (HP): gelembung ucapan, Info tamu, Aktivitas undangan, penyusun balasan.
 const DET = (() => {
   const bub = wrap("Selamat ya Rani & Dimas, semoga menjadi keluarga sakinah, mawaddah, warahmah. Aamiin.", 286, 14.2);
   const bh = 6 + 31 + 6 + bub.length * 19 + 8 + 15, bTop = 116, bEnd = bTop + bh;
   const inBubble = rect(16, bTop, 305, bh, { r: 7.5, fill: "#fff" }) + rect(16, bTop, 10, 10, { fill: "#fff" }) + tail(16, bTop, "in", "#fff") +
     rect(19, bTop + 3, 298, 31, { r: 6, fill: "rgba(0,0,0,.05)" }) + text(27, bTop + 24, "Hadir · 2 orang", { size: 14.2, weight: 500, fill: T.text }) +
     para(25, bTop + 52, bub, { size: 14.2, fill: T.text, lh: 19 }) + text(314, bTop + bh - 8, "19.42", { size: 11, fill: T.sub, anchor: "end" });
-  const info = (y) => text(20, y + 20, "Info tamu", { size: 14, fill: T.sub }) + detailGroup(16, y + 28, 358, [["Kehadiran", "Hadir"], ["Jumlah tamu", "2 orang"], ["Pihak keluarga", "Mempelai wanita"], ["Perkiraan datang", "Belum diisi"], ["Check-in", "Belum datang"]]);
+  // Info tamu lalu Aktivitas undangan (judul 20px, grup 28px di bawah judul; antargrup 20px).
+  const info = (y) => text(20, y + 20, "Info tamu", { size: 14, fill: T.sub }) + detailGroup(16, y + 28, 358, DEWI_INFO) +
+    text(20, y + 336, "Aktivitas undangan", { size: 14, fill: T.sub }) + detailGroup(16, y + 344, 358, DEWI_TRACK);
   const replyTop = bEnd + 12, outY = replyTop + 36, outH = 6 + 19 + 8 + 15, infoB = outY + outH + 36;
   const compose = (label) => rect(0, 768, 390, 76, { fill: T.wall }) + rect(8, 786, 374, 52, { r: 26, fill: "rgba(0,0,0,.08)" }) + rect(8, 784, 374, 52, { r: 26, fill: "#fff" }) +
     text(29, 815, label, { size: 15, fill: T.sub }) + circle(357, 810, 20, { fill: T.accent }) + wa("send", 357, 810, 24, "#fff");
@@ -357,7 +380,6 @@ function rowD(x0, y, w, o) {
   return s + text(cx, y + 53, [{ t: o.chip, fill: o.fill ?? T.sub }, " " + o.cap], { size: 14, fill: T.sub });
 }
 // Beranda laptop. Ukuran tanpa tanggal acara, ditambah 28px untuk baris hitung mundur (data contoh punya tanggal acara).
-const TREND = [0, 1, 0, 2, 3, 1, 4, 2, 0, 5, 3, 8, 12, 2]; // RSVP per hari, contoh
 function berandaDesk() {
   let s = rect(64, 64, 1376, 836, { fill: T.wash }) + paneHead(64, 1376, "Beranda") +
     text(352, 110, "Ringkasan undangan", { size: 22, fill: T.text }) + text(352, 138, "45 hari lagi · Akad Nikah, Sabtu, 28 November 2026 pukul 08.00", { size: 16, fill: T.sub });
@@ -369,7 +391,7 @@ function berandaDesk() {
     (s += circle(lx + 4, 312, 4, { fill: c }) + text(lx + 14, 316, [l + " ", { t: n, w: 500, fill: T.text }], { size: 12, fill: T.sub })));
   s += rect(376.5, 336.5, 143, 35, { r: 18, fill: "#fff", stroke: T.outline }) + text(448, 359, "Lihat daftar tamu", { size: 14, weight: 500, fill: T.strong, anchor: "middle" });
   s += rect(764, 164, 388, 232, { r: 16, fill: "#fff" }) + STATS.map(([l, v, n], i) => { const x = i % 2 ? 966 : 784, y = i > 1 ? 108 : 0;
-    return text(x, 196 + y, l, { size: 12, fill: T.sub }) + text(x, 224 + y, v, { size: 24, weight: 500, fill: T.text }) + text(x, 244 + y, n.join(" "), { size: 12, fill: T.sub }); }).join("");
+    return text(x, 196 + y, l, { size: 12, fill: T.sub }) + text(x, 224 + y, v, { size: 24, weight: 500, fill: T.text }) + text(x, 244 + y, n, { size: 12, fill: T.sub }); }).join("");
   s += QUICK.map(([ic, a, b], i) => { const x = [352, 621, 891][i]; return rect(x, 428, 261, 73, { r: 16, fill: "#fff" }) + circle(x + 36, 464, 20, { fill: T.soft }) + wa(ic, x + 36, 464, 24, T.strong) +
     text(x + 68, 460, a, { size: 16, weight: 500, fill: T.text }) + text(x + 68, 481, b, { size: 12, fill: T.sub }); }).join("");
   const top = Math.max(...TREND);
@@ -424,8 +446,6 @@ const barD = (name, sub) => rect(614, 0, 826, 900, { fill: T.wall }) + rect(615,
 const secD = (y, title, lines) => text(792, y + 15, title, { size: 14, fill: T.sub }) + detailGroup(788, y + 28, 480, lines, 36);
 const HENDRA_INFO = [["Kehadiran", "Belum konfirmasi"], ["Jumlah tamu", "Tidak ada konfirmasi hadir"], ["Pihak keluarga", "Belum diisi"], ["Perkiraan datang", "Belum diisi"], ["Check-in", "Belum datang"]];
 const HENDRA_TRACK = [["Status", "Perangkat penuh"], ["Dibuka", "5 kali"], ["Pertama dibuka", "4 Okt 2026 · 19.20"], ["Terakhir dibuka", "11 Okt 2026 · 08.05"], ["Perangkat", "2/2"], ["Tautan dibuat", "2 Okt 2026 · 14.30"], ["Kode tamu", "H3T6VQ"]];
-const DEWI_INFO = [["Kehadiran", "Hadir"], ["Jumlah tamu", "2 orang"], ["Pihak keluarga", "Mempelai wanita"], ["Perkiraan datang", "Belum diisi"], ["Check-in", "Belum datang"]];
-const DEWI_TRACK = [["Status", "Sudah dibuka"], ["Dibuka", "3 kali"], ["Pertama dibuka", "3 Okt 2026 · 20.11"], ["Terakhir dibuka", "12 Okt 2026 · 19.40"], ["Perangkat", "1/2"], ["Tautan dibuat", "2 Okt 2026 · 14.30"], ["Kode tamu", "K7Q2MX"]];
 const hendraD = () => barD("Bapak Hendra", "Belum konfirmasi") + dayChip(1028, 84, "2 Oktober 2026") + sysNote(1028, 120, "Tamu ini belum mengirim konfirmasi atau ucapan.") +
   secD(173, "Info tamu", HENDRA_INFO) + secD(409, "Aktivitas undangan", HENDRA_TRACK);
 const dewiD = () => barD("Dewi Lestari", "Hadir · 2 orang · 082198765432") + dayChip(1028, 84, "12 Oktober 2026") +
@@ -575,9 +595,9 @@ const SCENES = {
       { caption: "Beranda terbuka pertama kali setelah masuk.", focus: PB(0, 0, 390, 844), lens: { src: PB(0, 0, 390, 64), zoom: 1.25 }, dur: 2.8 },
       { caption: "Di bawah judul: berapa hari lagi menuju acara utama.", focus: PB(0, 64, 390, 110), mark: PB(12, 113, 366, 52), lens: { src: PB(8, 76, 348, 94), zoom: 1.25 } },
       { caption: "Estimasi tamu hadir menjumlahkan orang dari RSVP Hadir.", focus: PB(16, 180, 358, 230), mark: { box: PB(16, 180, 358, 230), r: 16 }, lens: { src: PB(8, 172, 374, 246), zoom: 1.25 } },
-      { caption: "Gulir: konfirmasi, sudah datang, ucapan, dan tamu membuka.", focus: PB(16, 104, 358, 207), mark: { box: PB(16, 104, 358, 207), r: 16 }, lens: { src: PB(8, 96, 374, 223), zoom: 1.25 },
+      { caption: "Gulir: konfirmasi, sudah datang, ucapan, dan tamu membuka.", focus: PB(16, 106, 358, 192), mark: { box: PB(16, 106, 358, 192), r: 16 }, lens: { src: PB(8, 98, 374, 208), zoom: 1.25 },
         scroll: { id: "home", dy: 330 }, dur: 3.4 },
-      { caption: "Tombol cepat: Lihat undangan, Kirim undangan, Scan tamu datang.", focus: PB(16, 335, 358, 211), mark: { box: PB(16, 335, 358, 211), r: 16 }, lens: { src: PB(8, 327, 374, 227), zoom: 1.25 } },
+      { caption: "Tombol cepat: Lihat undangan, Kirim undangan, Scan tamu datang.", focus: PB(16, 322, 358, 235), mark: { box: PB(16, 322, 358, 235), r: 16 }, lens: { src: PB(8, 314, 374, 251), zoom: 1.25 } },
       { caption: "Gulir ke atas, tekan Lihat daftar tamu: tab Tamu terbuka.", focus: PB(0, 0, 390, 180), mark: { box: PB(...LIHAT_DAFTAR), r: 18 },
         note: "Lihat daftar tamu", scroll: { id: "home", dy: -330 }, at: P(LIHAT_DAFTAR[0] + 72, LIHAT_DAFTAR[1] + 18), click: true, show: ["tamu"], dur: 5 }
     ]
@@ -675,7 +695,7 @@ const SCENES = {
   // 6. Tab Ucapan: buka, balas, menu ⋮, pilih banyak.
   "pasangan-ucapan": (() => {
     const menu = [["pencil", "Ubah ucapan"], ["eye-off", "Sembunyikan ucapan"], ["del", "Hapus balasan", true], ["lock-open", "Buka kunci perangkat"], ["del", "Hapus data tamu", true]];
-    const g = DET.geo, compose = { box: PB(8, 784, 374, 52), r: 26 }, bulk = { src: PB(12, 134, 366, 134), zoom: 1.25 };
+    const g = DET.geo, compose = { box: PB(8, 784, 374, 52), r: 26 }, bulk = { src: PB(12, 164, 366, 122), zoom: 1.25 };
     const pick = (i, picked) => ({ box: PB(22, ucapanRowY(i, picked) + 26, 20, 20), r: 5 });
     return {
       title: "Membalas ucapan dan memilih banyak ucapan",
@@ -690,19 +710,19 @@ const SCENES = {
         pick2: { svg: onPhone(ucapanList({ replied: true, picked: [1, 2] })), skel: true }
       },
       steps: [
-        { caption: "Buka tab Ucapan. Tiap baris bertanda Belum dibalas atau Sudah dibalas.", focus: [PB(0, 0, 390, 250), PB(0, 773, 390, 71)], mark: tabBox("ucapan"),
+        { caption: "Buka tab Ucapan. Tiap baris bertanda Belum dibalas atau Sudah dibalas.", focus: [PB(0, 0, 390, 300), PB(0, 773, 390, 71)], mark: tabBox("ucapan"),
           lens: { src: PB(134, 778, 194, 64), at: [20, 470] }, at: tabAt("ucapan"), click: true, show: ["ucapan"] },
         { caption: "Balas ucapan: ketuk ucapannya. Detail terbuka seperti chat.", focus: PB(0, 0, 390, g.bEnd + 30), mark: { box: PB(54, ucapanRowY(0), 326, 72), r: 12 },
-          lens: { src: PB(8, 100, 374, 150), zoom: 1.25 }, at: P(200, ucapanRowY(0) + 36), click: true, show: ["sel", "detail", "infoA", "composeA"] },
+          lens: { src: PB(8, 148, 374, 150), zoom: 1.25 }, at: P(200, ucapanRowY(0) + 36), click: true, show: ["sel", "detail", "infoA", "composeA"] },
         { caption: "Tekan Tulis balasan di bawah.", focus: PB(0, 740, 390, 104), mark: compose, lens: { src: PB(4, 756, 382, 88), zoom: 1.25 }, at: P(150, 810), click: true, show: ["reply", "phReply"], dur: 2.8 },
         { caption: "Ketik balasan, maksimal 500 huruf.", mark: compose, lens: { src: PB(4, 756, 382, 88), zoom: 1.25 }, hide: ["phReply"], show: ["typed"], type: [{ id: "typed", n: 26, box: [PX + 29, PY + 798, 196, 24] }], dur: 2.8 },
         { caption: "Tekan tombol kirim. Muncul Balasan berhasil disimpan.", focus: [PB(0, g.replyTop, 390, g.outY + g.outH + 12 - g.replyTop), PB(60, 700, 270, 60)], mark: circ(P(357, 811)[0], P(357, 811)[1], 20),
           lens: { src: PB(138, g.outY - 8, 244, g.outH + 16), zoom: 1.75 }, at: P(357, 811), click: true, hide: ["reply", "typed"], show: ["out", "saved"], dur: 3.6 },
         { caption: "Menu ⋮ di kanan atas: ubah, sembunyikan, hapus, buka kunci perangkat.", focus: PB(0, 0, 390, 64), mark: KEBAB, lens: { src: PB(140, 50, 240, 236), zoom: 1.5 },
           at: P(362, 32), click: true, hide: ["saved"], show: ["menu"], dur: 3.8 },
-        { caption: "Tutup menu dan kembali. Ucapan itu kini Sudah dibalas.", focus: [PB(0, 0, 390, 64), PB(0, 150, 390, 250)], mark: BACK, lens: { src: PB(16, 166, 366, 88), zoom: 1.25 },
+        { caption: "Tutup menu dan kembali. Ucapan itu kini Sudah dibalas.", focus: [PB(0, 0, 390, 64), PB(0, 198, 390, 250)], mark: BACK, lens: { src: PB(16, 214, 366, 88), zoom: 1.25 },
           at: P(24, 32), click: true, hide: ["menu"], show: ["back"] },
-        { caption: "Pilih banyak: centang kotak di kiri ucapan. Bar dipilih muncul.", focus: PB(0, 130, 390, 410), mark: pick(1, []), lens: bulk,
+        { caption: "Pilih banyak: centang kotak di kiri ucapan. Bar dipilih muncul.", focus: PB(0, 110, 390, 450), mark: pick(1, []), lens: bulk,
           at: P(32, ucapanRowY(1) + 36), click: true, show: ["pick1"] },
         { caption: "Centang lagi, lalu pilih Tampilkan, Sembunyikan, Hapus, atau Batal.", mark: pick(2, [1]), lens: bulk,
           at: P(32, ucapanRowY(2, [1]) + 36), click: true, show: ["pick2"], dur: 3.8 }
@@ -715,7 +735,7 @@ const SCENES = {
     title: "Check-in tamu di hari-H",
     base: [phoneDesk(onPhone(HOME_STATIC), { screen: T.wash })],
     els: {
-      scan: { svg: onPhone(rect(0, 0, 390, 844, { fill: T.wall }), pillBtn(16, 80, 358, "Buka kamera"), linkBox(132)), enter: "fade", skel: true },
+      scan: { svg: onPhone(rect(0, 0, 390, 844, { fill: T.wall }), pillBtn(16, 92, 358, "Buka kamera"), linkBox(132)), enter: "fade", skel: true },
       cam: { svg: onPhone(rect(0, 64, 390, 709, { fill: T.wall }), camStage(), pillBtn(16, 448, 358, "Tutup kamera"), text(195, 501, "Arahkan ke QR tamu.", { size: 13, fill: T.sub, anchor: "middle" }), linkBox(517)), skel: true },
       qr: { svg: onPhone(rect(110, 150, 170, 218, { r: 14, fill: "#2c3a43" }), rect(118, 160, 154, 198, { r: 8, fill: "#fdf6ee" }), qrCode(139, 200, 112)), enter: "rise" },
       // Hasil scan = kartu di dalam jendela kamera; tombol dan kolom link tidak bergeser. Riwayat: satu baris per tamu.
@@ -729,8 +749,8 @@ const SCENES = {
     steps: [
       { caption: "Buka tab Hari-H di HP penerima tamu.", focus: [PB(0, 0, 390, 220), PB(0, 773, 390, 71)], mark: tabBox("harih"), lens: { src: PB(196, 778, 186, 64), at: [20, 470] },
         at: tabAt("harih"), click: true, show: ["scan", "cover"], dur: 3 },
-      { caption: "Tekan Buka kamera, lalu izinkan kamera.", focus: PB(0, 64, 390, 460), mark: { box: PB(16, 80, 358, 40), r: 20 }, note: "Buka kamera",
-        at: P(195, 100), click: true, show: ["cam"] },
+      { caption: "Tekan Buka kamera, lalu izinkan kamera.", focus: PB(0, 64, 390, 460), mark: { box: PB(16, 92, 358, 40), r: 20 }, note: "Buka kamera",
+        at: P(195, 112), click: true, show: ["cam"] },
       { caption: "Arahkan QR tamu ke dalam garis bidik di jendela kamera.", mark: { box: PB(STAGE.x, STAGE.y, STAGE.s, STAGE.s), r: 12 }, lens: { src: PB(8, 440, 374, 72), zoom: 1.25 }, show: ["qr"], dur: 3 },
       { caption: "Kartu hijau Selamat datang muncul di jendela kamera.", focus: [PB(0, 64, 390, 380), PB(0, 600, 390, 130)], mark: { box: PB(27, 298, 336, 128), r: 8 },
         lens: { src: PB(19, 290, 352, 144), zoom: 1.25 }, hide: ["qr"], show: ["ok"], dur: 3.4 },

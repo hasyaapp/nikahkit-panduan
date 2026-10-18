@@ -33,5 +33,41 @@
     ],
     "intro": "Halo, ini panduan member NikahKit. Pastikan NikahKit sudah terpasang di Chrome komputermu. Kita mulai dari masuk sampai undangan pertamamu terbit.",
     "outro": "Selesai. Undangan pertamamu sudah terbit dan siap dibagikan. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan."
+  },
+  {
+    "slug": "panduan-member-jualan",
+    "title": "Member NikahKit: Landing page dan Pesanan masuk",
+    "chapters": [
+      ["jualan-profil-merek", "Isi Profil merek"],
+      ["jualan-pasang-landing", "Pilih Landing Klasik"],
+      ["jualan-pasang-landing-dialog", "Pasang Landing page"],
+      ["jualan-pasang-landing-hasil", "Landing page dipasang"],
+      ["jualan-pasang-landing-terbit", "Terbitkan Landing page"],
+      ["jualan-landing-page", "Klien memesan di Landing page"],
+      ["jualan-pesanan-masuk", "Buka Pesanan masuk"],
+      ["jualan-pesanan-terbit", "Ganti foto dan terbitkan"],
+      ["jualan-tempel-pesanan", "Pesanan dari WhatsApp"]
+    ],
+    "intro": "Halo, ini panduan member NikahKit untuk berjualan. Kita isi Profil merek, pasang Landing page, lalu mengubah pesanan klien menjadi undangan lewat Pesanan masuk.",
+    "outro": "Selesai. Landing pagemu siap dibagikan, dan setiap pesanan bisa langsung jadi undangan. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan."
+  },
+  {
+    "slug": "panduan-pasangan-dashboard",
+    "title": "Pasangan: kirim undangan dan dashboard",
+    "chapters": [
+      ["jualan-pasang-dashboard", "Pilih Dashboard pasangan"],
+      ["jualan-pasang-dashboard-dialog", "Pasang Dashboard pasangan"],
+      ["jualan-pasang-dashboard-hasil", "Dashboard pasangan dipasang"],
+      ["jualan-pasang-dashboard-terbit", "Terbitkan Dashboard pasangan"],
+      ["jualan-bagikan-pengantin", "Buka Dashboard dari Bagikan"],
+      ["pasangan-masuk", "Masuk dengan PIN"],
+      ["pasangan-beranda", "Kenali Beranda"],
+      ["pasangan-kirim", "Kirim undangan lewat WhatsApp"],
+      ["pasangan-tamu", "Lihat daftar tamu"],
+      ["pasangan-ucapan", "Balas ucapan"],
+      ["pasangan-hari-h", "Check-in di Hari-H"]
+    ],
+    "intro": "Halo, ini panduan Dashboard pasangan. Pertama member memasang dashboardnya, lalu pengantin masuk dengan PIN, mengirim undangan ke tamu, membalas ucapan, dan mencatat tamu yang datang di hari H.",
+    "outro": "Selesai. Dengan Dashboard pasangan, pengantin bisa mengirim undangan dan memantau tamu dari HP. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan."
   }
 ]
