@@ -121,7 +121,7 @@ const FAQ = [[161, 63, ["Apakah tamu perlu memasang aplikasi?"]], [224, 78.6, ["
   [570.1, 63, ["Berapa lama undangan bisa dibuka?"]]];
 const faqPlus = (cx, cy) => circle(cx, cy, 13.25, { stroke: LP.dash, sw: 1.5 }) + rect(cx - 5.5, cy - 1, 11, 2, { fill: LP.cocoa }) + rect(cx - 1, cy - 5.5, 2, 11, { fill: LP.cocoa });
 
-function landingTop(x0, y0, name) {
+export function landingTop(x0, y0, name) {
   const X = x0 + 20, Y = (v) => y0 + v;
   let s = rect(x0, y0, 390, LPY.card, { fill: LP.paper });
   // header

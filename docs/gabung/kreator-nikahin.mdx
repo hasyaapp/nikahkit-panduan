@@ -1,6 +1,6 @@
 ---
 title: Gabung sebagai Kreator Nikahin
-description: Terima undangan Scalev dari bisnis Nikahin, bergabung sebagai Kreator dengan nomor HP sendiri, buat undangan dengan NikahKit tanpa membayar dan tanpa menghubungkan bisnis Scalev, lalu terbitkan Katalog Nikahin atas nama merekmu.
+description: Terima undangan Scalev dari bisnis Nikahin, bergabung sebagai Kreator dengan nomor HP sendiri, buat undangan dengan NikahKit tanpa membayar dan tanpa menghubungkan bisnis Scalev, lalu jualan lewat Landing atas nama merekmu.
 ---
 
 Halaman ini untuk anggota tim berperan **Kreator** di bisnis Scalev **Nikahin**. Kamu menerima undangan lewat email, bergabung ke bisnis Nikahin, lalu membuat halaman undangan di bisnis itu dengan NikahKit.
@@ -175,54 +175,57 @@ Pasang NikahKit di Chrome sebelum lanjut. Lihat [Pasang ekstensi NikahKit](/gabu
 Buku Tamu-mu hanya berisi undangan buatanmu. Kreator lain tidak bisa melihatnya. Pemilik bisnis Nikahin bisa melihat dan mengelola semua undangan di bisnis itu, termasuk undanganmu.
 </Info>
 
-### Bagian 7: Terbitkan Katalog Nikahin
+### Bagian 7: Jualan lewat Landing di bisnis Nikahin
 
-Katalog Nikahin adalah halaman jualan atas nama merekmu di domain Nikahin, misalnya `nikahin.myscalev.com/katalog-rina-wo`. Isinya desain dan paket undangan Nikahin dengan harga Nikahin, ditambah nama bisnis dan nomor WhatsApp dari Profil merek kamu. Klien membayar ke toko Nikahin. Sesudah lunas, form data undangannya masuk ke **Pesanan masuk** kamu, dan kamu mendapat komisi 60% dari harga paket setelah diskon.
+Kreator menjual undangan Nikahin lewat Landing page atas nama merekmu, di halaman buatanmu sendiri di bisnis Nikahin, misalnya `nikahin.myscalev.com/rina-wo`. Isinya desain dan paket undangan Nikahin dengan harga Nikahin, ditambah nama bisnis, nomor WhatsApp, dan logo dari Profil merek kamu. Klien membayar online lewat checkout toko Nikahin. Sesudah lunas, klien diarahkan ke form data undangan, datanya masuk ke **Pesanan masuk** kamu, dan kamu mendapat komisi 60% dari harga paket setelah diskon.
 
 <Info>
 **Yang kamu perlukan**
 
 - Kursi Kreator yang sedang kamu pegang (di papan tertulis **Kursi milikmu.**).
-- **Profil merek** berlabel **Terisi**, dengan nama bisnis dan nomor WhatsApp. Lihat [Profil merek](/jualan/profil-merek).
+- Halaman HTML Sales Page baru di bisnis Nikahin, khusus untuk Landing, misalnya bernama `Landing Rina WO` dengan slug `rina-wo`. Buat seperti [Bagian 3](#bagian-3-buat-halaman-undangan-di-bisnis-nikahin). Jangan pakai halaman undangan: Landing mengganti seluruh isi halaman.
+- **Profil merek** berlabel **Terisi**: **Nama bisnis** dan **Nomor WhatsApp**, **Logo (opsional)**. Kreator tidak mengisi paket: di Profil merek tertulis "Paket dan harga mengikuti paket Nikahin pusat."
 </Info>
 
-Selama kursimu aktif, **Template** > **Marketing** tidak menampilkan kartu **Landing Klasik**, **Landing Etalase**, dan **Landing Langit**. Kreator menjual lewat Katalog Nikahin. Kartu **Dashboard pasangan** juga tidak tampil di bisnis Nikahin, karena bisnis itu sudah punya Dashboard; di panel tertulis "Dashboard tidak perlu dipasang. Bisnis ini sudah punya."
+Selama kursimu aktif, **Template** > **Marketing** di bisnis Nikahin menampilkan **Landing Klasik**, **Landing Etalase**, dan **Landing Langit**, tanpa kartu **Dashboard pasangan** (bisnis Nikahin sudah punya Dashboard). Di bawah kartu tertulis "Landing memakai paket dan harga Nikahin pusat. Klien bayar online ke toko Nikahin, kamu dapat komisi 60%."
 
-<Image src="/assets/anim/gabung-kreator-katalog.svg" alt="Editor halaman undangan Rani & Dimas di bisnis Nikahin, panel Template terbuka. Marketing diklik: kotak Profil merek berlabel Terisi, di bawahnya tulisan Dashboard tidak perlu dipasang. Bisnis ini sudah punya., lalu kartu Katalog Nikahin berisi Halaman katalog atas nama merekmu di Nikahin. Klien bayar ke toko Nikahin, kamu dapat komisi 60%. dan tombol Terbitkan katalog Nikahin. Tidak ada kartu Landing. Tombol itu diklik dan sebentar bertuliskan Menerbitkan…, lalu menjadi Perbarui katalog, dengan alamat https://nikahin.myscalev.com/katalog-rina-wo dan tombol Salin di bawahnya. Salin diklik dan muncul tulisan Tersalin." caption="Bagian 7: Katalog Nikahin di Template > Marketing" />
+<Image src="/assets/anim/gabung-kreator-landing.svg" alt="Editor halaman Landing Rina WO yang masih kosong di bisnis Nikahin, panel Template terbuka. Marketing diklik: kotak Profil merek berlabel Terisi, lalu kartu Landing Klasik, Landing Etalase, dan Landing Langit, tanpa kartu Dashboard pasangan. Di bawahnya tertulis Landing memakai paket dan harga Nikahin pusat. Klien bayar online ke toko Nikahin, kamu dapat komisi 60%. Kartu Landing Klasik diklik dan dialog Pasang Landing Klasik di halaman ini? muncul. Pasang diklik: pratinjau menjadi Landing Klasik dengan nama Rina WO, kartunya berlabel Dipakai, dan muncul pesan Landing Klasik dipasang. Tekan Simpan di Scalev. Terakhir Simpan dan Terbitkan di kanan atas diklik." caption="Bagian 7: pasang Landing di Template > Marketing" />
 
 <Steps>
-  <Step title="Buka halaman di bisnis Nikahin, tab NikahKit">
-    Halaman mana saja yang kamu buat di bisnis Nikahin, misalnya undangan Rani & Dimas.
+  <Step title="Buka halaman Landing di bisnis Nikahin, tab NikahKit, lalu Template">
+    Halaman HTML Sales Page baru yang kamu buat untuk Landing, misalnya `Landing Rina WO`.
   </Step>
-  <Step title="Klik Template, lalu Marketing">
-    Pastikan kotak **Profil merek** berlabel **Terisi**. Kalau belum, buka kotaknya, isi nama bisnis dan nomor WhatsApp, lalu klik **Simpan profil**.
+  <Step title="Klik Marketing">
+    Pastikan kotak **Profil merek** berlabel **Terisi**. Kalau belum, buka kotaknya, isi **Nama bisnis** dan **Nomor WhatsApp**, lalu klik **Simpan profil**.
   </Step>
-  <Step title="Cari kartu Katalog Nikahin">
-    Kartunya menulis "Halaman katalog atas nama merekmu di Nikahin. Klien bayar ke toko Nikahin, kamu dapat komisi 60%."
+  <Step title="Klik kartu Landing, misalnya Landing Klasik">
+    Muncul dialog **Pasang Landing Klasik di halaman ini?** dengan tulisan "Seluruh isi halaman diganti. Bisa diurungkan." Bedanya ketiga Landing ada di [Landing page](/jualan/landing-page).
   </Step>
-  <Step title="Klik Terbitkan katalog Nikahin">
-    Tombolnya bertuliskan **Menerbitkan…** sebentar. Katalog langsung tayang, tanpa Simpan atau Terbitkan di Scalev. Alamatnya dibuat dari nama bisnis di Profil merek, misalnya `katalog-rina-wo`. Kalau alamat itu sudah dipakai, NikahKit menambah angka, misalnya `katalog-rina-wo-2`.
+  <Step title="Klik Pasang">
+    Pratinjau berubah menjadi Landing dengan nama bisnismu, kartunya berlabel **Dipakai**, dan muncul pesan **Landing Klasik dipasang. Tekan Simpan di Scalev.** NikahKit juga mengatur checkout halaman ke toko Nikahin dan mencatat halaman ini atas namamu untuk komisi.
   </Step>
-  <Step title="Klik Salin">
-    Di bawah tombol, yang kini bertuliskan **Perbarui katalog**, tampil alamat katalogmu dan tombol **Salin**. Klik **Salin**: tertulis **Tersalin.** Kirim alamat itu ke klien, atau klik alamatnya untuk membuka katalog di tab baru.
+  <Step title="Klik Simpan, lalu Terbitkan">
+    Di kanan atas editor Scalev. Setiap kali kamu menekan **Simpan**, NikahKit mencatat ulang halaman ini untuk komisimu.
   </Step>
-  <Step title="Perbarui setelah Profil merek berubah">
-    Nama bisnis dan nomor WhatsApp di katalog ikut Profil merek saat diterbitkan. Setelah mengubah Profil merek, klik tombol di kartu Katalog Nikahin lagi. Saat panel dibuka lagi, tombolnya kembali bertuliskan **Terbitkan katalog Nikahin**; mengkliknya tetap memperbarui katalog yang sama, alamatnya tidak berubah.
+  <Step title="Kirim alamat halaman ke klien">
+    Alamatnya `nikahin.myscalev.com/` diikuti slug halaman, misalnya `nikahin.myscalev.com/rina-wo`. Klien memilih desain dan paket, lalu membayar lewat checkout toko Nikahin.
   </Step>
 </Steps>
 
-Katalog tetap tayang walau kursimu dilepas, termasuk lewat **Keluar dari bisnis**. Untuk menerbitkan ulang atau memperbarui, kamu perlu memegang kursi lagi. Katalog berhenti tayang bila emailmu dikeluarkan dari daftar Kreator Nikahin.
+Mengubah Profil merek? Buka lagi halaman Landing-nya. Panel menulis **Profil merek berubah.** dengan tombol **Perbarui halaman ini**. Klik, lalu **Simpan** dan **Terbitkan** lagi.
 
-Desain di katalog mengikuti pilihan **Desain di katalog** di Profil merek. Template milikmu dari [Ajukan template dari Canva](/gabung/ajukan-template-canva) tampil paling depan. Lihat [Profil merek](/jualan/profil-merek#desain-di-katalog).
+Desain di Landing mengikuti pilihan **Desain di katalog** di Profil merek, bila kamu punya template sendiri dari [Ajukan template dari Canva](/gabung/ajukan-template-canva). Lihat [Profil merek](/jualan/profil-merek#desain-di-katalog).
+
+Katalog Nikahin lama (misalnya `nikahin.myscalev.com/katalog-rina-wo`) tidak bisa diterbitkan atau diperbarui lagi, tetapi pesanan lunas dari katalog itu tetap dihitung komisinya.
 
 #### Penjualan dan komisi
 
-Buka **Pesanan masuk** (ikon kotak masuk di atas panel NikahKit). Setelah katalogmu terbit, kotak **Penjualan katalog** tampil di bawah daftar pesanan:
+Buka **Pesanan masuk** (ikon kotak masuk di atas panel NikahKit). Setelah halaman Landing-mu tercatat, kotak **Penjualan katalog** tampil di bawah daftar pesanan:
 
 - Total komisi di judul kotak.
 - Tulisan seperti "3 pesanan lunas. Komisi 60% dari harga paket setelah diskon." Biaya layanan yang dibayar klien dan potongan Scalev tidak ikut dihitung.
-- Pesanan lunas dari katalogmu: nama klien, paket, tanggal, dan komisinya.
-- Tombol **Buka /katalog-rina-wo** (alamat katalogmu) untuk membuka katalognya.
+- Pesanan lunas dari halamanmu: nama klien, paket, tanggal, dan komisinya.
+- Tombol **Buka /rina-wo** untuk tiap halaman yang tercatat atas namamu, termasuk katalog lama.
 
 Pesanan yang belum dibayar tidak masuk hitungan. Lihat juga [Pesanan masuk](/jualan/pesanan-masuk).
 
@@ -237,7 +240,7 @@ Kursi Kreator di bisnis Nikahin terbatas dan bergilir. Semuanya diatur di [papan
 | **Kursi milikmu.** | Kamu sudah bergabung ke bisnis Nikahin. Bila ada yang antre, kursi yang 30 menit tidak membuka NikahKit bisa diberikan ke antrean berikutnya. | Klik **Buka Landing Pages** dan buat undangan. **Kelola undangan** membuka daftar undanganmu, **Pasang NikahKit** membuka halaman pemasangan. |
 | **Antre nomor N.** | Semua kursi sedang dipakai. | Tunggu. Saat kursi kosong, undangan Scalev dikirim ke emailmu. |
 | **Undangan Scalev ditolak.** dengan alasan dari Scalev | Scalev menolak mengundang emailmu, misalnya karena email itu sudah anggota tim Nikahin dengan peran lain. Kamu keluar dari antrean, jadi kursi tidak tertahan. | Klik **Hubungi tim Nikahin**. Setelah beres, klik **Minta kursi** lagi. |
-| **Keluar dari bisnis** | Melepas kursimu: undangan Scalev dibatalkan atau kamu dikeluarkan dari tim Nikahin, dan kursinya diberikan ke antrean berikutnya. Undangan pernikahan yang sudah kamu buat tetap tayang dan tetap bisa dikelola. Katalog Nikahin-mu juga tetap tayang. | Klik bila sudah selesai membuat undangan. Mau membuat lagi? Klik **Minta kursi** lagi. |
+| **Keluar dari bisnis** | Melepas kursimu: undangan Scalev dibatalkan atau kamu dikeluarkan dari tim Nikahin, dan kursinya diberikan ke antrean berikutnya. Undangan pernikahan yang sudah kamu buat tetap tayang dan tetap bisa dikelola. Landing yang sudah terbit juga tetap tayang. | Klik bila sudah selesai membuat undangan. Mau membuat lagi? Klik **Minta kursi** lagi. |
 
 Saat kamu membuka halaman sebagai anggota tim (di bisnis Nikahin), panel NikahKit juga bisa menampilkan salah satu catatan ini di atas panel. Di bisnis Scalev milikmu sendiri catatan ini tidak muncul.
 
@@ -255,7 +258,7 @@ Saat menerima undangan, Scalev meminta nomor HP. Kolomnya bisa sudah terisi nomo
 - Kotak bisnis di kiri atas Scalev bertuliskan **Nikahin**, dengan menu **Landing Pages** dan **Buku Tamu**.
 - Tab **NikahKit** di halaman buatanmu membuka editor, dengan chip **Sekali Bayar** di kanan atas panel.
 - Undanganmu tampil di **Buku Tamu**.
-- Kartu **Katalog Nikahin** menampilkan alamat katalogmu dan tombol **Perbarui katalog**.
+- Di **Template** > **Marketing**, kartu Landing yang kamu pasang berlabel **Dipakai**, dan halamannya sudah disimpan dan diterbitkan.
 </Success>
 
 ## Kelola undangan dari HP
@@ -297,20 +300,17 @@ Buku Tamu di Scalev tetap tempat kerja lengkap di laptop. Untuk cek cepat dari H
   <Accordion title="Halaman lain di Landing Pages tidak tampil atau tidak terbuka">
     Normal. Peran Kreator hanya melihat dan membuka halaman buatannya sendiri.
   </Accordion>
-  <Accordion title="Kartu Katalog Nikahin tidak ada, yang tampil kartu Landing">
-    Kursimu sedang tidak aktif. Kartu Katalog Nikahin hanya tampil selama kamu memegang kursi. Lihat [Papan Kursi Kreator](#papan-kursi-kreator).
+  <Accordion title="Kartu Landing tidak tampil, atau Profil merek meminta paket">
+    Kursimu sedang tidak aktif, atau halaman ini bukan di bisnis Nikahin. Paket dan harga Nikahin pusat hanya dipakai selama kamu memegang kursi dan membuka halaman di bisnis Nikahin. Lihat [Papan Kursi Kreator](#papan-kursi-kreator).
   </Accordion>
-  <Accordion title="&quot;Isi Profil merek dulu (nama dan WhatsApp 62…), lalu simpan.&quot;">
-    Profil merek belum berisi nama bisnis atau nomor WhatsApp yang bisa dipakai. Nama bisnis hanya boleh berisi huruf, angka, spasi, dan tanda baca sederhana, tanpa tanda kutip. Lengkapi, klik **Simpan profil**, lalu klik **Terbitkan katalog Nikahin** lagi.
+  <Accordion title="&quot;Isi Profil merek dulu untuk memasang Landing Klasik.&quot;">
+    Profil merek belum berisi nama bisnis atau nomor WhatsApp yang bisa dipakai. Lengkapi, klik **Simpan profil**, lalu klik kartu Landing lagi.
   </Accordion>
-  <Accordion title="&quot;Khusus Kreator Nikahin yang memegang kursi.&quot;">
-    Kursimu baru saja dilepas. Minta kursi lagi di [papan Kursi Kreator](https://nikahin.myscalev.com/kreator-nikahin).
+  <Accordion title="&quot;Checkout toko Nikahin gagal dipasang. Muat ulang, lalu pasang lagi.&quot;">
+    Checkout halaman tidak bisa diatur ke toko Nikahin. Muat ulang editor (F5, atau Cmd+R di Mac), buka tab **NikahKit**, lalu pasang Landing lagi. Halaman yang sudah pernah disimpan dengan toko lain tidak bisa dipindah ke toko Nikahin: buat halaman HTML Sales Page baru. Kalau tetap gagal, [hubungi tim Nikahin](/bantuan/hubungi).
   </Accordion>
-  <Accordion title="&quot;Terlalu sering. Coba lagi sebentar.&quot;">
-    Tunggu sebentar, lalu klik tombolnya lagi.
-  </Accordion>
-  <Accordion title="&quot;Gagal menerbitkan katalog. Coba lagi.&quot; atau &quot;Katalog belum bisa diterbitkan. Hubungi admin.&quot;">
-    Coba lagi beberapa saat kemudian. Kalau tetap gagal, [hubungi tim Nikahin](/bantuan/hubungi).
+  <Accordion title="Halaman Landing tidak muncul di Penjualan katalog">
+    Kotak itu baru tampil setelah ada halaman yang tercatat atas namamu. Pastikan kamu memegang kursi dan halaman itu buatanmu sendiri di bisnis Nikahin, lalu klik **Simpan** lagi di editor halaman Landing.
   </Accordion>
 </AccordionGroup>
 

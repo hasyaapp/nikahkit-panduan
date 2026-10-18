@@ -34,7 +34,7 @@ export const MK = { dashboard: ["Dashboard pasangan", "Kirim undangan, RSVP, uca
 const CARD_AT = { dashboard: [88, 0], landing: [234, 0], etalase: [88, 241], langit: [234, 241] };
 // The Dipakai badge of card id with the card at (x, y): beside the name when both fit the 134 px row, else under it
 // (.nk-card__name wraps, row gap 2), which pushes the description down. [badge box, extra height].
-const dipakaiAt = (id, x, y) => {
+export const dipakaiAt = (id, x, y) => {
   const w = nkBadgeBox(0, 0, "Dipakai")[2], under = textWidth(MK[id][0], 14, 500) + 4 + w > 134;
   return under ? [[x, y + 196, w, 18], 20] : [[x + 134 - w, y + 175, w, 18], 0];
 };
@@ -42,7 +42,7 @@ const dipakaiAt = (id, x, y) => {
 // badge row grows its grid row. Card box: [x, y, 134, 167].
 export const MKY = 281;
 export const cardXY = (id, y = MKY, on) => [CARD_AT[id][0], y + CARD_AT[id][1] + (CARD_AT[id][1] && on && !CARD_AT[on][1] ? dipakaiAt(on, 0, 0)[1] : 0)];
-function mkCard(x, y, id, on) {
+export function mkCard(x, y, id, on) {
   const [name, desc] = MK[id], [badge, dy] = on ? dipakaiAt(id, x, y) : [null, 0];
   return rect(x + 1, y + 1, 132, 165, { r: 8, fill: C.page, stroke: on ? C.primary : C.line, sw: 2 }) +
     clipped(x + 2, y + 2, 130, 163, group({ transform: `translate(${x + 2} ${y + 2 + 38.2}) scale(${130 / 150})` }, SKETCH[id])) +
