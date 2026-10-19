@@ -1,19 +1,26 @@
 [
   {
     "slug": "panduan-kreator-nikahin",
-    "title": "Kreator Nikahin: dari gabung sampai klien bayar",
+    "title": "Kreator Nikahin: ringkasan dari minta kursi sampai komisi",
     "chapters": [
+      ["gabung-kreator-kursi-minta", "Minta kursi"],
       ["gabung-kreator-terima-undangan", "Terima undangan Scalev"],
       ["gabung-kreator-bergabung", "Bergabung ke bisnis Nikahin"],
-      ["gabung-kreator-buat-halaman", "Buat halaman undangan"],
+      ["gabung-kreator-buat-halaman", "Buat halaman"],
       ["gabung-kreator-masuk", "Masuk ke NikahKit"],
-      ["gabung-kreator-template", "Pilih template"],
-      ["gabung-kreator-buku-tamu", "Buka Buku Tamu"],
-      ["gabung-kreator-landing", "Pasang halaman jualan"],
-      ["gabung-kreator-landing-bayar", "Klien memesan dan membayar"]
+      ["gabung-kreator-profil-merek", "Isi Profil merek"],
+      ["gabung-kreator-landing", "Pasang Landing"],
+      ["gabung-kreator-landing-bayar", "Klien memesan dan membayar"],
+      ["gabung-kreator-template", "Pasang template"],
+      ["gabung-kreator-pesanan", "Isi dari Pesanan masuk"],
+      ["gabung-kreator-buku-tamu", "Cek di Buku Tamu"],
+      ["scalev-terbitkan", "Simpan & Terbitkan"],
+      ["gabung-kreator-pin", "Kelola PIN dashboard"],
+      ["gabung-kreator-pin-salin", "Serahkan ke pengantin"],
+      ["gabung-kreator-komisi", "Penjualan dan komisi"]
     ],
-    "intro": "Halo, selamat datang di panduan Kreator Nikahin. Di video ini kita mulai dari menerima undangan Scalev, membuat undangan dengan NikahKit, sampai klien memesan dan membayar di halaman jualanmu.",
-    "outro": "Selesai. Sekarang halaman jualanmu siap dibagikan, dan setiap pesanan lunas tercatat untuk komisimu. Panduan lengkapnya ada di docs.page, hasyaapp, nikahkit-panduan. Sampai jumpa di video berikutnya."
+    "intro": "Halo, ini ringkasan panduan Kreator Nikahin: gabung, buka lapak dengan Profil merek dan Landing, lalu tiap pesanan klien sampai komisi. Pasang NikahKit di Chrome sebelum masuk.",
+    "outro": "Selesai. Video per langkahnya ada di playlist Panduan Kreator Nikahin, dan panduan tertulisnya di docs.page, hasyaapp, nikahkit-panduan."
   },
   {
     "slug": "panduan-member-nikahkit",
