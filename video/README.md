@@ -8,6 +8,10 @@ npm run video -- panduan-kreator-nikahin ~/Desktop
 ```
 
 Hasil: `<folder>/<slug>.mp4` (1920x1080) dan `<slug>-bab.txt` (daftar bab). Tanpa folder, hasilnya di `video/out/`.
+Video yang sudah diunggah disimpan di `~/Movies/Nikahin Video Panduan/` (`1 Member`, `2 Kreator` bernomor sesuai urutan
+playlist, `3 Ringkasan`, `9 Arsip`), dengan `Daftar video.csv` berisi judul, ID YouTube, playlist, dan status. Render baru
+masuk ke `_baru/` di folder itu. `video/out/frames` dan `video/out/seg` hanya berkas sementara dan boleh dihapus;
+`video/cache` jangan dihapus (narasi yang sudah dibayar).
 
 - Narasi tiap langkah = teks langkah di `<desc>` SVG animasinya, dibaca ElevenLabs (suara Sarah, model eleven_v4, bahasa
   Indonesia). Jalankan `node panduan/anim/build.mjs` dulu bila adegan berubah.
