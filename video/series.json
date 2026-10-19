@@ -487,5 +487,33 @@
     ],
     "intro": "Cara mengirim Dashboard dan PIN ke pengantin.",
     "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-profil-merek",
+    "title": "Kreator Nikahin: Isi Profil merek",
+    "chapters": [["gabung-kreator-profil-merek", "Profil merek"]],
+    "intro": "Cara mengisi Profil merek sebagai Kreator.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-klien-bayar",
+    "title": "Kreator Nikahin: Klien memesan dan membayar",
+    "chapters": [["gabung-kreator-landing-bayar", "Klien memesan dan membayar"]],
+    "intro": "Cara klien memesan dan membayar di Landing-mu.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-isi-pesanan",
+    "title": "Kreator Nikahin: Isi undangan dari Pesanan masuk",
+    "chapters": [["gabung-kreator-pesanan", "Isi undangan dari Pesanan masuk"]],
+    "intro": "Cara mengisi undangan dari Pesanan masuk.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
+  },
+  {
+    "slug": "kreator-terbitkan",
+    "title": "Kreator Nikahin: Simpan & Terbitkan",
+    "chapters": [["scalev-terbitkan", "Simpan & Terbitkan"]],
+    "intro": "Cara menerbitkan undangan klienmu.",
+    "outro": "Selesai. Lanjut ke langkah berikutnya."
   }
 ]

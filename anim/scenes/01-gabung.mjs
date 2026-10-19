@@ -13,7 +13,7 @@
 import { C, PHONE, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
-  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk
+  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk, nkInput, nkLabel
 } from "../ui/kit.mjs";
 import {
   securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, LP_ROWS, head, genericBody,
@@ -24,7 +24,7 @@ import { brandClosed, brandOpen, mkCards, mkCard, dipakaiAt, BOX, MKY, cardXY, S
 import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE, urlBox as shareUrlBox, BAGIKAN_TOOL, accessHead, forCouple, pinBtn, pinBox, pinHint, ACC_Y, COUPLE_Y } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, kreatorHead, KR_CHIP_BOX } from "../ui/gate.mjs";
-import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA } from "../ui/pesanan.mjs";
+import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA, badgeAt } from "../ui/pesanan.mjs";
 import { landingTop } from "./07-jualan.mjs";
 
 const W = 1440, CT = CHROME_TOP, VIEW = 900 - CT; // Chrome content top 85, page viewport 1440 x 815
@@ -536,9 +536,26 @@ const klXY = (id, on) => [KL_AT[id][0], MKY + KL_AT[id][1] + (KL_AT[id][1] && on
 const KL_HINT = wrap("Landing memakai paket dan harga Nikahin pusat. Klien bayar online ke toko Nikahin, kamu dapat komisi 60%.", 279, 12, 400, textWidth);
 const klHintY = (on) => klXY("langit", on)[1] + 249;
 const KL = { card: [88, MKY, 134, 167], hint: (on) => [88, klHintY(on) - 12, 279, KL_HINT.length * 16 + 2] };
-const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) +
+// A Landing page is no invitation (store phase "start"), so its panel head has no Pesanan masuk icon (App.jsx: ready).
+const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) +
   panelBody(panelBg(), seg("marketing"), brandClosed(BOX), KL_IDS.map((id) => mkCard(...klXY(id, on), id, on === id)).join(""),
     para(88, klHintY(on), KL_HINT, { size: 12, fill: C.faint, lh: 16 }));
+// Profil merek open for a Kreator in the Nikahin business (panels-style.jsx BrandForm, central): Nama bisnis and Nomor
+// WhatsApp start empty for a team member (store.brandStart), Logo (opsional), the central hint instead of the packages,
+// Simpan profil. Same field metrics as ui/marketing brandOpen; the box, then the Landing cards 12 below it.
+const KB_HINT = wrap("Paket dan harga mengikuti paket Nikahin pusat.", 253, 12, 400, textWidth);
+const KB_SIMPAN = 524 + KB_HINT.length * 16, KB_END = KB_SIMPAN + 48, KB_LOGO = nkBtnBox(101, 456, "Pilih foto", { icon: "image" });
+const KB_SAVE = nkBtnBox(101, KB_SIMPAN, "Simpan profil", { w: 110 }), KB_HINT_BOX = [101, 508, 253, KB_HINT.length * 16 + 2];
+const brandK = () => rect(85.5, BOX - 2.5, 284, KB_END - BOX + 6, { r: 6, stroke: C.primarySoft, sw: 3 }) + rect(88.5, BOX + 0.5, 278, KB_END - BOX - 1, { r: 4, fill: C.white, stroke: C.primary }) +
+  text(101, BOX + 30, "Profil merek", { size: 14, weight: 500 }) + badgeAt(354, BOX + 16, "Belum diisi", "plain") + line(89, BOX + 49, 366, BOX + 49) +
+  nkLabel(101, 292, "Nama bisnis") + nkInput(101, 300, 253, "") + nkLabel(101, 360, "Nomor WhatsApp") + nkInput(101, 368, 253, "0812 3456 7890", { placeholder: true }) +
+  text(101, 420, "Untuk tombol Tanya lewat WhatsApp.", { size: 12, fill: C.faint }) + nkLabel(101, 448, "Logo (opsional)") + nkBtn(101, 456, "Pilih foto", { variant: "quiet", icon: "image" }) +
+  para(101, 520, KB_HINT, { size: 12, fill: C.faint, lh: 16 }) + nkBtn(101, KB_SIMPAN, "Simpan profil", { w: 110 });
+const mkKreatorOpen = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) +
+  panelBody(panelBg(), seg("marketing"), brandK(), KL_IDS.map((id) => mkCard(KL_AT[id][0], KB_END + 12 + KL_AT[id][1], id, false)).join(""));
+// The blank Landing page of the Kreator (bisnis Nikahin), tab NikahKit on Template.
+const KL_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template", page: "Landing Rina WO" }), pvBlank(),
+  nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219, null))];
 // Pasang dialog (panels-style.jsx nk-confirm) and the toast after it (store.js applyMarketing).
 const KL_DLG = [540, 383, 360, 134], KL_DLG_O = [720, 450], KL_PASANG = [816, 461, 64, 36];
 const klDlg = rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }) + shadow(...KL_DLG, 8, 3) + rect(...KL_DLG, { r: 8, fill: C.white }) +
@@ -1330,12 +1347,39 @@ export const scenes = {
     ]
   },
 
+  // Kreator Nikahin: Profil merek before the first Landing (a new HTML page in bisnis Nikahin, Template > Marketing). Captions
+  // 1, 4 and 6 are the member's jualan-profil-merek captions word for word (same steps; narration shared).
+  "gabung-kreator-profil-merek": {
+    title: "Mengisi Profil merek sebagai Kreator Nikahin",
+    base: KL_BASE,
+    els: {
+      open: { svg: mkKreatorOpen(), enter: "fade", skel: true },
+      nmF: { svg: nkInput(101, 300, 253, "", { focus: true }), enter: "fade" },
+      nmB: { svg: rect(97, 296, 261, 44, { fill: C.white }) + nkInput(101, 300, 253, ""), enter: "fade" },
+      nm: text(112, 323, "Rina WO", { size: 14 }),
+      waF: { svg: rect(97, 364, 261, 44, { fill: C.white }) + nkInput(101, 368, 253, "", { focus: true }), enter: "fade" },
+      wa: text(112, 391, "0812 3456 7890", { size: 14 }),
+      done: { svg: mkKreator(null), enter: "fade", delay: 0.15, skel: true }
+    },
+    steps: [
+      { caption: "Di Kategori, klik Marketing. Kotak Profil merek terbuka: Belum diisi.", focus: [[72, 153, 327, 747]], at: SEG.marketing, click: true, show: ["open"],
+        mark: { box: MARKETING_BOX, r: 4 }, lens: { src: [80, 161, 295, 116] }, dur: 3.4 },
+      { caption: "Isi Nama bisnis, misalnya Rina WO.", at: [228, 318], click: true, show: ["nmF", "nm"], type: [{ id: "nm", n: 7, box: [112, 303, tw("Rina WO", 14) + 2, 30] }],
+        mark: { box: [101, 300, 253, 36], r: 4 }, lens: { src: [92, 276, 282, 68] }, dur: 3 },
+      { caption: "Isi Nomor WhatsApp milikmu.", at: [228, 386], click: true, hide: ["nmF"], show: ["nmB", "waF", "wa"], type: [{ id: "wa", n: 14, box: [112, 371, tw("0812 3456 7890", 14) + 2, 30] }],
+        mark: { box: [101, 368, 253, 36], r: 4 }, lens: { src: [92, 344, 282, 88] }, dur: 3.2 },
+      { caption: "Logo (opsional): klik Pilih foto untuk memilih gambar dari Media.", mark: { box: KB_LOGO, r: 4 }, lens: { src: [92, 430, 282, 72] }, dur: 3.2 },
+      { caption: "Paket dan harga mengikuti paket Nikahin pusat.", mark: { box: KB_HINT_BOX, r: 4 }, lens: { src: grow(KB_HINT_BOX, 8) }, dur: 3 },
+      { caption: "Klik Simpan profil. Kotak menutup dengan label Terisi.", at: mid(KB_SAVE), click: true, hide: ["waF"], show: ["done"], mark: { box: KB_SAVE, r: 4 },
+        lens: { src: [80, BOX - 8, 295, 64] }, dur: 3.4 }
+    ]
+  },
+
   // Kreator Nikahin 7: halaman baru di bisnis Nikahin, Template > Marketing (tiga kartu Landing, tanpa Dashboard), Pasang
   // Landing Klasik, lalu Simpan dan Terbitkan.
   "gabung-kreator-landing": {
     title: "Memasang Landing sebagai Kreator Nikahin",
-    base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template", page: "Landing Rina WO" }), pvBlank(),
-      nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, null))],
+    base: KL_BASE,
     els: {
       mk: { svg: mkKreator(null), enter: "fade", skel: true },
       dlg: { svg: klDlg, enter: "pop", origin: KL_DLG_O },

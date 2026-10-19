@@ -15,8 +15,8 @@ import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, IS
 import { kreatorHead, KR_INBOX } from "../ui/gate.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
-import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL } from "../ui/editor-panels.mjs";
-import { PHOTO_DEFS, pvMempelai } from "../ui/invitation.mjs";
+import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL, library, cardAt } from "../ui/editor-panels.mjs";
+import { PHOTO_DEFS, pvMempelai, pvDasar, kencana } from "../ui/invitation.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 // PHOTO_DEFS: the gradients the invitation preview's photos use.
@@ -425,6 +425,9 @@ const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + (o.panel ?
 const krKonten = kreatorHead("Konten", true) + kList({ left: 0 }).svg;
 const krEd = [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvMempelai(SAMPLE)];
 const KR_INBOX_M = M(KR_INBOX[0] - 18, 104, 36, 36, 8);
+// The Kreator's Landing order row in Pesanan masuk with the client's design in front (worker pesanan-masuk.mjs:
+// "Desain <nama> · <paket>"), over the meta line of ui/pesanan kreatorOrders.
+const KR_ROW_DESAIN = rect(27, ROW1 + 32, 262, 14, { fill: C.white }) + text(28, ROW1 + 42, "Desain Kencana · Undangan Inti · 19 Okt, 10.20", { size: 10, fill: C.text });
 // Install one Marketing card on a blank HTML Mode page (pasang-dashboard-pasangan, landing-page), one scene per group
 // of steps: the panel up to the card click, the dialog and Pasang, then the toast and the Dipakai badge.
 function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
@@ -531,7 +534,7 @@ const payForm = body(rect(0, 0, 390, PAY_Y2 + 844, { fill: LP.paper }), h(20, 44
   text(20, 72, "Bayar online, lalu isi data undangan.", { size: 14, fill: LP.muted }),
   text(20, PAY_TOP - 10, "Paket", { size: 14, weight: 700, fill: LP.cocoa }), PAY_PLANS.map(([n, p], i) => payPick(PAY_TOP + i * 56, n, p, i === 0)).join(""),
   text(20, PAY_ADD - 10, "Tambahan", { size: 14, weight: 700, fill: LP.cocoa }), PAY_ADDONS.map(([n, k], i) => payPick(PAY_ADD + i * 56, n, `+Rp${k}.000`, false, true)).join(""),
-  rect(20, PAY_DESIGN, 350, 44, { r: 12, fill: LP.tint }), text(34, PAY_DESIGN + 28, "Desain: Dasar", { size: 15, weight: 700, fill: LP.ink }),
+  rect(20, PAY_DESIGN, 350, 44, { r: 12, fill: LP.tint }), text(34, PAY_DESIGN + 28, "Desain: Kencana", { size: 15, weight: 700, fill: LP.ink }),
   payField(PAY_FIELDS, "Nama pemesan", "Rani Ayu"), payField(PAY_FIELDS + 74, "Nomor WhatsApp", "081234567890"), payField(PAY_FIELDS + 148, "Email", "rani@contoh.com"),
   payField(PAY_FIELDS + 222, "Cara bayar", "QRIS"), lpBtn(PAY_BTN[0], PAY_BTN[1], "bayar Rp129.903", { solid: true, w: 350 }),
   text(20, 1224, "Termasuk biaya layanan Rp903.", { size: 14, fill: LP.muted }), text(20, 1252, "Sesudah lunas, form data undangan langsung terbuka.", { size: 13, fill: LP.muted }));
@@ -556,7 +559,7 @@ const orderPaid = body(rect(0, 0, 390, 844, { fill: LP.paper }), h(20, 52, "Nika
   Array.from({ length: 10 }, (_, i) => rect(36 + i * 32, 270, 28, 6, { r: 3, fill: i ? LP.dash : "#ff6f1e" })).join(""),
   text(36, 296, "Langkah 1 dari 10 · Pesanan", { size: 13, weight: 600, fill: LP.muted }),
   h(36, 340, "Pesanan", 22, { weight: 600 }), text(36, 366, "Sesuai pembayaran kalian.", { size: 15, fill: LP.muted }),
-  text(36, 408, "Undangan Inti, desain Dasar", { size: 15, weight: 700, fill: LP.ink }),
+  text(36, 408, "Undangan Inti, desain Kencana", { size: 15, weight: 700, fill: LP.ink }),
   lpBtn(36, 436, "lanjut", { w: 120 }));
 
 export const scenes = {
@@ -675,33 +678,55 @@ export const scenes = {
     ]
   },
 
-  // Kreator: the paid Landing order in Pesanan masuk, filled into a new invitation in bisnis Nikahin.
-  "gabung-kreator-pesanan": {
-    title: "Mengisi undangan dari pesanan Landing Kreator",
-    base: [...krEd, inboxCount("1", KR_INBOX[0])],
-    els: {
-      inbox: { svg: kreatorOrders, enter: "fade" },
-      memuat: { svg: rect(270, ROW1 + 16, 64, 24, { fill: C.white }) + badgeAt(331, ROW1 + 19, "Memuat…", "off"), enter: "fade" },
-      ...filled({ panel: krKonten })
-    },
-    steps: [
-      tabStep("Buka halaman undangan klien di editor, tab NikahKit.", 2.6),
-      { caption: "Angka merah di ikon kotak masuk: ada pesanan yang belum diisi.", focus: F.left, mark: KR_INBOX_M, lens: { src: [150, 96, 240, 52] }, dur: 3 },
-      { caption: "Klik ikonnya. Layar Pesanan masuk terbuka, terbaru di atas.", at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
-      { caption: "Data dari form klienmu masuk ke sini, berlabel Baru.", mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3.2 },
-      { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3 },
-      { caption: "Undangan terisi. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
-        mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 }
-    ]
-  },
+  // Kreator: the paid Landing order in Pesanan masuk, filled into the client's invitation in bisnis Nikahin. The page already
+  // has template Dasar (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
+  // client's design (worker pesanan-masuk.mjs: "Desain <nama> · <paket>"). Filling keeps the page's template, so a
+  // different design is then picked in Template: the content stays (store.js setTemplate, toast "Template diganti ke …").
+  "gabung-kreator-pesanan": (() => {
+    const Q = { q: "Kencana", n: [1, 1, 0, 0, 0, 0], ids: ["kencana"] }, K_CARD = [...cardAt(0, 337), 134, 167], K_TOAST = "Template diganti ke Kencana.";
+    const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true);
+    return {
+      title: "Mengisi undangan dari pesanan Landing Kreator",
+      base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvDasar(), inboxCount("1", KR_INBOX[0])],
+      els: {
+        inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" },
+        memuat: { svg: rect(270, ROW1 + 16, 64, 24, { fill: C.white }) + badgeAt(331, ROW1 + 19, "Memuat…", "off"), enter: "fade" },
+        konten: { svg: nkRail(0, 0, "Konten") + krKonten + pvDasar(), enter: "fade" },
+        t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: 0.3 },
+        tplA: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
+        tplQ: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "dasar", Q)), enter: "fade", delay: 1.2, skel: true },
+        qF: { svg: nkInput(88, 219, 279, "", { focus: true }), enter: "fade" },
+        qT: text(99, 242, "Kencana", { size: 14 }),
+        tplK: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "kencana", Q)), enter: "fade", skel: true },
+        pvK: { svg: kencana.cover(), enter: "fade", delay: 0.2, skel: true },
+        t2: { svg: nkToast(K_TOAST), enter: "slide", delay: 0.4 }
+      },
+      steps: [
+        tabStep("Buka halaman undangan klien di editor, tab NikahKit.", 2.6),
+        { caption: "Angka merah di ikon kotak masuk: ada pesanan yang belum diisi.", focus: F.left, mark: KR_INBOX_M, lens: { src: [150, 96, 240, 52] }, dur: 3 },
+        { caption: "Klik ikonnya. Layar Pesanan masuk terbuka, terbaru di atas.", at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
+        { caption: "Data dari form klienmu masuk ke sini, berlabel Baru.", mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3.2 },
+        { caption: "Klik nama pasangan berlabel Baru.", at: [150, ROW1 + 20], click: true, show: ["memuat"], mark: M(17, ROW1, 364, 57), lens: { src: [12, LIST_Y - 7, 374, 70] }, dur: 3 },
+        { caption: "Undangan terisi. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
+          mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 },
+        { caption: "Desain klien beda? Klik Template.", at: ED.rail.Template, click: true, hide: ["t1"], show: ["tplA"], focus: F.left, mark: M(0, 104, 71, 52, 0),
+          lens: { src: [80, 330, 295, 242], at: [430, 300] }, dur: 3 },
+        { caption: "Ketik Kencana di kotak Cari.", at: [228, 237], click: true, show: ["tplQ", "qF", "qT"], type: [{ id: "qT", n: 7, box: [99, 222, tw("Kencana", 14) + 2, 30] }],
+          mark: M(88, 219, 279, 36), lens: { src: [80, 211, 295, 84], at: [430, 200] }, dur: 3 },
+        { caption: "Klik kartu Kencana. Desain berganti, isinya tetap.", at: mid(K_CARD), click: true, hide: ["qF", "qT"], show: ["tplK", "pvK", "t2"], focus: [F.left, F.preview],
+          mark: M(...K_CARD, 8), lens: toastLens(K_TOAST), dur: 3.8 }
+      ]
+    };
+  })(),
 
-  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Buka /slug).
+  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Buka /slug). The Landing order row
+  // starts with its design, as in gabung-kreator-pesanan.
   "gabung-kreator-komisi": (() => {
     const { box, total, lead, list, buka } = SALES_AT;
     return {
       title: "Melihat penjualan dan komisi Kreator",
       base: krEd,
-      els: { inbox: { svg: kreatorOrders, enter: "fade" } },
+      els: { inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" } },
       steps: [
         { caption: "Di editor halamanmu, klik ikon kotak masuk.", focus: F.left, at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3 },
         { caption: "Di bawah daftar pesanan ada kotak Penjualan katalog.", mark: M(...box), lens: { src: [box[0] - 6, box[1] - 6, box[2] + 12, box[3] + 12], zoom: 1.2 }, dur: 3.2 },
