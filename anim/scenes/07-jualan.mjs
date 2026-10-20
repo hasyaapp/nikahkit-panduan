@@ -32,6 +32,9 @@ const INBOX = M(218, 104, 36, 36, 8);
 // [name, description, [paper, accent]].
 const DESIGN = (id, pal) => [TPL[id][0], TPL[id][1], pal];
 const DESIGNS = [DESIGN("dasar", ["#ffffff", "#8b8178"]), DESIGN("folio", ["#f3ece2", "#7a5c3e"]), DESIGN("galeri", ["#fafafa", "#9aa3ad"]), DESIGN("modern-estetik", ["#e9efe7", "#5d7a5a"])];
+// The opening art (#lpArt): the three display designs (TAMPILAN in server/pages/src/landing) when the catalogue has them,
+// [paper, accent] sketched like DESIGNS; first in the middle, second left, third right.
+const TAMPILAN = [["#fdf8ec", "#a31d33"], ["#eef3e4", "#c8541f"], ["#8b3a5c", "#f6e4ea"]];
 function pageSketch(x, y, w, h, [bg, ac]) {
   const cx = x + w / 2;
   return rect(x, y, w, h, { fill: bg }) + rect(x, y, w, h * 0.06, { fill: ac, opacity: 0.25 }) +
@@ -134,7 +137,7 @@ export function landingTop(x0, y0, name) {
   s += h(X, Y(131), "Kabarkan hari", 42.9) + h(X, Y(174.8), "bahagia kalian", 42.9);
   s += para(X, Y(217.5), ["Pilih desain dan paket, isi datanya. Kami", "siapkan undangannya."], { size: 17, fill: LP.muted, lh: 26.3 });
   s += lpBtn(X, Y(LPY.cta), "Pesan undangan", { solid: true, w: 178.8 }) + lpBtn(x0 + 210.8, Y(LPY.cta), "Lihat desain", { w: 143.6 });
-  s += THUMB(X + 10.5, Y(LPY.art + 28), 175, 219, DESIGNS[1][2], -6) + THUMB(X + 164.5, Y(LPY.art + 28), 175, 219, DESIGNS[2][2], 6) + THUMB(X + 87.5, Y(LPY.art), 175, 219, DESIGNS[0][2]);
+  s += THUMB(X + 10.5, Y(LPY.art + 28), 175, 219, TAMPILAN[1], -6) + THUMB(X + 164.5, Y(LPY.art + 28), 175, 219, TAMPILAN[2], 6) + THUMB(X + 87.5, Y(LPY.art), 175, 219, TAMPILAN[0]);
   // katalog: theme buttons, the first four designs
   s += dash(X, Y(LPY.katalog), 350) + h(X, Y(LPY.katalog + 88), "Pilih desain undangan", 32) +
     text(X, Y(LPY.katalog + 123.6), "Buka demonya, lalu pilih yang kalian suka.", { size: 17, fill: LP.muted }) +
