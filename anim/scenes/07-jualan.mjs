@@ -258,7 +258,9 @@ const LP_LOCKED = [216, 328, 384].map((y) => rect(0, y, 71, 52, { fill: C.page, 
   rect(0, 750, 71, 46, { fill: C.page, opacity: 0.62 });
 // Palet of Landing Klasik (LOOKS.grid): Bawaan shows the template's own main and accent.
 const PALETTES = [["Bawaan", "#2B1A07", "#B8460D"], ["Zaitun", "#2F3A1F", "#6E5A12"], ["Marun", "#3B0D11", "#9B2335"], ["Laut", "#12304A", "#1C6584"]];
-const PAL_Y = (i) => 193 + i * 50, COLOR_Y = [437, 491], FONT_Y = [565, 633], TERAPKAN_Y = 701;
+// Below Warna aksen: Buka Google Fonts (ExtLink, the ghost button of the invitation's Huruf tab), then the two font fields.
+// Once the applied font has more than one weight (Lora: 400 to 700), Ketebalan judul shows above the buttons.
+const PAL_Y = (i) => 193 + i * 50, COLOR_Y = [437, 491], GF_Y = 549, FONT_Y = [611, 679], TERAPKAN_Y = 747, WEIGHT_Y = 763, TERAPKAN_Y2 = 815;
 const palRow = ([name, main, accent], i, on) => {
   const y = PAL_Y(i);
   return rect(88.5, y + 0.5, 278, 43, { r: 4, fill: C.white, stroke: on ? C.primary : C.line, sw: on ? 2 : 1 }) +
@@ -267,7 +269,10 @@ const palRow = ([name, main, accent], i, on) => {
 };
 const colorRow = (y, label, sub, hex, own) => rect(88.5, y + 0.5, 278, 47, { r: 4, fill: C.white, stroke: C.line }) + rect(97.5, y + 10.5, 35, 27, { r: 4, fill: hex, stroke: C.line }) +
   text(143, y + 21, label, { size: 14, weight: 500 }) + text(143, y + 38, sub, { size: 11, fill: C.faint }) + text(358, y + 28, own || "Bawaan", { size: 11, fill: C.text, anchor: "end" });
-const TERAPKAN = nkBtnBox(88, TERAPKAN_Y, "Terapkan"), KEMBALI = nkBtnBox(88 + TERAPKAN[2] + 8, TERAPKAN_Y, "Kembali ke bawaan", { variant: "quiet" });
+const btnsY = (th) => (th?.heading ? TERAPKAN_Y2 : TERAPKAN_Y);
+const TERAPKAN = nkBtnBox(88, TERAPKAN_Y, "Terapkan");
+const KEMBALI = nkBtnBox(88 + TERAPKAN[2] + 8, TERAPKAN_Y2, "Kembali ke bawaan", { variant: "quiet" });
+const GF_BOX = nkBtnBox(88, GF_Y, "Buka Google Fonts", { w: 279, icon: "external-link" }), WEIGHT_BOX = [88, WEIGHT_Y, 279, 36];
 // The panel for a page theme th ({ main, accent, heading } or null): the palette it equals is pressed, Custom is marked
 // dipakai when none is (or a font is set), and Kembali ke bawaan shows once the page has a theme.
 function gayaPanel(th) {
@@ -277,10 +282,13 @@ function gayaPanel(th) {
   if (custom) { const cx = 88 + textWidth("Custom", 12, 700) + 9; s += circle(cx, 421, 3, { fill: C.changed }) + text(cx + 7, 425, "dipakai", { size: 11, weight: 500, fill: C.warnStrong }); }
   s += colorRow(COLOR_Y[0], "Warna utama", "Judul, teks, dan tombol.", th?.main || PALETTES[0][1], th?.main) +
     colorRow(COLOR_Y[1], "Warna aksen", "Tautan, angka, dan sorotan.", th?.accent || PALETTES[0][2], th?.accent) +
+    nkBtn(88, GF_Y, "Buka Google Fonts", { variant: "ghost", w: 279, icon: "external-link" }) +
     nkLabel(88, FONT_Y[0] - 8, "Huruf judul") + nkInput(88, FONT_Y[0], 279, th?.heading || "Nama atau link Google Fonts", { placeholder: !th?.heading }) +
     nkLabel(88, FONT_Y[1] - 8, "Huruf teks") + nkInput(88, FONT_Y[1], 279, "Nama atau link Google Fonts", { placeholder: true }) +
-    text(88, FONT_Y[1] + 52, "Contoh: Lora, atau link dari fonts.google.com.", { size: 12, fill: C.faint }) +
-    nkBtn(88, TERAPKAN_Y, "Terapkan") + (th ? nkBtn(KEMBALI[0], TERAPKAN_Y, "Kembali ke bawaan", { variant: "quiet" }) : "");
+    text(88, FONT_Y[1] + 52, "Contoh: Lora, atau link dari fonts.google.com.", { size: 12, fill: C.faint });
+  if (th?.heading) s += nkLabel(88, WEIGHT_Y - 8, "Ketebalan judul") + nkInput(88, WEIGHT_Y, 279, "Bawaan", { select: true });
+  const y = btnsY(th);
+  s += nkBtn(88, y, "Terapkan") + (th ? nkBtn(88 + TERAPKAN[2] + 8, y, "Kembali ke bawaan", { variant: "quiet" }) : "");
   return s;
 }
 const gayaBody = (th) => panelBody(panelBg(), gayaPanel(th));
@@ -839,12 +847,14 @@ export const scenes = {
     steps: [
       { caption: "Di Custom, klik kotak Warna utama, lalu pilih warna yang gelap.", at: [115, COLOR_Y[0] + 24], click: true, show: ["main"], focus: F.panel,
         mark: M(88, COLOR_Y[0], 279, 48), lens: { src: [84, 410, 290, 136] }, dur: 3.6 },
+      { caption: "Belum tahu nama fontnya? Buka Google Fonts membuka fonts.google.com.", mark: M(...GF_BOX), lens: { src: [84, GF_Y - 30, 290, 92] }, dur: 3.4 },
       { caption: "Di Huruf judul, ketik nama font Google Fonts, misalnya Lora.", at: [228, FONT_Y[0] + 18], click: true, show: ["fFocus", "fVal"],
         type: [{ id: "fVal", n: 4, box: [99, FONT_Y[0] + 3, 40, 30] }], mark: M(88, FONT_Y[0], 279, 36), lens: { src: [84, FONT_Y[0] - 28, 290, 132] }, dur: 3.4 },
       { caption: "Klik Terapkan. Warna dan huruf halaman langsung berganti.", at: mid(TERAPKAN), click: true, hide: ["main", "fFocus", "fVal"], show: ["done", "pv", "t1"],
         focus: [F.panel, F.preview], mark: M(...TERAPKAN), lens: toastLens(GAYA_TOAST), dur: 3.8 },
+      { caption: "Lora punya beberapa ketebalan, jadi muncul Ketebalan judul.", hide: ["t1"], focus: F.panel, mark: M(...WEIGHT_BOX), lens: { src: [84, WEIGHT_Y - 30, 290, 80] }, dur: 3.4 },
       { caption: "Custom kini dipakai. Kembali ke bawaan menghapus warna dan huruf ini.", focus: F.panel, mark: [M(86, 409, 130, 22), M(...KEMBALI)],
-        lens: { src: [84, TERAPKAN_Y - 10, 290, 56] }, dur: 3.8 },
+        lens: { src: [84, TERAPKAN_Y2 - 10, 290, 56] }, dur: 3.8 },
       pubStep("Klik Simpan & Terbitkan supaya klien melihat gaya baru.")
     ]
   },
