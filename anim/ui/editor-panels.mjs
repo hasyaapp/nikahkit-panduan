@@ -189,7 +189,10 @@ export const TPL = {
   saman: ["Saman", ["Hitam & emas, motif", "Aceh dan bingkai…"]], pendopo: ["Pendopo", ["Krem & cokelat emas,", "bingkai lengkung dan…"]],
   "sekar-kedaton": ["Sekar Kedaton", ["Krem & merah marun,", "gerbang lengkung…"]], sogan: ["Sogan", ["Krem & cokelat sogan,", "bingkai ukir emas…"]],
   "sekar-jagad": ["Sekar Jagad", ["Kertas batik putih &", "hijau tua, gunungan…"]], kayon: ["Kayon", ["Kertas krem & cokelat", "tua, gunungan…"]],
-  joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]]
+  joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]], pagaruyung: ["Pagaruyung", ["Krem & terakota, bingkai", "ukir, awan…"]],
+  gorga: ["Gorga", ["Karamel & cokelat, pita", "ulos merah, awan…"]], penjor: ["Penjor", ["Cokelat tanah & emas,", "candi bentar, meru…"]],
+  "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung…"]], "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]],
+  "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]], "garden-stroll": ["Garden Stroll", ["Taman cat air, pasangan", "ilustrasi di jalan…"]]
 };
 const FIRST6 = ["dasar", "folio", "galeri", "modern-estetik", "cute-gemoy", "tradisional-elegan"];
 // Section strip colours [light, mid, accent]; adat templates from their default palette (surface, bg, accent).
@@ -197,7 +200,8 @@ const STRIP = { dasar: ["#ffffff", "#e7e3dc", "#3a3a3a"], folio: ["#ffffff", "#e
   "modern-estetik": ["#ffffff", "#efe7dd", "#7b5a44"], "cute-gemoy": ["#fff3f6", "#fbd9e2", "#e48aa3"], "tradisional-elegan": ["#2a2522", "#1f1c1a", "#ecbb6c"],
   kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], joyo: ["#E7DCC8", "#D8C9AE", "#18150F"], ladomudo: ["#FFFFFF", "#FFFAF0", "#520000"], pusako: ["#F2EDDC", "#E1DABB", "#520000"],
   saman: ["#232220", "#181818", "#F0DA86"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], "sekar-kedaton": ["#FFFFFF", "#FFFCF3", "#7A1A1A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
-  "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"] };
+  "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"],
+  "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"] };
 const HS = [10, 16, 8, 20, 12, 18, 9, 14, 22, 11, 16, 8, 13];
 // Catalogue thumbnail: the template's phone cover plus its section strip (the real card image is a screenshot).
 function thumb(x, y, id) {
@@ -234,12 +238,14 @@ export const seg = (active = "template") => rect(P + 0.5, 169.5, PW - 1, 37, { r
   rect(P + 140, 170, 138, 36, { r: 3, fill: C.primarySoft }) + icon("layout-grid", 157, 188, 16, C.text) + megaphone(264, C.action) + text(279, 192, "Marketing", { size: 12, weight: 600, fill: C.action }));
 // Warning under the switch when the page holds other HTML (moves the library down by 68).
 export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) + para(P + 12, 242, ["Halaman berisi HTML lain. Template akan", "menggantinya."], { size: 12, fill: C.warnStrong, lh: 18 });
-// Search box and category chips above the cards (panels-style.jsx TemplatePanel; categories from templates/base/categories.json,
-// counts from the build catalogue). Chips are 28 high, 6 apart, wrap at the panel width; widths measured in Chromium.
+// Search box and category chips above the cards (panels-style.jsx TemplatePanel; Semua, then the categories of
+// templates/base/categories.json, counts from the build catalogue). Chips are 28 high, 6 apart, wrap at the panel width;
+// widths measured in Chromium (Eksklusif: Roboto 12px measured in Chromium plus the same 2-3 px the other entries carry).
 const SEARCH_PH = "Cari: Jawa, bunga, atau tulis keinginan klien…";
-const CATS = ["Semua", "Adat", "Floral", "Elegan", "Minimalis", "Ceria"];
-export const ALL_N = [62, 32, 15, 6, 5, 4];
-const CHIP_W = { Semua: [72, 76, 79], Adat: [60, 63, 67], Floral: [65, 70, 70], Elegan: [72], Minimalis: [86], Ceria: [63] }; // 1 digit, 11, other 2 digits
+const CATS = ["Semua", "Eksklusif", "Adat", "Floral", "Elegan", "Minimalis", "Ceria"];
+export const ALL_N = [72, 11, 32, 15, 5, 5, 4];
+const CHIP_W = { Semua: [72, 76, 79], Eksklusif: [83, 88, 91], Adat: [60, 63, 67], Floral: [65, 70, 70], Elegan: [72, 72, 72], Minimalis: [86, 86, 86], Ceria: [63, 63, 63] }; // 1 digit, 11, other 2 digits
+// The chips wrap to three rows (263 to 359 under a search box at 219), so the cards start 152 below the search box.
 export function chips(y, n = ALL_N, on = "Semua") {
   let x = P, row = y, s = "";
   CATS.forEach((c, i) => {
@@ -252,9 +258,9 @@ export function chips(y, n = ALL_N, on = "Semua") {
   return s;
 }
 const searchBox = (y, q = "", focus = false) => nkInput(P, y, PW, q || SEARCH_PH, { placeholder: !q, focus });
-// The whole library under the switch: search at top, chips 44 below, cards 118 below (cards at 337 when top = 219).
+// The whole library under the switch: search at top, chips 44 below, cards 152 below (cards at 371 when top = 219).
 // used: id of the card marked Dipakai; o.q: search text, o.n: chip counts, o.cat: active chip, o.ids: the cards shown.
-export const library = (top, used, o = {}) => searchBox(top, o.q) + chips(top + 44, o.n, o.cat) + cards(top + 118, used, o.ids);
+export const library = (top, used, o = {}) => searchBox(top, o.q) + chips(top + 44, o.n, o.cat) + cards(top + 152, used, o.ids);
 // The Template panel body content (switch + library at 219), unclipped: wrap in panelBody() or clip it yourself.
 // used: id of the card marked Dipakai, or null before a template is picked.
 export const templatePanel = (used, o = {}) => seg() + library(219, used, o);

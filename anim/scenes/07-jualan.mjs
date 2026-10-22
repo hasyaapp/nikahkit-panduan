@@ -28,10 +28,11 @@ const M = (x, y, w, hh, r = 4) => ({ box: [x, y, w, hh], r });
 const F = { left: [0, 92, 399, 808], panel: [72, 92, 327, 808], rail: [0, 92, 72, 808], tabs: [0, 44, 399, 48], top: [1180, 44, 260, 48], preview: [727, 106, 390, 784] };
 const INBOX = M(218, 104, 36, 36, 8);
 
-// The designs the Landing page shows (names from editor-panels TPL; palettes for the page sketches drawn here):
-// [name, description, [paper, accent]].
+// The designs the Landing page shows first, newest first (highest template.json order; names from editor-panels TPL;
+// [paper, accent] = bg and accent of each design's default palette in nikahkit/src/model.js): [name, description, [paper, accent]].
 const DESIGN = (id, pal) => [TPL[id][0], TPL[id][1], pal];
-const DESIGNS = [DESIGN("dasar", ["#ffffff", "#8b8178"]), DESIGN("folio", ["#f3ece2", "#7a5c3e"]), DESIGN("galeri", ["#fafafa", "#9aa3ad"]), DESIGN("modern-estetik", ["#e9efe7", "#5d7a5a"])];
+const DESIGNS = [DESIGN("wana-lentera", ["#E4DCAF", "#124541"]), DESIGN("wungu-kencana", ["#F0EAE4", "#985372"]), DESIGN("pinky-promise", ["#F1EEE3", "#901D44"]),
+  DESIGN("garden-stroll", ["#F9FFF5", "#D04518"])];
 // The opening art (#lpArt): the three display designs (TAMPILAN in server/pages/src/landing) when the catalogue has them,
 // [paper, accent] sketched like DESIGNS; first in the middle, second left, third right.
 const TAMPILAN = [["#fdf8ec", "#a31d33"], ["#eef3e4", "#c8541f"], ["#8b3a5c", "#f6e4ea"]];
@@ -62,9 +63,9 @@ const dashPreview = rect(727, 106, 390, 784, { fill: "#f5f4f2" }) + gate(727, 32
 
 
 // ---- Landing page (server/pages/src/landing/index.html), 390 wide, mobile styles ----------------------------------
-// Measured in Chrome at 390x844 (Landing Klasik): Rina WO, Basic + Premium, every design in the extension's order; the
-// later sections then shifted for the current page's shorter lede, feature notes and Cara pesan steps. Only the first
-// four designs are drawn; the sections after the catalogue sit where they would under a two-row catalogue.
+// Measured in Chrome at 390x844 (Landing Klasik): Rina WO, Basic + Premium, every design newest first; the later
+// sections then shifted for the current page's shorter lede, feature notes and Cara pesan steps. Only the first four
+// designs are drawn; the sections after the catalogue sit where they would under a two-row catalogue.
 const LP = { paper: "#ffffff", tint: "#f7efe9", ink: "#171717", cocoa: "#2b1a07", muted: "#6f675f", accent: "#b8460d", danger: "#913a34", line: "rgba(43,26,7,.22)", dash: "#d2bbad" };
 const DISP = "Fraunces,Georgia,serif", BODY = "Nunito,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
 const body = (...s) => `<g font-family="${BODY}">${s.join("")}</g>`;
@@ -81,27 +82,25 @@ const THUMB = (x, y, w, hh, pal, rot = 0) => group({ transform: `rotate(${rot} $
   rect(x, y + 10, w, hh, { r: 14, fill: "rgba(43,26,7,.08)" }), clipped(x, y, w, hh, pageSketch(x, y, w, hh, pal)), rect(x, y, w, hh, { r: 14, stroke: LP.cocoa, sw: 1.5 }));
 const PKG = [["Basic", "Rp150.000", ["Isi dan foto dari kalian", "Revisi 2 kali"]], ["Premium", "Rp350.000", ["Semua isi paket Basic", "Revisi 5 kali"]]];
 // Page positions (relative to the page top) used by scenes.
-const LPY = { cta: 253.9, art: 345.9, katalog: 681.9, chips: 843.8, grid: 927.8, fitur: 1669, harga: 2985.7, pkg1: 3176, cara: 3842.2, faq: 4329.9, pesan: 5023, card: 5209.3 };
+const LPY = { cta: 253.9, art: 345.9, katalog: 681.9, chips: 843.8, grid: 927.8, fitur: 1609.8, harga: 2926.5, pkg1: 3116.8, cara: 3783, faq: 4270.7, pesan: 4963.8, card: 5150.1 };
 
-// Pilihan tema (#catFilter): Semua, then one button per category with its number of designs, most first. The row
-// scrolls sideways, so a phone shows the first few. [label, count, x, width]; `on` is the pressed one. Label and count
-// are one centred text: the guide's SVG may fall back to another font, and two separately placed texts would collide.
-const CHIPS = [["Semua", "62", 20, 103.3], ["Adat", "32", 131.3, 89.7], ["Floral", "15", 228.9, 96.8], ["Elegan", "6", 333.7, 95.7], ["Minimalis", "5", 437.4, 114.6], ["Ceria", "4", 559.9, 83.5]];
+// Pilihan tema (#catFilter): Semua, Eksklusif (Nikahin's exclusive designs plus the account's own Kreator templates),
+// then one button per category with its number of designs, most first. The row scrolls sideways, so a phone shows the
+// first few. [label, count, x, width] as measured on nikahin.myscalev.com/undanganman; `on` is the pressed one. Label
+// and count are one centred text: the guide's SVG may fall back to another font, and two separately placed texts would collide.
+const CHIPS = [["Semua", "72", 20, 103.3], ["Eksklusif", "11", 131.3, 117.9], ["Adat", "32", 257.2, 89.7], ["Floral", "15", 354.8, 96.8], ["Elegan", "5", 459.6, 95.7],
+  ["Minimalis", "5", 563.3, 114.6], ["Ceria", "4", 685.9, 83.5]];
 const chipRow = (x0, y, on = "Semua") => CHIPS.map(([l, n, x, w]) => {
   const p = l === on, fg = p ? LP.paper : LP.cocoa;
   return rect(x0 + x + 0.75, y + 0.75, w - 1.5, 42.5, { r: 21.25, fill: p ? LP.cocoa : LP.paper, stroke: LP.cocoa, sw: 1.5 }) +
     `<text x="${x0 + x + w / 2}" y="${y + 26.7}" font-size="15" font-weight="700" fill="${fg}" text-anchor="middle">${l}<tspan dx="6" font-size="13" font-weight="600" opacity=".75">${n}</tspan></text>`;
 }).join("");
 const chipX = (label) => { const [, , x, w] = CHIPS.find((c) => c[0] === label); return x + w / 2; };
-// Design notes (the description) as the catalogue clamps them at 390 px, read off the screen.
-const NOTES = [["Abu-abu gelap di atas", "foto, tanpa ornamen · 20…"], ["Hitam & krem gaya", "majalah, foto penuh di…"], ["Putih bersih gaya majalah,", "huruf serif besar, tombol…"],
-  ["Putih & krem, bingkai", "lengkung, bayangan dau…"]];
-// One Grid design: picture, name lines, note, Lihat demo and Pilih. `act` is the top of Pilih, shared by both designs
-// of a row (a two-line name pushes it down).
-const gridItem = (x, t, names, note, pal, act = 287.6) => clipped(x, t, 168, 210, pageSketch(x, t, 168, 210, pal)) + rect(x, t, 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
-  names.map((n, k) => h(x, t + 229 + k * 23, n, 20)).join("") + para(x, t + 251 + (names.length - 1) * 23, note, { size: 14, fill: LP.muted, lh: 20.3 }) +
-  text(x, t + act + 27.2, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true }) + lpBtn(x + 92, t + act, "Pilih", { small: true, w: 71 });
-const tplGrid = (x0, top) => DESIGNS.map(([n, , pal], i) => gridItem(x0 + 20 + (i % 2) * 182, top + Math.floor(i / 2) * 357.6, [n], NOTES[i], pal)).join("");
+// One Grid design (card 304 tall, rows 328 apart): picture, name (baseline 243), Lihat demo (baseline 285.3) and Pilih (top 258).
+const gridItem = (x, t, name, pal) => clipped(x, t, 168, 210, pageSketch(x, t, 168, 210, pal)) + rect(x, t, 168, 210, { r: 14, stroke: LP.cocoa, sw: 1.5 }) +
+  h(x, t + 243, name, 20) + text(x, t + 285.3, "Lihat demo", { size: 15, weight: 700, fill: LP.cocoa, underline: true }) + lpBtn(x + 92, t + 258, "Pilih", { small: true, w: 71 });
+const gridOf = (x0, top, items) => items.map(([n, , pal], i) => gridItem(x0 + 20 + (i % 2) * 182, top + Math.floor(i / 2) * 328, n, pal)).join("");
+const tplGrid = (x0, top) => gridOf(x0, top, DESIGNS);
 
 // Fitur undangan digital (.feat-grid, two columns): icons and words from the page. [x, top below the section top,
 // height, title, text]; the title starts 75 below the card top, the text 126.6 below (103.8 under a one-line title);
@@ -362,15 +361,15 @@ const PH_BOTTOM = PHONE.y + PHONE.h;
 const phEdges = skeleton(clipped(0, 0, 1440, PHONE.y, phoneDesk("")) + clipped(0, PH_BOTTOM, 1440, 900 - PH_BOTTOM, phoneDesk("")));
 const LAND = landingTop(0, 0, "Rina WO");
 const F0 = formTail(0, LPY.card, PESANAN);
-const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain Dasar"], desain: "Dasar" });
-const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Dasar"], desain: "Dasar", paket: "Basic" });
+const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain Wana Lentera"], desain: "Wana Lentera" });
+const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Wana Lentera"], desain: "Wana Lentera", paket: "Basic" });
 // Live demo (dialog.demo, full screen): bar 63 px (name, Pakai desain ini 147x46, close 44), the sample invitation below.
 const DEMO_PICK = [181 + 147 / 2, 31], DEMO_X = [360, 31];
 const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + PHOTO_DEFS + clipped(0, 63, 390, 781, group({ transform: "translate(-727 -43)" }, pvMempelai(RANI))) +
-  rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Dasar", 19, { weight: 600 }) +
+  rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Wana Lentera", 19, { weight: 600 }) +
   iconX("x", DEMO_X[0], DEMO_X[1], 24, LP.cocoa, 2.2));
 const demoPick = body(lpBtn(181, 8, "Pakai desain ini", { small: true, solid: true, w: 147 }));
-const KAT = LPY.katalog, LIHAT_DEMO = [62, LPY.grid + 310 - KAT];
+const KAT = LPY.katalog, LIHAT_DEMO = [59, LPY.grid + 280.5 - KAT];
 // The phone's address bar (56 px) above a 844 viewport, for the shareable ?demo= link.
 const ADDR = "tokomu.myscalev.com/rina-wo";
 const urlBar = (u) => rect(0, 0, 390, 56, { fill: "#f1f3f4" }) + rect(12, 8, 366, 40, { r: 20, fill: "#e3e5e8" }) + icon("lock", 32, 28, 14, C.text) + text(46, 33, u, { size: 14, fill: C.strong });
@@ -378,11 +377,11 @@ const inBrowser = (...s) => clipped(0, 56, 390, 844, group({ transform: "transla
 
 // The theme buttons and the first designs, in y from the katalog's dashed line.
 const CT = LPY.grid - KAT, CHIP_Y = LPY.chips - KAT;
-// Pilihan tema Adat (page y): the first four adat designs; Tradisional Elegan's name takes two lines, so its row is taller.
-const ADAT = [[["Tradisional", "Elegan"], ["Hitam & emas, bingkai", "lengkung, judul huruf…"], ["#1f1c1a", "#ecbb6c"]], [["Kencana"], ["Krem & merah bata,", "wayang golek berwarna…"], ["#fff7e9", "#8e2818"]],
-  [["Kembang Joyo"], ["Kertas cokelat muda,", "bingkai lengkung dan…"], ["#d8c9ae", "#18150f"]], [["Lado Mudo"], ["Krem merah muda &", "marun, pita ulos dan…"], ["#fffaf0", "#520000"]]];
-const adatView = body(rect(0, LPY.chips - 4, 390, KAT + 844 - LPY.chips + 4, { fill: LP.paper }), chipRow(0, LPY.chips, "Adat"),
-  ADAT.map(([names, note, pal], i) => gridItem(20 + (i % 2) * 182, LPY.grid + (i > 1 ? 380.6 : 0), names, note, pal, i > 1 ? 287.6 : 310.6)).join(""));
+// Pilihan tema (page y from the buttons down): Eksklusif pressed (its first four are the newest designs, as under
+// Semua), and Adat with the first four adat designs, newest first.
+const ADAT = [DESIGN("pagaruyung", ["#ECE3CE", "#8A5732"]), DESIGN("gorga", ["#DFB67E", "#473735"]), DESIGN("penjor", ["#704F38", "#FFF8EE"]), DESIGN("joglo", ["#E6D6B4", "#473735"])];
+const catView = (on, items) => body(rect(0, LPY.chips - 4, 390, KAT + 844 - LPY.chips + 4, { fill: LP.paper }), chipRow(0, LPY.chips, on), gridOf(0, LPY.grid, items));
+const eksView = catView("Eksklusif", DESIGNS), adatView = catView("Adat", ADAT);
 const PKG_Y = LPY.pkg1 - 40, FORM_Y = LPY.card - 20;
 
 // form-klien: the #pesan section from its top; the phone shows it from FY0.
@@ -516,7 +515,7 @@ function perbaruiScene(kind, title, page, before, after, toast, steps) {
 }
 
 // Phone scenes: positions of the Landing page and form in phone px.
-const LIHAT_BOX = [20, LIHAT_DEMO[1] - 11, 88, 22]; // the Lihat demo link of the first design (Dasar)
+const LIHAT_BOX = [20, LIHAT_DEMO[1] - 11, 78, 22]; // the Lihat demo link of the first design (Wana Lentera)
 const PICKED = F1.pos.picked - FORM_Y; // the Pilihan kalian box on the form, under the scrolled view
 const PKG_BTN = (i) => [45, LPY.pkg1 + i * 311.1 + 218.1 - PKG_Y, 300, 52];
 const CHIP_BOX = (label) => { const [, , x, w] = CHIPS.find((c) => c[0] === label); return [x, CHIP_Y, w, 44]; };
@@ -694,7 +693,7 @@ export const scenes = {
   // client's design (worker pesanan-masuk.mjs: "Desain <nama> · <paket>"). Filling keeps the page's template, so a
   // different design is then picked in Template: the content stays (store.js setTemplate, toast "Template diganti ke …").
   "gabung-kreator-pesanan": (() => {
-    const Q = { q: "Kencana", n: [1, 1, 0, 0, 0, 0], ids: ["kencana"] }, K_CARD = [...cardAt(0, 337), 134, 167], K_TOAST = "Template diganti ke Kencana.";
+    const Q = { q: "Kencana", n: [2, 1, 1, 0, 0, 0, 0], ids: ["kencana", "wungu-kencana"] }, K_CARD = [...cardAt(0, 371), 134, 167], K_TOAST = "Template diganti ke Kencana.";
     const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true);
     return {
       title: "Mengisi undangan dari pesanan Landing Kreator",
@@ -721,7 +720,7 @@ export const scenes = {
         { caption: "Undangan terisi. Salah halaman? Klik Urungkan.", hide: ["inbox", "memuat"], show: ["konten", "t1"], focus: [F.left, F.preview],
           mark: M(...nkToastBoxes(DATA_TOAST).undo), lens: toastLens(DATA_TOAST), dur: 4 },
         { caption: "Desain klien beda? Klik Template.", at: ED.rail.Template, click: true, hide: ["t1"], show: ["tplA"], focus: F.left, mark: M(0, 104, 71, 52, 0),
-          lens: { src: [80, 330, 295, 242], at: [430, 300] }, dur: 3 },
+          lens: { src: [80, 364, 295, 242], at: [430, 300] }, dur: 3 },
         { caption: "Ketik Kencana di kotak Cari.", at: [228, 237], click: true, show: ["tplQ", "qF", "qT"], type: [{ id: "qT", n: 7, box: [99, 222, tw("Kencana", 14) + 2, 30] }],
           mark: M(88, 219, 279, 36), lens: { src: [80, 211, 295, 84], at: [430, 200] }, dur: 3 },
         { caption: "Klik kartu Kencana. Desain berganti, isinya tetap.", at: mid(K_CARD), click: true, hide: ["qF", "qT"], show: ["tplK", "pvK", "t2"], focus: [F.left, F.preview],
@@ -770,10 +769,10 @@ export const scenes = {
         lens: lensBy(QR(12, LIHAT_DEMO[1] - 98, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: Q(...DEMO_PICK), click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"],
         mark: QM(181, 8, 147, 46, 20), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 3.4 },
-      { caption: "Form menulis Pilihan kalian: desain Dasar.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 2.6 },
+      { caption: "Form menulis Pilihan kalian: desain Wana Lentera.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 2.6 },
       { caption: "Di Paket dan harga, setiap paket punya Pilih paket ini.", hide: ["f1"], show: ["vPkg", "p2"], mark: [QM(...PKG_BTN(0), 20), QM(...PKG_BTN(1), 20)],
         lens: lensBy(QR(14, 34, 362, 306), "l", 1.2), dur: 2.8 },
-      { caption: "Pilih paket ini: form mencatat Paket Basic, desain Dasar.", at: Q(195, PKG_BTN(0)[1] + 26), click: true, press: "p2", show: ["f2"], mark: QM(...PKG_BTN(0), 20),
+      { caption: "Pilih paket ini: form mencatat Paket Basic, desain Wana Lentera.", at: Q(195, PKG_BTN(0)[1] + 26), click: true, press: "p2", show: ["f2"], mark: QM(...PKG_BTN(0), 20),
         lens: lensBy(QR(36, PICKED - 12, 320, 94), "r", 1.4), dur: 3.8 }
     ]
   },
@@ -781,14 +780,17 @@ export const scenes = {
   "jualan-landing-tema": {
     title: "Pilihan tema di katalog Landing page",
     base: phBase(scr(KAT, LAND, F0.svg)),
-    els: { adat: { svg: onPhone(scr(KAT, adatView)), enter: "fade", delay: 0.1 } },
+    els: { eks: { svg: onPhone(scr(KAT, eksView)), enter: "fade", delay: 0.1 }, adat: { svg: onPhone(scr(KAT, adatView)), enter: "fade", delay: 0.1 } },
     steps: [
-      { caption: "Di atas katalog ada tombol tema: Semua dan tiap kategori, dengan jumlahnya.", focus: PHF, mark: QM(18, CHIP_Y - 2, 372, 48, 24),
-        lens: lensBy(QR(14, CHIP_Y - 8, 212, 60), "l"), dur: 3.8 },
-      { caption: "Klik Adat: katalog hanya menampilkan desain adat.", at: Q(chipX("Adat"), CHIP_Y + 22), click: true, show: ["adat"], mark: QM(...CHIP_BOX("Adat"), 22),
-        lens: lensBy(QR(12, CT + 212, 370, 71), "l", 1.2), dur: 3.6 },
+      { caption: "Di atas katalog ada tombol tema: Semua, Eksklusif, dan tiap kategori.", focus: PHF, mark: QM(18, CHIP_Y - 2, 372, 48, 24),
+        lens: lensBy(QR(14, CHIP_Y - 8, 240, 60), "l"), dur: 3.8 },
+      { caption: "Desain terbaru tampil paling depan.", mark: QM(14, CT - 6, 362, 310, 18), lens: lensBy(QR(12, CT + 222, 370, 71), "l", 1.2), dur: 3 },
+      { caption: "Klik Eksklusif: desain eksklusif Nikahin dan template milik akunmu.", at: Q(chipX("Eksklusif"), CHIP_Y + 22), click: true, show: ["eks"], mark: QM(...CHIP_BOX("Eksklusif"), 22),
+        lens: lensBy(QR(12, CT + 222, 370, 71), "l", 1.2), dur: 3.6 },
+      { caption: "Klik Adat: katalog hanya menampilkan desain adat.", at: Q(chipX("Adat"), CHIP_Y + 22), click: true, hide: ["eks"], show: ["adat"], mark: QM(...CHIP_BOX("Adat"), 22),
+        lens: lensBy(QR(12, CT + 222, 370, 71), "l", 1.2), dur: 3.6 },
       { caption: "Klik Semua untuk menampilkan lagi seluruh desain.", at: Q(chipX("Semua"), CHIP_Y + 22), click: true, hide: ["adat"], mark: QM(...CHIP_BOX("Semua"), 22),
-        lens: lensBy(QR(12, CT + 212, 370, 71), "r", 1.2), dur: 3.2 }
+        lens: lensBy(QR(12, CT + 222, 370, 71), "r", 1.2), dur: 3.2 }
     ]
   },
 
@@ -798,16 +800,16 @@ export const scenes = {
     els: {
       demo: { svg: onPhone(inBrowser(demoView)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
       pick: { svg: onPhone(inBrowser(demoPick)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
-      url: { svg: onPhone(urlBar(`${ADDR}?demo=dasar`)), enter: "fade" },
+      url: { svg: onPhone(urlBar(`${ADDR}?demo=wana-lentera`)), enter: "fade" },
       f1: { svg: onPhone(urlBar(ADDR), inBrowser(scr(FORM_Y, LAND, F1.svg))), enter: "fade", delay: 0.2 }
     },
     steps: [
       { caption: "Di Pilih desain undangan, klien menekan Lihat demo.", at: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56), click: true, show: ["demo", "pick", "url"], focus: PHF,
         mark: QM(LIHAT_BOX[0], LIHAT_BOX[1] + 56, LIHAT_BOX[2], LIHAT_BOX[3]), lens: lensBy(QR(12, LIHAT_DEMO[1] - 42, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh desain itu terbuka satu layar penuh.", mark: QM(0, 56, 390, 63, 0), lens: lensBy(QR(0, 56, 390, 63), "l", 1.2), dur: 2.8 },
-      { caption: "Alamatnya mendapat ?demo=dasar. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(4, 2, 382, 52), "l", 1.2), dur: 3.6 },
+      { caption: "Alamatnya mendapat ?demo=wana-lentera. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(4, 2, 382, 52), "l", 1.2), dur: 3.6 },
       { caption: "Tombol silang, Esc, atau tombol kembali menutup demo.", mark: QM(DEMO_X[0] - 22, DEMO_X[1] + 56 - 22, 44, 44, 22), lens: lensBy(QR(150, 56, 240, 63), "r"), dur: 3.4 },
-      { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Dasar.", at: Q(DEMO_PICK[0], DEMO_PICK[1] + 56), click: true, press: "pick",
+      { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Wana Lentera.", at: Q(DEMO_PICK[0], DEMO_PICK[1] + 56), click: true, press: "pick",
         hide: ["demo", "pick", "url"], show: ["f1"], mark: QM(181, 64, 147, 46, 20), lens: lensBy(QR(36, PICKED + 48, 318, 62), "r", 1.4), dur: 3.8 }
     ]
   },

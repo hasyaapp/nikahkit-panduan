@@ -201,7 +201,7 @@ const atY = (y, svg) => group({ transform: `translate(0 ${y})` }, svg);
 const panelShell = (title) => rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, title, { account: ACCOUNT });
 const tplPanel = (o = {}) => nkRail(0, 0, "Template") + panelShell("Template") +
   panelBody(o.banner ? atY(BANNER_H + (o.hint ? 36 : 0), templatePanel()) : templatePanel()) + (o.banner ? updateBanner(o) : "");
-const TPL_CARD = [...cardAt(0, 337), 134, 167]; // first template card (Dasar)
+const TPL_CARD = [...cardAt(0, 371), 134, 167]; // first template card (Dasar)
 // Template > Marketing (ui/marketing): Profil merek closed + the two page cards, or Profil merek open and filled.
 const marketing = (o = {}) => panelShell("Template") + panelBody(panelBg(), seg("marketing"),
   o.open ? brandOpen({ name: "Rina WO", wa: "0812 3456 7890", ready: true }) : brandClosed(BOX) + mkCards(MKY));
@@ -396,7 +396,7 @@ const PV = {
     -74, -60, SEL(214, 150), { lens: [184, 130, 400, 128] }),
   plans: () => { const t = planDlg(0, 0, 788); return pv(t.svg, 4, 0, [t.col(1), t.t0, t.pc, 170], { r: 4, lens: [t.col(0), t.t0, 3 * t.pc, 168] }); },
   gate: (g, key) => pv(edLeft(g.svg, { tab: "NikahKit", rail: "", top: 44 }), -184, 44, g.at[key], { lens: [0, 44, 400, g.area[1] + g.area[3] - 44] }),
-  template: () => pv(edLeft(tplPanel()), -184, 92, TPL_CARD, { lens: [80, 329, 150, 241] })
+  template: () => pv(edLeft(tplPanel()), -184, 92, TPL_CARD, { lens: [80, 363, 150, 241] })
 };
 
 // ---- Google account chooser (generic): a popup at the right, Rina WO's account first ---------------------------------
@@ -496,7 +496,7 @@ const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, 
 // Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
 // and Media.
 const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
-const DASAR_CARD = [...cardAt(0, 337), 134, 167];
+const DASAR_CARD = [...cardAt(0, 371), 134, 167];
 // Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
 // before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);

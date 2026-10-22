@@ -19,8 +19,8 @@ const accM = (y) => [88, y, 279, 50];
 const cardM = (x, y) => ({ box: [x, y, 134, 167], r: 8 });
 // Box of a kit badge with its right edge at xr, stretched down by `more` for a column of badges.
 const badgeM = (label, xr, y, more = 0) => { const [x, , w, h] = nkBadgeBox(xr, y, label, { end: true }); return [x, y, w, h + more]; };
-const FOLIO_C = [301, 420], DASAR_C = [155, 420]; // card centres with the cards at y 337
-const ADAT_CHIP = [206, 277]; // centre of the Adat chip with the default counts
+const FOLIO_C = [301, 454], DASAR_C = [155, 454]; // card centres with the cards at y 371
+const ADAT_CHIP = [302.5, 277]; // centre of the Adat chip with the default counts
 // The whole editor with a rail tab active (gradients for the photo placeholders first).
 const editor = (rail, o = {}) => [PHOTO_DEFS, scalevEditor(0, 0, { rail, ...o })];
 // Lens around the save status at the rail foot.
@@ -46,7 +46,7 @@ export const scenes = {
       { caption: "Buka halaman undangan di Scalev. Editornya terbuka dalam HTML Mode.", focus: F.top, mark: [8, 54, 222, 26], lens: { src: [0, 0, 412, 92] }, at: [120, 66] },
       { caption: "Klik tab NikahKit. Sebentar tertulis Memeriksa akses...", focus: [0, 44, 399, 856], mark: [226, 54, 88, 26], lens: { src: [224, 46, 172, 46] }, show: ["gate"], at: ED.tab.NikahKit, click: true },
       { caption: "Tunggu pemeriksaan akses selesai. Menu dan panel muncul.", focus: F.side, mark: { box: [0, 104, 71, 332], r: 0 }, lens: { src: [0, 96, 399, 166], at: [290, 70] }, show: ["tpl", "locked"], at: [230, 330] },
-      { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", mark: cardM(234, 337), lens: { src: [226, 330, 150, 242] }, hide: ["locked"], show: ["picked", "pvF"], at: FOLIO_C, click: true, dur: 3.4 },
+      { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", mark: cardM(234, 371), lens: { src: [226, 364, 150, 242] }, hide: ["locked"], show: ["picked", "pvF"], at: FOLIO_C, click: true, dur: 3.4 },
       { caption: "Klik Konten untuk mengisi data. Daftar bagian undangan muncul.", mark: railM("Konten"), lens: { src: [0, 380, 72, 60], zoom: 3, at: [290, 200] }, show: ["konten"], at: ED.rail.Konten, click: true }
     ]
   },
@@ -74,7 +74,7 @@ export const scenes = {
       { caption: "Klik Template di menu kiri. Panel Template terbuka.", focus: F.side, mark: railM("Template"), lens: { src: [0, 96, 399, 122], at: [290, 70] }, at: ED.rail.Template, click: true, show: ["cardsA"] },
       { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", focus: [80, 161, 295, 122], mark: [P, 169, PW, 38], lens: { src: [80, 161, 295, 122] }, at: [160, 188] },
       { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", focus: F.body, scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", mark: cardM(234, 337), lens: { src: [226, 330, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: [301, 420], click: true, dur: 3.6 }
+      { caption: "Klik kartu yang kamu suka, misalnya Folio.", mark: cardM(234, 371), lens: { src: [226, 364, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: FOLIO_C, click: true, dur: 3.6 }
     ]
   },
 
@@ -99,7 +99,7 @@ export const scenes = {
     base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "folio")), pvFolio()],
     els: { konten: { svg: kontenPanel(), enter: "fade", skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
-      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: badgeM("Dipakai", 367, 511), r: 9 }, lens: { src: [226, 330, 150, 242] }, at: [346, 520] },
+      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: badgeM("Dipakai", 367, 545), r: 9 }, lens: { src: [226, 364, 150, 242] }, at: [346, 554] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", mark: railM("Konten"), lens: { src: [80, 161, 295, 80], at: [290, 90] }, show: ["konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
       { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
     ]
@@ -115,20 +115,20 @@ export const scenes = {
       title: "Mencari template lewat kata kunci, kategori, atau kalimat",
       base: [...editor("Template", { screenFill: C.white }), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219))],
       els: {
-        adat: { svg: panelBody(below(chips(263, ALL_N, "Adat"), cards(337, null, ["tradisional-elegan", "kencana", "joyo", "ladomudo", "pusako", "saman"]))), enter: "fade", skel: true },
-        jawa: { svg: panelBody(below(chips(263, [11, 11, 0, 0, 0, 0], "Adat"), cards(337, null, ["tradisional-elegan", "kencana", "joyo", "pendopo", "sekar-kedaton", "sogan"]))), enter: "fade", delay: 0.5, skel: true },
-        busy: { svg: panelBody(below(chips(263, [0, 0, 0, 0, 0, 0], "Adat"), hintL(P, 337, ["Mencari template yang paling cocok…"]))), enter: "fade", delay: 1.4, skel: true },
-        smart: { svg: panelBody(below(chips(263, [6, 6, 0, 0, 0, 0], "Adat"), hintL(P, 337, ["Paling cocok untuk “Jawa, nuansa hijau”,", "urut dari yang terdekat."]),
-          cards(369, null, ["sekar-jagad", "kayon", "joglo", "sogan", "kencana", "pendopo"]))), enter: "fade", skel: true },
+        adat: { svg: panelBody(below(chips(263, ALL_N, "Adat"), cards(371, null, ["tradisional-elegan", "kencana", "joyo", "ladomudo", "pusako", "saman"]))), enter: "fade", skel: true },
+        jawa: { svg: panelBody(below(chips(263, [13, 2, 11, 0, 0, 0, 0], "Adat"), cards(371, null, ["tradisional-elegan", "kencana", "joyo", "pendopo", "sekar-kedaton", "sogan"]))), enter: "fade", delay: 0.5, skel: true },
+        busy: { svg: panelBody(below(chips(263, [0, 0, 0, 0, 0, 0, 0], "Adat"), hintL(P, 371, ["Mencari template yang paling cocok…"]))), enter: "fade", delay: 1.4, skel: true },
+        smart: { svg: panelBody(below(chips(263, [6, 0, 6, 0, 0, 0, 0], "Adat"), hintL(P, 371, ["Paling cocok untuk “Jawa, nuansa hijau”,", "urut dari yang terdekat."]),
+          cards(403, null, ["sekar-jagad", "kayon", "joglo", "sogan", "kencana", "pendopo"]))), enter: "fade", skel: true },
         qBox: { svg: qBox, enter: "fade", skel: true },
         q1: { svg: q1, enter: "fade", skel: true },
         q2: { svg: q2, enter: "fade", skel: true }
       },
       steps: [
-        { caption: "Klik kategori, misalnya Adat. Hanya template adat yang tampil.", focus: F.body, mark: { box: [173, 263, 67, 28], r: 14 }, lens: LS, at: ADAT_CHIP, click: true, show: ["adat"] },
+        { caption: "Klik kategori, misalnya Adat. Hanya template adat yang tampil.", focus: F.body, mark: { box: [269, 263, 67, 28], r: 14 }, lens: LS, at: ADAT_CHIP, click: true, show: ["adat"] },
         { caption: "Ketik kata kunci di kotak Cari, misalnya Jawa. Angka kategori ikut berubah.", mark: Q, lens: LS, at: [228, 237], click: true, show: ["qBox", "q1", "jawa"], type: [{ id: "q1", ...t1 }], dur: 3.6 },
         { caption: "Tulis keinginan klien dalam kalimat, lalu tekan Enter.", mark: Q, lens: { src: [80, 211, 295, 118] }, at: [300, 237], click: true, hide: ["q1"], show: ["q2", "busy"], type: [{ id: "q2", ...t2 }], dur: 4.4 },
-        { caption: "Hasilnya diurutkan dari yang paling cocok dengan kalimatmu.", mark: cardM(P, 369), lens: { src: [80, 329, 295, 276], at: [290, 170] }, at: [160, 452], show: ["smart"], dur: 3.6 }
+        { caption: "Hasilnya diurutkan dari yang paling cocok dengan kalimatmu.", mark: cardM(P, 403), lens: { src: [80, 363, 295, 276], at: [290, 170] }, at: [160, 486], show: ["smart"], dur: 3.6 }
       ]
     };
   })(),
@@ -144,8 +144,8 @@ export const scenes = {
       pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true }
     },
     steps: [
-      { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", focus: F.side, mark: railM("Template"), lens: { src: [226, 330, 150, 242], at: [290, 160] }, at: ED.rail.Template, click: true, show: ["tplB"] },
-      { caption: "Klik kartu template lain, misalnya Dasar. Muncul pesan dengan Urungkan.", mark: cardM(P, 337), lens: { src: [80, 330, 295, 242], at: [290, 140] }, at: DASAR_C, click: true, show: ["cardsC", "toast", "pvD"], dur: 3.6 }
+      { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", focus: F.side, mark: railM("Template"), lens: { src: [226, 364, 150, 242], at: [290, 160] }, at: ED.rail.Template, click: true, show: ["tplB"] },
+      { caption: "Klik kartu template lain, misalnya Dasar. Muncul pesan dengan Urungkan.", mark: cardM(P, 371), lens: { src: [80, 364, 295, 242], at: [290, 140] }, at: DASAR_C, click: true, show: ["cardsC", "toast", "pvD"], dur: 3.6 }
     ]
   },
 
