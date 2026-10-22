@@ -6,7 +6,7 @@
 // ui/fields.jsx, ui/App.jsx (MediaDialog, Toast). Template card thumbnails are drawn (the real ones are screenshots).
 import { C, rect, text, line, circle, para, clipped, icon, iconX, tw } from "../lib.mjs";
 import { nkHead, nkRail, nkLabel, nkBtn, nkInput, nkBadge, nkAcc, nkSwitch, nkDialogHead, scalevEditor } from "./kit.mjs";
-import { SERIF, photo } from "./invitation.mjs";
+import { photo } from "./invitation.mjs";
 
 export const ACCOUNT = "Tahunan"; // the account chip shows the member's plan
 export const P = 88, PW = 279, I = 101, IW = 253; // panel content box; inside an open accordion
@@ -181,27 +181,28 @@ export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + r
 // Templates as cards show them (build/templates.json name + description, clamped to two lines as measured in Chromium):
 // TPL[id] = [name, [description line 1, line 2]].
 export const TPL = {
-  dasar: ["Dasar", ["Abu-abu gelap di atas", "foto, tanpa ornamen…"]], folio: ["Folio", ["Hitam & krem gaya", "majalah, foto penuh…"]],
-  galeri: ["Galeri Putih", ["Putih bersih gaya", "majalah, huruf serif…"]], "modern-estetik": ["Modern Estetik", ["Putih & krem, bingkai", "lengkung, bayangan…"]],
-  "cute-gemoy": ["Cute Gemoy", ["Krem, foto polaroid", "berjepit, bunga kering…"]], "tradisional-elegan": ["Tradisional Elegan", ["Hitam & emas, bingkai", "lengkung, judul huruf…"]],
+  "tradisional-elegan": ["Tradisional Elegan", ["Hitam & emas, bingkai", "lengkung, judul huruf…"]],
   kencana: ["Kencana", ["Krem & merah bata,", "wayang golek…"]], joyo: ["Kembang Joyo", ["Kertas cokelat muda,", "bingkai lengkung dan…"]],
   ladomudo: ["Lado Mudo", ["Krem merah muda &", "marun, pita ulos dan…"]], pusako: ["Pusako", ["Merah marun, rumah", "gadang bergaris dan…"]],
   saman: ["Saman", ["Hitam & emas, motif", "Aceh dan bingkai…"]], pendopo: ["Pendopo", ["Krem & cokelat emas,", "bingkai lengkung dan…"]],
   "sekar-kedaton": ["Sekar Kedaton", ["Krem & merah marun,", "gerbang lengkung…"]], sogan: ["Sogan", ["Krem & cokelat sogan,", "bingkai ukir emas…"]],
   "sekar-jagad": ["Sekar Jagad", ["Kertas batik putih &", "hijau tua, gunungan…"]], kayon: ["Kayon", ["Kertas krem & cokelat", "tua, gunungan…"]],
-  joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]], pagaruyung: ["Pagaruyung", ["Krem & terakota, bingkai", "ukir, awan…"]],
+  joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]], pagaruyung: ["Pagaruyung", ["Krem & terakota,", "bingkai ukir, awan…"]],
   gorga: ["Gorga", ["Karamel & cokelat, pita", "ulos merah, awan…"]], penjor: ["Penjor", ["Cokelat tanah & emas,", "candi bentar, meru…"]],
-  "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung…"]], "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]],
-  "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]], "garden-stroll": ["Garden Stroll", ["Taman cat air, pasangan", "ilustrasi di jalan…"]]
+  "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung, akar…"]], "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]],
+  "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]], "garden-stroll": ["Garden Stroll", ["Taman cat air,", "pasangan ilustrasi di…"]],
+  "crimson-rose": ["Crimson Rose", ["Mawar merah & krem,", "renda maroon…"]], "lotus-mist": ["Lotus Mist", ["Biru kabut & pink,", "teratai dan peoni cat…"]]
 };
-const FIRST6 = ["dasar", "folio", "galeri", "modern-estetik", "cute-gemoy", "tradisional-elegan"];
-// Section strip colours [light, mid, accent]; adat templates from their default palette (surface, bg, accent).
-const STRIP = { dasar: ["#ffffff", "#e7e3dc", "#3a3a3a"], folio: ["#ffffff", "#e9e3d8", "#2b2a28"], galeri: ["#ffffff", "#eceae6", "#9a948c"],
-  "modern-estetik": ["#ffffff", "#efe7dd", "#7b5a44"], "cute-gemoy": ["#fff3f6", "#fbd9e2", "#e48aa3"], "tradisional-elegan": ["#2a2522", "#1f1c1a", "#ecbb6c"],
+// The first six cards: the account's own templates first (none here), then newest first (highest template.json order;
+// model.js setTemplates).
+const FIRST6 = ["wana-lentera", "wungu-kencana", "pinky-promise", "garden-stroll", "crimson-rose", "lotus-mist"];
+// Section strip colours [light, mid, accent], from each template's default palette (surface, bg, accent).
+const STRIP = { "tradisional-elegan": ["#2a2522", "#1f1c1a", "#ecbb6c"],
   kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], joyo: ["#E7DCC8", "#D8C9AE", "#18150F"], ladomudo: ["#FFFFFF", "#FFFAF0", "#520000"], pusako: ["#F2EDDC", "#E1DABB", "#520000"],
   saman: ["#232220", "#181818", "#F0DA86"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], "sekar-kedaton": ["#FFFFFF", "#FFFCF3", "#7A1A1A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
   "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"],
-  "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"] };
+  "wana-lentera": ["#FFF9C7", "#E4DCAF", "#124541"], "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"], "pinky-promise": ["#FFFFFF", "#F1EEE3", "#901D44"],
+  "garden-stroll": ["#FFFFFF", "#F9FFF5", "#D04518"], "crimson-rose": ["#FFFFFF", "#EBE3DD", "#7D2229"], "lotus-mist": ["#FFFFFF", "#E6F4F8", "#B14D64"] };
 const HS = [10, 16, 8, 20, 12, 18, 9, 14, 22, 11, 16, 8, 13];
 // Catalogue thumbnail: the template's phone cover plus its section strip (the real card image is a screenshot).
 function thumb(x, y, id) {
@@ -212,23 +213,28 @@ function thumb(x, y, id) {
     while (yy < y + 160) { const h = HS[i % HS.length]; s += rect(cx, yy, 22, Math.min(h - 2, y + 161 - yy), { r: 1, fill: i % 3 === 2 ? c : i % 2 ? b : a }); yy += h; i++; }
   }
   const tline = (yy, w, f) => rect(mx - w / 2, yy, w, 2.5, { r: 1, fill: f });
-  if (id === "dasar" || id === "folio") s += photo(ix, iy, iw, ih, 6, 3) + text(mx, iy + (id === "dasar" ? 70 : 92), "Rani & Dimas", { size: 7, font: SERIF, fill: C.white, anchor: "middle" }) + tline(iy + 78, 40, "rgba(255,255,255,.7)") + tline(iy + 98, 30, "rgba(255,255,255,.6)") + rect(mx - 15, iy + 108, 30, 6, { r: 3, fill: C.white });
-  else if (id === "galeri") s += rect(ix, iy, iw, ih, { r: 3, fill: C.white }) + tline(iy + 14, 30, "#9a948c") + tline(iy + 22, 22, "#c9c3bb") + photo(ix + 12, iy + 40, 50, 64, 0, 2) + tline(iy + 118, 40, "#6b6560") + rect(mx - 18, iy + 132, 36, 7, { fill: "#2F3E4E" });
-  else if (id === "modern-estetik") s += rect(ix, iy, iw, ih, { r: 3, fill: C.white }) + tline(iy + 16, 36, "#9b8676") + photo(ix + 17, iy + 30, 40, 52, 4, 20) + tline(iy + 96, 30, "#7b5a44") + tline(iy + 104, 24, "#7b5a44") + rect(mx - 16, iy + 126, 32, 7, { r: 3.5, fill: "#7b5a44" });
-  else if (id === "cute-gemoy") s += rect(ix, iy, iw, ih, { r: 3, fill: "#fde7ec" }) + circle(mx, iy + 56, 22, { fill: "#f7b9c8" }) + circle(mx, iy + 56, 16, { fill: "#fff3f6" }) + tline(iy + 96, 40, "#e48aa3") + tline(iy + 106, 28, "#e9a4b6") + rect(mx - 16, iy + 126, 32, 7, { r: 3.5, fill: "#e48aa3" });
-  // Adat covers: paper colour, arch frame and title lines in the accent.
-  else s += rect(ix, iy, iw, ih, { r: 3, fill: b }) + `<path d="M${ix + 14} ${iy + 100} V${iy + 48} A23 23 0 0 1 ${ix + 60} ${iy + 48} V${iy + 100} Z" fill="none" stroke="${c}" stroke-width="1.5"/>` + tline(iy + 116, 40, c) + tline(iy + 126, 26, c);
+  // Cover: paper colour, arch frame and title lines in the accent.
+  s += rect(ix, iy, iw, ih, { r: 3, fill: b }) + `<path d="M${ix + 14} ${iy + 100} V${iy + 48} A23 23 0 0 1 ${ix + 60} ${iy + 48} V${iy + 100} Z" fill="none" stroke="${c}" stroke-width="1.5"/>` + tline(iy + 116, 40, c) + tline(iy + 126, 26, c);
   return s;
 }
-// One template card at (x, y): thumbnail 134x167, name, two description lines; o.on: blue border + Dipakai badge.
+// One template card at (x, y): thumbnail 134x167, name, two description lines; o.on: blue border + Dipakai badge. The
+// name row wraps (.nk-card__name flex-wrap): a name too wide for the badge beside it puts the badge on a row of its own,
+// 20 lower, and the description with it (measured in Chromium: badge 45.3 wide, gap 4).
+const wraps = (id, on) => on && tw(TPL[id][0], 14, 500) + 4 + 45.3 > 134;
+// Top of the Dipakai badge of the card at y.
+export const badgeTop = (y, id) => y + (wraps(id, true) ? 195 : 174);
 export function card(x, y, id, o = {}) {
-  const [name, desc] = TPL[id];
+  const [name, desc] = TPL[id], dy = wraps(id, o.on) ? 20 : 0;
   return rect(x + 1, y + 1, 132, 165, { r: 8, fill: C.page, stroke: o.on ? C.primary : C.line, sw: 2 }) + clipped(x + 2, y + 2, 130, 163, thumb(x, y, id)) +
-    text(x, y + 188, name, { size: 14, weight: 500 }) + (o.on ? nkBadge(x + 133, y + 174, "Dipakai", { end: true }) : "") + para(x, y + 209, desc, { size: 12, fill: C.faint, lh: 16 });
+    text(x, y + 188, name, { size: 14, weight: 500 }) + (o.on ? nkBadge(x + 133, badgeTop(y, id), "Dipakai", { end: true }) : "") + para(x, y + 209 + dy, desc, { size: 12, fill: C.faint, lh: 16 });
 }
-// Top-left of card i (two columns, 241 apart) when the cards start at y top; its box is [x, y, 134, 167].
+// Top-left of card i (two columns, rows 241 apart) when the cards start at y top; its box is [x, y, 134, 167]. A row
+// whose Dipakai badge wraps is 20 taller, so the rows under it move down.
 export const cardAt = (i, top) => [i % 2 ? 234 : 88, top + Math.floor(i / 2) * 241];
-export const cards = (top, used, ids = FIRST6) => ids.map((id, i) => card(...cardAt(i, top), id, { on: id === used })).join("");
+export const cards = (top, used, ids = FIRST6) => ids.map((id, i) => {
+  const [x, y] = cardAt(i, top), below = ids.slice(0, i - (i % 2)).some((u) => wraps(u, u === used)) ? 20 : 0;
+  return card(x, y + below, id, { on: id === used });
+}).join("");
 const MEGAPHONE = `<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>`;
 // Template / Marketing switch at the top of the panel body; the active half is light blue with its icon and label, the
 // other half shows its icon only.

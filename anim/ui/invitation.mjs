@@ -1,6 +1,6 @@
 // The invitation as the editor preview shows it: a plain 390x784 screen at ED.screen (no device frame). Two designs:
-// - the maroon-and-cream reference design (cover, Waktu & Tempat, Galeri, Tanda Kasih, bottom dock), plus the Folio and
-//   Dasar covers, another page's HTML before a template is picked, and gradient photo placeholders. Colours and type follow
+// - the maroon-and-cream reference design (cover, Waktu & Tempat, Galeri, Tanda Kasih, bottom dock), plus the Wana
+//   Lentera and Wungu Kencana covers, another page's HTML before a template is picked, and gradient photo placeholders. Colours and type follow
 //   the reference template; section positions are generic (laid out for the 390 px screen, not measured);
 // - `kencana`: the Kencana template page (cover with palette/scale/shape/font, sections below it, Menu bawah), as Gaya
 //   changes it; fonts and colours from the template's defaults, guest dock from undangan/widgets/dock.js.
@@ -60,9 +60,8 @@ export function pvMempelai({ nick = "Rani", full = "Rani Ayu, S.Psi.", job = "Ps
     ig ? rect(CX - tw(ig, 13) / 2 - 16, py + 22, tw(ig, 13) + 32, 30, { r: 15, fill: MAROON }) + text(CX, py + 42, ig, { size: 13, font: SERIF, fill: C.white, anchor: "middle" }) : "",
     dock("Mempelai"), disc());
 }
-// The cover name changed to Sinta, drawn over pvCover (maroon) and over pvFolio.
+// The cover name changed to Sinta, drawn over pvCover (maroon).
 export const pvSinta = () => rect(760, 462, 324, 64, { fill: CREAM }) + text(CX, 508, "Sinta & Dimas", { size: 46, font: SCRIPT, fill: MAROON, anchor: "middle" });
-export const pvSintaFolio = () => rect(752, 420, 340, 44, { fill: "#232220" }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: C.white });
 // Event cards of Waktu & Tempat (y, h on the screen).
 export const EV = {
   akad: { y: 250, h: 162, title: "Akad Nikah", time: "08.00 WIB s.d. Selesai", place: "Masjid Al-Ikhlas", addr: "Jl. Melati 1, Jakarta" },
@@ -92,15 +91,21 @@ export const pvForeign = () => pvScreen(C.white, rect(SC.x, SC.y, SC.w, 56, { fi
   rect(SC.x + 125, SC.y + 220, 140, 40, { r: 6, fill: "#2563eb" }),
   ...[0, 1, 2, 3, 4, 5, 6].map((i) => rect(SC.x + 30, SC.y + 340 + i * 26, [330, 290, 310, 250, 320, 280, 200][i], 10, { r: 5, fill: "#e5e7eb" })),
   rect(SC.x + 30, SC.y + 540, 155, 120, { r: 6, fill: "#f3f4f6" }), rect(SC.x + 205, SC.y + 540, 155, 120, { r: 6, fill: "#f3f4f6" }));
-// Folio and Dasar template covers.
-export const pvFolio = () => pvScreen("#F4F1EA", photo(SC.x, SC.y, SC.w, 300, 6, 0), rect(SC.x, SC.y + 300, SC.w, 140, { fill: "#232220" }),
-  sTxt(402, "Undangan Pernikahan", { size: 13, fill: "#f4f1ea" }), sTxt(452, "Rani & Dimas", { size: 38, fill: C.white }), sTxt(484, "Minggu, 14 Februari 2027", { fill: "#f4f1ea" }),
-  sTxt(600, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, fill: "#333333" }), sTxt(628, "Tamu Undangan", { size: 18, fill: "#1E1E1E" }),
-  rect(836, 660, 172, 46, { fill: "#1E1E1E" }) + text(922, 688, "Buka Undangan", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }));
-export const pvDasar = () => pvScreen("#F4F1EA", rect(747.5, 126.5, 349, 743, { stroke: "#3A3A3A", sw: 0.8 }), sTxt(300, "Undangan Pernikahan", { size: 13, fill: "#6B6B6B" }),
-  sTxt(360, "Rani & Dimas", { size: 40, fill: "#1E1E1E" }), line(872, 382, 972, 382, { stroke: "#6B6B6B" }), sTxt(410, "Minggu, 14 Februari 2027", { size: 15, fill: "#333333" }),
-  sTxt(560, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, fill: "#333333" }), sTxt(588, "Tamu Undangan", { size: 18, fill: "#1E1E1E" }),
-  rect(836, 620, 172, 46, { r: 6, fill: "#3A3A3A" }) + text(922, 648, "Buka Undangan", { size: 15, font: SERIF, fill: C.white, anchor: "middle" }));
+// Covers of the newest designs, in each template's default palette (nikahkit/src/model.js: Lentera Hutan for Wana
+// Lentera, Mauve Baper for Wungu Kencana): its ornament at the top, an arch photo, the names, the guest and Buka Undangan.
+const WANA = { bg: "#FFF9C7", heading: "#124541", text: "#2E645C", accent: "#124541", on: "#FFF9C7" };
+const WUNGU = { bg: "#F0EAE4", heading: "#985372", text: "#2B2628", accent: "#985372", on: "#FFFFFF" };
+const lantern = (x, y, c) => line(x, SC.y, x, y, { stroke: c, sw: 1.2 }) + rect(x - 10, y, 20, 28, { r: 6, fill: c }) + rect(x - 5, y + 7, 10, 14, { r: 3, fill: "#F2C46B" });
+const wisteria = (x, n) => Array.from({ length: n }, (_, i) => circle(x + (i % 2 ? 5 : -5), SC.y + 10 + i * 12, 7 - i * 0.6, { fill: i % 2 ? "#B98AA6" : "#C9A3BA" })).join("");
+const designCover = (p, deco) => pvScreen(p.bg, deco,
+  clipShape(`<path d="M862 360 V232 A60 60 0 0 1 982 232 V360 Z"/>`, photo(862, 172, 120, 188, 2, 0)) + `<path d="M862 360 V232 A60 60 0 0 1 982 232 V360 Z" fill="none" stroke="${p.accent}" stroke-width="2"/>`,
+  sTxt(398, "The Wedding Of", { size: 15, fill: p.text }), sTxt(452, "Rani & Dimas", { size: 38, fill: p.heading }), sTxt(484, "Minggu, 14 Februari 2027", { fill: p.text }),
+  sTxt(600, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, fill: p.text }), sTxt(628, "Tamu Undangan", { size: 18, fill: p.heading }),
+  rect(836, 660, 172, 46, { r: 23, fill: p.accent }) + text(922, 688, "Buka Undangan", { size: 15, font: SERIF, fill: p.on, anchor: "middle" }));
+export const pvWana = () => designCover(WANA, rect(SC.x, SC.y, SC.w, 40, { fill: WANA.heading }) + lantern(790, 176, WANA.heading) + lantern(1054, 150, WANA.heading));
+export const pvWungu = () => designCover(WUNGU, wisteria(770, 9) + wisteria(800, 6) + wisteria(1044, 6) + wisteria(1074, 9));
+// The cover name changed to Sinta, drawn over pvWana.
+export const pvSintaWana = () => rect(752, 420, 340, 44, { fill: WANA.bg }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: WANA.heading });
 
 // ---- Kencana page (template "kencana") --------------------------------------------------------------------------------
 const K_SERIF = "Tinos,'Times New Roman',Georgia,serif";

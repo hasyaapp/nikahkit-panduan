@@ -3,10 +3,10 @@
 // Template and Konten panels come from ui/editor-panels (measured), the preview from ui/invitation (generic layout).
 import { C, rect, text, line, clipped, shadow, icon, iconX, tw } from "../lib.mjs";
 import { ED, nkHead, nkRail, nkBtn, nkInput, nkAcc, nkBadgeBox, nkToast, nkToastBoxes, svSimpan, scalevEditor } from "../ui/kit.mjs";
-import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvBlank, pvForeign, pvFolio, pvDasar, pvSinta, pvSintaFolio } from "../ui/invitation.mjs";
+import { PHOTO_DEFS, EV, pvCover, pvEvents, pvGallery, pvGift, pvBlank, pvForeign, pvWana, pvWungu, pvSinta, pvSintaWana } from "../ui/invitation.mjs";
 import { ACCOUNT, P, PW, I, IW, hintL, typeIn, col, itemBar, itemBox, panelBg, panelBody, lid, LOCKED, kList, kListAt,
   fillMempelai, EVS, fillAcara, fillSampul, fillSalam, fillRsvp, fillKisah, fillVideo, fillDress, fillGifts, fillFamilies, fillFooter, kontenPanel,
-  seg, htmlNote, chips, ALL_N, cards, library, GAL } from "../ui/editor-panels.mjs";
+  seg, htmlNote, chips, ALL_N, cards, library, badgeTop, GAL } from "../ui/editor-panels.mjs";
 
 // Focus areas (world px): rail + panel, panel body, preview screen, Scalev bars, Simpan buttons, rail foot. Every element
 // in this file is a state of the screen (`skel: true`): skeleton outside the step's focus, detail inside, like the base.
@@ -19,14 +19,14 @@ const accM = (y) => [88, y, 279, 50];
 const cardM = (x, y) => ({ box: [x, y, 134, 167], r: 8 });
 // Box of a kit badge with its right edge at xr, stretched down by `more` for a column of badges.
 const badgeM = (label, xr, y, more = 0) => { const [x, , w, h] = nkBadgeBox(xr, y, label, { end: true }); return [x, y, w, h + more]; };
-const FOLIO_C = [301, 454], DASAR_C = [155, 454]; // card centres with the cards at y 371
+const WANA_C = [155, 454], WUNGU_C = [301, 454]; // centres of the first two cards (Wana Lentera, Wungu Kencana) at y 371
 const ADAT_CHIP = [302.5, 277]; // centre of the Adat chip with the default counts
 // The whole editor with a rail tab active (gradients for the photo placeholders first).
 const editor = (rail, o = {}) => [PHOTO_DEFS, scalevEditor(0, 0, { rail, ...o })];
 // Lens around the save status at the rail foot.
 const FOOT_LENS = { src: [0, 852, 72, 48], zoom: 3 };
 // Toast after a template change (Urungkan button box for the mark).
-const TOAST_TXT = "Template diganti ke Dasar.", TOAST = nkToast(TOAST_TXT), TB = nkToastBoxes(TOAST_TXT);
+const TOAST_TXT = ["Template diganti ke Wungu", "Kencana."], TOAST = nkToast(TOAST_TXT), TB = nkToastBoxes(TOAST_TXT);
 
 export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
@@ -38,23 +38,23 @@ export const scenes = {
         text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade", skel: true },
       tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + panelBody(seg(), library(219)), enter: "fade", delay: 0.5, skel: true },
       locked: { svg: LOCKED, enter: "fade", delay: 0.5, skel: true },
-      picked: { svg: panelBody(panelBg(), seg(), library(219, "folio")) + icon("inbox", 236, 122, 18, C.text), enter: "fade", skel: true },
-      pvF: { svg: pvFolio(), enter: "fade", delay: 0.2, skel: true },
+      picked: { svg: panelBody(panelBg(), seg(), library(219, "wana-lentera")) + icon("inbox", 236, 122, 18, C.text), enter: "fade", skel: true },
+      pvF: { svg: pvWana(), enter: "fade", delay: 0.2, skel: true },
       konten: { svg: kontenPanel(), enter: "fade", skel: true }
     },
     steps: [
       { caption: "Buka halaman undangan di Scalev. Editornya terbuka dalam HTML Mode.", focus: F.top, mark: [8, 54, 222, 26], lens: { src: [0, 0, 412, 92] }, at: [120, 66] },
       { caption: "Klik tab NikahKit. Sebentar tertulis Memeriksa akses...", focus: [0, 44, 399, 856], mark: [226, 54, 88, 26], lens: { src: [224, 46, 172, 46] }, show: ["gate"], at: ED.tab.NikahKit, click: true },
       { caption: "Tunggu pemeriksaan akses selesai. Menu dan panel muncul.", focus: F.side, mark: { box: [0, 104, 71, 332], r: 0 }, lens: { src: [0, 96, 399, 166], at: [290, 70] }, show: ["tpl", "locked"], at: [230, 330] },
-      { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Folio.", mark: cardM(234, 371), lens: { src: [226, 364, 150, 242] }, hide: ["locked"], show: ["picked", "pvF"], at: FOLIO_C, click: true, dur: 3.4 },
+      { caption: "Halaman masih kosong? Klik satu kartu template, misalnya Wana Lentera.", mark: cardM(P, 371), lens: { src: [80, 364, 150, 262] }, hide: ["locked"], show: ["picked", "pvF"], at: WANA_C, click: true, dur: 3.4 },
       { caption: "Klik Konten untuk mengisi data. Daftar bagian undangan muncul.", mark: railM("Konten"), lens: { src: [0, 380, 72, 60], zoom: 3, at: [290, 200] }, show: ["konten"], at: ED.rail.Konten, click: true }
     ]
   },
 
   "editor-peta-simpan": {
     title: "Langkah pertama di editor NikahKit: pratinjau dan Simpan",
-    base: [...editor("Konten"), kontenPanel("Sinta"), pvFolio()],
-    els: { pvName: { svg: pvSintaFolio(), enter: "fade", delay: 0.6, skel: true }, sBtn: { svg: svSimpan(), skel: true } },
+    base: [...editor("Konten"), kontenPanel("Sinta"), pvWana()],
+    els: { pvName: { svg: pvSintaWana(), enter: "fade", delay: 0.6, skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
       { caption: "Lihat hasilnya di pratinjau: nama yang kamu ketik langsung tampil.", focus: F.pv, mark: [784, 420, 276, 46], show: ["pvName"], at: [922, 560], dur: 3.4 },
       { caption: "Status Tersimpan di kolom kiri? Klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
@@ -74,7 +74,7 @@ export const scenes = {
       { caption: "Klik Template di menu kiri. Panel Template terbuka.", focus: F.side, mark: railM("Template"), lens: { src: [0, 96, 399, 122], at: [290, 70] }, at: ED.rail.Template, click: true, show: ["cardsA"] },
       { caption: "Pastikan pilihan Template yang aktif, bukan Marketing.", focus: [80, 161, 295, 122], mark: [P, 169, PW, 38], lens: { src: [80, 161, 295, 122] }, at: [160, 188] },
       { caption: "Gulir ke bawah dan lihat gambar contoh tiap template.", focus: F.body, scroll: { id: "cardsA", dy: 241 }, at: [230, 560], dur: 3.4 },
-      { caption: "Klik kartu yang kamu suka, misalnya Folio.", mark: cardM(234, 371), lens: { src: [226, 364, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: FOLIO_C, click: true, dur: 3.6 }
+      { caption: "Klik kartu yang kamu suka, misalnya Wana Lentera.", mark: cardM(P, 371), lens: { src: [80, 364, 150, 242] }, scroll: { id: "cardsA", dy: -241 }, at: WANA_C, click: true, dur: 3.6 }
     ]
   },
 
@@ -83,23 +83,23 @@ export const scenes = {
     base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), panelBody(panelBg(), seg(), htmlNote(), library(287)), pvForeign()],
     els: {
       veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade", skel: true },
-      dlg: { svg: shadow(540, 383, 360, 134, 8, 3) + rect(540, 383, 360, 134, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Folio?", { size: 14, weight: 600 }) +
+      dlg: { svg: shadow(540, 383, 360, 134, 8, 3) + rect(540, 383, 360, 134, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Wana Lentera?", { size: 14, weight: 600 }) +
         text(560, 442, "HTML yang sekarang ada di halaman akan diganti.", { size: 12, fill: C.faint }) + nkBtn(758, 461, "Batal", { variant: "quiet", w: 57 }), enter: "fade", skel: true },
       gnt: { svg: nkBtn(823, 461, "Ganti", { w: 57 }), enter: "fade", skel: true },
-      pvF: { svg: pvFolio(), enter: "fade", delay: 0.2, skel: true }
+      pvF: { svg: pvWana(), enter: "fade", delay: 0.2, skel: true }
     },
     steps: [
       { caption: "Halaman berisi HTML lain, jadi muncul dialog Ganti isi halaman.", focus: [540, 383, 360, 134], mark: { box: [540, 383, 360, 134], r: 8 }, lens: { src: [540, 383, 360, 134] }, at: [650, 495] },
-      { caption: "Klik Ganti. Pratinjau kini menampilkan Folio.", focus: F.pv, mark: [823, 461, 57, 36], note: "Ganti", at: [851, 479], click: true, press: "gnt", hide: ["veil", "dlg", "gnt"], show: ["pvF"], dur: 3.6 }
+      { caption: "Klik Ganti. Pratinjau kini menampilkan Wana Lentera.", focus: F.pv, mark: [823, 461, 57, 36], note: "Ganti", at: [851, 479], click: true, press: "gnt", hide: ["veil", "dlg", "gnt"], show: ["pvF"], dur: 3.6 }
     ]
   },
 
   "editor-pilih-template-dipakai": {
     title: "Memilih template NikahKit pertama kali: Dipakai dan Konten",
-    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "folio")), pvFolio()],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "wana-lentera")), pvWana()],
     els: { konten: { svg: kontenPanel(), enter: "fade", skel: true }, sBtn: { svg: svSimpan(), skel: true } },
     steps: [
-      { caption: "Kartu Folio kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: badgeM("Dipakai", 367, 545), r: 9 }, lens: { src: [226, 364, 150, 242] }, at: [346, 554] },
+      { caption: "Kartu Wana Lentera kini bertanda Dipakai. Menu lain bisa diklik.", focus: F.side, mark: { box: badgeM("Dipakai", 221, badgeTop(371, "wana-lentera")), r: 9 }, lens: { src: [80, 364, 150, 262] }, at: [200, badgeTop(371, "wana-lentera") + 9] },
       { caption: "Ganti data contoh: klik Konten. Catatan kuning menghitung isian contoh.", mark: railM("Konten"), lens: { src: [80, 161, 295, 80], at: [290, 90] }, show: ["konten"], at: ED.rail.Konten, click: true, dur: 3.6 },
       { caption: "Tunggu status Tersimpan, lalu klik Simpan di kanan atas Scalev.", focus: [F.foot, F.save], mark: [FOOT, { box: SIMPAN, r: 4 }], lens: FOOT_LENS, at: ED.simpan, press: "sBtn" }
     ]
@@ -136,30 +136,30 @@ export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-ganti-template": {
     title: "Mengganti template nanti: kartu lain",
-    base: [...editor("Konten"), kontenPanel(), pvFolio()],
+    base: [...editor("Konten"), kontenPanel(), pvWana()],
     els: {
-      tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + panelBody(seg(), library(219, "folio")), enter: "fade", skel: true },
-      cardsC: { svg: panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
+      tplB: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + panelBody(seg(), library(219, "wana-lentera")), enter: "fade", skel: true },
+      cardsC: { svg: panelBody(panelBg(), seg(), library(219, "wungu-kencana")), enter: "fade", skel: true },
       toast: { svg: TOAST, enter: "slide", delay: 0.4, skel: true },
-      pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true }
+      pvD: { svg: pvWungu(), enter: "fade", delay: 0.2, skel: true }
     },
     steps: [
-      { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", focus: F.side, mark: railM("Template"), lens: { src: [226, 364, 150, 242], at: [290, 160] }, at: ED.rail.Template, click: true, show: ["tplB"] },
-      { caption: "Klik kartu template lain, misalnya Dasar. Muncul pesan dengan Urungkan.", mark: cardM(P, 371), lens: { src: [80, 364, 295, 242], at: [290, 140] }, at: DASAR_C, click: true, show: ["cardsC", "toast", "pvD"], dur: 3.6 }
+      { caption: "Klik Template di menu kiri. Template yang dipakai bertanda Dipakai.", focus: F.side, mark: railM("Template"), lens: { src: [80, 364, 150, 262], at: [290, 160] }, at: ED.rail.Template, click: true, show: ["tplB"] },
+      { caption: "Klik kartu template lain, misalnya Wungu Kencana. Muncul pesan dengan Urungkan.", mark: cardM(234, 371), lens: { src: [80, 364, 295, 262], at: [290, 140] }, at: WUNGU_C, click: true, show: ["cardsC", "toast", "pvD"], dur: 3.6 }
     ]
   },
 
   "editor-ganti-template-pratinjau": {
     title: "Mengganti template nanti: pratinjau",
-    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "dasar")), pvDasar()],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), library(219, "wungu-kencana")), pvWungu()],
     els: {
-      cardsF: { svg: panelBody(panelBg(), seg(), library(219, "folio")), enter: "fade", skel: true },
-      pvF: { svg: pvFolio(), enter: "fade", skel: true },
+      cardsF: { svg: panelBody(panelBg(), seg(), library(219, "wana-lentera")), enter: "fade", skel: true },
+      pvF: { svg: pvWana(), enter: "fade", skel: true },
       toast: { svg: TOAST, skel: true }
     },
     steps: [
-      { caption: "Periksa pratinjau. Desainnya Dasar, isian Konten tetap ada.", focus: F.pv, mark: [790, 326, 264, 48], at: [922, 420] },
-      { caption: "Tidak suka? Klik Urungkan di pesan bawah panel. Folio kembali.", focus: [TB.toast, F.pv], mark: TB.undo, lens: { src: TB.toast }, at: [342, 863], click: true, show: ["cardsF", "pvF"], dur: 3.4 }
+      { caption: "Periksa pratinjau. Desainnya Wungu Kencana, isian Konten tetap ada.", focus: F.pv, mark: [784, 420, 276, 46], at: [922, 520] },
+      { caption: "Tidak suka? Klik Urungkan di pesan bawah panel. Wana Lentera kembali.", focus: [TB.toast, F.pv], mark: TB.undo, lens: { src: TB.toast }, at: [342, 863], click: true, show: ["cardsF", "pvF"], dur: 3.4 }
     ]
   },
 

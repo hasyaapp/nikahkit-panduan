@@ -16,7 +16,7 @@ import { kreatorHead, KR_INBOX } from "../ui/gate.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL, library, cardAt } from "../ui/editor-panels.mjs";
-import { PHOTO_DEFS, pvMempelai, pvDasar, kencana } from "../ui/invitation.mjs";
+import { PHOTO_DEFS, pvMempelai, pvWana, kencana } from "../ui/invitation.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 // PHOTO_DEFS: the gradients the invitation preview's photos use.
@@ -689,7 +689,7 @@ export const scenes = {
   },
 
   // Kreator: the paid Landing order in Pesanan masuk, filled into the client's invitation in bisnis Nikahin. The page already
-  // has template Dasar (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
+  // has template Wana Lentera (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
   // client's design (worker pesanan-masuk.mjs: "Desain <nama> · <paket>"). Filling keeps the page's template, so a
   // different design is then picked in Template: the content stays (store.js setTemplate, toast "Template diganti ke …").
   "gabung-kreator-pesanan": (() => {
@@ -697,14 +697,14 @@ export const scenes = {
     const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true);
     return {
       title: "Mengisi undangan dari pesanan Landing Kreator",
-      base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvDasar(), inboxCount("1", KR_INBOX[0])],
+      base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvWana(), inboxCount("1", KR_INBOX[0])],
       els: {
         inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" },
         memuat: { svg: rect(270, ROW1 + 16, 64, 24, { fill: C.white }) + badgeAt(331, ROW1 + 19, "Memuat…", "off"), enter: "fade" },
-        konten: { svg: nkRail(0, 0, "Konten") + krKonten + pvDasar(), enter: "fade" },
+        konten: { svg: nkRail(0, 0, "Konten") + krKonten + pvWana(), enter: "fade" },
         t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: 0.3 },
-        tplA: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
-        tplQ: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "dasar", Q)), enter: "fade", delay: 1.2, skel: true },
+        tplA: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "wana-lentera")), enter: "fade", skel: true },
+        tplQ: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "wana-lentera", Q)), enter: "fade", delay: 1.2, skel: true },
         qF: { svg: nkInput(88, 219, 279, "", { focus: true }), enter: "fade" },
         qT: text(99, 242, "Kencana", { size: 14 }),
         tplK: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "kencana", Q)), enter: "fade", skel: true },

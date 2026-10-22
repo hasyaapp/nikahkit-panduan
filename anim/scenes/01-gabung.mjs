@@ -21,7 +21,7 @@ import {
 } from "../ui/scalev.mjs";
 import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
 import { brandClosed, brandOpen, mkCards, mkCard, dipakaiAt, BOX, MKY, cardXY, SEG, MARKETING_BOX } from "../ui/marketing.mjs";
-import { pvCover, pvBlank, pvDasar, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
+import { pvCover, pvBlank, pvWana, photo, PHOTO_DEFS } from "../ui/invitation.mjs";
 import { shareTop, shareBtns, shareBox, NO_NOTE, urlBox as shareUrlBox, BAGIKAN_TOOL, accessHead, forCouple, pinBtn, pinBox, pinHint, ACC_Y, COUPLE_Y } from "../ui/bagikan.mjs";
 import { gate, gLogo, gBtn, GBTN_W, kreatorHead, KR_CHIP_BOX } from "../ui/gate.mjs";
 import { ordersDlg, linkOpen, salinBtn, SALIN_BOX, pasteOpen, LIST_Y, LINK_Y, ISI_Y, PASTE_AREA, badgeAt } from "../ui/pesanan.mjs";
@@ -201,7 +201,7 @@ const atY = (y, svg) => group({ transform: `translate(0 ${y})` }, svg);
 const panelShell = (title) => rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, title, { account: ACCOUNT });
 const tplPanel = (o = {}) => nkRail(0, 0, "Template") + panelShell("Template") +
   panelBody(o.banner ? atY(BANNER_H + (o.hint ? 36 : 0), templatePanel()) : templatePanel()) + (o.banner ? updateBanner(o) : "");
-const TPL_CARD = [...cardAt(0, 371), 134, 167]; // first template card (Dasar)
+const TPL_CARD = [...cardAt(0, 371), 134, 167]; // first template card (Wana Lentera)
 // Template > Marketing (ui/marketing): Profil merek closed + the two page cards, or Profil merek open and filled.
 const marketing = (o = {}) => panelShell("Template") + panelBody(panelBg(), seg("marketing"),
   o.open ? brandOpen({ name: "Rina WO", wa: "0812 3456 7890", ready: true }) : brandClosed(BOX) + mkCards(MKY));
@@ -496,7 +496,7 @@ const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, 
 // Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
 // and Media.
 const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
-const DASAR_CARD = [...cardAt(0, 371), 134, 167];
+const WANA_CARD = [...cardAt(0, 371), 134, 167];
 // Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
 // before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
@@ -566,7 +566,7 @@ const KL_TOAST = ["Landing Klasik dipasang. Tekan", "Simpan di Scalev."];
 // the Kreator chip, Bagikan with the page's nikahin.myscalev.com address and Untuk pengantin (the business's Dashboard, so
 // no "Pasang Dashboard pasangan dulu"), then pin.html with the Kreator's account (Paket Sekali Bayar without a button, no
 // business linked). The handover message links nikahin.myscalev.com/dashboard (server buku-tamu.mjs dashboardFor).
-const HO_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvDasar(), nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Konten", true) + kList().svg];
+const HO_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvWana(), nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Konten", true) + kList().svg];
 const hoShare = rect(0, 92, 399, 808, { fill: C.white }) + shareTop(NO_NOTE) + shareUrlBox(NO_NOTE + 311, [`https://nikahin.myscalev.com/${SLUG}?`, "to=Nama+Tamu"]) + shareBtns(NO_NOTE) +
   accessHead(ACC_Y, false) + forCouple(COUPLE_Y) + pinHint(COUPLE_Y);
 const hoDlg = (pin, msg) => {
@@ -1264,14 +1264,14 @@ export const scenes = {
     };
   })(),
 
-  // Kreator Nikahin 5: kartu Dasar langsung terpasang (halaman baru dihitung kosong), Media > Unggah foto, Simpan.
+  // Kreator Nikahin 5: kartu Wana Lentera langsung terpasang (halaman baru dihitung kosong), Media > Unggah foto, Simpan.
   "gabung-kreator-template": {
     title: "Memilih template, mengunggah foto, dan menyimpan",
     base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvBlank()],
     els: {
       tpl: { svg: tplNew(), skel: true },
-      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, "dasar")), enter: "fade", skel: true },
-      pvD: { svg: pvDasar(), enter: "fade", delay: 0.2, skel: true },
+      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, "wana-lentera")), enter: "fade", skel: true },
+      pvD: { svg: pvWana(), enter: "fade", delay: 0.2, skel: true },
       media: { svg: mediaK([]), enter: "fade", skel: true },
       win: { svg: fileWin(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },
       winSel: { svg: fileWin(true), enter: "fade", delay: 0.9 },
@@ -1280,8 +1280,8 @@ export const scenes = {
     },
     steps: [
       { caption: "Panel Template terbuka. Halaman baru masih kosong, jadi tanpa catatan.", focus: [[0, 92, 399, 808]], at: [230, 247], mark: [88, 169, 279, 38], lens: { src: [80, 161, 295, 122], at: [290, 70] }, dur: 3.4 },
-      { caption: "Klik kartu template, misalnya Dasar. Template langsung terpasang.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(DASAR_CARD), click: true,
-        hide: ["tpl"], show: ["picked", "pvD"], mark: { box: DASAR_CARD, r: 8 }, dur: 3.8 },
+      { caption: "Klik kartu template, misalnya Wana Lentera. Template langsung terpasang.", focus: [[0, 92, 399, 808], [726, 105, 392, 786]], at: mid(WANA_CARD), click: true,
+        hide: ["tpl"], show: ["picked", "pvD"], mark: { box: WANA_CARD, r: 8 }, dur: 3.8 },
       { caption: "Klik Media di rail kiri. Isinya hanya foto unggahanmu: masih kosong.", focus: [[0, 92, 399, 808]], at: ED.rail.Media, click: true, show: ["media"], mark: { box: [0, ED.rail.Media[1] - 26, 71, 52], r: 0 },
         lens: { src: [0, 96, 384, 116], at: [300, 40] } },
       { caption: "Klik Unggah foto, lalu pilih foto di jendela file.", focus: [[72, 154, 327, 84], FW_BOX], at: mid(UNGGAH), click: true, show: ["win", "winSel"], mark: UNGGAH,
