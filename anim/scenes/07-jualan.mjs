@@ -16,7 +16,7 @@ import { kreatorHead, KR_INBOX } from "../ui/gate.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
 import { ACCOUNT, panelBg, panelBody, lid, kList, seg, templatePanel, TPL, library, cardAt } from "../ui/editor-panels.mjs";
-import { PHOTO_DEFS, pvMempelai, pvNur, kencana } from "../ui/invitation.mjs";
+import { PHOTO_DEFS, pvMempelai, pvKenang, kencana } from "../ui/invitation.mjs";
 
 // ---- Editor: the Scalev editor fills the 1440x900 screen at 0,0 -----------------------------------------------------
 // PHOTO_DEFS: the gradients the invitation preview's photos use.
@@ -31,8 +31,8 @@ const INBOX = M(218, 104, 36, 36, 8);
 // The designs the Landing page shows first, newest first (highest template.json order; names from editor-panels TPL;
 // [paper, accent] = bg and accent of each design's default palette in nikahkit/src/model.js): [name, description, [paper, accent]].
 const DESIGN = (id, pal) => [TPL[id][0], TPL[id][1], pal];
-const DESIGNS = [DESIGN("nur-sakinah", ["#F4EEE5", "#806053"]), DESIGN("lili-renda", ["#FFFFFF", "#3D5D2E"]), DESIGN("wastra-parang", ["#F1EEE3", "#592D13"]),
-  DESIGN("wana-lentera", ["#E4DCAF", "#124541"])];
+const DESIGNS = [DESIGN("kenang-krisan", ["#EBE8E1", "#8A5F33"]), DESIGN("nur-sakinah", ["#F4EEE5", "#806053"]), DESIGN("lili-renda", ["#FFFFFF", "#3D5D2E"]),
+  DESIGN("wastra-parang", ["#F1EEE3", "#592D13"])];
 // The opening art (#lpArt): the three display designs (TAMPILAN in server/pages/src/landing) when the catalogue has them,
 // [paper, accent] sketched like DESIGNS; first in the middle, second left, third right.
 const TAMPILAN = [["#fdf8ec", "#a31d33"], ["#eef3e4", "#c8541f"], ["#8b3a5c", "#f6e4ea"]];
@@ -88,7 +88,7 @@ const LPY = { cta: 253.9, art: 345.9, katalog: 681.9, chips: 843.8, grid: 927.8,
 // then one button per category with its number of designs, most first. The row scrolls sideways, so a phone shows the
 // first few. [label, count, x, width] as measured on nikahin.myscalev.com/undanganman; `on` is the pressed one. Label
 // and count are one centred text: the guide's SVG may fall back to another font, and two separately placed texts would collide.
-const CHIPS = [["Semua", "75", 20, 103.3], ["Eksklusif", "14", 131.3, 117.9], ["Adat", "32", 257.2, 89.7], ["Floral", "15", 354.8, 96.8], ["Elegan", "5", 459.6, 95.7],
+const CHIPS = [["Semua", "76", 20, 103.3], ["Eksklusif", "15", 131.3, 117.9], ["Adat", "32", 257.2, 89.7], ["Floral", "15", 354.8, 96.8], ["Elegan", "5", 459.6, 95.7],
   ["Minimalis", "5", 563.3, 114.6], ["Ceria", "4", 685.9, 83.5]];
 const chipRow = (x0, y, on = "Semua") => CHIPS.map(([l, n, x, w]) => {
   const p = l === on, fg = p ? LP.paper : LP.cocoa;
@@ -361,12 +361,12 @@ const PH_BOTTOM = PHONE.y + PHONE.h;
 const phEdges = skeleton(clipped(0, 0, 1440, PHONE.y, phoneDesk("")) + clipped(0, PH_BOTTOM, 1440, 900 - PH_BOTTOM, phoneDesk("")));
 const LAND = landingTop(0, 0, "Rina WO");
 const F0 = formTail(0, LPY.card, PESANAN);
-const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain Nur Sakinah"], desain: "Nur Sakinah" });
-const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Nur Sakinah"], desain: "Nur Sakinah", paket: "Basic" });
+const F1 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: desain Kenang Krisan"], desain: "Kenang Krisan" });
+const F2 = formTail(0, LPY.card, { ...PESANAN, picked: ["Pilihan kalian: Paket Basic, desain", "Kenang Krisan"], desain: "Kenang Krisan", paket: "Basic" });
 // Live demo (dialog.demo, full screen): bar 63 px (name, Pakai desain ini 147x46, close 44), the sample invitation below.
 const DEMO_PICK = [181 + 147 / 2, 31], DEMO_X = [360, 31];
 const demoView = body(rect(0, 0, 390, 844, { fill: LP.paper }) + PHOTO_DEFS + clipped(0, 63, 390, 781, group({ transform: "translate(-727 -43)" }, pvMempelai(RANI))) +
-  rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Nur Sakinah", 19, { weight: 600 }) +
+  rect(0, 0, 390, 62, { fill: LP.paper }) + line(0, 62.25, 390, 62.25, { stroke: LP.cocoa, sw: 1.5 }) + h(16, 38, "Kenang Krisan", 19, { weight: 600 }) +
   iconX("x", DEMO_X[0], DEMO_X[1], 24, LP.cocoa, 2.2));
 const demoPick = body(lpBtn(181, 8, "Pakai desain ini", { small: true, solid: true, w: 147 }));
 const KAT = LPY.katalog, LIHAT_DEMO = [59, LPY.grid + 280.5 - KAT];
@@ -515,7 +515,7 @@ function perbaruiScene(kind, title, page, before, after, toast, steps) {
 }
 
 // Phone scenes: positions of the Landing page and form in phone px.
-const LIHAT_BOX = [20, LIHAT_DEMO[1] - 11, 78, 22]; // the Lihat demo link of the first design (Nur Sakinah)
+const LIHAT_BOX = [20, LIHAT_DEMO[1] - 11, 78, 22]; // the Lihat demo link of the first design (Kenang Krisan)
 const PICKED = F1.pos.picked - FORM_Y; // the Pilihan kalian box on the form, under the scrolled view
 const PKG_BTN = (i) => [45, LPY.pkg1 + i * 311.1 + 218.1 - PKG_Y, 300, 52];
 const CHIP_BOX = (label) => { const [, , x, w] = CHIPS.find((c) => c[0] === label); return [x, CHIP_Y, w, 44]; };
@@ -689,7 +689,7 @@ export const scenes = {
   },
 
   // Kreator: the paid Landing order in Pesanan masuk, filled into the client's invitation in bisnis Nikahin. The page already
-  // has template Nur Sakinah (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
+  // has template Kenang Krisan (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
   // client's design (worker pesanan-masuk.mjs: "Desain <nama> · <paket>"). Filling keeps the page's template, so a
   // different design is then picked in Template: the content stays (store.js setTemplate, toast "Template diganti ke …").
   "gabung-kreator-pesanan": (() => {
@@ -697,14 +697,14 @@ export const scenes = {
     const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true);
     return {
       title: "Mengisi undangan dari pesanan Landing Kreator",
-      base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvNur(), inboxCount("1", KR_INBOX[0])],
+      base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvKenang(), inboxCount("1", KR_INBOX[0])],
       els: {
         inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" },
         memuat: { svg: rect(270, ROW1 + 16, 64, 24, { fill: C.white }) + badgeAt(331, ROW1 + 19, "Memuat…", "off"), enter: "fade" },
-        konten: { svg: nkRail(0, 0, "Konten") + krKonten + pvNur(), enter: "fade" },
+        konten: { svg: nkRail(0, 0, "Konten") + krKonten + pvKenang(), enter: "fade" },
         t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: 0.3 },
-        tplA: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "nur-sakinah")), enter: "fade", skel: true },
-        tplQ: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "nur-sakinah", Q)), enter: "fade", delay: 1.2, skel: true },
+        tplA: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "kenang-krisan")), enter: "fade", skel: true },
+        tplQ: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "kenang-krisan", Q)), enter: "fade", delay: 1.2, skel: true },
         qF: { svg: nkInput(88, 219, 279, "", { focus: true }), enter: "fade" },
         qT: text(99, 242, "Kencana", { size: 14 }),
         tplK: { svg: tplHead + panelBody(panelBg(), seg(), library(219, "kencana", Q)), enter: "fade", skel: true },
@@ -769,10 +769,10 @@ export const scenes = {
         lens: lensBy(QR(12, LIHAT_DEMO[1] - 98, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh tampil satu layar. Klik Pakai desain ini.", at: Q(...DEMO_PICK), click: true, press: "pick", hide: ["dlg", "pick", "v1"], show: ["f1"],
         mark: QM(181, 8, 147, 46, 20), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 3.4 },
-      { caption: "Form menulis Pilihan kalian: desain Nur Sakinah.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 2.6 },
+      { caption: "Form menulis Pilihan kalian: desain Kenang Krisan.", mark: QM(41.5, PICKED, 307, 45.25, 8), lens: lensBy(QR(36, PICKED - 8, 318, 62), "l", 1.4), dur: 2.6 },
       { caption: "Di Paket dan harga, setiap paket punya Pilih paket ini.", hide: ["f1"], show: ["vPkg", "p2"], mark: [QM(...PKG_BTN(0), 20), QM(...PKG_BTN(1), 20)],
         lens: lensBy(QR(14, 34, 362, 306), "l", 1.2), dur: 2.8 },
-      { caption: "Pilih paket ini: form mencatat Paket Basic, desain Nur Sakinah.", at: Q(195, PKG_BTN(0)[1] + 26), click: true, press: "p2", show: ["f2"], mark: QM(...PKG_BTN(0), 20),
+      { caption: "Pilih paket ini: form mencatat Paket Basic, desain Kenang Krisan.", at: Q(195, PKG_BTN(0)[1] + 26), click: true, press: "p2", show: ["f2"], mark: QM(...PKG_BTN(0), 20),
         lens: lensBy(QR(36, PICKED - 12, 320, 94), "r", 1.4), dur: 3.8 }
     ]
   },
@@ -800,16 +800,16 @@ export const scenes = {
     els: {
       demo: { svg: onPhone(inBrowser(demoView)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
       pick: { svg: onPhone(inBrowser(demoPick)), enter: "pop", origin: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56) },
-      url: { svg: onPhone(urlBar(`${ADDR}?demo=nur-sakinah`)), enter: "fade" },
+      url: { svg: onPhone(urlBar(`${ADDR}?demo=kenang-krisan`)), enter: "fade" },
       f1: { svg: onPhone(urlBar(ADDR), inBrowser(scr(FORM_Y, LAND, F1.svg))), enter: "fade", delay: 0.2 }
     },
     steps: [
       { caption: "Di Pilih desain undangan, klien menekan Lihat demo.", at: Q(LIHAT_DEMO[0], LIHAT_DEMO[1] + 56), click: true, show: ["demo", "pick", "url"], focus: PHF,
         mark: QM(LIHAT_BOX[0], LIHAT_BOX[1] + 56, LIHAT_BOX[2], LIHAT_BOX[3]), lens: lensBy(QR(12, LIHAT_DEMO[1] - 42, 370, 138), "l", 1.2), dur: 3.4 },
       { caption: "Undangan contoh desain itu terbuka satu layar penuh.", mark: QM(0, 56, 390, 63, 0), lens: lensBy(QR(0, 56, 390, 63), "l", 1.2), dur: 2.8 },
-      { caption: "Alamatnya mendapat ?demo=nur-sakinah. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(4, 2, 382, 52), "l", 1.2), dur: 3.6 },
+      { caption: "Alamatnya mendapat ?demo=kenang-krisan. Bagikan tautan ini ke klien.", mark: QM(12, 8, 366, 40, 20), lens: lensBy(QR(4, 2, 382, 52), "l", 1.2), dur: 3.6 },
       { caption: "Tombol silang, Esc, atau tombol kembali menutup demo.", mark: QM(DEMO_X[0] - 22, DEMO_X[1] + 56 - 22, 44, 44, 22), lens: lensBy(QR(150, 56, 240, 63), "r"), dur: 3.4 },
-      { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Nur Sakinah.", at: Q(DEMO_PICK[0], DEMO_PICK[1] + 56), click: true, press: "pick",
+      { caption: "Pakai desain ini: form menulis Pilihan kalian: desain Kenang Krisan.", at: Q(DEMO_PICK[0], DEMO_PICK[1] + 56), click: true, press: "pick",
         hide: ["demo", "pick", "url"], show: ["f1"], mark: QM(181, 64, 147, 46, 20), lens: lensBy(QR(36, PICKED + 48, 318, 62), "r", 1.4), dur: 3.8 }
     ]
   },

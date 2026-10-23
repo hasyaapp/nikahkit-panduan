@@ -1,6 +1,6 @@
 // The invitation as the editor preview shows it: a plain 390x784 screen at ED.screen (no device frame). Two designs:
-// - the maroon-and-cream reference design (cover, Waktu & Tempat, Galeri, Tanda Kasih, bottom dock), plus the Nur
-//   Sakinah and Lili Renda covers, another page's HTML before a template is picked, and gradient photo placeholders. Colours and type follow
+// - the maroon-and-cream reference design (cover, Waktu & Tempat, Galeri, Tanda Kasih, bottom dock), plus the Kenang
+//   Krisan and Nur Sakinah covers, another page's HTML before a template is picked, and gradient photo placeholders. Colours and type follow
 //   the reference template; section positions are generic (laid out for the 390 px screen, not measured);
 // - `kencana`: the Kencana template page (cover with palette/scale/shape/font, sections below it, Menu bawah), as Gaya
 //   changes it; fonts and colours from the template's defaults, guest dock from undangan/widgets/dock.js.
@@ -91,25 +91,27 @@ export const pvForeign = () => pvScreen(C.white, rect(SC.x, SC.y, SC.w, 56, { fi
   rect(SC.x + 125, SC.y + 220, 140, 40, { r: 6, fill: "#2563eb" }),
   ...[0, 1, 2, 3, 4, 5, 6].map((i) => rect(SC.x + 30, SC.y + 340 + i * 26, [330, 290, 310, 250, 320, 280, 200][i], 10, { r: 5, fill: "#e5e7eb" })),
   rect(SC.x + 30, SC.y + 540, 155, 120, { r: 6, fill: "#f3f4f6" }), rect(SC.x + 205, SC.y + 540, 155, 120, { r: 6, fill: "#f3f4f6" }));
-// Covers of the newest designs, in each template's default palette (nikahkit/src/model.js: Cokelat Sakinah for Nur
-// Sakinah, Renda Hijau for Lili Renda): its ornament at the top, an arch photo, the names, the guest and Buka Undangan.
+// Covers of the newest designs, in each template's default palette (nikahkit/src/model.js: Krisan Krem for Kenang
+// Krisan, Cokelat Sakinah for Nur Sakinah): its ornament at the top, an arch photo, the names, the guest and Buka Undangan.
+const KENANG = { bg: "#EBE8E1", heading: "#3E3E3E", text: "#3E3E3E", accent: "#8A5F33", on: "#FFFFFF" };
 const NUR = { bg: "#F4EEE5", heading: "#806053", text: "#7D5E51", accent: "#806053", on: "#FFFFFF" };
-const LILI = { bg: "#FFFFFF", heading: "#3D5D2E", text: "#000000", accent: "#3D5D2E", on: "#FFFFFF" };
+// Polaroids pegged on a clothesline, each with a strip of tan washi tape, at both sides above the arch.
+const polaroids = () => `<path d="M${SC.x} ${SC.y + 30} Q${CX} ${SC.y + 62} ${SC.x + SC.w} ${SC.y + 30}" fill="none" stroke="#CDA379" stroke-width="1.5"/>` +
+  [[748, 34, -6], [806, 42, 5], [1006, 42, -5], [1062, 34, 6]].map(([x, y, a]) => `<g transform="rotate(${a} ${x + 22} ${SC.y + y})">` +
+    rect(x, SC.y + y, 44, 54, { fill: "#FFFFFF", stroke: "#E2DFD7" }) + rect(x + 5, SC.y + y + 5, 34, 32, { fill: "#D9CBB8" }) +
+    rect(x + 14, SC.y + y - 5, 16, 10, { fill: "#CDA379", opacity: 0.7 }) + "</g>").join("");
 // A mosque silhouette (dome, two minarets) in the milk brown, sitting on the top edge.
 const mosque = (c) => `<path d="M${CX - 60} ${SC.y + 120} V${SC.y + 90} A60 50 0 0 1 ${CX + 60} ${SC.y + 90} V${SC.y + 120} Z" fill="${c}" opacity=".18"/>` +
   [CX - 90, CX + 82].map((x) => rect(x, SC.y + 40, 8, 80, { fill: c, opacity: 0.18 }) + circle(x + 4, SC.y + 40, 6, { fill: c, opacity: 0.18 })).join("");
-// A lily-of-the-valley sprig: a curved green stem with white bells.
-const lily = (x, dir) => `<path d="M${x} ${SC.y} Q${x + dir * 30} ${SC.y + 60} ${x + dir * 10} ${SC.y + 140}" fill="none" stroke="${LILI.heading}" stroke-width="2"/>` +
-  [0, 1, 2, 3, 4].map((i) => circle(x + dir * (14 + i * 2), SC.y + 24 + i * 24, 7, { fill: "#FFFFFF", stroke: "#9DB590" })).join("");
 const designCover = (p, deco) => pvScreen(p.bg, deco,
   clipShape(`<path d="M862 360 V232 A60 60 0 0 1 982 232 V360 Z"/>`, photo(862, 172, 120, 188, 2, 0)) + `<path d="M862 360 V232 A60 60 0 0 1 982 232 V360 Z" fill="none" stroke="${p.accent}" stroke-width="2"/>`,
   sTxt(398, "The Wedding Of", { size: 15, fill: p.text }), sTxt(452, "Rani & Dimas", { size: 38, fill: p.heading }), sTxt(484, "Minggu, 14 Februari 2027", { fill: p.text }),
   sTxt(600, "Kepada Yth. Bapak/Ibu/Saudara/i", { size: 13, fill: p.text }), sTxt(628, "Tamu Undangan", { size: 18, fill: p.heading }),
   rect(836, 660, 172, 46, { r: 23, fill: p.accent }) + text(922, 688, "Buka Undangan", { size: 15, font: SERIF, fill: p.on, anchor: "middle" }));
+export const pvKenang = () => designCover(KENANG, polaroids());
 export const pvNur = () => designCover(NUR, mosque(NUR.heading));
-export const pvLili = () => designCover(LILI, lily(770, 1) + lily(1074, -1));
-// The cover name changed to Sinta, drawn over pvNur.
-export const pvSintaNur = () => rect(752, 420, 340, 44, { fill: NUR.bg }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: NUR.heading });
+// The cover name changed to Sinta, drawn over pvKenang.
+export const pvSintaKenang = () => rect(752, 420, 340, 44, { fill: KENANG.bg }) + sTxt(452, "Sinta & Dimas", { size: 38, fill: KENANG.heading });
 
 // ---- Kencana page (template "kencana") --------------------------------------------------------------------------------
 const K_SERIF = "Tinos,'Times New Roman',Georgia,serif";

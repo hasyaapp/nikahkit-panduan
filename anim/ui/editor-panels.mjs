@@ -187,20 +187,20 @@ export const TPL = {
   "sekar-jagad": ["Sekar Jagad", ["Kertas batik putih &", "hijau tua, gunungan…"]], kayon: ["Kayon", ["Kertas krem & cokelat", "tua, gunungan…"]],
   joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]], pagaruyung: ["Pagaruyung", ["Krem & terakota,", "bingkai ukir, awan…"]],
   gorga: ["Gorga", ["Karamel & cokelat, pita", "ulos merah, awan…"]], penjor: ["Penjor", ["Cokelat tanah & emas,", "candi bentar, meru…"]],
-  "nur-sakinah": ["Nur Sakinah", ["Krem & cokelat susu di", "kertas bertekstur…"]], "lili-renda": ["Lili Renda", ["Hijau daun & putih, lili", "lembah dan mawar…"]],
-  "wastra-parang": ["Wastra Parang", ["Cokelat sogan & krem,", "batik parang…"]], "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung, akar…"]],
-  "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]], "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]]
+  "kenang-krisan": ["Kenang Krisan", ["Krem lembut, foto", "polaroid di tali…"]], "nur-sakinah": ["Nur Sakinah", ["Krem & cokelat susu di", "kertas bertekstur…"]],
+  "lili-renda": ["Lili Renda", ["Hijau daun & putih, lili", "lembah dan mawar…"]], "wastra-parang": ["Wastra Parang", ["Cokelat sogan & krem,", "batik parang…"]],
+  "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung, akar…"]], "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]]
 };
 // The first six cards: the account's own templates first (none here), then newest first (highest template.json order;
 // model.js setTemplates).
-const FIRST6 = ["nur-sakinah", "lili-renda", "wastra-parang", "wana-lentera", "wungu-kencana", "pinky-promise"];
+const FIRST6 = ["kenang-krisan", "nur-sakinah", "lili-renda", "wastra-parang", "wana-lentera", "wungu-kencana"];
 // Section strip colours [light, mid, accent], from each template's default palette (surface, bg, accent).
 const STRIP = { kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
   mataram: ["#FFFFFF", "#FFFCF3", "#836A3A"], nila: ["#FFFFFF", "#F4F6F8", "#4E647A"], pagaruyung: ["#F2EBDC", "#ECE3CE", "#8A5732"],
   gorga: ["#FFFFFF", "#DFB67E", "#473735"], penjor: ["#583F2E", "#704F38", "#FFF8EE"],
   "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"],
-  "nur-sakinah": ["#FFFFFF", "#F4EEE5", "#806053"], "lili-renda": ["#F7F9F6", "#FFFFFF", "#3D5D2E"], "wastra-parang": ["#FAEFD2", "#F1EEE3", "#592D13"],
-  "wana-lentera": ["#FFF9C7", "#E4DCAF", "#124541"], "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"], "pinky-promise": ["#FFFFFF", "#F1EEE3", "#901D44"] };
+  "kenang-krisan": ["#FFFFFF", "#EBE8E1", "#8A5F33"], "nur-sakinah": ["#FFFFFF", "#F4EEE5", "#806053"], "lili-renda": ["#F7F9F6", "#FFFFFF", "#3D5D2E"],
+  "wastra-parang": ["#FAEFD2", "#F1EEE3", "#592D13"], "wana-lentera": ["#FFF9C7", "#E4DCAF", "#124541"], "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"] };
 const HS = [10, 16, 8, 20, 12, 18, 9, 14, 22, 11, 16, 8, 13];
 // Catalogue thumbnail: the template's phone cover plus its section strip (the real card image is a screenshot).
 function thumb(x, y, id) {
@@ -248,7 +248,7 @@ export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) +
 // widths measured in Chromium (Eksklusif: Roboto 12px measured in Chromium plus the same 2-3 px the other entries carry).
 const SEARCH_PH = "Cari: Jawa, bunga, atau tulis keinginan klien…";
 const CATS = ["Semua", "Eksklusif", "Adat", "Floral", "Elegan", "Minimalis", "Ceria"];
-export const ALL_N = [75, 14, 32, 15, 5, 5, 4];
+export const ALL_N = [76, 15, 32, 15, 5, 5, 4];
 const CHIP_W = { Semua: [72, 76, 79], Eksklusif: [83, 88, 91], Adat: [60, 63, 67], Floral: [65, 70, 70], Elegan: [72, 72, 72], Minimalis: [86, 86, 86], Ceria: [63, 63, 63] }; // 1 digit, 11, other 2 digits
 // The chips wrap to three rows (263 to 359 under a search box at 219), so the cards start 152 below the search box.
 export function chips(y, n = ALL_N, on = "Semua") {
