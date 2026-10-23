@@ -181,28 +181,26 @@ export const kontenPanel = (nick = "Rani", o = {}) => nkRail(0, 0, "Konten") + r
 // Templates as cards show them (build/templates.json name + description, clamped to two lines as measured in Chromium):
 // TPL[id] = [name, [description line 1, line 2]].
 export const TPL = {
-  "tradisional-elegan": ["Tradisional Elegan", ["Hitam & emas, bingkai", "lengkung, judul huruf…"]],
-  kencana: ["Kencana", ["Krem & merah bata,", "wayang golek…"]], joyo: ["Kembang Joyo", ["Kertas cokelat muda,", "bingkai lengkung dan…"]],
-  ladomudo: ["Lado Mudo", ["Krem merah muda &", "marun, pita ulos dan…"]], pusako: ["Pusako", ["Merah marun, rumah", "gadang bergaris dan…"]],
-  saman: ["Saman", ["Hitam & emas, motif", "Aceh dan bingkai…"]], pendopo: ["Pendopo", ["Krem & cokelat emas,", "bingkai lengkung dan…"]],
-  "sekar-kedaton": ["Sekar Kedaton", ["Krem & merah marun,", "gerbang lengkung…"]], sogan: ["Sogan", ["Krem & cokelat sogan,", "bingkai ukir emas…"]],
+  kencana: ["Kencana", ["Krem & merah bata,", "wayang golek…"]], pendopo: ["Pendopo", ["Krem & cokelat emas,", "bingkai lengkung dan…"]],
+  sogan: ["Sogan", ["Krem & cokelat sogan,", "bingkai ukir emas…"]], mataram: ["Mataram", ["Krem & marun, motif", "emas, pendopo dan…"]],
+  nila: ["Nila", ["Biru slate & putih, joglo,", "wayang dan anggrek…"]],
   "sekar-jagad": ["Sekar Jagad", ["Kertas batik putih &", "hijau tua, gunungan…"]], kayon: ["Kayon", ["Kertas krem & cokelat", "tua, gunungan…"]],
   joglo: ["Joglo", ["Kertas batik tan,", "gunungan, rumah…"]], pagaruyung: ["Pagaruyung", ["Krem & terakota,", "bingkai ukir, awan…"]],
   gorga: ["Gorga", ["Karamel & cokelat, pita", "ulos merah, awan…"]], penjor: ["Penjor", ["Cokelat tanah & emas,", "candi bentar, meru…"]],
-  "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung, akar…"]], "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]],
-  "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]], "garden-stroll": ["Garden Stroll", ["Taman cat air,", "pasangan ilustrasi di…"]],
-  "crimson-rose": ["Crimson Rose", ["Mawar merah & krem,", "renda maroon…"]], "lotus-mist": ["Lotus Mist", ["Biru kabut & pink,", "teratai dan peoni cat…"]]
+  "nur-sakinah": ["Nur Sakinah", ["Krem & cokelat susu di", "kertas bertekstur…"]], "lili-renda": ["Lili Renda", ["Hijau daun & putih, lili", "lembah dan mawar…"]],
+  "wastra-parang": ["Wastra Parang", ["Cokelat sogan & krem,", "batik parang…"]], "wana-lentera": ["Wana Lentera", ["Hijau hutan & krem,", "lentera gantung, akar…"]],
+  "wungu-kencana": ["Wungu Kencana", ["Ungu mauve & emas,", "pohon wisteria…"]], "pinky-promise": ["Pinky Promise", ["Mawar merah muda,", "hijau hutan & krem…"]]
 };
 // The first six cards: the account's own templates first (none here), then newest first (highest template.json order;
 // model.js setTemplates).
-const FIRST6 = ["wana-lentera", "wungu-kencana", "pinky-promise", "garden-stroll", "crimson-rose", "lotus-mist"];
+const FIRST6 = ["nur-sakinah", "lili-renda", "wastra-parang", "wana-lentera", "wungu-kencana", "pinky-promise"];
 // Section strip colours [light, mid, accent], from each template's default palette (surface, bg, accent).
-const STRIP = { "tradisional-elegan": ["#2a2522", "#1f1c1a", "#ecbb6c"],
-  kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], joyo: ["#E7DCC8", "#D8C9AE", "#18150F"], ladomudo: ["#FFFFFF", "#FFFAF0", "#520000"], pusako: ["#F2EDDC", "#E1DABB", "#520000"],
-  saman: ["#232220", "#181818", "#F0DA86"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], "sekar-kedaton": ["#FFFFFF", "#FFFCF3", "#7A1A1A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
+const STRIP = { kencana: ["#FFFDF8", "#FFF7E9", "#8E2818"], pendopo: ["#FFFAF2", "#FAF4EC", "#86683A"], sogan: ["#FFFFFF", "#FFFCF3", "#86683A"],
+  mataram: ["#FFFFFF", "#FFFCF3", "#836A3A"], nila: ["#FFFFFF", "#F4F6F8", "#4E647A"], pagaruyung: ["#F2EBDC", "#ECE3CE", "#8A5732"],
+  gorga: ["#FFFFFF", "#DFB67E", "#473735"], penjor: ["#583F2E", "#704F38", "#FFF8EE"],
   "sekar-jagad": ["#FFFFFF", "#FDFDFD", "#374A33"], kayon: ["#F7F1E3", "#E6D6B4", "#473735"], joglo: ["#F7F1E3", "#E6D6B4", "#473735"],
-  "wana-lentera": ["#FFF9C7", "#E4DCAF", "#124541"], "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"], "pinky-promise": ["#FFFFFF", "#F1EEE3", "#901D44"],
-  "garden-stroll": ["#FFFFFF", "#F9FFF5", "#D04518"], "crimson-rose": ["#FFFFFF", "#EBE3DD", "#7D2229"], "lotus-mist": ["#FFFFFF", "#E6F4F8", "#B14D64"] };
+  "nur-sakinah": ["#FFFFFF", "#F4EEE5", "#806053"], "lili-renda": ["#F7F9F6", "#FFFFFF", "#3D5D2E"], "wastra-parang": ["#FAEFD2", "#F1EEE3", "#592D13"],
+  "wana-lentera": ["#FFF9C7", "#E4DCAF", "#124541"], "wungu-kencana": ["#F8F8F8", "#F0EAE4", "#985372"], "pinky-promise": ["#FFFFFF", "#F1EEE3", "#901D44"] };
 const HS = [10, 16, 8, 20, 12, 18, 9, 14, 22, 11, 16, 8, 13];
 // Catalogue thumbnail: the template's phone cover plus its section strip (the real card image is a screenshot).
 function thumb(x, y, id) {
@@ -219,8 +217,9 @@ function thumb(x, y, id) {
 }
 // One template card at (x, y): thumbnail 134x167, name, two description lines; o.on: blue border + Dipakai badge. The
 // name row wraps (.nk-card__name flex-wrap): a name too wide for the badge beside it puts the badge on a row of its own,
-// 20 lower, and the description with it (measured in Chromium: badge 45.3 wide, gap 4).
-const wraps = (id, on) => on && tw(TPL[id][0], 14, 500) + 4 + 45.3 > 134;
+// 20 lower, and the description with it (measured in Chromium: badge 45.3 wide, gap 4; names in Roboto 500 14px).
+const NAME_W = { "nur-sakinah": 76.2, "lili-renda": 61.3, kencana: 54.2 };
+const wraps = (id, on) => on && (NAME_W[id] ?? tw(TPL[id][0], 14, 500)) + 4 + 45.3 > 134;
 // Top of the Dipakai badge of the card at y.
 export const badgeTop = (y, id) => y + (wraps(id, true) ? 195 : 174);
 export function card(x, y, id, o = {}) {
@@ -249,7 +248,7 @@ export const htmlNote = () => rect(P, 219, PW, 56, { r: 4, fill: C.warnSoft }) +
 // widths measured in Chromium (Eksklusif: Roboto 12px measured in Chromium plus the same 2-3 px the other entries carry).
 const SEARCH_PH = "Cari: Jawa, bunga, atau tulis keinginan klien…";
 const CATS = ["Semua", "Eksklusif", "Adat", "Floral", "Elegan", "Minimalis", "Ceria"];
-export const ALL_N = [72, 11, 32, 15, 5, 5, 4];
+export const ALL_N = [75, 14, 32, 15, 5, 5, 4];
 const CHIP_W = { Semua: [72, 76, 79], Eksklusif: [83, 88, 91], Adat: [60, 63, 67], Floral: [65, 70, 70], Elegan: [72, 72, 72], Minimalis: [86, 86, 86], Ceria: [63, 63, 63] }; // 1 digit, 11, other 2 digits
 // The chips wrap to three rows (263 to 359 under a search box at 219), so the cards start 152 below the search box.
 export function chips(y, n = ALL_N, on = "Semua") {
