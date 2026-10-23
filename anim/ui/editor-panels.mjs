@@ -160,7 +160,7 @@ export const fillDress = (c) => { c.field("Judul", "Dress Code", { placeholder: 
   c.area("Catatan", ["Contoh palet, tidak harus sama", "persis."]).field("Larangan warna (opsional)", "Mohon hindari busana berwarna putih."); };
 export const fillGifts = (c) => {
   c.field("Judul", "Tanda Kasih", { placeholder: true }).area("Teks pengantar (opsional)", ["Doa restu Anda sudah lebih dari", "cukup. Bila ingin memberi tanda"])
-    .toggle(["Tampilkan lewat tombol", "\"Kirim Hadiah\""], true, ["Rekening dan alamat tampil setelah", "tombol ditekan."]);
+    .add(hintL(I, c.y, ["Tamu melihat rekening dan alamat setelah", "menekan Kirim Hadiah."]), 44);
   [["BCA", "1234567890", "Rani Ayu"], ["Mandiri", "1230004567890", "Dimas Putra"]].forEach(([b, n, h], i) => item(c, b, (f) => f.field("Bank atau e-wallet", b, { hint: ["Bank dan e-wallet yang dikenal", "tampil dengan logo."] })
     .field("Nomor rekening", n).field("Nama pemilik rekening", h).photo("Gambar QRIS (opsional)", null, "Pilih foto"), i === 0, i === 1));
   c.add(quietBlock(I, c.y, IW, "Tambah rekening", "plus"), 48).h3("Kirim kado (opsional)").field("Nama penerima", "Rani Ayu").area("Alamat", ["Jl. Melati 10, Jakarta 12110"], 3)
