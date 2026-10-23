@@ -551,7 +551,8 @@ const SCENES = {
 
   // 1b. Jendela NikahKit (pin.html): Lihat PIN > balon chat > pesan untuk pengantin.
   "pasangan-salin-pesan": (() => {
-    const msg = ["Undangan siap: " + SITE, "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas", "PIN: 482913"]
+    // "\u00a0" = the blank line pin.js puts between the parts (an empty tspan would not move the next line down).
+    const msg = ["Undangan siap: " + SITE, "\u00a0", "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas", "\u00a0", "PIN: 482913"]
       .flatMap((l) => wrap(l, 372, 14));
     const bx = 976, by = 330, bh = 24 + msg.length * 20 + 16, [hx, hy] = DLG_B.handover;
     // Kartu PIN (sebelum dan sesudah Lihat PIN) selalu di dalam jendela: focus tidak membuka redup gelap di sekitarnya.

@@ -106,10 +106,11 @@ const PIN_LENS = [PL, PIN_ROW - 26, PW, MSG_Y + 44 - PIN_ROW + 26]; // PIN row d
 const copiedBar = (msg) => rect(...MSG_BOX, { r: 4, fill: C.primarySoft }) + text(PL + 12, MSG_Y + 23, msg, { size: 12, fill: C.strong });
 const SHADE = dim(0, 0, 1440, 900);
 
-// WhatsApp-like chat on the phone screen (not captured: no labels beyond the pasted message).
+// WhatsApp-like chat on the phone screen (not captured: no labels beyond the pasted message). "" = the blank line pin.js
+// puts between the parts.
 const WA_LINES = [
-  ["Undangan siap:", 0], [PUBLIC, 1], ["Kelola undangan (kirim ke tamu, RSVP,", 0], ["ucapan, check-in):", 0],
-  ["https://tokomu.myscalev.com/kelola?w=", 1], [`${WID}&link=https%3A%2F%2Ftokomu.`, 1], ["myscalev.com%2Frani-dimas", 1], ["PIN: 482913", 0]
+  ["Undangan siap:", 0], [PUBLIC, 1], ["", 0], ["Kelola undangan (kirim ke tamu, RSVP,", 0], ["ucapan, check-in):", 0],
+  ["https://tokomu.myscalev.com/kelola?w=", 1], [`${WID}&link=https%3A%2F%2Ftokomu.`, 1], ["myscalev.com%2Frani-dimas", 1], ["", 0], ["PIN: 482913", 0]
 ];
 const WA_BUBBLE = [PHONE.x + 60, PHONE.y + 100, 318, 24 + WA_LINES.length * 20];
 function waChat() {
@@ -117,7 +118,7 @@ function waChat() {
   return rect(x, y, 390, h, { fill: "#efeae2" }) + rect(x, y, 390, 64, { fill: "#f0f2f5" }) +
     iconX("arrow-left", x + 20, y + 32, 20, "#54656f") + circle(x + 58, y + 32, 18, { fill: "#c8d0d6" }) + rect(x + 86, y + 25, 90, 12, { r: 6, fill: "#d6dbe0" }) +
     rect(bx, by, bwid, bh, { r: 8, fill: C.waSoft }) +
-    WA_LINES.map(([l, link], i) => text(bx + 12, by + 24 + i * 20, l, { size: 14, fill: link ? "#027eb5" : "#111b21", underline: !!link })).join("") +
+    WA_LINES.map(([l, link], i) => (l ? text(bx + 12, by + 24 + i * 20, l, { size: 14, fill: link ? "#027eb5" : "#111b21", underline: !!link }) : "")).join("") +
     text(bx + bwid - 12, by + bh - 8, "10.02", { size: 11, fill: "#667781", anchor: "end" }) +
     rect(x, y + h - 64, 390, 64, { fill: "#f0f2f5" }) + rect(x + 12, y + h - 54, 310, 42, { r: 21, fill: C.white }) + circle(x + 354, y + h - 33, 21, { fill: C.wa }) + icon("send", x + 353, y + h - 33, 18, C.white);
 }
