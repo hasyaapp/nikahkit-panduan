@@ -143,7 +143,7 @@ const KGROUPS = ["Sampul", "Mempelai", "Acara & Tanggal", "Salam Pembuka", "Ayat
 
 // =====================================================================================================================
 // Gaya: Warna
-const ROLES = [["Latar", "Latar halaman", "bg"], ["Kartu", "Kotak acara, form, kartu", "surface"], ["Judul", "Nama mempelai dan judul bagian", "heading"], ["Teks", "Isi dan keterangan", "text"], ["Aksen", "Sampul, tombol, ikon", "accent"]];
+const ROLES = [["Latar", "Latar halaman dan sampul", "bg"], ["Kartu", "Kartu dan form ucapan", "surface"], ["Judul", "Nama mempelai dan judul bagian", "heading"], ["Teks", "Isi, keterangan, dan tautan", "text"], ["Aksen", "Tombol dan hiasan", "accent"]];
 const colorRow = (y, [label, hint], hex) => rect(PX + 0.5, y + 0.5, PW - 1, 53, { r: 4, fill: C.white, stroke: C.line }) + rect(97, y + 13, 36, 28, { r: 4, fill: C.white, stroke: C.line }) +
   rect(101, y + 18, 28, 18, { r: 2, fill: hex, stroke: "rgba(0,0,0,.25)", sw: 0.5 }) + text(143, y + 22, label, { size: 14, weight: 500 }) + text(143, y + 41, hint, { size: 10, fill: C.faint }) +
   text(358, y + 31, hex, { size: 10, fill: C.text, anchor: "end", mono: true });
