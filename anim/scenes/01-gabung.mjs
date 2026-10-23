@@ -10,7 +10,7 @@
 // extension version numbers: the banner and the ZIP names keep their place, the number is left out. Not measured
 // (generic, grey bars instead of unverified labels): Scalev and Google login/consent windows, Windows Explorer, the
 // Chrome download bubble, folder picker, extension menu and prompt box.
-import { C, PHONE, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow } from "../lib.mjs";
+import { C, PHONE, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow, waCode } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
   svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk, nkInput, nkLabel
@@ -575,15 +575,16 @@ const hoDlg = (pin, msg) => {
 };
 const HO_A = hoDlg("none", null), HO_B = hoDlg("made", ["PIN dibuat. Lihat lagi kapan saja lewat Lihat PIN."]), HO_C = hoDlg("made", ["Pesan tersalin."]);
 // The pasted message on a phone (WhatsApp-like chat, not captured: no labels beyond the message, wrapped as on a phone).
-// "" = the blank line pin.js puts between the parts.
+// "" = the blank line pin.js puts between the parts; a third item = inline code after the text (the PIN in backticks).
 const HO_WA = [["Undangan siap:", 0], [`https://nikahin.myscalev.com/${SLUG}`, 1], ["", 0], ["Kelola undangan (kirim ke tamu, RSVP,", 0], ["ucapan, check-in):", 0],
-  ["https://nikahin.myscalev.com/dashboard?", 1], [`w=${ID}&link=https%3A%2F%2Fnikahin.`, 1], [`myscalev.com%2F${SLUG}`, 1], ["", 0], ["PIN: 482913", 0]];
+  ["https://nikahin.myscalev.com/dashboard?", 1], [`w=${ID}&link=https%3A%2F%2Fnikahin.`, 1], [`myscalev.com%2F${SLUG}`, 1], ["", 0], ["PIN: ", 0, "482913"]];
 const HO_BUBBLE = [PHONE.x + 60, PHONE.y + 100, 318, 24 + HO_WA.length * 20];
 const hoWa = () => {
   const { x, y, h } = PHONE, [bx, by, bw, bh] = HO_BUBBLE;
   return rect(x, y, 390, h, { fill: "#efeae2" }) + rect(x, y, 390, 64, { fill: "#f0f2f5" }) + iconX("arrow-left", x + 20, y + 32, 20, "#54656f") + circle(x + 58, y + 32, 18, { fill: "#c8d0d6" }) +
     rect(x + 86, y + 25, 90, 12, { r: 6, fill: "#d6dbe0" }) + rect(bx, by, bw, bh, { r: 8, fill: C.waSoft }) +
-    HO_WA.map(([l, link], i) => (l ? text(bx + 12, by + 24 + i * 20, l, { size: 14, fill: link ? "#027eb5" : "#111b21", underline: !!link }) : "")).join("") +
+    HO_WA.map(([l, link, code], i) => (!l ? "" : code ? waCode(bx + 12, by + 24 + i * 20, l, code, { fill: "#111b21" })
+      : text(bx + 12, by + 24 + i * 20, l, { size: 14, fill: link ? "#027eb5" : "#111b21", underline: !!link }))).join("") +
     text(bx + bw - 12, by + bh - 8, "10.02", { size: 11, fill: "#667781", anchor: "end" }) + rect(x, y + h - 64, 390, 64, { fill: "#f0f2f5" }) +
     rect(x + 12, y + h - 54, 310, 42, { r: 21, fill: C.white }) + circle(x + 354, y + h - 33, 21, { fill: C.wa }) + icon("send", x + 353, y + h - 33, 18, C.white);
 };

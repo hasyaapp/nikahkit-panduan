@@ -7,7 +7,7 @@
 // checkin} dan nikahkit/ext/pin.html; ikon WhatsApp dan template pesan dibaca langsung dari sumbernya.
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { C, WORLD, PHONE, rect, text, line, circle, para, group, textWidth, wrap, clamp, icon, iconX, skeleton, clipped } from "../lib.mjs";
+import { C, WORLD, PHONE, rect, text, line, circle, para, group, textWidth, wrap, clamp, icon, iconX, skeleton, clipped, waCode } from "../lib.mjs";
 import { BAGIKAN_TOOL, NO_NOTE, ACC_Y, COUPLE_Y, shareTop, shareBtns, accessHead, forCouple, pinBtn, pinHint, pinBox } from "../ui/bagikan.mjs";
 import { nkBtn, nkBtnBox, nkInput, nkLabel, nkHint, nkH3, nkNote, nkLogo, nkHead, nkAcc, scalevEditor, dim, phoneDesk, onPhone } from "../ui/kit.mjs";
 import { gLogo } from "../ui/gate.mjs";
@@ -551,10 +551,11 @@ const SCENES = {
 
   // 1b. Jendela NikahKit (pin.html): Lihat PIN > balon chat > pesan untuk pengantin.
   "pasangan-salin-pesan": (() => {
-    // "\u00a0" = the blank line pin.js puts between the parts (an empty tspan would not move the next line down).
-    const msg = ["Undangan siap: " + SITE, "\u00a0", "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas", "\u00a0", "PIN: 482913"]
+    // "\u00a0" = the blank line pin.js puts between the parts (an empty tspan would not move the next line down). The
+    // PIN line follows as inline code (the PIN in backticks).
+    const msg = ["Undangan siap: " + SITE, "\u00a0", "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas", "\u00a0"]
       .flatMap((l) => wrap(l, 372, 14));
-    const bx = 976, by = 330, bh = 24 + msg.length * 20 + 16, [hx, hy] = DLG_B.handover;
+    const bx = 976, by = 330, bh = 24 + (msg.length + 1) * 20 + 16, [hx, hy] = DLG_B.handover;
     // Kartu PIN (sebelum dan sesudah Lihat PIN) selalu di dalam jendela: focus tidak membuka redup gelap di sekitarnya.
     const pinCard = [DLG_B.pinCard[0], DLG_B.pinCard[1], 408, DLG_A.pinCard[1] + DLG_A.pinCard[3] - DLG_B.pinCard[1] + 2];
     return {
@@ -567,7 +568,7 @@ const SCENES = {
         tip: { svg: rect(hx - 150, hy + 24, 192, 24, { r: 4, fill: "#fff", stroke: "#c4c7c5" }) + text(hx - 54, hy + 40, "Salin pesan untuk pengantin", { size: 12, fill: C.crText, anchor: "middle" }), enter: "fade" },
         copied: { svg: pinNote("Pesan tersalin."), enter: "fade" },
         bubble: { svg: rect(bx, by + 2, 404, bh, { r: 8, fill: "rgba(0,0,0,.08)" }) + rect(bx, by, 404, bh, { r: 8, fill: T.soft }) +
-          para(bx + 16, by + 30, msg, { size: 14, fill: T.text, lh: 20 }), enter: "rise" }
+          para(bx + 16, by + 30, msg, { size: 14, fill: T.text, lh: 20 }) + waCode(bx + 16, by + 30 + msg.length * 20, "PIN: ", "482913", { fill: T.text }), enter: "rise" }
       },
       steps: [
         { caption: "Di jendela NikahKit, bagian PIN dashboard, klik Lihat PIN. PIN 6 angka tampil.", focus: pinCard, mark: DLG_A.lihat,

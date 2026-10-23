@@ -101,6 +101,13 @@ export const textWidth = (s, size = 14, weight = 400, { mono = false, spacing = 
   const em = glyphs.reduce((t, c) => t + (mono ? 60 : adv[GLYPH.get(c)] ?? 60), 0) / 100;
   return +(em * size * (mono ? 1 : opsz(size)) + spacing * Math.max(0, glyphs.length - 1)).toFixed(1);
 };
+// One WhatsApp line ending in inline code (`482913`): the lead text, then the code in monospace on a light rounded box,
+// as WhatsApp draws a backticked span in a bubble (the backticks themselves are hidden).
+export const waCode = (x, y, lead, code, o = {}) => {
+  const size = o.size ?? 14, cx = x + textWidth(lead, size), w = textWidth(code, size - 1, 400, { mono: true }) + 8;
+  return text(x, y, lead, { size, fill: o.fill }) + rect(cx, y - size + 1, w, size + 5, { r: 4, fill: "rgba(0,0,0,.07)" }) +
+    text(cx + 4, y, code, { size: size - 1, mono: true, fill: o.fill });
+};
 // Greedy word wrap to a width; a word longer than the width (a URL) is split where the line is full. measure: tw
 // (keeps every line inside its column on every system) or textWidth (breaks where a Mac breaks, as clamp() needs).
 export function wrap(s, width, size = 14, weight = 400, measure = tw) {
