@@ -8,7 +8,7 @@
 // (/tmp/ref/dash-gate-hp.png), the WhatsApp message bubble (generic), and the member Landing page and its form
 // (server/pages/src/landing/index.html + server/pages/shared/order-form.js, measured in Chrome at 390 px). The flow
 // diagram and the checklist are guide graphics, not product screens.
-import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw, textWidth, mid } from "../lib.mjs";
+import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw, textWidth, wrap, mid } from "../lib.mjs";
 import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkH3, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
 import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, ISI_Y, PASTE_AREA, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete,
   kreatorOrders, SALES_AT } from "../ui/pesanan.mjs";
@@ -729,21 +729,25 @@ export const scenes = {
     };
   })(),
 
-  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Buka /slug). The Landing order row
-  // starts with its design, as in gabung-kreator-pesanan.
+  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Salin link form per order, Buka /slug).
+  // The Landing order row starts with its design, as in gabung-kreator-pesanan.
   "gabung-kreator-komisi": (() => {
-    const { box, total, lead, list, buka } = SALES_AT;
+    const { box, total, lead, list, copy, buka } = SALES_AT;
+    // orders.jsx Sales: the toast names the client and has no Urungkan, so its text gets the toast's full width (303 - 2 x 12).
+    const COPY_TOAST = wrap("Link form Rani Kusuma tersalin. Kirim ke klien lewat WhatsApp.", 279, 14, 400, textWidth);
     return {
       title: "Melihat penjualan dan komisi Kreator",
       base: krEd,
-      els: { inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" } },
+      els: { inbox: { svg: kreatorOrders + KR_ROW_DESAIN, enter: "fade" }, t1: { svg: nkToast(COPY_TOAST, { undo: false }), enter: "slide", delay: 0.3 } },
       steps: [
         { caption: "Di editor halamanmu, klik ikon kotak masuk.", focus: F.left, at: KR_INBOX, click: true, show: ["inbox"], mark: KR_INBOX_M, lens: { src: [12, 160, 374, 150] }, dur: 3 },
         { caption: "Di bawah daftar pesanan ada kotak Penjualan katalog.", mark: M(...box), lens: { src: [box[0] - 6, box[1] - 6, box[2] + 12, box[3] + 12], zoom: 1.2 }, dur: 3.2 },
         { caption: "Total komisimu tertulis di judul kotak.", mark: M(...total, 9), lens: { src: [20, box[1] + 2, 358, 46] }, dur: 3 },
         { caption: "Komisi 60% dari harga paket setelah diskon, hanya yang lunas.", mark: M(...lead), lens: { src: [24, lead[1] - 6, 350, lead[3] + 12] }, dur: 3.6 },
         { caption: "Tiap baris: nama klien, paket, tanggal, dan komisinya.", mark: M(...list), lens: { src: [24, list[1] - 4, 350, list[3] + 8], zoom: 1.5 }, dur: 3.6 },
-        { caption: "Buka /rina-wo membuka halaman Landing-mu.", at: mid(buka), mark: M(...buka), lens: { src: [24, buka[1] - 6, 350, 48] }, dur: 3 }
+        { caption: "Klik ikon Salin link form di baris klien.", at: mid(copy), click: true, show: ["t1"], mark: M(...copy), lens: { src: [24, copy[1] - 14, 350, 64], zoom: 1.5 }, dur: 3.2 },
+        { caption: `Muncul pesan: ${COPY_TOAST.join(" ")}`, mark: M(...nkToastBoxes(COPY_TOAST).toast), lens: toastLens(COPY_TOAST), dur: 3.8 },
+        { caption: "Buka /rina-wo membuka halaman Landing-mu.", at: mid(buka), hide: ["t1"], mark: M(...buka), lens: { src: [24, buka[1] - 6, 350, 48] }, dur: 3 }
       ]
     };
   })(),

@@ -65,10 +65,13 @@ const SALES = [["Rani Kusuma", "Undangan Inti · 19 Okt, 09.55", "Rp77.400"], ["
 const SALES_TOTAL = "Rp442.200", SALES_LEAD = wrap("3 pesanan lunas. Komisi 60% dari harga paket setelah diskon.", 342, 12, 400, textWidth);
 // Box geometry: summary 50, body padding 12, lead 16 per line + 12, list rows 56 + 1 px rules + 16, the button 36.
 const SY = LIST_Y + 73, LEAD_Y = SY + 63, SL_Y = LEAD_Y + SALES_LEAD.length * 16 + 12, SL_H = SALES.length * 57 + 1, BUKA_Y = SL_Y + SL_H + 16, SH = BUKA_Y + 36 + 12 - SY;
-// Boxes the steps mark: the whole box, the total badge, the lead, the paid orders, the Buka /rina-wo button.
+// Boxes the steps mark: the whole box, the total badge, the lead, the paid orders, row 1's Salin link form icon button
+// (nk-iconbtn 36 px at the row's right, 6 px padding), the Buka /rina-wo button.
 export const SALES_AT = { box: [16, SY, 366, SH], total: nkBadgeBox(369, SY + 16, SALES_TOTAL, { end: true }), lead: [28, LEAD_Y - 1, 342, SALES_LEAD.length * 16 + 2],
-  list: [28, SL_Y, 342, SL_H], buka: [28, BUKA_Y, 342, 36] };
-const salesRow = (y, [name, meta, fee]) => text(40, y + 26, name, { size: 14, weight: 600 }) + text(40, y + 42, meta, { size: 10, fill: C.text }) + badgeAt(364, y + 19, fee, "ok");
+  list: [28, SL_Y, 342, SL_H], copy: [327, SL_Y + 11, 36, 36], buka: [28, BUKA_Y, 342, 36] };
+// One paid order: name, meta, commission badge, then the copy icon (badge ends 8 px left of the 36 px button).
+const salesRow = (y, [name, meta, fee]) => text(40, y + 26, name, { size: 14, weight: 600 }) + text(40, y + 42, meta, { size: 10, fill: C.text }) + badgeAt(319, y + 19, fee, "ok") +
+  icon("copy", 345, y + 28, 18, C.text);
 const salesBox = rect(13, SY - 3, 372, SH + 6, { r: 7, fill: C.primarySoft }) + rect(16.5, SY + 0.5, 365, SH - 1, { r: 4, fill: C.white, stroke: C.primary }) +
   icon("chevron-down", 38, SY + 25, 18, C.strong) + text(59, SY + 30, "Penjualan katalog", { size: 14, weight: 500 }) + badgeAt(369, SY + 16, SALES_TOTAL, "ok") +
   para(28, LEAD_Y + 11, SALES_LEAD, { size: 12, fill: C.faint, lh: 16 }) + rect(28.5, SL_Y + 0.5, 341, SL_H - 1, { r: 4, fill: C.white, stroke: C.line }) +
