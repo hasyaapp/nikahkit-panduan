@@ -1,10 +1,11 @@
 // Scenes for the "Bagikan dan tamu" pages (panduan/docs/tamu/*): each one full 1440x900 screen (lib v4).
 // The editor screens compose ui/bagikan.mjs (Bagikan dialog), ui/editor-panels.mjs (Konten panel, RSVP & Ucapan group)
-// and ui/invitation.mjs (preview, guest cover). Drawn here, from nikahkit/ext/pin.html + pin.js (PIN window),
+// and ui/invitation.mjs (preview, guest cover); the Scalev dashboard (sidebar with the Buku Tamu row, Landing Pages list)
+// is ui/kit.mjs scalevApp and ui/scalev.mjs lpScreen. Drawn here, from nikahkit/ext/pin.html + pin.js (PIN window),
 // nikahkit/ext/buku-tamu.html + buku-tamu.js (Buku Tamu: iframe over Scalev's <main> at x 256, body max 960
 // border-box, so the content box is 392..1304), server/pages/src/panel/index.html (dashboard gate, Hari-H for staff)
-// and the guest gate (render.js .nk-gate: 400 px card). Measured from editor-akun.png, scalev-pages.png,
-// scalev-bukutamu.png, dash-gate-hp.png, dash-hari-h-hp.png (14 Okt 2026).
+// and the guest gate (render.js .nk-gate: 400 px card). Measured from editor-akun.png, scalev-bukutamu.png,
+// dash-gate-hp.png, dash-hari-h-hp.png (14 Okt 2026).
 // Not captured, drawn generic: the desktop background around the guest cover, the WhatsApp chat, the spreadsheet with
 // its save dialog, the OS file picker and Chrome's confirm and download bubble.
 // Pattern: base = the state most steps discuss; other states are full-screen `skel` elements (skeleton outside the
@@ -17,8 +18,9 @@ import {
 import { I, IW, kontenPanel, kListAt, fillRsvp, lid } from "../ui/editor-panels.mjs";
 import { PHOTO_DEFS, pvMempelai, pvCover, pvBingkai, BINGKAI_BTN, MAROON, SERIF, CREAM } from "../ui/invitation.mjs";
 import {
-  CHROME_TOP as T, ED, chrome, crDownload, favScalev, scalevEditor, scalevApp, svMenuAt, svSimpan, nkInput, nkHint, nkSwitch, nkH3, nkLogo, dim, phoneDesk
+  CHROME_TOP as T, ED, chrome, crDownload, favScalev, scalevEditor, scalevApp, svMenuAt, svMenuBox, svSimpan, nkInput, nkHint, nkSwitch, nkH3, nkLogo, dim, phoneDesk
 } from "../ui/kit.mjs";
+import { lpScreen } from "../ui/scalev.mjs";
 
 const PAGE = "rani-dimas", PUBLIC = `https://tokomu.myscalev.com/${PAGE}`, WID = "365671";
 const scalevTab = (active = true) => ({ title: "Scalev", fav: favScalev, active });
@@ -128,22 +130,9 @@ function waChat() {
 const BX = 392, BW2 = 912, BR = BX + BW2; // content box 392..1304 (scalev-bukutamu.png)
 const appShell = (active = "Buku Tamu") => scalevApp(0, 0, { active });
 const SIDE = [0, 0, 256, 900], MAIN = [256, 0, 1184, 900];
-const menuBox = (name) => { const [, y] = svMenuAt(name); return [24, y - 16, 207, 32]; };
-// Landing Pages content (scalev-pages.png), the screen the member starts from.
-function landingPages() {
-  const rows = [["The Wedding of Rani & Dimas", "/rani-dimas"], ["Sinta & Bagas", "/sinta-bagas"], ["Contoh Undangan Nikahin", "/contoh"], ["Dashboard Pasangan", "/kelola"], ["Landing Paket Undangan", "/paket"]];
-  let s = rect(256, 0, 1184, 900, { fill: "#f7f9fc" }) + rect(256, 0, 1170, 137, { fill: C.white }) + text(280, 35, "Landing Pages", { size: 18, weight: 700, fill: C.ink }) +
-    line(280, 58, 1400, 58, { stroke: C.svDivider }) + rect(280, 78, 173, 40, { r: 4, fill: "#4497ca" }) + text(366, 103, "+ Create Landing Page", { size: 14, weight: 500, fill: C.white, anchor: "middle" }) +
-    card(280, 243, 1120, 657) + text(297, 275, "Folders", { size: 14, weight: 700, fill: C.ink }) + line(520, 243, 520, 900, { stroke: C.line }) +
-    text(537, 274, "All Landing Pages", { size: 14, weight: 700, fill: C.ink }) + rect(521, 293, 879, 38, { fill: "#f7f9fc" }) +
-    [["Nama Landing Page", 585], ["Slug", 925], ["Mode", 1125]].map(([l, x]) => text(x, 317, l, { size: 12, fill: C.text })).join("");
-  rows.forEach(([n, slug], i) => {
-    const y = 331 + i * 71;
-    s += line(521, y + 71, 1400, y + 71, { stroke: C.line }) + checkbox(538, y + 28, false) + text(585, y + 41, n, { size: 14, weight: 500, fill: "#2a8bc9" }) +
-      text(925, y + 41, slug, { size: 14, fill: "#2a8bc9" }) + rect(1125, y + 22, 83, 28, { r: 4, fill: C.primarySoft }) + text(1166, y + 41, "HTML Mode", { size: 12, weight: 500, fill: C.action, anchor: "middle" });
-  });
-  return s;
-}
+// Landing Pages (ui/scalev lpScreen), the screen the member starts from: the pages behind the Buku Tamu list below.
+const LP_TAMU = [{ name: "The Wedding of Rani & Dimas", slug: "/rani-dimas", pub: true }, { name: "Sinta & Bagas", slug: "/sinta-bagas", pub: false },
+  { name: "Contoh Undangan Nikahin", slug: "/contoh", pub: true }, { name: "Dashboard Pasangan", slug: "/kelola", pub: true }, { name: "Landing Paket Undangan", slug: "/paket", pub: true }];
 const frameBg = () => rect(256, 0, 1184, 900, { fill: C.page });
 const frameHead = (msg) => nkLogo(BX + 16, 40, 32) + text(BX + 42, 46, "Buku Tamu", { size: 16, weight: 700, fill: C.strong }) +
   (msg ? rect(BX, 72, BW2, 38, { r: 4, fill: C.primarySoft }) + text(BX + 12, 95, msg, { size: 12, fill: C.strong }) : "") +
@@ -564,11 +553,11 @@ export const scenes = {
     title: "Membuka Buku Tamu di Scalev",
     base: [appShell(), detail()],
     els: {
-      pre: { svg: appShell("Landing Pages") + landingPages(), skel: true, enter: "fade" },
+      pre: { svg: lpScreen({ rows: LP_TAMU }), skel: true, enter: "fade" },
       list: { svg: appShell() + listView(), skel: true, enter: "fade" }
     },
     steps: [
-      { caption: "Di sidebar Scalev, klik menu Buku Tamu.", focus: [menuBox("Buku Tamu"), [BX - 8, 0, BW2 + 16, 440]], mark: menuBox("Buku Tamu"), lens: { src: [0, 252, 256, 28] }, at: svMenuAt("Buku Tamu"), click: true, hide: ["pre"], show: ["list"] },
+      { caption: "Di sidebar Scalev, klik menu Buku Tamu.", focus: [svMenuBox("Buku Tamu"), [BX - 8, 0, BW2 + 16, 440]], mark: { box: svMenuBox("Buku Tamu"), r: 6 }, lens: { src: [0, 236, 256, 112] }, at: svMenuAt("Buku Tamu"), click: true, hide: ["pre"], show: ["list"] },
       { caption: "Daftar undanganmu tampil. Klik kartu undangan.", focus: MAIN, mark: { box: CARD0, r: 8 }, lens: { src: CARD_LENS }, at: CARD0_AT, click: true, hide: ["list"] },
       { caption: "Di atas ada ringkasan kehadiran, per sesi dan per pihak.", focus: grow(SUM, 8), mark: { box: SUM, r: 8 }, lens: { src: [BX, DY.sum, 400, 104] }, dur: 3.4 },
       { caption: "Pilih tab: Ucapan, RSVP, atau Tautan personal.", focus: grow(TABS, 8), mark: TABS, lens: { src: grow(TABS, 14) }, at: mid(TABS), dur: 3.2 }

@@ -2,15 +2,16 @@
 // thumbnail (Canva + SEO & Page Identity), tutorial resmi. Every scene is one 1440x900 screen (lib v4): Scalev pages fill
 // it at 0,0 (the editor and dashboard viewport); scenes where the address bar matters put the same page in a Chrome window
 // (frame + shifted, page from y 85); other sites are Chrome pages laid out at 1440 wide; the phone check uses phoneDesk.
-// The Scalev product screens (editor Settings and Security tabs, Settings > Domain / Profil, Stores, the Scalev palette)
-// come from ../ui/scalev.mjs, measured there. Measured here: the Landing Pages list (14 Okt 2026, page 365671), the
-// Settings tab's SEO & PAGE IDENTITY section; Canva's public gallery, this guide on docs.page and
-// tutorial.scalev.com/azcustomdomain at 1440x900 in headless Chromium (14 Okt 2026).
+// The Scalev product screens (dashboard shell and topbar, the Landing Pages list and + Create Landing Page menu, Choose
+// Business, editor Settings and Security tabs, Settings > Domain / Profil, Stores, the Scalev palette) come from
+// ../ui/kit.mjs and ../ui/scalev.mjs, measured there. Measured here: the Settings tab's SEO & PAGE IDENTITY section;
+// Canva's public gallery, this guide on docs.page and tutorial.scalev.com/azcustomdomain at 1440x900 in headless
+// Chromium (14 Okt 2026).
 // Not measured, so generic (grey bars, only the labels the guide pages name): the type chooser, the confirmation after
 // Edit Account, Cloudflare, the domain registrar, WhatsApp Web, Canva's logged-in header, menus and editor.
 import { C, icon, iconX, shadow, clipped, PHONE, group, text, para, rect, line, circle, tw, mid } from "../lib.mjs";
 import {
-  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan, crDownload
+  chrome, favScalev, CHROME_TOP, scalevEditor, ED, scalevApp, svMenuAt, svMenuBox, nkHead, nkHint, dim, phoneDesk, svSimpan, svTerbitkan, crDownload
 } from "../ui/kit.mjs";
 import {
   SV, bar, check, SVC, tx, tick, head, card, genericBody, lpScreen, CREATE, btnCreate, CREATE_ROW, createMenu, lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsEd, SLUG, slugText, slugFocus,
@@ -32,6 +33,10 @@ const CT = CHROME_TOP; // page top inside a Chrome window (y 85)
 const frame = (url = "app.scalev.com") => chrome(0, 0, 1440, 900, { tabs: [{ title: "Scalev", active: true, fav: favScalev }], url });
 const shifted = (svg) => clipped(0, CT, 1440, 900 - CT, group({ transform: `translate(0 ${CT})` }, svg));
 const dn = ([x, y, w, h]) => [x, y + CT, w, h];
+// The dashboard's Home route (folder Home open in the sidebar, greeting in the topbar), the start of the dashboard scenes;
+// h: the viewport height (815 inside a Chrome window).
+const HOME = { active: "Home" };
+const homeScreen = (h) => scalevApp(0, 0, { ...HOME, h }) + head("Halo, Rina") + genericBody();
 const urlSwap = (url) => rect(150, 48, 700, 30, { fill: C.crOmni }) + text(166, 68, url, { size: 14, fill: C.crText });
 const OMNI = { box: [124, 46, 1184, 34], r: 17 };
 // Clip for a scrolling element: on the element's class, so the clip stays put while its inner group scrolls (also in lenses).
@@ -383,11 +388,11 @@ const NS_SAVE = [344, CT + 290, 120, 42];
 export const scenes = {
   "scalev-buat-halaman-html": {
     title: "Membuka Landing Pages di dasbor Scalev",
-    base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
+    base: [homeScreen()],
     els: { lp: { svg: lpScreen(), skel: true, enter: "fade" } },
     steps: [{
-      caption: "Di dasbor Scalev, klik Landing Pages di menu kiri.", focus: [0, 118, 256, 540], at: svMenuAt("Landing Pages"), click: true, show: ["lp"], dur: 3.4,
-      mark: { box: [28, 220, 196, 28], r: 6 }, lens: { src: [8, 180, 248, 110] }
+      caption: "Di dasbor Scalev, klik Landing Pages di menu kiri.", focus: [0, 118, 256, 652], at: svMenuAt("Landing Pages", HOME), click: true, show: ["lp"], dur: 3.4,
+      mark: { box: svMenuBox("Landing Pages", HOME), r: 6 }, lens: { src: [0, 226, 256, 172] }
     }]
   },
 
@@ -396,12 +401,12 @@ export const scenes = {
     base: [lpScreen()],
     els: {
       create: btnCreate,
-      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 84] }
+      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 73] }
     },
     steps: [
-      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 70, 230, 240]], at: mid(CREATE), click: true, press: "create", show: ["cmenu"], mark: CREATE,
-        lens: { src: [274, 78, 216, 228], zoom: 1.5 } },
-      { caption: "Klik HTML Sales Page. Editor HTML Mode terbuka.", focus: [[270, 70, 230, 240]], at: mid(CREATE_ROW(1)), click: true, mark: CREATE_ROW(1), note: "HTML Sales Page", dur: 3.4 }
+      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 64, 230, 232]], at: mid(CREATE), click: true, press: "create", show: ["cmenu"], mark: { box: CREATE, r: 6 },
+        lens: { src: [274, 66, 216, 219], zoom: 1.5 } },
+      { caption: "Klik HTML Sales Page. Editor HTML Mode terbuka.", focus: [[270, 64, 230, 232]], at: mid(CREATE_ROW(1)), click: true, mark: CREATE_ROW(1), note: "HTML Sales Page", dur: 3.4 }
     ]
   },
 
@@ -602,7 +607,7 @@ export const scenes = {
 
   "scalev-epayment": {
     title: "Membuka Add Payment Method di toko Scalev",
-    base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
+    base: [homeScreen()],
     els: {
       storeFrame: { svg: scalevApp(0, 0, { active: "Stores" }) + rect(256, 0, 1184, 900, { fill: SV.bg }) + storeRight + storeHead, skel: true, enter: "fade" },
       storeBody: { svg: clipCss("storeBody", 256, 89, 790, 811) + storeLeft(), skel: true, enter: "fade" },
@@ -611,8 +616,8 @@ export const scenes = {
       dlgOpen: { svg: payDialog(true, 2), enter: "fade" }
     },
     steps: [
-      { caption: "Klik Stores. Dengan satu toko, halaman tokomu langsung terbuka.", focus: [256, 0, 1184, 232], at: svMenuAt("Stores"), click: true, show: ["storeFrame", "storeBody"], dur: 3.4,
-        mark: { box: [28, 412, 196, 28], r: 6 }, lens: { src: [8, 380, 248, 92] } },
+      { caption: "Klik Stores. Dengan satu toko, halaman tokomu langsung terbuka.", focus: [256, 0, 1184, 232], at: svMenuAt("Stores", HOME), click: true, show: ["storeFrame", "storeBody"], dur: 3.4,
+        mark: { box: svMenuBox("Stores", HOME), r: 6 }, lens: { src: [0, 414, 256, 200] } },
       { caption: "Gulir ke Payment Methods, klik + Add Payment Method.", focus: PAY_DLG, scroll: { id: "storeBody", dy: STORE_DY }, at: [391, 386], click: true, show: ["shade", "dlg"], dur: 3.8,
         mark: ADD_PM, lens: { src: [318, 366, 148, 40], zoom: 2, at: [16, 300] } },
       { caption: "Di dialog Add Payment Method, buka ALL E-Payment.", focus: PAY_DLG_OPEN, at: [640, 366], click: true, show: ["dlgOpen"], hide: ["dlg"], dur: 3.4,
@@ -765,14 +770,15 @@ export const scenes = {
     base: [frame(""), rect(0, CT, 1440, 815, { fill: C.white })],
     els: {
       url: text(166, 68, "app.scalev.com", { size: 14, fill: C.crText }),
-      dash: { svg: shifted(scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody()), skel: true, enter: "fade", delay: 1.3 },
-      biz: { svg: shifted(bizMenu([{ name: "Rina WO", cur: true }])), enter: "pop", origin: [127, CT + 110] }
+      dash: { svg: shifted(homeScreen(900 - CT)), skel: true, enter: "fade", delay: 1.3 },
+      biz: { svg: shifted(bizMenu([{ name: "Rina WO", cur: true }])), enter: "pop", origin: [127, CT + 67] }
     },
     steps: [
       { caption: "Buka app.scalev.com di Chrome komputer, lalu daftar dan masuk.", focus: OMNI.box, at: [300, 63], click: true, show: ["url", "dash"], type: [{ id: "url", n: 14, box: [166, 54, 108, 20] }], dur: 3.8,
         mark: OMNI, lens: { src: [134, 48, 200, 30] } },
-      { caption: "Tanda sudah masuk: menu kiri punya Landing Pages.", focus: [0, CT, 256, 815], at: [110, 234 + CT], mark: { box: [28, 220 + CT, 196, 28], r: 6 }, lens: { src: [8, 180 + CT, 248, 110] } },
-      { caption: "Klik nama bisnis. Pilih bisnis untuk merek undanganmu.", at: [127, 86 + CT], click: true, show: ["biz"], dur: 3.6, mark: { box: dn(BIZ), r: 4 }, lens: { src: [18, CT + 114, 278, 236], at: [300, 120] } }
+      { caption: "Tanda sudah masuk: menu kiri punya Landing Pages.", focus: [0, CT, 256, 815], at: mid(dn(svMenuBox("Landing Pages", HOME))),
+        mark: { box: dn(svMenuBox("Landing Pages", HOME)), r: 6 }, lens: { src: [0, CT + 330, 256, 86] } },
+      { caption: "Klik nama bisnis. Pilih bisnis untuk merek undanganmu.", at: mid(dn(BIZ)), click: true, show: ["biz"], dur: 3.6, mark: { box: dn(BIZ), r: 6 }, lens: { src: [6, CT, 250, 314], at: [300, 120] } }
     ]
   },
 

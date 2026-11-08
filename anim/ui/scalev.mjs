@@ -1,24 +1,20 @@
 // Scalev product screens, one copy each (owner: 02-scalev). Drawn at the editor / dashboard viewport (0,0, 1440x900).
-// Measured 14 Okt 2026 (/tmp/scalev-ukur, headless Chromium at 1440x900): the Landing Pages list, the editor Settings tab, the Security tab
+// Measured 14 Okt 2026 (/tmp/scalev-ukur, headless Chromium at 1440x900): the editor Settings tab, the Security tab
 // (Connect / Image Sources with Scalev's auto-allowed chips, the Image Sources picker), Settings > Domain with the
 // Tambah Domain dialog, Settings > Profil with Edit Account and the Security section, the store page (Stores) with
-// Payment Methods and the Add Payment Method dialog. Example data replaces account data (Rina WO, tokomu.myscalev.com).
+// Payment Methods and the Add Payment Method dialog. Measured 8 Nov 2026 (new dashboard, 1892 x 975 mapped to 1440 x 900):
+// the topbar, the Landing Pages list, the + Create Landing Page menu, Choose Business. Example data replaces account data
+// (Rina WO, tokomu.myscalev.com, rina.wo@gmail.com).
 // Generic (not observed): the Save-enabled look, the domain row + DNS records after Save, the MFA switch label (bar),
-// the store's product list. SV / svBtn / check / head / card / genericBody are the older generic Scalev dashboard
-// pieces (grey bars) for screens a scene does not walk through.
-import { C, icon, iconX, shadow, clipped, group, text, para, rect, line, circle, tw } from "../lib.mjs";
-import { scalevApp, scalevEditor } from "./kit.mjs";
+// the store's product list. SV / check / card / genericBody are the older generic Scalev dashboard pieces (grey bars) for
+// screens a scene does not walk through.
+import { C, icon, iconX, shadow, clipped, group, text, para, rect, line, circle, tw, textWidth } from "../lib.mjs";
+import { scalevApp, scalevEditor, svSwitcher } from "./kit.mjs";
 
 // ---- palette and primitives ---------------------------------------------------------------------------------------
-const SV = { blue: "#3b8fd0", link: "#2f86d1", ink: "#1f2d3d", sub: "#6b7480", line: "#e5e8ec", bg: "#f8f9fb", soft: "#e6f2fb", bar: "#e9edf2" };
+const SV = { blue: "#3b8fd0", line: "#e5e8ec", bg: "#f8f9fb", bar: "#e9edf2" };
 const bar = (x, y, w, h = 10, fill = SV.bar) => rect(x, y, w, h, { r: h / 2, fill });
-// Scalev buttons (app): primary blue, outline, plain. svBox gives the exact [x, y, w, h] svBtn draws.
-const svBox = (x, y, label, o = {}) => [x, y, o.w ?? tw(label, o.size ?? 14, 500) + 32, o.h ?? 40];
-function svBtn(x, y, label, o = {}) {
-  const v = o.variant ?? "primary", size = o.size ?? 14, [, , w, h] = svBox(x, y, label, o);
-  const fill = v === "primary" ? SV.blue : C.white, stroke = v === "primary" ? undefined : v === "outline" ? SV.blue : "#d5dae1";
-  return rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 4, fill, stroke }) + text(x + w / 2, y + h / 2 + size * 0.36, label, { size, weight: 500, fill: v === "primary" ? C.white : v === "outline" ? SV.blue : SV.ink, anchor: "middle" });
-}
+// Generic checkbox (older dashboard look) for the generic screens.
 const check = (x, y, on) => rect(x + 0.5, y + 0.5, 17, 17, { r: 3, fill: on ? SV.blue : C.white, stroke: on ? SV.blue : "#b8c0ca" }) + (on ? iconX("check", x + 9, y + 9, 13, C.white, 3) : "");
 // Measured Scalev app (14 Okt 2026, /tmp/scalev-ukur): colours, and text placed by its measured line box (top y, CSS px);
 // `w` pins the measured width (textLength) so text and its skeleton bar match the real line.
@@ -31,72 +27,114 @@ const tx = (x, top, s, size, o = {}) => {
 // Field / button with a 2px border drawn inside its box (Scalev inputs, dialogs).
 const box2 = (x, y, w, h, o = {}) => rect(x + 1, y + 1, w - 2, h - 2, { r: o.r ?? 4, fill: o.fill ?? C.white, stroke: o.stroke ?? SVC.field, sw: 2 });
 const tick = (x, y, on) => on ? rect(x, y, 16, 16, { r: 4, fill: SVC.tick }) + iconX("check", x + 8, y + 8, 12, C.white, 3) : box2(x, y, 16, 16, { stroke: SVC.sub });
-// Page header in the Scalev app main area (x 256..1440), like Landing Pages: title + rule.
-const head = (title) => rect(256, 0, 1184, 900, { fill: SV.bg }) + rect(256, 0, 1184, 70, { fill: C.white }) + line(256, 70.5, 1440, 70.5, { stroke: SV.line }) + text(280, 43, title, { size: 18, weight: 600, fill: SV.ink });
+// ---- Dashboard main area (new UI, 8 Nov 2026; controls on the right moved left by 452 for 1440) ----------------------
+// Topbar (x 256..1440, y 0..60): page title (the Home route greets "Halo, <name>"), Referral Program, the balance eye,
+// the bell with its unread badge, the account avatar and chevron. Pages sit below it on light grey.
+const SVT = { line: "#e6e6e6", page: "#f3f5f9", ink: "#1a1a1a", blue: "#048bc5", soft: "#f0faff", sub: "#5b6675" };
+const topbar = (title) => rect(256, 0, 1184, 60, { fill: C.white }) + line(256, 59.5, 1440, 59.5, { stroke: SVT.line }) + text(280, 36, title, { size: 19, weight: 700, fill: SVT.ink }) +
+  rect(1063.3, 12, 146.2, 35, { r: 6, fill: SVT.soft, stroke: SVC.field }) + icon("link", 1082.3, 29.5, 15, SVT.blue) + text(1097.8, 34, "Referral Program", { size: 13, weight: 500, fill: SVT.blue }) +
+  rect(1220.5, 12, 35, 35, { r: 6, fill: C.white, stroke: SVT.line }) + icon("eye", 1238, 29.5, 18, SVT.sub) + line(1276.5, 18.5, 1276.5, 40.5, { stroke: SVT.line }) +
+  iconX("bell", 1305, 29.5, 22, "#3d3d3d") + rect(1308.5, 6.5, 19.5, 18, { r: 9, fill: "#df0e03" }) + text(1318.25, 19, "3", { size: 10, weight: 700, fill: C.white, anchor: "middle" }) +
+  line(1333.5, 18.5, 1333.5, 40.5, { stroke: SVT.line }) + circle(1366, 29.5, 18, { fill: SVT.soft }) + text(1366, 33.8, "R", { size: 12, weight: 700, fill: SVT.blue, anchor: "middle" }) +
+  icon("chevron-down", 1402, 29.5, 18, SVT.sub, 1.6);
+// A dashboard page: light grey main area under the topbar with the page's title.
+const head = (title) => rect(256, 0, 1184, 900, { fill: SVT.page }) + topbar(title);
 const card = (x, y, w, h) => rect(x + 0.5, y + 0.5, w - 1, h - 1, { r: 6, fill: C.white, stroke: SV.line });
 // Generic dashboard body (cards of grey bars) for screens we do not walk through.
 const genericBody = (y = 94) => [0, 1, 2].map((i) => card(280 + i * 380, y, 364, 120) + bar(300 + i * 380, y + 24, 120) + bar(300 + i * 380, y + 56, 220, 18) + bar(300 + i * 380, y + 92, 160)).join("") +
   card(280, y + 144, 1124, 380) + [0, 1, 2, 3, 4, 5].map((k) => bar(304, y + 180 + k * 52, [520, 380, 600, 300, 460, 340][k])).join("");
 
-// ---- Landing Pages list (measured 14 Okt 2026, page 365671): rows of HTML Mode pages (row i name at 585, 372 + 71 i) -----
-const LP_ROWS = [["Undangan Rani & Dimas", "/rani-dimas"], ["Undangan Sari & Bima", "/sari-bima"], ["Contoh Undangan", "/contoh"], ["Katalog Rina WO", "/katalog"]];
-// n: the page count in the folder list and the list heading; with 0 the list shows "No Landing Pages Yet" (observed on a
-// Kreator's list, 15 Okt 2026; its place in the list is not measured).
-function lpPage(n = 4) {
-  return rect(256, 0, 1184, 900, { fill: SV.bg }) + rect(256, 0, 1184, 137, { fill: C.white }) + line(256, 137.5, 1440, 137.5, { stroke: SV.line }) +
-    text(280, 36, "Landing Pages", { size: 18, weight: 600, fill: SV.ink }) + line(280, 58.5, 1400, 58.5, { stroke: SV.line }) +
-    text(469, 93, "Checkout form creation has moved.", { size: 13, fill: "#3b4350" }) + text(469, 112, "Create a checkout form here →", { size: 13, fill: SV.link, underline: true }) +
-    iconX("search", 1203, 97, 15, SV.sub) + text(1223, 103, "Cari landing page...", { size: 13, fill: "#a6adb7" }) +
-    rect(1360.5, 78.5, 40, 40, { r: 4, fill: C.white, stroke: "#d5dae1" }) + `<path d="M1371 89 h18 l-7 9 v7 l-4 2 v-9 z" fill="none" stroke="#4a5361" stroke-width="1.6" stroke-linejoin="round"/>` +
-    rect(280, 163, 1120, 54, { r: 4, fill: "#eef8fb" }) + circle(308, 190, 7, { stroke: SV.blue, sw: 1.5 }) + text(308, 194, "i", { size: 10, weight: 700, fill: SV.blue, anchor: "middle" }) +
-    text(336, 195, "Looking for landing pages with an order form? They're now called Checkout Flows.", { size: 14, fill: SV.ink }) +
-    text(336 + tw("Looking for landing pages with an order form? They're now called Checkout Flows. ", 14) - 12, 195, "Open Checkout Flows", { size: 14, fill: SV.ink, underline: true }) +
-    card(281, 244, 1119, 680) + line(520.5, 244, 520.5, 900, { stroke: SV.line }) +
-    text(297, 275, "Folders", { size: 14, weight: 600, fill: SV.ink }) + para(297, 294, ["Kelompokkan landing page per", "campaign, produk, atau klien."], { size: 11, fill: SV.sub, lh: 16 }) +
-    rect(297, 328, 207, 36, { r: 4, fill: "#eef6fc" }) + icon("layout-grid", 316, 346, 15, SV.blue) + text(335, 351, "All Landing Pages", { size: 14, weight: 500, fill: SV.link }) + text(498, 351, String(n), { size: 12, fill: SV.link, anchor: "end" }) +
-    [["Ungrouped", "file-text", n], ["Page", "folder", 0], ["Undangan", "folder", 0]].map(([nm, ic, c], i) => iconX(ic, 316, 384 + i * 38, 15, "#4a5361") + text(335, 389 + i * 38, nm, { size: 14, fill: "#3b4350" }) + text(498, 389 + i * 38, String(c), { size: 12, fill: SV.sub, anchor: "end" })).join("") +
-    rect(297.5, 488.5, 206, 41, { r: 4, fill: C.white, stroke: SV.blue }) + text(400, 514, "+  New Folder", { size: 14, weight: 500, fill: SV.link, anchor: "middle" }) +
-    text(537, 273, "All Landing Pages", { size: 14, weight: 600, fill: SV.ink }) + text(667, 273, String(n), { size: 12, fill: SV.sub }) +
-    rect(521, 293, 879, 38, { fill: "#f6f8fa" }) + check(537, 303, false) +
-    [["Nama Landing Page", 585], ["Folder", 785], ["Slug", 925], ["Mode", 1125], ["Domains", 1245]].map(([l, x]) => text(x, 316, l, { size: 12, fill: SV.sub })).join("") +
-    (n ? "" : iconX("file-text", 960, 420, 32, "#b8c0ca") + text(960, 468, "No Landing Pages Yet", { size: 16, weight: 600, fill: SV.ink, anchor: "middle" }));
+// ---- Landing Pages list (pages.png, 8 Nov 2026; columns re-divided to end by x 1416) -------------------------------------
+// Topbar, the white tool band (+ Create Landing Page; Cari landing page... and the filter on the right), the card: the
+// Folders column (All Landing Pages, Ungrouped, Page, Undangan, + New Folder) and the list (heading with the count, header
+// row, one row per page). rows: { name, slug, pub } (Published, else Draft). o.tags: the chips every row carries, each an
+// array of its lines (the Nikahin business tags its pages "Peran: <peran>" and "Pembuat: <email>"). A row is 71 high
+// without tags (14 Okt 2026), 41 + its chips with them (119 for Peran and a two-line Pembuat, as measured).
+const LP_ROWS = [{ name: "Undangan Rani & Dimas", slug: "/rani-dimas", pub: true }, { name: "Undangan Sari & Bima", slug: "/sari-bima", pub: true },
+  { name: "Contoh Undangan", slug: "/contoh", pub: true }, { name: "Katalog Rina WO", slug: "/katalog", pub: false }];
+const LPX = { check: 537, name: 585, folder: 800, slug: 917, mode: 1012, domains: 1112, status: 1236, tags: 1250, dots: 1394 };
+const tagH = (lines) => 8 + 18 * lines.length;
+const lpRowH = (o = {}) => (o.tags ? 41 + o.tags.reduce((h, t) => h + tagH(t) + 8, -8) : 71);
+const lpRowTop = (i, o) => 232 + i * lpRowH(o);
+// Box of row i's page name (marks); o as given to lpRow.
+const lpNameBox = (i, o = {}) => [LPX.name, lpRowTop(i, o) + lpRowH(o) / 2 - 10, textWidth((o.rows ?? LP_ROWS)[i].name, 14, 500), 20];
+const LP_ALL = [297, 229, 207, 36]; // All Landing Pages in the Folders column
+const lpCheck = (x, cy) => rect(x + 0.75, cy - 7.25, 14.5, 14.5, { r: 2, fill: C.white, stroke: SVT.sub, sw: 1.5 });
+const CREATE = [280, 74, 161, 32];
+const btnCreate = rect(...CREATE, { r: 6, fill: "#4497ca" }) + tx(292, 82, "+ Create Landing Page", 14, { weight: 500, fill: C.white, w: 137 });
+const LP_FOLDERS = [["All Landing Pages", "layout-grid"], ["Ungrouped", "file-text"], ["Page", "folder"], ["Undangan", "folder"]];
+// n: the page count (folder list, heading); with 0 the list shows "No Landing Pages Yet" (seen on a Kreator's list,
+// 15 Okt 2026; its place in the list is not measured). o.h: the viewport height (the card ends 24 above it).
+function lpPage(n = LP_ROWS.length, o = {}) {
+  const hw = textWidth("All Landing Pages", 14, 700), cw = textWidth(String(n), 12, 500) + 12, bottom = (o.h ?? 900) - 24;
+  return rect(256, 0, 1184, 900, { fill: SVT.page }) + topbar("Landing Pages") + rect(256, 60, 1184, 60, { fill: C.white }) +
+    [0.07, 0.04, 0.02].map((a, k) => rect(256, 120 + 2 * k, 1184, 2, { fill: `rgba(16,24,40,${a})` })).join("") + btnCreate +
+    iconX("search", 1228, 90, 18, SVT.sub) + text(1248, 94.5, "Cari landing page...", { size: 12, fill: "#a6adb7" }) +
+    rect(1384.5, 74.5, 31, 31, { r: 6, fill: SVC.fieldBg, stroke: SVC.field }) + iconX("funnel", 1400, 90, 16, SVC.text) +
+    rect(280.5, 144.5, 1135, bottom - 145, { r: 6, fill: C.white, stroke: SVC.line }) + line(521.5, 145, 521.5, bottom - 1, { stroke: SVC.line }) +
+    text(297, 176, "Folders", { size: 14, weight: 700, fill: SVC.dark }) + para(297, 195, ["Kelompokkan landing page per", "campaign, produk, atau klien."], { size: 12, fill: SVC.mute, lh: 16 }) +
+    rect(...LP_ALL, { r: 6, fill: C.primarySoft }) +
+    LP_FOLDERS.map(([f, ic], i) => {
+      const cy = 247 + i * 38, fg = i ? "#676569" : SVC.blue;
+      return iconX(ic, 316, cy, 18, fg) + text(335, cy + 5, f, { size: 14, weight: i ? 400 : 500, fill: fg }) + text(498, cy + 4, String(i < 2 ? n : 0), { size: 12, weight: 500, fill: i ? SVC.mute : SVC.blue, anchor: "end" });
+    }).join("") +
+    rect(297.5, 389.5, 206, 41, { r: 6, fill: C.white, stroke: SVC.blue }) + icon("plus", 362, 410, 16, SVC.blue) + text(378, 415, "New Folder", { size: 14, weight: 500, fill: SVC.blue }) +
+    text(537, 174, "All Landing Pages", { size: 14, weight: 700, fill: SVC.dark }) + rect(545 + hw, 160.5, cw, 18, { r: 6, fill: SVC.fieldBg }) +
+    text(545 + hw + cw / 2, 173.5, String(n), { size: 12, weight: 500, fill: SVC.mute, anchor: "middle" }) + rect(522, 194, 893, 38, { fill: SVT.page }) + lpCheck(LPX.check, 213) +
+    [["Nama Landing Page", LPX.name], ["Folder", LPX.folder], ["Slug", LPX.slug], ["Mode", LPX.mode], ["Domains", LPX.domains], ["Tags", LPX.tags]].map(([l, x]) => text(x, 217, l, { size: 12, weight: 500, fill: SVC.mute })).join("") +
+    (n ? "" : iconX("file-text", 968, 400, 32, "#b8c0ca") + text(968, 448, "No Landing Pages Yet", { size: 16, weight: 600, fill: SVC.dark, anchor: "middle" }));
 }
-function lpRow(i) {
-  const [name, slug] = LP_ROWS[i], y = 331 + i * 71;
-  return rect(521, y, 879, 71, { fill: C.white }) + line(521, y + 70.5, 1400, y + 70.5, { stroke: SV.line }) + check(537, y + 27, false) +
-    text(585, y + 41, name, { size: 14, weight: 500, fill: SV.link }) + rect(787, y + 24, 92, 24, { r: 4, fill: "#f3f4f6" }) + iconX("file-text", 800, y + 36, 12, SV.sub) + text(812, y + 40, "Ungrouped", { size: 12, fill: "#3b4350" }) +
-    text(925, y + 41, slug, { size: 14, fill: SV.link }) + rect(1125, y + 22, 83, 28, { r: 3, fill: SV.soft }) + text(1166.5, y + 40, "HTML Mode", { size: 12, weight: 700, fill: SV.blue, anchor: "middle" }) +
-    text(1245, y + 41, "-", { size: 14, fill: SV.sub }) + [0, 1, 2].map((k) => circle(1364 + k * 7, y + 36, 2.2, { fill: "#3b4350" })).join("");
+function lpRow(i, o = {}) {
+  const { name, slug, pub } = (o.rows ?? LP_ROWS)[i], h = lpRowH(o), y = lpRowTop(i, o), c = y + h / 2, grey = "#676569";
+  const fw = textWidth("Ungrouped", 12, 500) + 36, mw = textWidth("HTML Mode", 12, 600) + 16, st = pub ? "Published" : "Draft", sw = textWidth(st, 12, 500) + 24;
+  let s = rect(522, y, 893, h, { fill: C.white }) + line(522, y + h - 0.5, 1415, y + h - 0.5, { stroke: SVC.line }) + lpCheck(LPX.check, c) +
+    text(LPX.name, c + 5, name, { size: 14, weight: 500, fill: SVC.blue }) + rect(LPX.folder, c - 13, fw, 26, { r: 6, fill: "#f7f9fc" }) +
+    iconX("file-text", LPX.folder + 15, c, 14, grey) + text(LPX.folder + 28, c + 4, "Ungrouped", { size: 12, weight: 500, fill: grey }) + text(LPX.slug, c + 5, slug, { size: 14, fill: SVC.blue }) +
+    rect(LPX.mode, c - 14, mw, 28, { r: 6, fill: C.primarySoft }) + text(LPX.mode + mw / 2, c + 4, "HTML Mode", { size: 12, weight: 600, fill: SVC.blue, anchor: "middle" }) +
+    text(LPX.domains, c + 5, "-", { size: 14, fill: grey }) + rect(LPX.status - sw, c - 15, sw, 30, { r: 6, fill: pub ? C.okSoft : "#eaeaeb" }) +
+    text(LPX.status - sw / 2, c + 4, st, { size: 12, weight: 500, fill: pub ? "#00a344" : SVC.sub, anchor: "middle" }) + [0, 1, 2].map((k) => circle(LPX.dots + k * 6, c, 2, { fill: SVT.ink })).join("");
+  let ty = y + 20;
+  for (const t of o.tags ?? []) {
+    const w = Math.max(...t.map((l) => textWidth(l, 12, 600))) + 16;
+    s += rect(LPX.tags, ty, w, tagH(t), { r: 6, fill: C.primarySoft }) + t.map((l, k) => text(LPX.tags + 8, ty + 17 + k * 18, l, { size: 12, weight: 600, fill: SVC.blue })).join("");
+    ty += tagH(t) + 8;
+  }
+  return s;
 }
-const lpScreen = () => scalevApp(0, 0, { active: "Landing Pages" }) + lpPage() + LP_ROWS.map((_, i) => lpRow(i)).join("");
-const CREATE = svBox(280, 78, "+ Create Landing Page", { w: 173 });
-const btnCreate = svBtn(280, 78, "+ Create Landing Page", { w: 173 });
-// + Create Landing Page menu (docs/gambar/kreator/buat-halaman.jpg, 15 Okt 2026): 202 wide over the button, four 54 px
-// rows, the first highlighted. CREATE_ROW(i) gives row i's box.
+// The whole Landing Pages screen of the owner (sidebar, list, rows); o: as given to lpRow, plus h (viewport height).
+const lpScreen = (o = {}) => { const rows = o.rows ?? LP_ROWS; return scalevApp(0, 0, { active: "Landing Pages", h: o.h }) + lpPage(rows.length, o) + rows.map((_, i) => lpRow(i, o)).join(""); };
+// + Create Landing Page menu (create-menu.png, 8 Nov 2026): a card from y 73 over the button (x 281..483 measured; drawn
+// from 280 so the button's edge does not show), four rows split by rules, the first highlighted, a New chip on HTML Sales
+// Page. CREATE_ROW(i) gives row i's box.
 const CREATE_ITEMS = ["Sales Page", "HTML Sales Page", "Blank Page", "Import Sesama Scalev"];
-const CREATE_ROW = (i) => [281, 84 + i * 54, 202, 54];
-const createMenu = () => shadow(281, 84, 202, 216, 6, 2) + rect(281, 84, 202, 216, { r: 4, fill: C.white }) + rect(282, 85, 200, 53, { r: 3, fill: "#f3f7fc" }) +
-  CREATE_ITEMS.map((l, i) => (i ? line(281, 84.5 + i * 54, 483, 84.5 + i * 54, { stroke: SV.line }) : "") + text(298, 116 + i * 54, l, { size: 14, weight: 500, fill: i ? "#3b4350" : SV.link })).join("") +
-  rect(434, 160, 34, 17, { r: 4, fill: SV.soft }) + text(451, 172, "New", { size: 11, weight: 500, fill: SV.blue, anchor: "middle" });
+const CREATE_ROW = (i) => [280, i ? 72 + i * 53 : 73, 203, i ? 53 : 52];
+const createMenu = () => shadow(280, 73, 203, 211, 6, 2) + rect(280.5, 73.5, 202, 210, { r: 6, fill: C.white, stroke: SVT.line }) +
+  rect(281, 74, 201, 51, { r: 5, fill: "#f7f9fc" }) + rect(281, 100, 201, 25, { fill: "#f7f9fc" }) +
+  CREATE_ITEMS.map((l, i) => { const [, y, , h] = CREATE_ROW(i); return (i ? line(281, y + 0.5, 482, y + 0.5, { stroke: SVC.line }) : "") + text(297, y + h / 2 + 5, l, { size: 14, weight: 500, fill: i ? SVT.sub : SVT.blue }); }).join("") +
+  rect(433, 144, 32, 15, { r: 7.5, fill: "#eef8fb" }) + text(449, 155, "New", { size: 10, weight: 500, fill: SVT.blue, anchor: "middle" });
 
-// ---- Business switcher (Pilih Bisnis Kamu, measured: docs/gambar/kreator/pilih-bisnis.jpg) ----------------------------
-// Under the business box: search, one 53 px row per business (66 apart), + Buat Bisnis Baru. rows: [{ name, cur, invite }]:
-// cur = the active business (blue border); invite = an invitation not yet accepted (light yellow, "!" at the right).
-// BIZ_BOX: the business box in the sidebar; BIZ_ROW(i): row i's box.
-const BIZ_BOX = [24, 62, 206, 48];
-const BIZ_ROW = (i) => [41, 227 + i * 66, 234, 53];
+// ---- Business switcher open (biz-switcher.png and SidebarBusinessSwitcher / SidebarBusinessList, build 7c3ba6c) ---------
+// Choose Business under the switcher, over the menu rows (panel padding 16, gap 12): Search Business..., one 54 px card per
+// business (8 apart; avatar 32, name, a 20 px circle on the right), + Add New Business; the switcher keeps its hover
+// background. rows: [{ name, cur, invite }]: cur = the active business (blue border, solid check circle); others have a
+// grey border and an empty circle; invite = an invitation not yet accepted (yellow question-mark icon before the circle,
+// tooltip "Undangan belum diterima"). BIZ_BOX: the switcher button; BIZ_ROW(i): row i's card.
+const BIZ_BOX = [8, 6, 239, 48];
+const BIZ_ROW = (i) => [29, 173 + i * 62, 197, 54];
 function bizMenu(rows) {
-  const h = 223 + 66 * (rows.length - 1);
-  let s = shadow(24, 120, 268, h, 6, 2) + rect(24, 120, 268, h, { r: 6, fill: C.white }) + text(40, 150, "Pilih Bisnis Kamu", { size: 12, fill: "#3b4350" }) +
-    rect(41, 171, 234, 40, { r: 4, fill: C.white, stroke: "#d5dae1", sw: 2 }) + text(54, 196, "Cari Bisnis", { size: 14, fill: "#8d97a3" }) + iconX("search", 252, 191, 13, "#3b4350");
+  const add = 173 + rows.length * 62 + 12, h = add + 61 - 67, plus = textWidth("+", 18) + 8, aw = plus + textWidth("Add New Business", 14, 600);
+  let s = svSwitcher(0, 0, rows.find((r) => r.cur).name, { open: true }) + shadow(12, 67, 231, h, 6, 2) + rect(12.5, 67.5, 230, h - 1, { r: 6, fill: C.white, stroke: SVT.line }) +
+    text(29, 99, "Choose Business", { size: 14, fill: "#656565" }) + rect(29.5, 117.5, 196, 43, { r: 6, fill: "#f7f8f8", stroke: SVT.line }) +
+    iconX("search", 50, 139, 16, "#989898") + text(66, 143.5, "Search Business...", { size: 13, fill: "#989898" });
   rows.forEach(({ name, cur, invite }, i) => {
-    const y = 227 + i * 66;
-    s += (cur ? rect(41, y, 234, 53, { r: 4, fill: "#f8fafc", stroke: SV.blue, sw: 2 }) : invite ? rect(41, y, 234, 53, { r: 4, fill: "#fff6e5" }) : "") +
-      (invite ? circle(66, y + 27, 12, { fill: C.white, stroke: "#e3e7ec" }) : "") + text(66, y + 31, name[0], { size: 12, weight: 700, fill: "#3b4350", anchor: "middle" }) +
-      text(86, y + 31, name, { size: 14, weight: 500, fill: SV.ink }) +
-      (invite ? circle(252, y + 27, 6.5, { stroke: "#e8a317", sw: 1.5 }) + rect(251.3, y + 23, 1.4, 4.5, { fill: "#e8a317" }) + circle(252, y + 30, 0.9, { fill: "#e8a317" }) : "");
+    const [x, y, w, bh] = BIZ_ROW(i), c = y + bh / 2;
+    s += rect(x + 0.5, y + 0.5, w - 1, bh - 1, { r: 6, fill: cur ? SVT.soft : C.white, stroke: cur ? "#20b7ef" : SVT.line }) +
+      circle(58, c, 16, { fill: "#f7f8f8" }) + circle(58, c, 15.5, { stroke: SVT.line }) + text(58, c + 4.5, name[0], { size: 13, weight: 700, fill: SVT.blue, anchor: "middle" }) +
+      text(86, c + 5, name, { size: 14, weight: 600, fill: "#3d3d3d" }) + (invite ? icon("circle-question-mark", 174, c, 14, "#713f12") : "") +
+      (cur ? circle(203, c, 10, { fill: "#4497ca" }) + iconX("check", 203, c, 12, C.white, 3) : circle(203, c, 9.5, { stroke: SVT.line }));
   });
-  return s + text(158, h + 91, "+ Buat Bisnis Baru", { size: 12, weight: 500, fill: SV.link, anchor: "middle" });
+  return s + rect(29, add, 197, 44, { r: 6, fill: SVT.soft }) + text(127.5 - aw / 2, add + 28.5, "+", { size: 18, weight: 600, fill: SVT.blue }) +
+    text(127.5 - aw / 2 + plus, add + 27, "Add New Business", { size: 14, weight: 600, fill: SVT.blue });
 }
 
 // ---- editor Settings tab -------------------------------------------------------------------------------------------
@@ -185,13 +223,13 @@ const subBox = (n) => [304, subTop(n) - 6, 150, 28];
 const SUBMENU = [280, 83, 200, 735];
 // tall: the content runs below the fold (Profil): card to the bottom, page scrollbar, no footer.
 function settingsPage(active, tall) {
-  let s = scalevApp(0, 0, { active: "Settings" }) + rect(256, 0, 1184, 900, { fill: SV.bg }) + tx(280, 26, "Settings", 26, { weight: 700, fill: SVC.ink }) + rect(280, 83, 200, tall ? 817 : 735, { fill: C.white });
+  let s = scalevApp(0, 0, { active: "Settings" }) + head("Settings") + rect(280, 83, 200, tall ? 817 : 735, { fill: C.white });
   SUB_ITEMS.forEach((n) => {
     const on = n === active;
     if (on) s += rect(...subBox(n), { r: 4, fill: SVC.fieldBg });
     s += tx(314, subTop(n), n, 13, { weight: 500, fill: on ? SVC.text : SVC.off });
   });
-  if (tall) return s + rect(480, 83, 921, 817, { fill: C.white }) + rect(1425, 0, 15, 900, { fill: "#f6f6f6" }) + rect(1428, 4, 8, 516, { r: 4, fill: "#c4c4c4" });
+  if (tall) return s + rect(480, 83, 921, 817, { fill: C.white }) + rect(1425, 60, 15, 840, { fill: "#f6f6f6" }) + rect(1428, 64, 8, 480, { r: 4, fill: "#c4c4c4" });
   return s + rect(480, 83, 936, 735, { fill: C.white }) + tx(280, 852, "© 2026 Scalev PT Interna Cipta Asia", 12, { fill: SVC.mute }) +
     [["Kebijakan Privasi", 1144], ["Syarat dan Ketentuan", 1246], ["Bantuan", 1372]].map(([t, x]) => tx(x, 852, t, 12, { fill: SVC.blue })).join("");
 }
@@ -322,7 +360,7 @@ const PAY_DLG = [497, 176, 431, 548], PAY_DLG_OPEN = [497, 134, 431, 632], ALLPA
 const payTicked = tick(839, 398, true) + rect(820, 155, 90, 20, { fill: C.white }) + tx(904, 163, "3 selected", 12, { fill: SVC.sub, anchor: "end" });
 
 export {
-  SV, bar, svBox, svBtn, check, SVC, tx, box2, tick, head, card, genericBody, LP_ROWS, lpPage, lpRow, lpScreen, CREATE, btnCreate, CREATE_ROW, createMenu,
+  SV, bar, check, SVC, tx, box2, tick, topbar, head, card, genericBody, LP_ROWS, LP_ALL, lpPage, lpRow, lpNameBox, lpScreen, CREATE, btnCreate, CREATE_ROW, createMenu,
   BIZ_BOX, BIZ_ROW, bizMenu,
   lu, ACC_ICON, ACC, accGrad, acc, svField, svLabel, settingsPanel, settingsEd, SLUG, slugText, slugFocus, SLUG_LENS, DOMAIN_ACC,
   secContent, secPicker, securityPanel, SECURITY,

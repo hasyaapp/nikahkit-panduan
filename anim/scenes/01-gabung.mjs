@@ -13,10 +13,10 @@
 import { C, PHONE, rect, text, para, line, circle, group, clipped, shadow, icon, iconX, tw, wrap, clamp, textWidth, mid, grow, waCode } from "../lib.mjs";
 import {
   CHROME_TOP, nkBtn, nkBtnBox, nkHead, nkRail, chrome, toggleCr, nkLogo, scalevEditor, scalevApp,
-  svMenuAt, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk, nkInput, nkLabel
+  svMenuAt, svMenuBox, favScalev, favChrome, ED, dim, crDownload, SV_KREATOR, svSimpan, nkToast, phoneDesk, nkInput, nkLabel
 } from "../ui/kit.mjs";
 import {
-  securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, LP_ROWS, head, genericBody,
+  securityPanel, settingsPanel, slugText, slugFocus, SLUG as SLUG_BOX, SLUG_LENS, DOMAIN_ACC, lpScreen, lpPage, lpRow, lpNameBox, LP_ALL, head, genericBody,
   CREATE, CREATE_ROW, createMenu, BIZ_BOX, BIZ_ROW, bizMenu
 } from "../ui/scalev.mjs";
 import { templatePanel, cardAt, kList, panelBody, panelBg, seg, library, LOCKED, ACCOUNT } from "../ui/editor-panels.mjs";
@@ -277,8 +277,10 @@ const DOC_FOLDERS = ["Faktur", "NikahKit", "Foto klien"];
 
 // ---- Scalev pages ---------------------------------------------------------------------------------------------------
 // Landing Pages list and the editor Settings tab come from ui/scalev (editor or dashboard at 0,0).
-const LP_NAME = (y) => [585, y + 358, tw(LP_ROWS[0][0], 14, 500), 18]; // first row's page name
-const LP_ALL = (y) => [297, y + 328, 207, 36];
+const LP_NAME = (y) => { const b = lpNameBox(0); return [b[0], y + b[1], b[2], b[3]]; }; // first row's page name
+// The dashboard's Home route in Chrome's page area (viewport VIEW high, greeting in the topbar).
+const HOME = { active: "Home", h: VIEW };
+const homeVp = () => atY(CT, scalevApp(0, 0, HOME) + head("Halo, Rina") + genericBody());
 const SLUG_FIELD = (T) => [SLUG_BOX[0], T + SLUG_BOX[1], SLUG_BOX[2], SLUG_BOX[3]];
 const settingsP = () => settingsPanel({}) + slugText(SLUG);
 // Scalev PayLink invoice page (nikahin.myscalev.com/pay/…, labels as seen live), Tahunan Rp349.000, in the viewport.
@@ -409,14 +411,17 @@ const GG = { x: 960, y: 130, w: 440, h: 560 }, GOOGLE_ACCT = [GG.x + 32, GG.y + 
 const googleWin = popup(GG.x, GG.y, GG.w, GG.h, "accounts.google.com") + googleCard(GG.x, GG.y, GG.w);
 
 // ---- Kreator Nikahin (docs/Panduan Kreator.md; screens observed 15 Okt 2026) -----------------------------------------
-// Measured from docs/gambar/kreator: the Terms dialog (ketentuan.jpg, 468 x 741, centred), Pilih Bisnis Kamu and the
-// + Create Landing Page menu (ui/scalev), Tawaran Bergabung ke Bisnis (tawaran-bergabung.jpg, 488 x 620, centred), the
-// Kreator sidebar (ui/kit SV_KREATOR), the Buku Tamu row (buku-tamu-kreator.jpg, laid out like the member's Buku Tamu).
+// Measured from docs/gambar/kreator: the Terms dialog (ketentuan.jpg, 468 x 741, centred), Tawaran Bergabung ke Bisnis
+// (tawaran-bergabung.jpg, 488 x 620, centred), the Buku Tamu row (buku-tamu-kreator.jpg, laid out like the member's Buku
+// Tamu). From ui/scalev (new dashboard, 8 Nov 2026): Choose Business, the + Create Landing Page menu, the Landing Pages
+// list with the Nikahin business's page tags; the Kreator sidebar is ui/kit SV_KREATOR.
 // Generic, with the labels as observed: the invitation email and the Scalev login page. Generic without labels (they were
 // not recorded): the WhatsApp number check after Bergabung ke Bisnis. The owner's name on the offer card stays a bar.
 const KR = { biz: "Nikahin", ...SV_KREATOR };
 const krApp = (active) => scalevApp(0, 0, { active, ...KR });
-const krMenuBox = (name) => { const [, y] = svMenuAt(name, KR); return [24, y - 16, 207, 32]; };
+const krRow = (name) => ({ box: svMenuBox(name, KR), r: 6 }); // a Kreator sidebar row (mark)
+// The Kreator's own page in the Nikahin business list: saved, not published, with the tags the Nikahin business adds.
+const KR_LP = { rows: [{ name: PAGE, slug: "/" + SLUG, pub: false }], tags: [["Peran: Kreator"], ["Pembuat:", EMAIL]] };
 const svLogo = (cx, cy, r) => circle(cx, cy, r, { fill: "#3b7dd8" }) + circle(cx - r * 0.3, cy - r * 0.25, r * 0.25, { fill: C.white }) + circle(cx + r * 0.3, cy + r * 0.25, r * 0.25, { fill: C.white });
 // Invitation email (Gmail in Chrome, generic layout; subject and body as received).
 const MAIL_TAB = { title: "Gmail", active: true }, SV_TAB = { title: "Scalev", active: true, fav: favScalev };
@@ -771,7 +776,7 @@ export const scenes = {
   ]),
   "mulai-alur-scalev": checklist("Bagian 2: siapkan Scalev", "Bagian 2: Siapkan Scalev", "Langkah 1 sampai 4.", [
     ["1. Pastikan paket Scalev cukup", "Satu undangan memakai satu halaman Scalev. Cek batas halaman paketmu.",
-      pv(lpScreen(), 276, 220, LP_ALL(0), { lens: [281, 256, 500, 148] })],
+      pv(lpScreen(), 276, 124, LP_ALL, { lens: [281, 148, 480, 124] })],
     ["2. Buat halaman undangan dengan HTML Mode", "Buat Landing Page HTML Mode, isi slug di Settings, lalu Simpan.",
       pv(edLeft(settingsP(), { tab: "Settings", top: 44 }), -184, 44, SLUG_FIELD(0), { lens: SLUG_LENS.src })],
     ["3. Pahami Simpan dan Simpan & Terbitkan", "Simpan menyimpan halaman. Simpan & Terbitkan menayangkannya ke tamu.",
@@ -963,20 +968,18 @@ export const scenes = {
 
   // Pasang bagian 3: app.scalev.com, Landing Pages, halaman HTML Mode, tab NikahKit, panel Masuk ke NikahKit.
   "gabung-tab-nikahkit-muncul": (() => {
-    const g = GATE_OUT(CT), lp = svMenuAt("Landing Pages"), LPROW = [24, CT + lp[1] - 14, 216, 28];
-    const home = atY(CT, scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody());
-    const ROW0 = [521, CT + 331, 879, 71];
+    const g = GATE_OUT(CT), lp = svMenuBox("Landing Pages", HOME), LPROW = [lp[0], CT + lp[1], lp[2], lp[3]];
     return {
       title: "Tab NikahKit muncul di editor Scalev",
       base: [win({ tabs: [TAB_ED], url: URL }), scalevEditor(0, CT, { tab: "Code" })],
       els: {
-        dash: { svg: crTop({ tabs: [{ title: "Scalev", active: true, fav: favScalev }], url: "app.scalev.com" }) + vp(home), skel: true },
-        list: { svg: vp(atY(CT, lpScreen())), enter: "fade", skel: true },
+        dash: { svg: crTop({ tabs: [{ title: "Scalev", active: true, fav: favScalev }], url: "app.scalev.com" }) + vp(homeVp()), skel: true },
+        list: { svg: vp(atY(CT, lpScreen({ h: VIEW }))), enter: "fade", skel: true },
         gate: { svg: gateEl(g), enter: "fade" }
       },
       steps: [
         { caption: "Buka app.scalev.com. Editor sudah terbuka? Muat ulang dengan F5.", focus: [TOOLBAR], at: [330, 63], mark: { box: urlBox("app.scalev.com"), r: 3 }, lens: { src: [124, 44, 300, 40] }, dur: 3 },
-        { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [LPROW, [256, CT, 1184, 404]], at: [lp[0], CT + lp[1]], click: true, show: ["list"], mark: LPROW, lens: { src: [0, CT + 190, 260, 90] } },
+        { caption: "Klik menu Landing Pages. Daftar halamanmu tampil.", focus: [[0, CT, 256, VIEW], [256, CT, 1184, 404]], at: [110, CT + lp[1] + 18.5], click: true, show: ["list"], mark: { box: LPROW, r: 6 }, lens: { src: [0, CT + 226, 256, 172] } },
         { caption: "Klik halaman undangan yang memakai HTML Mode. Editor terbuka.", focus: [TOP], at: mid(LP_NAME(CT)), click: true, hide: ["dash", "list"], mark: LP_NAME(CT), note: PAGE, dur: 3.4 },
         { caption: "Klik tab NikahKit di samping Settings.", focus: [LEFT], at: TAB_NK, click: true, show: ["gate"], mark: TAB_NK_BOX, lens: { src: [0, CT + 44, 400, g.area[1] + g.area[3] - CT - 44] } },
         { caption: "Panel menampilkan Masuk ke NikahKit. dan tombol Masuk dengan Google.", mark: g.at.google, lens: { src: g.area }, dur: 3.6 }
@@ -1156,7 +1159,7 @@ export const scenes = {
         top2: { svg: crTop({ tabs: tabs2, url: "app.scalev.com/login" }), skel: true },
         login: { svg: loginPage(), enter: "fade", skel: true },
         google: { svg: googleWin, enter: "pop", origin: [GG.x + GG.w / 2, GG.y + GG.h / 2] },
-        dash: { svg: crTop({ tabs: tabs2, url: "app.scalev.com/dashboard" }) + vp(atY(CT, scalevApp(0, 0, { active: "Home" }) + head("Home") + genericBody())), enter: "fade", skel: true },
+        dash: { svg: crTop({ tabs: tabs2, url: "app.scalev.com/dashboard" }) + vp(homeVp()), enter: "fade", skel: true },
         dim: { svg: DIM, enter: "fade" },
         terms: { svg: termsDlg(), enter: "pop", origin: mid(TD_BOX) },
         tick: { svg: termsOn, enter: "fade" }
@@ -1173,44 +1176,47 @@ export const scenes = {
           lens: { src: [TD.x, TD.y + 612, TD.w, 120] }, dur: 3.8 },
         { caption: "Klik Accept. Jangan klik Close: akunmu langsung keluar dari Scalev.", at: mid(TD_ACCEPT), click: true, hide: ["terms", "tick", "dim"], mark: TD_ACCEPT,
           note: "Accept", dur: 3.6 },
-        { caption: "Kamu sudah masuk Scalev. Lanjut ke kotak bisnis di kiri atas.", focus: [[0, CT, 256, 140]], at: [127, CT + 86], mark: [24, CT + 62, 206, 48],
-          lens: { src: [0, CT, 256, 130] }, dur: 3 }
+        { caption: "Kamu sudah masuk Scalev. Lanjut ke kotak bisnis di kiri atas.", focus: [[0, CT, 256, 140]], at: [127.5, CT + 30], mark: { box: [BIZ_BOX[0], CT + BIZ_BOX[1], BIZ_BOX[2], BIZ_BOX[3]], r: 6 },
+          lens: { src: [0, CT, 256, 120] }, dur: 3 }
       ]
     };
   })(),
 
-  // Kreator Nikahin 2: Pilih Bisnis Kamu > Nikahin (!), Tawaran Bergabung ke Bisnis, nomor HP sendiri, verifikasi, menu Kreator.
+  // Kreator Nikahin 2: Choose Business > Nikahin (Undangan belum diterima): Scalev switches to Nikahin, opens Home and the
+  // join offer (Tawaran Bergabung ke Bisnis); nomor HP sendiri, verifikasi, menu Kreator. Under the offer the sidebar is
+  // drawn with the Kreator menu (the menu of a not yet accepted membership was not captured).
   "gabung-kreator-bergabung": {
     title: "Bergabung ke bisnis Nikahin sebagai Kreator",
-    base: [scalevApp(0, 0, { active: "Home" }), head("Home"), genericBody()],
+    base: [scalevApp(0, 0, { active: "Home" }), head("Halo, Rina"), genericBody()],
     els: {
-      menu: { svg: bizMenu([{ name: "Rina WO", cur: true }, { name: "Nikahin", invite: true }]), enter: "pop", origin: [127, 110] },
+      kr: { svg: krApp("Home") + head("Halo, Rina") + genericBody(), enter: "fade", skel: true },
+      menu: { svg: bizMenu([{ name: "Rina WO", cur: true }, { name: "Nikahin", invite: true }]), enter: "pop", origin: [127, 67] },
       dim: { svg: dim(0, 0, W, 900), enter: "fade" },
       offer: { svg: tawaran(), enter: "pop", origin: mid(TW_BOX) },
       num: text(TW.x + 125, TW.y + 472, PHONE_NO, { size: 14, fill: "#2d3748" }),
-      verify: { svg: verifyWa, enter: "pop", origin: mid(VF_BOX) },
-      kr: { svg: krApp("Home") + head("Home") + genericBody(), enter: "fade", skel: true }
+      verify: { svg: verifyWa, enter: "pop", origin: mid(VF_BOX) }
     },
     steps: [
-      { caption: "Klik kotak bisnis di kiri atas. Muncul Pilih Bisnis Kamu.", focus: [[0, 0, 300, 420]], at: mid(BIZ_BOX), click: true, show: ["menu"], mark: BIZ_BOX,
-        lens: { src: [18, 114, 280, 300], zoom: 1.5 }, dur: 3.4 },
-      { caption: "Klik Nikahin, yang berlatar kuning dengan tanda !.", focus: [TW_BOX], at: mid(BIZ_ROW(1)), click: true, hide: ["menu"], show: ["dim", "offer"], mark: BIZ_ROW(1), note: "Nikahin", dur: 3.4 },
+      { caption: "Klik kotak bisnis di kiri atas. Muncul Choose Business.", focus: [[0, 0, 300, 420]], at: mid(BIZ_BOX), click: true, show: ["menu"], mark: { box: BIZ_BOX, r: 6 },
+        lens: { src: [6, 62, 244, 309], zoom: 1.5 }, dur: 3.4 },
+      { caption: "Klik Nikahin, yang bertanda tanya kuning. Muncul Tawaran Bergabung ke Bisnis.", focus: [TW_BOX], at: mid(BIZ_ROW(1)), click: true, hide: ["menu"], show: ["kr", "dim", "offer"],
+        mark: { box: BIZ_ROW(1), r: 6 }, note: "Nikahin", dur: 3.4 },
       { caption: "Isi Nomor Telepon Bisnis dengan nomor HP-mu sendiri.", at: [TW.x + 300, TW.y + 467], click: true, show: ["num"],
         type: [{ id: "num", n: PHONE_NO.length, box: [TW.x + 124, TW.y + 456, tw(PHONE_NO, 14) + 4, 22] }], mark: TW_INPUT, lens: { src: [TW.x, TW.y + 410, TW.w, 90] }, dur: 3.6 },
       { caption: "Klik Bergabung ke Bisnis.", focus: [VF_BOX], at: mid(TW_JOIN), click: true, hide: ["offer", "num"], show: ["verify"], mark: TW_JOIN, note: "Bergabung ke Bisnis" },
       { caption: "Verifikasi nomor HP lewat WhatsApp. Ikuti petunjuk di layar Scalev.", mark: { box: VF_BOX, r: 8 }, at: [720, VF.y + 248], dur: 3.6 },
-      { caption: "Bisnis Nikahin terbuka: Home, Landing Pages, Buku Tamu, Checkout Flows.", focus: [[0, 0, 256, 330]], hide: ["verify", "dim"], show: ["kr"],
-        mark: [BIZ_BOX, [24, 122, 207, 128]], lens: { src: [0, 56, 256, 200], at: [300, 120] }, dur: 4 }
+      { caption: "Bisnis Nikahin terbuka: Home, Landing Pages, Buku Tamu, Checkout Flows.", focus: [[0, 0, 256, 352]], hide: ["verify", "dim"],
+        mark: [{ box: BIZ_BOX, r: 6 }, { box: [8, 126, 239, 148], r: 6 }], lens: { src: [0, 0, 256, 280], at: [580, 110] }, dur: 4 }
     ]
   },
 
   // Kreator Nikahin 3: Landing Pages (hanya halaman sendiri), + Create Landing Page > HTML Sales Page, slug, Simpan.
   "gabung-kreator-buat-halaman": {
     title: "Membuat halaman HTML Sales Page di bisnis Nikahin",
-    base: [krApp("Home"), head("Home"), genericBody()],
+    base: [krApp("Home"), head("Halo, Rina"), genericBody()],
     els: {
       lp: { svg: krApp("Landing Pages") + lpPage(0), enter: "fade", skel: true },
-      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 84] },
+      cmenu: { svg: createMenu(), enter: "pop", origin: [382, 73] },
       ed: { svg: scalevEditor(0, 0, { tab: "Code" }) + pvBlank(), enter: "fade", skel: true },
       simpan: { svg: svSimpan(), skel: true },
       set: { svg: scalevEditor(0, 0, { tab: "Settings" }) + settingsPanel({ pub: false }) + pvBlank(), enter: "fade", skel: true },
@@ -1218,9 +1224,9 @@ export const scenes = {
       slug: slugText(SLUG)
     },
     steps: [
-      { caption: "Di bisnis Nikahin, klik Landing Pages. Isinya hanya halaman buatanmu.", focus: [[0, 0, 256, 330], [256, 0, 1184, 520]], at: svMenuAt("Landing Pages", KR), click: true,
-        show: ["lp"], mark: krMenuBox("Landing Pages"), lens: { src: [0, 120, 256, 100], at: [520, 330] }, dur: 3.6 },
-      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 70, 230, 240]], at: mid(CREATE), click: true, show: ["cmenu"], mark: CREATE, lens: { src: [274, 78, 216, 228], zoom: 1.5 } },
+      { caption: "Di bisnis Nikahin, klik Landing Pages. Isinya hanya halaman buatanmu.", focus: [[0, 0, 256, 352], [256, 0, 1184, 520]], at: svMenuAt("Landing Pages", KR), click: true,
+        show: ["lp"], mark: krRow("Landing Pages"), lens: { src: [0, 116, 256, 128], at: [520, 330] }, dur: 3.6 },
+      { caption: "Klik + Create Landing Page. Muncul empat pilihan.", focus: [[270, 64, 230, 232]], at: mid(CREATE), click: true, show: ["cmenu"], mark: { box: CREATE, r: 6 }, lens: { src: [274, 66, 216, 219], zoom: 1.5 } },
       { caption: "Klik HTML Sales Page. Editor halaman baru terbuka.", focus: [[0, 44, 399, 48]], at: mid(CREATE_ROW(1)), click: true, hide: ["cmenu", "lp"], show: ["ed", "simpan"],
         mark: CREATE_ROW(1), note: "HTML Sales Page", dur: 3.4 },
       { caption: "Klik tab Settings. Bagian DOMAIN / URL berisi Slug URL.", focus: [[0, 44, 399, 48], DOMAIN_ACC], at: ED.tab.Settings, click: true, show: ["set"], hide: ["ed"],
@@ -1297,11 +1303,11 @@ export const scenes = {
   // Kreator Nikahin 6: menu Buku Tamu di bisnis Nikahin, baris undangan milik Kreator.
   "gabung-kreator-buku-tamu": {
     title: "Melihat undangan Kreator di Buku Tamu",
-    base: [krApp("Landing Pages"), lpPage(1), lpRow(0)],
+    base: [krApp("Landing Pages"), lpPage(1), lpRow(0, KR_LP)],
     els: { bt: { svg: krApp("Buku Tamu") + bukuTamuK(), enter: "fade", skel: true } },
     steps: [
-      { caption: "Di menu kiri bisnis Nikahin, klik Buku Tamu.", focus: [[0, 0, 256, 330], [BT.x - 8, 0, BT.w + 16, 270]], at: svMenuAt("Buku Tamu", KR), click: true, show: ["bt"],
-        mark: krMenuBox("Buku Tamu"), lens: { src: [0, 150, 256, 100], at: [520, 330] }, dur: 3.4 },
+      { caption: "Di menu kiri bisnis Nikahin, klik Buku Tamu.", focus: [[0, 0, 256, 352], [BT.x - 8, 0, BT.w + 16, 270]], at: svMenuAt("Buku Tamu", KR), click: true, show: ["bt"],
+        mark: krRow("Buku Tamu"), lens: { src: [0, 158, 256, 84], at: [520, 330] }, dur: 3.4 },
       { caption: "Undanganmu tampil: Undangan Rani & Dimas /365671 · Belum terbit.", focus: [[BT.x - 8, 92, BT.w + 16, 180]], at: [760, 186], mark: { box: BT_CARD, r: 8 },
         lens: { src: [BT.x, 144, 560, 86] }, dur: 3.8 }
     ]

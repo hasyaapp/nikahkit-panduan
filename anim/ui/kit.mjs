@@ -170,37 +170,74 @@ export const nkHead = (x, y, title, o = {}) => rect(x + 72, y + 92, 327, 61, { f
 // A panel-wide dialog (Bagikan, Bantuan, Pesanan masuk) covering rail and panel (0..398).
 export const nkDialogHead = (x, y, title) => rect(x, y + 92, 399, 808, { fill: C.white }) + text(x + 16, y + 128, title, { size: 16, weight: 700, fill: C.strong }) + iconX("x", x + 368, y + 122, 18, C.text) + line(x, y + 153, x + 399, y + 153, { stroke: C.line });
 
-// ---- Scalev dashboard shell (app.scalev.com), measured from /tmp/ref/scalev-pages.png ------------------------------
-// Sidebar 0..255; menu rows 32px apart from y 138; chevron = has a submenu; bottom group Tutorials/Billing/Settings.
-const SV_MENU = [["Home", "home", 1], ["E-Payment", "credit-card"], ["Products", "package", 1], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"],
-  ["Checkout Flows", "shopping-cart", 0, "New"], ["Orders", "list", 1], ["Subscriptions", "refresh-ccw"], ["Ads & WhatsApp", "send", 1], ["Stores", "home"], ["Customers", "users"],
-  ["Marketers", "link"], ["Collaborations", "heart"], ["Developers", "code-xml"], ["Mailev", "mail", 0, "ext"], ["Waylev", "message-circle", 0, "ext"]];
-const SV_BOTTOM = [["Tutorials", "video", 803], ["Billing", "landmark", 833], ["Settings", "settings", 862]];
-// Sidebar of the Kreator role in the Nikahin business (docs/gambar/kreator/menu-kreator.jpg, 15 Okt 2026): the same rows
-// and spacing, fewer items, Home without a submenu. Bottom group not captured: Tutorials and Settings kept at the bottom.
+// ---- Scalev dashboard shell (app.scalev.com, new UI measured 8 Nov 2026 at 1892 x 975, drawn at 1440 x 900) -------------
+// Sidebar 0..256 (rule at x 255.5): business switcher block 0..60, Search menu... box, 37 px rows from y 126 (icon centre
+// x 26, label x 46; active: light blue background, blue label and icon), the bottom group anchored to the bottom of the
+// viewport (o.h, default 900: row tops 769, 806, 843); the rows above it scroll, so a list that reaches it is cut there.
+// A row's third item marks a folder (chevron): an array lists its children, open (chevron up, label dark, children
+// indented behind a rule) while one of them is the active page, as on the owner's Home route; rows below move down. "ext"
+// rows (Mailev, Waylev) carry a brand dot and an external-link mark. Buku Tamu is NikahKit's row.
+const SVN = { line: "#e6e6e6", text: "#5b6675", ink: "#1a1a1a", on: "#008ecb", onBg: "#f0faff", grey: "#656565", dark: "#3d3d3d" };
+const SV_MENU = [["Home", "home", ["Home", "Insights", "Web Analytics"]], ["E-Payment", "banknote"], ["Products", "package", 1], ["Landing Pages", "file-text"],
+  ["Buku Tamu", "book-open"], ["Checkout Flows", "route"], ["Orders", "receipt", 1], ["Subscriptions", "refresh-ccw"], ["Ads & WhatsApp", "megaphone", 1], ["Stores", "store"],
+  ["Customers", "users"], ["Developers", "code-xml"], ["Mailev", "mailev", 0, "ext"], ["Waylev", "waylev", 0, "ext"]];
+const SV_BOTTOM = [["Tutorials", "video", 131], ["Billing", "bag", 94], ["Settings", "settings", 57]]; // row tops above the viewport bottom
+// Sidebar of the Kreator role in the Nikahin business: Home is a plain link (Scalev makes a folder only when a child is
+// visible to the role), Landing Pages, Buku Tamu, Checkout Flows, Mailev, Waylev; bottom group without Billing. Inferred
+// from the owner's sidebar and the Kreator's permissions (not captured with a Kreator account in the new UI).
 export const SV_KREATOR = {
-  menu: [["Home", "home"], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"], ["Checkout Flows", "shopping-cart", 0, "New"], ["Mailev", "mail", 0, "ext"], ["Waylev", "message-circle", 0, "ext"]],
-  bottom: [["Tutorials", "video", 833], ["Settings", "settings", 862]]
+  menu: [["Home", "home"], ["Landing Pages", "file-text"], ["Buku Tamu", "book-open"], ["Checkout Flows", "route"], ["Mailev", "mailev", 0, "ext"], ["Waylev", "waylev", 0, "ext"]],
+  bottom: [["Tutorials", "video", 94], ["Settings", "settings", 57]]
 };
-// Row centre of a sidebar item (pointer target): svMenuAt("Landing Pages"); o: { menu, bottom } as given to scalevApp.
-export const svMenuAt = (name, o = {}) => { const menu = o.menu ?? SV_MENU, bottom = o.bottom ?? SV_BOTTOM; const i = menu.findIndex((m) => m[0] === name); if (i >= 0) return [110, 138 + i * 32]; const b = bottom.find((m) => m[0] === name); if (b) return [100, b[2]]; throw new Error(`svMenuAt: "${name}"`); };
+// Rows with their tops for o = { active, menu, bottom, h } as given to scalevApp; an open folder's children follow it
+// (2 px below it, 4 px gap after them, measured on /dashboard). Bottom rows carry foot.
+function svRows(o = {}) {
+  const active = o.active ?? "Landing Pages", rows = [];
+  let y = 126;
+  for (const [n, ic, sub, tag] of o.menu ?? SV_MENU) {
+    const open = Array.isArray(sub) && sub.includes(active);
+    rows.push({ n, ic, sub, tag, y, open });
+    y += 37;
+    if (open) { sub.forEach((c, k) => rows.push({ n: c, y: y + 2 + k * 37, child: true })); y += 6 + sub.length * 37; }
+  }
+  return rows.concat((o.bottom ?? SV_BOTTOM).map(([n, ic, up]) => ({ n, ic, y: (o.h ?? 900) - up, foot: true })));
+}
+// Exact box of a sidebar row (marks, radius 6) and its centre (pointer target): svMenuBox("Landing Pages", { active: "Home" }).
+// On an open folder the name is its child (the Home page on the Home route).
+export const svMenuBox = (name, o = {}) => {
+  const m = svRows(o).find((r) => r.n === name && !r.open);
+  if (!m) throw new Error(`svMenuBox: "${name}"`);
+  return m.child ? [36, m.y, 211, 37] : [8, m.y, 239, 37];
+};
+export const svMenuAt = (name, o = {}) => [110, svMenuBox(name, o)[1] + 18.5];
+// Brand dots and Billing's money bag (Scalev's own glyphs, drawn simplified at 16 px).
+const svGlyph = (ic, cx, cy, color) => ic === "mailev" ? circle(cx, cy, 8, { fill: "#f7d949" }) + `<path d="M${cx - 3.5} ${cy - 1} l3 -2.5 M${cx - 1.5} ${cy + 3.5} l5 -4.5" fill="none" stroke="#f0761d" stroke-width="2" stroke-linecap="round"/>`
+  : ic === "waylev" ? circle(cx, cy, 8, { fill: "#5db96c" }) + circle(cx - 2.6, cy - 2.6, 2.2, { fill: "#1d5a2a" }) + circle(cx + 2.6, cy + 2.6, 2.2, { fill: "#1d5a2a" }) + line(cx - 3, cy + 3, cx + 3, cy - 3, { stroke: C.white, sw: 1.6, cap: "round" })
+  : ic === "bag" ? `<path d="M${cx - 3} ${cy - 7.5} h6 l-1.6 2.8 h-2.8 z M${cx} ${cy - 3.8} c-4.2 0 -6.8 4.2 -6.8 7.2 c0 2.4 1.6 4.1 4 4.1 h5.6 c2.4 0 4 -1.7 4 -4.1 c0 -3 -2.6 -7.2 -6.8 -7.2 z" fill="${color}"/>` +
+    text(cx, cy + 6, "$", { size: 8, weight: 700, fill: C.white, anchor: "middle" })
+  : iconX(ic, cx, cy, 16, color);
+// Business switcher block (0..60): avatar with the first letter, name, Powered by Scalev, up/down chevrons. o.open: the
+// hover background it keeps while Choose Business is open.
+export const svSwitcher = (x, y, biz, o = {}) => (o.open ? rect(x + 8, y + 5.5, 239, 48, { r: 6, fill: "#f3f4f6" }) : "") + line(x, y + 59.5, x + 255, y + 59.5, { stroke: SVN.line }) +
+  circle(x + 34, y + 29.5, 18, { fill: SVN.dark }) + text(x + 34, y + 34.5, biz[0], { size: 14, weight: 600, fill: C.white, anchor: "middle" }) +
+  text(x + 62, y + 26.5, biz, { size: 14, weight: 600, fill: SVN.dark }) +
+  text(x + 62, y + 43.5, "Powered by", { size: 12, fill: SVN.grey }).replace("<text", '<text textLength="62" lengthAdjust="spacingAndGlyphs"') +
+  circle(x + 134.1, y + 39.5, 6, { fill: "#2d8ceb" }) + `<path d="M${x + 131.6} ${y + 41.5} q2.5 -0.5 2.5 -2 t2.5 -2" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>` +
+  text(x + 144.1, y + 43.5, "Scalev", { size: 12, weight: 500, fill: "#464646" }) + iconX("chevrons-up-down", x + 231, y + 29.5, 20, SVN.grey, 1.6);
 export function scalevApp(x, y, o = {}) {
-  const active = o.active ?? "Landing Pages", biz = o.biz ?? "Rina WO";
-  let s = rect(x, y, 1440, 900, { fill: C.white }) + rect(x, y, 255, 900, { fill: C.white }) + line(x + 255.5, y, x + 255.5, y + 900, { stroke: C.svDivider }) +
-    circle(x + 44, y + 33, 16, { fill: "#3b7dd8" }) + circle(x + 39, y + 29, 4, { fill: C.white }) + circle(x + 49, y + 37, 4, { fill: C.white }) + text(x + 72, y + 39, "Scalev", { size: 15, weight: 700, fill: C.ink }) +
-    icon("eye", x + 150, y + 33, 17, C.text) + icon("heart", x + 181, y + 33, 17, "#d42a2a") +
-    `<defs><linearGradient id="svBiz" x1="0" x2="1"><stop offset="0" stop-color="#4497ca"/><stop offset="1" stop-color="#7cc6f0"/></linearGradient></defs>` +
-    rect(x + 24, y + 62, 206, 48, { r: 4, fill: "url(#svBiz)" }) + circle(x + 47, y + 86, 11, { fill: C.white }) + text(x + 47, y + 90, biz[0], { size: 11, weight: 700, fill: C.strong, anchor: "middle" }) +
-    text(x + 68, y + 91, biz, { size: 13, weight: 600, fill: C.white }) + icon("chevron-down", x + 212, y + 86, 14, C.white);
-  (o.menu ?? SV_MENU).forEach(([n, ic, sub, tag], i) => {
-    const my = y + 138 + i * 32, on = n === active;
-    s += iconX(ic, x + 41, my, 15, on ? C.primary : "#4a5361") + text(x + 64, my + 5, n, { size: 14, weight: on ? 700 : 400, fill: on ? C.ink : "#3b4350" });
-    if (sub) s += icon("chevron-down", x + 215, my, 14, "#4a5361");
-    if (tag === "New") s += rect(x + 172, my - 9, 43, 18, { r: 9, fill: "#3b8fd0" }) + text(x + 193.5, my + 4, "New", { size: 11, weight: 600, fill: C.white, anchor: "middle" });
-    if (tag === "ext") s += icon("external-link", x + 212, my, 12, "#4a5361");
-  });
-  (o.bottom ?? SV_BOTTOM).forEach(([n, ic, by]) => { const on = n === active; s += iconX(ic, x + 44, y + by, 15, on ? C.primary : "#3b4350") + text(x + 68, y + by + 5, n, { size: 14, weight: on ? 700 : 500, fill: C.ink }); });
-  return s;
+  const active = o.active ?? "Landing Pages", h = o.h ?? 900, rows = svRows(o), kids = rows.filter((m) => m.child);
+  const listEnd = Math.min(...rows.filter((m) => m.foot).map((m) => m.y)) - 8; // the scrolling list ends above the bottom group
+  const row = (m) => {
+    const on = m.n === active && !m.open, my = y + m.y, fg = on ? SVN.on : m.open ? SVN.ink : SVN.text;
+    return (on ? rect(x + (m.child ? 36 : 8), my, m.child ? 211 : 239, 37, { r: 6, fill: SVN.onBg }) : "") + (m.ic ? svGlyph(m.ic, x + 26, my + 18.5, fg) : "") +
+      text(x + 46, my + 23.5, m.n, { size: 14, fill: fg }) + (m.sub ? icon(m.open ? "chevron-up" : "chevron-down", x + 229, my + 18.5, 18, SVN.text, 1.6) : "") +
+      (m.tag === "ext" ? icon("external-link", x + 231, my + 18.5, 13, SVN.text) : "");
+  };
+  const list = (kids.length ? line(x + 26.5, y + kids[0].y, x + 26.5, y + kids.at(-1).y + 37, { stroke: SVN.line }) : "") + rows.filter((m) => !m.foot).map(row).join("");
+  return rect(x, y, 1440, h, { fill: C.white }) + line(x + 255.5, y, x + 255.5, y + h, { stroke: SVN.line }) + svSwitcher(x, y, o.biz ?? "Rina WO") +
+    rect(x + 12.5, y + 72.5, 230, 39, { r: 6, fill: "#f7f8f8", stroke: SVN.line }) + iconX("search", x + 33, y + 92, 16, "#989898") +
+    text(x + 49, y + 96.5, "Search menu...", { size: 13, fill: "#989898" }) +
+    (rows.some((m) => !m.foot && m.y + 37 > listEnd) ? clipped(x, y + 118, 256, listEnd - 118, list) : list) + rows.filter((m) => m.foot).map(row).join("");
 }
 
 // ---- Guide stage pieces ---------------------------------------------------------------------------------------------
