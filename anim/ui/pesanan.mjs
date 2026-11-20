@@ -57,25 +57,33 @@ export const afterDelete = rect(15, LIST_Y - 3, 368, 400, { fill: C.white }) + r
   boxRow(LIST_Y + 73, "Tempel data pesanan") + boxRow(LIST_Y + 131, "Link form klien");
 
 // A Kreator's Pesanan masuk (orders.jsx Sales, styles.js .nk-box[open]): one order from the Landing, then Penjualan
-// katalog open (the total commission on its title row, the lead, the paid orders with their commission, Buka /slug),
-// then Tempel data pesanan and Link form klien closed. Example sales: the three Nikahin packages at 60%.
+// katalog open (the total commission on its title row, the lead, the paid orders with their data status and commission,
+// Buka /slug), then Tempel data pesanan and Link form klien closed. Example sales: the three Nikahin packages at 60%;
+// Ayu Lestari has not filled the form yet (Belum isi data), so hers is the link the steps copy (SALES_COPY).
 export const KR_ROW = ["Rani & Dimas", "Undangan Inti · 19 Okt, 10.20"];
-const SALES = [["Rani Kusuma", "Undangan Inti · 19 Okt, 09.55", "Rp77.400"], ["Ayu Lestari", "Paket Lengkap · 12 Okt, 14.05", "Rp137.400"],
-  ["Dewi Lestari", "Paket Istimewa · 3 Okt, 19.30", "Rp227.400"]];
+const SALES = [["Rani Kusuma", "Undangan Inti · 19 Okt, 09.55", "Rp77.400", true], ["Ayu Lestari", "Paket Lengkap · 12 Okt, 14.05", "Rp137.400", false],
+  ["Dewi Lestari", "Paket Istimewa · 3 Okt, 19.30", "Rp227.400", true]];
+const COPY_ROW = SALES.findIndex((r) => !r[3]);
+export const SALES_COPY = SALES[COPY_ROW][0];
 const SALES_TOTAL = "Rp442.200", SALES_LEAD = wrap("3 pesanan lunas. Komisi 60% dari harga paket setelah diskon.", 342, 12, 400, textWidth);
-// Box geometry: summary 50, body padding 12, lead 16 per line + 12, list rows 56 + 1 px rules + 16, the button 36.
-const SY = LIST_Y + 73, LEAD_Y = SY + 63, SL_Y = LEAD_Y + SALES_LEAD.length * 16 + 12, SL_H = SALES.length * 57 + 1, BUKA_Y = SL_Y + SL_H + 16, SH = BUKA_Y + 36 + 12 - SY;
-// Boxes the steps mark: the whole box, the total badge, the lead, the paid orders, row 1's Salin link form icon button
-// (nk-iconbtn 36 px at the row's right, 6 px padding), the Buka /rina-wo button.
+// A paid order row (.nk-orders__row, 4 px padding): the .nk-order column holds name 20, meta 14 and the status badge 18
+// with 2 px gaps (56), so the row is 64 high; the commission badge and the 36 px copy button centre on it.
+const SR = 64, SRS = SR + 1, status = (ok) => (ok ? ["Data masuk", "ok"] : ["Belum isi data", "todo"]);
+// Box geometry: summary 50, body padding 12, lead 16 per line + 12, list rows SR + 1 px rules + 16, the button 36.
+const SY = LIST_Y + 73, LEAD_Y = SY + 63, SL_Y = LEAD_Y + SALES_LEAD.length * 16 + 12, SL_H = SALES.length * SRS + 1, BUKA_Y = SL_Y + SL_H + 16, SH = BUKA_Y + 36 + 12 - SY;
+const rowY = (i) => SL_Y + 1 + i * SRS;
+// Boxes the steps mark: the whole box, the total badge, the lead, the paid orders, each row's status badge, the
+// Salin link form icon button of the Belum isi data row (nk-iconbtn 36 px at the row's right, 6 px padding), Buka /rina-wo.
 export const SALES_AT = { box: [16, SY, 366, SH], total: nkBadgeBox(369, SY + 16, SALES_TOTAL, { end: true }), lead: [28, LEAD_Y - 1, 342, SALES_LEAD.length * 16 + 2],
-  list: [28, SL_Y, 342, SL_H], copy: [327, SL_Y + 11, 36, 36], buka: [28, BUKA_Y, 342, 36] };
-// One paid order: name, meta, commission badge, then the copy icon (badge ends 8 px left of the 36 px button).
-const salesRow = (y, [name, meta, fee]) => text(40, y + 26, name, { size: 14, weight: 600 }) + text(40, y + 42, meta, { size: 10, fill: C.text }) + badgeAt(319, y + 19, fee, "ok") +
-  icon("copy", 345, y + 28, 18, C.text);
+  list: [28, SL_Y, 342, SL_H], status: SALES.map((r, i) => nkBadgeBox(40, rowY(i) + 42, status(r[3])[0])), copy: [327, rowY(COPY_ROW) + 14, 36, 36], buka: [28, BUKA_Y, 342, 36] };
+// One paid order: name, meta, status badge, commission badge, then the copy icon (badge ends 8 px left of the 36 px button).
+const salesRow = (y, [name, meta, fee, ok]) => { const [label, tone] = status(ok);
+  return text(40, y + 20, name, { size: 14, weight: 600 }) + text(40, y + 36, meta, { size: 10, fill: C.text }) + nkBadge(40, y + 42, label, { fill: TONE[tone][0], fg: TONE[tone][1] }) +
+    badgeAt(319, y + 23, fee, "ok") + icon("copy", 345, y + 32, 18, C.text); };
 const salesBox = rect(13, SY - 3, 372, SH + 6, { r: 7, fill: C.primarySoft }) + rect(16.5, SY + 0.5, 365, SH - 1, { r: 4, fill: C.white, stroke: C.primary }) +
   icon("chevron-down", 38, SY + 25, 18, C.strong) + text(59, SY + 30, "Penjualan katalog", { size: 14, weight: 500 }) + badgeAt(369, SY + 16, SALES_TOTAL, "ok") +
   para(28, LEAD_Y + 11, SALES_LEAD, { size: 12, fill: C.faint, lh: 16 }) + rect(28.5, SL_Y + 0.5, 341, SL_H - 1, { r: 4, fill: C.white, stroke: C.line }) +
-  SALES.map((r, i) => (i ? line(29, SL_Y + i * 57 + 0.5, 369, SL_Y + i * 57 + 0.5) : "") + salesRow(SL_Y + 1 + i * 57, r)).join("") +
+  SALES.map((r, i) => (i ? line(29, SL_Y + i * SRS + 0.5, 369, SL_Y + i * SRS + 0.5) : "") + salesRow(rowY(i), r)).join("") +
   rect(28.5, BUKA_Y + 0.5, 341, 35, { r: 4, fill: C.surface, stroke: C.line }) + iconX("link", 48, BUKA_Y + 18, 16, C.strong) + text(64, BUKA_Y + 22, "Buka /rina-wo", { size: 12, weight: 500, fill: C.strong });
 export const KR_PASTE_Y = SY + SH + 8;
 export const kreatorOrders = ordersTop + rect(16.5, LIST_Y + 0.5, 365, 56, { r: 4, fill: C.white, stroke: C.line }) + orderRow(ROW1, ...KR_ROW, badgeAt(331, ROW1 + 19, "Baru", "todo")) +

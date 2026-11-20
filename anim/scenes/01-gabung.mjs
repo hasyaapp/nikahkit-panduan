@@ -500,13 +500,13 @@ const verifyWa = shadow(VF.x, VF.y, VF.w, VF.h, 8, 3) + rect(...VF_BOX, { r: 8, 
   bars(560, VF.y + 126, [320]) + bars(600, VF.y + 152, [240]) + bars(580, VF.y + 178, [280]) + rect(VF.x + 40, VF.y + 226, VF.w - 80, 44, { r: 6, fill: "#25d366" }) + rect(640, VF.y + 243, 160, 10, { r: 5, fill: "rgba(255,255,255,.6)" });
 // Template panel on a new HTML Sales Page: counted as empty (no warning), the library on top, the rail locked but Template
 // and Media.
-const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219)) + LOCKED;
+const tplNew = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template") + panelBody(panelBg(), seg(), library(219)) + LOCKED;
 const KENANG_CARD = [...cardAt(0, 371), 134, 167];
 // Media panel (App.jsx MediaPanel) as a Kreator sees it: only their own uploads (host/scalev.js mediaTag), "Belum ada foto."
 // before the first upload, and Muat lainnya while the business Media still has more pages.
 const MS = 89, mTile = (i, k) => photo(88 + (i % 3) * (MS + 6), 239 + Math.floor(i / 3) * (MS + 6), MS, MS, k);
 const UNGGAH = [88, 169, 279, 36];
-const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Media", true) + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
+const mediaK = (ks) => nkRail(0, 0, "Media") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Media") + nkBtn(88, 169, "Unggah foto", { w: 279, icon: "upload", size: 14 }) +
   text(88, 223, "Atau seret ke sini.", { size: 12, fill: C.faint }) +
   (ks.length ? ks.map((k, i) => mTile(i, k)).join("") : text(88, 255, "Belum ada foto.", { size: 12, fill: C.faint })) +
   nkBtn(88, ks.length ? 239 + Math.ceil(ks.length / 3) * (MS + 6) + 4 : 271, "Muat lainnya", { variant: "quiet", w: 279 });
@@ -541,8 +541,8 @@ const klXY = (id, on) => [KL_AT[id][0], MKY + KL_AT[id][1] + (KL_AT[id][1] && on
 const KL_HINT = wrap("Landing memakai paket dan harga Nikahin pusat. Klien bayar online ke toko Nikahin, kamu dapat komisi 60%.", 279, 12, 400, textWidth);
 const klHintY = (on) => klXY("langit", on)[1] + 249;
 const KL = { card: [88, MKY, 134, 167], hint: (on) => [88, klHintY(on) - 12, 279, KL_HINT.length * 16 + 2] };
-// A Landing page is no invitation (store phase "start"), so its panel head has no Pesanan masuk icon (App.jsx: ready).
-const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) +
+// A Landing page is no invitation (store phase "start"); its panel head still has the Pesanan masuk icon (App.jsx).
+const mkKreator = (on) => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template") +
   panelBody(panelBg(), seg("marketing"), brandClosed(BOX), KL_IDS.map((id) => mkCard(...klXY(id, on), id, on === id)).join(""),
     para(88, klHintY(on), KL_HINT, { size: 12, fill: C.faint, lh: 16 }));
 // Profil merek open for a Kreator in the Nikahin business (panels-style.jsx BrandForm, central): Nama bisnis and Nomor
@@ -556,11 +556,11 @@ const brandK = () => rect(85.5, BOX - 2.5, 284, KB_END - BOX + 6, { r: 6, stroke
   nkLabel(101, 292, "Nama bisnis") + nkInput(101, 300, 253, "") + nkLabel(101, 360, "Nomor WhatsApp") + nkInput(101, 368, 253, "0812 3456 7890", { placeholder: true }) +
   text(101, 420, "Untuk tombol Tanya lewat WhatsApp.", { size: 12, fill: C.faint }) + nkLabel(101, 448, "Logo (opsional)") + nkBtn(101, 456, "Pilih foto", { variant: "quiet", icon: "image" }) +
   para(101, 520, KB_HINT, { size: 12, fill: C.faint, lh: 16 }) + nkBtn(101, KB_SIMPAN, "Simpan profil", { w: 110 });
-const mkKreatorOpen = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) +
+const mkKreatorOpen = () => nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template") +
   panelBody(panelBg(), seg("marketing"), brandK(), KL_IDS.map((id) => mkCard(KL_AT[id][0], KB_END + 12 + KL_AT[id][1], id, false)).join(""));
 // The blank Landing page of the Kreator (bisnis Nikahin), tab NikahKit on Template.
 const KL_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template", page: "Landing Rina WO" }), pvBlank(),
-  nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", false) + panelBody(panelBg(), seg(), library(219, null))];
+  nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template") + panelBody(panelBg(), seg(), library(219, null))];
 // Pasang dialog (panels-style.jsx nk-confirm) and the toast after it (store.js applyMarketing).
 const KL_DLG = [540, 383, 360, 134], KL_DLG_O = [720, 450], KL_PASANG = [816, 461, 64, 36];
 const klDlg = rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }) + shadow(...KL_DLG, 8, 3) + rect(...KL_DLG, { r: 8, fill: C.white }) +
@@ -571,7 +571,7 @@ const KL_TOAST = ["Landing Klasik dipasang. Tekan", "Simpan di Scalev."];
 // the Kreator chip, Bagikan with the page's nikahin.myscalev.com address and Untuk pengantin (the business's Dashboard, so
 // no "Pasang Dashboard pasangan dulu"), then pin.html with the Kreator's account (Paket Sekali Bayar without a button, no
 // business linked). The handover message links nikahin.myscalev.com/dashboard (server buku-tamu.mjs dashboardFor).
-const HO_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvKenang(), nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Konten", true) + kList().svg];
+const HO_BASE = [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Konten" }), pvKenang(), nkRail(0, 0, "Konten") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Konten") + kList().svg];
 const hoShare = rect(0, 92, 399, 808, { fill: C.white }) + shareTop(NO_NOTE) + shareUrlBox(NO_NOTE + 311, [`https://nikahin.myscalev.com/${SLUG}?`, "to=Nama+Tamu"]) + shareBtns(NO_NOTE) +
   accessHead(ACC_Y, false) + forCouple(COUPLE_Y) + pinHint(COUPLE_Y);
 const hoDlg = (pin, msg) => {
@@ -1278,7 +1278,7 @@ export const scenes = {
     base: [PHOTO_DEFS, scalevEditor(0, 0, { rail: "Template" }), pvBlank()],
     els: {
       tpl: { svg: tplNew(), skel: true },
-      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true) + panelBody(panelBg(), seg(), library(219, "kenang-krisan")), enter: "fade", skel: true },
+      picked: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template") + panelBody(panelBg(), seg(), library(219, "kenang-krisan")), enter: "fade", skel: true },
       pvD: { svg: pvKenang(), enter: "fade", delay: 0.2, skel: true },
       media: { svg: mediaK([]), enter: "fade", skel: true },
       win: { svg: fileWin(false), enter: "pop", origin: [FW.x + FW.w / 2, FW.y] },

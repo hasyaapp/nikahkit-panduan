@@ -11,7 +11,7 @@
 import { C, PHONE, icon, iconX, rect, text, para, line, circle, group, clipped, shadow, skeleton, tw, textWidth, wrap, mid } from "../lib.mjs";
 import { ED, chrome, favScalev, scalevEditor, nkRail, nkHead, nkBtn, nkBtnBox, nkInput, nkLabel, nkH3, nkHint, nkBadgeBox, nkToast, nkToastBoxes, phoneDesk, onPhone } from "../ui/kit.mjs";
 import { badgeAt, inboxCount, ordersDlg, ROW1, ROW2, LIST_Y, PASTE_Y, LINK_Y, ISI_Y, PASTE_AREA, pasteOpen, linkOpen, salinBtn, SALIN_BOX, HAPUS_BOX, hapusRow, hapusBtn, afterDelete,
-  kreatorOrders, SALES_AT } from "../ui/pesanan.mjs";
+  kreatorOrders, SALES_AT, SALES_COPY } from "../ui/pesanan.mjs";
 import { kreatorHead, KR_INBOX } from "../ui/gate.mjs";
 import { BAGIKAN_TOOL, ACC_Y, COUPLE_Y, shareAll, dashboardBtn, dashboardBox } from "../ui/bagikan.mjs";
 import { SEG, MARKETING_BOX, BOX, brandClosed, brandOpen, MK, MKY, cardXY, mkCards, dipakaiBox, TAMBAH_Y, SIMPAN_Y, PKG_F, LOGO_BTN } from "../ui/marketing.mjs";
@@ -243,10 +243,10 @@ const PEMESAN = { kind: "pemesan", step: 1, title: "Pemesan", intro: ["Kontak un
 const CATATAN = { kind: "catatan", step: 9, title: "Catatan", intro: ["Hal lain yang ingin dimasukkan, lalu", "kirim."] };
 
 // ---- Shared panel pieces -----------------------------------------------------------------------------------------
-const tplPanel = (o = {}) => head("Template", o.head) + panelBody(panelBg(), templatePanel(null));
+const tplPanel = () => head("Template") + panelBody(panelBg(), templatePanel(null));
 // Template > Marketing: switch, Profil merek closed, extra (a note under it) and the four cards at cardY; on = the Dipakai card.
 const mkBody = (on, extra = "", cardY = MKY) => panelBody(panelBg(), seg("marketing"), brandClosed(BOX), extra, mkCards(cardY, on));
-const mkPanel = (on, extra, cardY) => head("Template", { inbox: false }) + mkBody(on, extra, cardY);
+const mkPanel = (on, extra, cardY) => head("Template") + mkBody(on, extra, cardY);
 
 const SCROLL = PKG_F - 248; // the brand form scrolled so the first package shows
 const BIZ = { name: "Rina WO", wa: "6281234567890" }; // an empty Profil merek starts from the Scalev business (wa as waDigits keeps it)
@@ -300,7 +300,7 @@ const themed = (svg, th) => {
 };
 const MARUN = { main: PALETTES[2][1], accent: PALETTES[2][2] }, OWN = { main: "#1E3A5F", heading: "Lora" };
 const GAYA_TOAST = ["Gaya diterapkan. Tekan", "Simpan di Scalev."];
-const gayaShell = [...shell({ page: "Landing Rina WO", rail: "Gaya" }), LP_LOCKED, head("Gaya", { inbox: false })];
+const gayaShell = [...shell({ page: "Landing Rina WO", rail: "Gaya" }), LP_LOCKED, head("Gaya")];
 
 // ---- Flow diagram and checklist ----------------------------------------------------------------------------------
 // The 11 steps of alur-dengan-klien.mdx, snaking over 4 rows of 3.
@@ -432,7 +432,7 @@ const filled = (o = {}) => ({ konten: { svg: nkRail(0, 0, "Konten") + (o.panel ?
   t1: { svg: nkToast(DATA_TOAST), enter: "slide", delay: o.toast ?? 0.3 } });
 // Kreator: an invitation page in bisnis Nikahin, the head with the Kreator chip (ui/gate), Pesanan masuk with Penjualan
 // katalog (ui/pesanan kreatorOrders).
-const krKonten = kreatorHead("Konten", true) + kList({ left: 0 }).svg;
+const krKonten = kreatorHead("Konten") + kList({ left: 0 }).svg;
 const krEd = [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvMempelai(SAMPLE)];
 const KR_INBOX_M = M(KR_INBOX[0] - 18, 104, 36, 36, 8);
 // The Kreator's Landing order row in Pesanan masuk with the client's design in front (worker pesanan-masuk.mjs:
@@ -447,7 +447,7 @@ function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
   return {
     [slug]: {
       title,
-      base: [...blank, tplPanel({ head: { inbox: false } })],
+      base: [...blank, tplPanel()],
       els: { mk: { svg: mkPanel(), enter: "fade" }, veil: { svg: veil + pasangDlg(name) + pasangBtn, enter: "fade" } },
       steps: [
         tabStep(caps[0], 3),
@@ -469,7 +469,7 @@ function pasangScenes(kind, title, page, after, resLens, result, toast, caps) {
     },
     [`${slug}-hasil`]: {
       title: `${name} dipasang`,
-      base: [...blank, after, head("Template", { inbox: false }), donePanel],
+      base: [...blank, after, head("Template"), donePanel],
       els: { t1: { svg: nkToast(toast), enter: "slide", delay: 0.3 } },
       steps: [
         { caption: `Muncul pesan: ${toast.join(" ")}`, show: ["t1"], focus: F.panel, mark: M(...nkToastBoxes(toast).toast), lens: toastLens(toast), dur: 3.4 },
@@ -689,12 +689,12 @@ export const scenes = {
   },
 
   // Kreator: the paid Landing order in Pesanan masuk, filled into the client's invitation in bisnis Nikahin. The page already
-  // has template Kenang Krisan (the inbox icon only shows once an invitation exists, App.jsx ready); the row starts with the
+  // has template Kenang Krisan (filling needs an invitation on the page, orders.jsx ready); the row starts with the
   // client's design (worker pesanan-masuk.mjs: "Desain <nama> · <paket>"). Filling keeps the page's template, so a
   // different design is then picked in Template: the content stays (store.js setTemplate, toast "Template diganti ke …").
   "gabung-kreator-pesanan": (() => {
     const Q = { q: "Kencana", n: [2, 1, 1, 0, 0, 0, 0], ids: ["wungu-kencana", "kencana"] }, K_CARD = [...cardAt(1, 371), 134, 167], K_TOAST = "Template diganti ke Kencana.";
-    const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template", true);
+    const tplHead = nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + kreatorHead("Template");
     return {
       title: "Mengisi undangan dari pesanan Landing Kreator",
       base: [...shell({ page: "Undangan Rani & Dimas", rail: "Konten" }), krKonten, pvKenang(), inboxCount("1", KR_INBOX[0])],
@@ -729,12 +729,13 @@ export const scenes = {
     };
   })(),
 
-  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders, Salin link form per order, Buka /slug).
-  // The Landing order row starts with its design, as in gabung-kreator-pesanan.
+  // Kreator: Penjualan katalog in Pesanan masuk (total commission, lead, paid orders with Data masuk or Belum isi data,
+  // Salin link form per order, Buka /slug). The Landing order row starts with its design, as in gabung-kreator-pesanan.
   "gabung-kreator-komisi": (() => {
-    const { box, total, lead, list, copy, buka } = SALES_AT;
+    const { box, total, lead, list, status, copy, buka } = SALES_AT;
     // orders.jsx Sales: the toast names the client and has no Urungkan, so its text gets the toast's full width (303 - 2 x 12).
-    const COPY_TOAST = wrap("Link form Rani Kusuma tersalin. Kirim ke klien lewat WhatsApp.", 279, 14, 400, textWidth);
+    const COPY_TOAST = wrap(`Link form ${SALES_COPY} tersalin. Kirim ke klien lewat WhatsApp.`, 279, 14, 400, textWidth);
+    const rowLens = (b) => ({ src: [24, b[1] - 46, 350, 72], zoom: 1.5 });
     return {
       title: "Melihat penjualan dan komisi Kreator",
       base: krEd,
@@ -744,8 +745,10 @@ export const scenes = {
         { caption: "Di bawah daftar pesanan ada kotak Penjualan katalog.", mark: M(...box), lens: { src: [box[0] - 6, box[1] - 6, box[2] + 12, box[3] + 12], zoom: 1.2 }, dur: 3.2 },
         { caption: "Total komisimu tertulis di judul kotak.", mark: M(...total, 9), lens: { src: [20, box[1] + 2, 358, 46] }, dur: 3 },
         { caption: "Komisi 60% dari harga paket setelah diskon, hanya yang lunas.", mark: M(...lead), lens: { src: [24, lead[1] - 6, 350, lead[3] + 12] }, dur: 3.6 },
-        { caption: "Tiap baris: nama klien, paket, tanggal, dan komisinya.", mark: M(...list), lens: { src: [24, list[1] - 4, 350, list[3] + 8], zoom: 1.5 }, dur: 3.6 },
-        { caption: "Klik ikon Salin link form di baris klien.", at: mid(copy), click: true, show: ["t1"], mark: M(...copy), lens: { src: [24, copy[1] - 14, 350, 64], zoom: 1.5 }, dur: 3.2 },
+        { caption: "Tiap baris: nama klien, paket, tanggal, status data, dan komisinya.", mark: M(...list), lens: { src: [24, list[1] - 4, 350, list[3] + 8], zoom: 1.2 }, dur: 3.6 },
+        { caption: "Data masuk: data form klien ini sudah ada di Pesanan masuk.", mark: M(...status[0], 9), lens: rowLens(status[0]), dur: 3.4 },
+        { caption: "Belum isi data: cek dulu daftar pesanan di atas.", mark: M(...status[1], 9), lens: rowLens(status[1]), dur: 3.4 },
+        { caption: "Datanya memang belum ada? Klik ikon Salin link form di baris itu.", at: mid(copy), click: true, show: ["t1"], mark: M(...copy), lens: { src: [24, copy[1] - 14, 350, 64], zoom: 1.5 }, dur: 3.6 },
         { caption: `Muncul pesan: ${COPY_TOAST.join(" ")}`, mark: M(...nkToastBoxes(COPY_TOAST).toast), lens: toastLens(COPY_TOAST), dur: 3.8 },
         { caption: "Buka /rina-wo membuka halaman Landing-mu.", at: mid(buka), hide: ["t1"], mark: M(...buka), lens: { src: [24, buka[1] - 6, 350, 48] }, dur: 3 }
       ]
@@ -822,7 +825,7 @@ export const scenes = {
     title: "Memilih palet di menu Gaya Landing page",
     base: [...shell({ page: "Landing Rina WO", rail: "Template" }), LP_LOCKED, mkPanel("landing"), landPreview("Rina WO")],
     els: {
-      gaya: { svg: nkRail(0, 0, "Gaya") + LP_LOCKED + head("Gaya", { inbox: false }) + gayaBody(null), enter: "fade" },
+      gaya: { svg: nkRail(0, 0, "Gaya") + LP_LOCKED + head("Gaya") + gayaBody(null), enter: "fade" },
       marun: { svg: gayaBody(MARUN), enter: "fade" },
       pv: { svg: themed(landPreview("Rina WO"), MARUN), enter: "fade", delay: 0.2 },
       t1: { svg: nkToast(GAYA_TOAST), enter: "slide", delay: 0.3 }
@@ -929,7 +932,7 @@ export const scenes = {
       ok: { svg: nkHint(SALIN_BOX[0] + SALIN_BOX[2] + 8, SALIN_BOX[1] + 23, "Tersalin."), enter: "fade", delay: 0.15 }
     },
     steps: [
-      tabStep("Buka panel NikahKit di halaman undangan.", 2.6),
+      tabStep("Buka panel NikahKit di editor, halaman mana pun.", 2.6),
       { caption: "Klik ikon kotak masuk di kepala panel. Pesanan masuk terbuka.", at: ED.inbox, click: true, show: ["inbox"], focus: F.left, mark: INBOX,
         lens: { src: [12, 160, 374, 150] }, dur: 3.2 },
       { caption: "Klik Link form klien. Alamat link form tampil.", at: [200, LINK_Y + 25], click: true, show: ["link", "salin"], mark: M(16, LINK_Y, 366, 50),

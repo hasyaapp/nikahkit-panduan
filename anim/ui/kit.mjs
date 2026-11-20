@@ -162,9 +162,10 @@ export function nkRail(x, y, active, o = {}) {
     circle(x + 36, y + 868, 4, { fill: o.saving === "Menulis..." ? C.changed : o.saving === "Gagal" || o.saving === "Dijeda" ? C.warn : C.ok }) + text(x + 36, y + 888, o.saving ?? "Tersimpan", { size: 10, fill: C.text, anchor: "middle" });
   return s;
 }
-// Panel header (title, inbox, account chip, close) at the panel's real place.
+// Panel header (title, inbox, account chip, close) at the panel's real place. The inbox shows on every page the panel
+// opens (App.jsx), Landing and a page without a template included.
 export const nkHead = (x, y, title, o = {}) => rect(x + 72, y + 92, 327, 61, { fill: C.white }) + text(x + 88, y + 128, title, { size: 16, weight: 700, fill: C.strong }) +
-  (o.inbox === false ? "" : icon("inbox", x + 236, y + 122, 18, C.text)) +
+  icon("inbox", x + 236, y + 122, 18, C.text) +
   (o.account === false ? "" : rect(x + 262.5, y + 108.5, 79, 27, { r: 14, fill: C.white, stroke: C.field }) + icon("circle-user-round", x + 278, y + 122, 14, C.action) + text(x + 289, y + 126, o.account ?? "Akun", { size: 12, weight: 500, fill: C.strong })) +
   iconX("x", x + 368, y + 122, 18, C.text);
 // A panel-wide dialog (Bagikan, Bantuan, Pesanan masuk) covering rail and panel (0..398).

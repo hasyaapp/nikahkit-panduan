@@ -36,9 +36,9 @@ export const scenes = {
     els: {
       gate: { svg: clipped(0, 44, 399, 856, scalevEditor(0, 0, { rail: "Template", screenFill: C.white })) + rect(0, 93, 399, 807, { fill: C.white }) +
         text(200, 300, "Memeriksa akses...", { size: 14, weight: 600, anchor: "middle" }), enter: "fade", skel: true },
-      tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }) + panelBody(seg(), library(219)), enter: "fade", delay: 0.5, skel: true },
+      tpl: { svg: nkRail(0, 0, "Template") + rect(72, 92, 327, 808, { fill: C.white }) + nkHead(0, 0, "Template", { account: ACCOUNT }) + panelBody(seg(), library(219)), enter: "fade", delay: 0.5, skel: true },
       locked: { svg: LOCKED, enter: "fade", delay: 0.5, skel: true },
-      picked: { svg: panelBody(panelBg(), seg(), library(219, "kenang-krisan")) + icon("inbox", 236, 122, 18, C.text), enter: "fade", skel: true },
+      picked: { svg: panelBody(panelBg(), seg(), library(219, "kenang-krisan")), enter: "fade", skel: true },
       pvF: { svg: pvKenang(), enter: "fade", delay: 0.2, skel: true },
       konten: { svg: kontenPanel(), enter: "fade", skel: true }
     },
@@ -64,11 +64,11 @@ export const scenes = {
   // ---------------------------------------------------------------------------------------------------------------------
   "editor-pilih-template": {
     title: "Memilih template NikahKit pertama kali: kartu template",
-    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), pvBlank()],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), pvBlank()],
     els: {
       locked: { svg: LOCKED, skel: true },
       cardsA: { svg: rect(72, 153, 327, 1000, { fill: C.white }) + seg() + library(219), enter: "fade", skel: true },
-      lidT: { svg: lid("Template", { inbox: false }), skel: true }
+      lidT: { svg: lid("Template"), skel: true }
     },
     steps: [
       { caption: "Klik Template di menu kiri. Panel Template terbuka.", focus: F.side, mark: railM("Template"), lens: { src: [0, 96, 399, 122], at: [290, 70] }, at: ED.rail.Template, click: true, show: ["cardsA"] },
@@ -80,7 +80,7 @@ export const scenes = {
 
   "editor-pilih-template-ganti": {
     title: "Memilih template NikahKit pertama kali: dialog Ganti",
-    base: [...editor("Template"), nkHead(0, 0, "Template", { inbox: false, account: ACCOUNT }), panelBody(panelBg(), seg(), htmlNote(), library(287)), pvForeign()],
+    base: [...editor("Template"), nkHead(0, 0, "Template", { account: ACCOUNT }), panelBody(panelBg(), seg(), htmlNote(), library(287)), pvForeign()],
     els: {
       veil: { svg: rect(0, 0, 1440, 900, { fill: "rgba(255,255,255,.92)" }), enter: "fade", skel: true },
       dlg: { svg: shadow(540, 383, 360, 134, 8, 3) + rect(540, 383, 360, 134, { r: 8, fill: C.white }) + text(560, 418, "Ganti isi halaman dengan Kenang Krisan?", { size: 14, weight: 600 }) +
