@@ -27,3 +27,20 @@ Video panduan berikutnya dibuat dengan [Remotion](https://www.remotion.dev) dari
 tetap untuk seri yang sudah ada. Versi dipaku di `package.json` folder ini (Remotion 4.0.547, React 19.3.1): pasang dengan
 `npm ci` di `panduan/video`. Render pertama mengunduh Chrome Headless Shell ke `node_modules/.remotion`; FFmpeg ikut paket
 Remotion. Hasil render ke `out/`.
+
+Satu video = `src/<video>/` (naskah, adegan, waktu, kotak layar) dan `public/<video>/` (narasi dan gambar layar, tidak
+masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
+
+- `src/kirim-undangan/`: cara kirim undangan ke tamu, tegak 1080x1920. `naskah.js` = teks narasi per kalimat (id dipakai
+  adegan), `Video.jsx` = adegan yang dijangkarkan ke kata narasi, `rekam-layar.mjs` = perekam layar asli.
+- `npm run layar`: membuka halaman dashboard hasil build (`server/pages/panel/scalev_panel.html`) di Chrome tanpa jendela
+  dengan API tiruan (data contoh Rani & Dimas, tidak menyentuh produksi), menjalankan alurnya di layar HP 393x744, lalu
+  menyimpan gambarnya ke `public/kirim-undangan/layar/` dan kotak tiap elemen ke `src/kirim-undangan/layar.json`.
+  Jalankan ulang bila halaman Kirim berubah, lalu render ulang.
+- `npm run waktu`: whisper.cpp (`brew install whisper-cpp`, model `ggml-large-v3-turbo-q5_0.bin` di
+  `~/Library/Caches/whisper.cpp/`) mencari waktu tiap kata `naskah.js` di `public/kirim-undangan/narasi.*`, hasilnya
+  `src/kirim-undangan/waktu.json`. Narasi diganti: jalankan ini dulu. Bandingkan dua rekaman tanpa menulis:
+  `node alat/waktu.mjs kirim-undangan <file> --cek`.
+- `npm run studio` untuk melihat di browser, `npm run render` untuk `out/kirim-undangan.mp4`. Hasil yang dipakai disalin
+  ke `~/Movies/Nikahin Video Panduan/_baru/`.
+- Narasi ElevenLabs dibuat di akun yang kuncinya di Keychain `nikahin-elevenlabs-6` (akun `api`).

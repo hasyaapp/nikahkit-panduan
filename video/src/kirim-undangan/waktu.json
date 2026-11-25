@@ -1,0 +1,2473 @@
+{
+ "audio": "kirim-undangan/narasi.mp3",
+ "durasi": 194.85,
+ "kalimat": [
+  {
+   "id": "buka",
+   "text": "Cara kirim undangan digital ke tamu, lengkap dengan nama masing-masing, langsung dari WhatsApp.",
+   "mulai": 0.1,
+   "selesai": 5.58,
+   "kata": [
+    [
+     "Cara",
+     0.1,
+     0.26
+    ],
+    [
+     "kirim",
+     0.26,
+     0.59
+    ],
+    [
+     "undangan",
+     0.59,
+     1.12
+    ],
+    [
+     "digital",
+     1.12,
+     1.64
+    ],
+    [
+     "ke",
+     1.64,
+     1.71
+    ],
+    [
+     "tamu,",
+     1.71,
+     2
+    ],
+    [
+     "lengkap",
+     2,
+     2.47
+    ],
+    [
+     "dengan",
+     2.47,
+     2.87
+    ],
+    [
+     "nama",
+     2.87,
+     3.13
+    ],
+    [
+     "masing-masing,",
+     3.13,
+     4.04
+    ],
+    [
+     "langsung",
+     4.04,
+     4.56
+    ],
+    [
+     "dari",
+     4.56,
+     4.82
+    ],
+    [
+     "WhatsApp.",
+     4.82,
+     5.58
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "masuk",
+   "text": "Pengantin mengetuk link kedua, mengetik PIN, lalu menekan Masuk.",
+   "mulai": 5.98,
+   "selesai": 10.28,
+   "kata": [
+    [
+     "Pengantin",
+     5.98,
+     6.27
+    ],
+    [
+     "mengetuk",
+     6.27,
+     6.88
+    ],
+    [
+     "link",
+     6.88,
+     7.19
+    ],
+    [
+     "kedua,",
+     7.19,
+     7.72
+    ],
+    [
+     "mengetik",
+     7.72,
+     8.33
+    ],
+    [
+     "PIN,",
+     8.33,
+     8.77
+    ],
+    [
+     "lalu",
+     8.77,
+     9.01
+    ],
+    [
+     "menekan",
+     9.01,
+     9.54
+    ],
+    [
+     "Masuk.",
+     9.54,
+     10.28
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "beranda",
+   "text": "Dashboard-nya langsung terbuka.",
+   "mulai": 10.86,
+   "selesai": 12.56,
+   "kata": [
+    [
+     "Dashboard-nya",
+     10.86,
+     11.17
+    ],
+    [
+     "langsung",
+     11.17,
+     11.77
+    ],
+    [
+     "terbuka.",
+     11.77,
+     12.56
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "tab-kirim",
+   "text": "Untuk mengirim undangan, buka tab Kirim, lalu ketuk tombol hijau di kanan bawah.",
+   "mulai": 13.06,
+   "selesai": 18.26,
+   "kata": [
+    [
+     "Untuk",
+     13.06,
+     13.16
+    ],
+    [
+     "mengirim",
+     13.16,
+     13.56
+    ],
+    [
+     "undangan,",
+     13.56,
+     14.33
+    ],
+    [
+     "buka",
+     14.33,
+     14.7
+    ],
+    [
+     "tab",
+     14.7,
+     14.86
+    ],
+    [
+     "Kirim,",
+     14.86,
+     15.41
+    ],
+    [
+     "lalu",
+     15.41,
+     15.69
+    ],
+    [
+     "ketuk",
+     15.69,
+     16.07
+    ],
+    [
+     "tombol",
+     16.07,
+     16.53
+    ],
+    [
+     "hijau",
+     16.53,
+     16.97
+    ],
+    [
+     "di",
+     16.97,
+     17.06
+    ],
+    [
+     "kanan",
+     17.06,
+     17.48
+    ],
+    [
+     "bawah.",
+     17.48,
+     18.26
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "laptop",
+   "text": "Kalau dari laptop, tombolnya ada di bagian atas daftar.",
+   "mulai": 18.7,
+   "selesai": 22.18,
+   "kata": [
+    [
+     "Kalau",
+     18.7,
+     18.8
+    ],
+    [
+     "dari",
+     18.8,
+     18.96
+    ],
+    [
+     "laptop,",
+     18.96,
+     19.58
+    ],
+    [
+     "tombolnya",
+     19.58,
+     20.34
+    ],
+    [
+     "ada",
+     20.34,
+     20.5
+    ],
+    [
+     "di",
+     20.5,
+     20.65
+    ],
+    [
+     "bagian",
+     20.65,
+     21.11
+    ],
+    [
+     "atas",
+     21.11,
+     21.49
+    ],
+    [
+     "daftar.",
+     21.49,
+     22.18
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "panel",
+   "text": "Panel Tambah tamu terbuka.",
+   "mulai": 22.54,
+   "selesai": 24.18,
+   "kata": [
+    [
+     "Panel",
+     22.54,
+     22.64
+    ],
+    [
+     "Tambah",
+     22.64,
+     23.05
+    ],
+    [
+     "tamu",
+     23.05,
+     23.36
+    ],
+    [
+     "terbuka.",
+     23.36,
+     24.18
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "tempel",
+   "text": "Tempel daftar tamu di kolom Daftar tamu, satu tamu per baris.",
+   "mulai": 24.64,
+   "selesai": 28.82,
+   "kata": [
+    [
+     "Tempel",
+     24.64,
+     24.74
+    ],
+    [
+     "daftar",
+     24.74,
+     25.19
+    ],
+    [
+     "tamu",
+     25.19,
+     25.52
+    ],
+    [
+     "di",
+     25.52,
+     25.69
+    ],
+    [
+     "kolom",
+     25.69,
+     26.11
+    ],
+    [
+     "Daftar",
+     26.11,
+     26.62
+    ],
+    [
+     "tamu,",
+     26.62,
+     27.12
+    ],
+    [
+     "satu",
+     27.12,
+     27.46
+    ],
+    [
+     "tamu",
+     27.46,
+     27.79
+    ],
+    [
+     "per",
+     27.79,
+     28.04
+    ],
+    [
+     "baris.",
+     28.04,
+     28.82
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "format",
+   "text": "Setiap baris bisa berisi empat hal, dipisah tanda strip: nama, nomor WhatsApp, kategori, dan jumlah orang.",
+   "mulai": 28.92,
+   "selesai": 36.86,
+   "kata": [
+    [
+     "Setiap",
+     28.92,
+     29.26
+    ],
+    [
+     "baris",
+     29.26,
+     29.61
+    ],
+    [
+     "bisa",
+     29.61,
+     29.91
+    ],
+    [
+     "berisi",
+     29.91,
+     30.35
+    ],
+    [
+     "empat",
+     30.35,
+     30.71
+    ],
+    [
+     "hal,",
+     30.71,
+     31.22
+    ],
+    [
+     "dipisah",
+     31.6,
+     31.72
+    ],
+    [
+     "tanda",
+     31.72,
+     32.08
+    ],
+    [
+     "strip:",
+     32.08,
+     32.7
+    ],
+    [
+     "nama,",
+     33.08,
+     33.2
+    ],
+    [
+     "nomor",
+     33.2,
+     33.63
+    ],
+    [
+     "WhatsApp,",
+     33.63,
+     34.49
+    ],
+    [
+     "kategori,",
+     34.49,
+     35.43
+    ],
+    [
+     "dan",
+     35.43,
+     35.59
+    ],
+    [
+     "jumlah",
+     35.59,
+     36.1
+    ],
+    [
+     "orang.",
+     36.1,
+     36.86
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "wajib",
+   "text": "Hanya nama yang wajib, sisanya boleh dikosongkan.",
+   "mulai": 37.28,
+   "selesai": 40.42,
+   "kata": [
+    [
+     "Hanya",
+     37.28,
+     37.3
+    ],
+    [
+     "nama",
+     37.3,
+     37.53
+    ],
+    [
+     "yang",
+     37.53,
+     37.83
+    ],
+    [
+     "wajib,",
+     37.83,
+     38.48
+    ],
+    [
+     "sisanya",
+     38.82,
+     38.99
+    ],
+    [
+     "boleh",
+     38.99,
+     39.36
+    ],
+    [
+     "dikosongkan.",
+     39.36,
+     40.42
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "contoh",
+   "text": "Contohnya seperti yang tertulis di kolom itu.",
+   "mulai": 40.76,
+   "selesai": 43.02,
+   "kata": [
+    [
+     "Contohnya",
+     40.76,
+     40.97
+    ],
+    [
+     "seperti",
+     40.97,
+     41.43
+    ],
+    [
+     "yang",
+     41.43,
+     41.66
+    ],
+    [
+     "tertulis",
+     41.66,
+     42.15
+    ],
+    [
+     "di",
+     42.15,
+     42.28
+    ],
+    [
+     "kolom",
+     42.28,
+     42.58
+    ],
+    [
+     "itu.",
+     42.58,
+     43.02
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "baris-1",
+   "text": "Baris pertama, Keluarga Besar Surya, hanya berisi nama.",
+   "mulai": 43.42,
+   "selesai": 47.24,
+   "kata": [
+    [
+     "Baris",
+     43.42,
+     43.52
+    ],
+    [
+     "pertama,",
+     43.52,
+     44.12
+    ],
+    [
+     "Keluarga",
+     44.12,
+     44.76
+    ],
+    [
+     "Besar",
+     44.76,
+     45.15
+    ],
+    [
+     "Surya,",
+     45.15,
+     45.82
+    ],
+    [
+     "hanya",
+     46.24,
+     46.34
+    ],
+    [
+     "berisi",
+     46.34,
+     46.68
+    ],
+    [
+     "nama.",
+     46.68,
+     47.24
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "baris-2",
+   "text": "Baris kedua, Bapak Andi & Ibu Rina strip 0812 dan seterusnya, berisi nama dan nomor WhatsApp.",
+   "mulai": 47.66,
+   "selesai": 55.66,
+   "kata": [
+    [
+     "Baris",
+     47.66,
+     47.76
+    ],
+    [
+     "kedua,",
+     47.76,
+     48.34
+    ],
+    [
+     "Bapak",
+     48.34,
+     48.79
+    ],
+    [
+     "Andi",
+     48.79,
+     49.19
+    ],
+    [
+     "&",
+     49.19,
+     49.44
+    ],
+    [
+     "Ibu",
+     49.44,
+     49.7
+    ],
+    [
+     "Rina",
+     49.7,
+     50.32
+    ],
+    [
+     "strip",
+     50.32,
+     50.79
+    ],
+    [
+     "0812",
+     50.79,
+     52.11
+    ],
+    [
+     "dan",
+     52.11,
+     52.43
+    ],
+    [
+     "seterusnya,",
+     52.43,
+     53.71
+    ],
+    [
+     "berisi",
+     53.71,
+     54.06
+    ],
+    [
+     "nama",
+     54.06,
+     54.28
+    ],
+    [
+     "dan",
+     54.28,
+     54.49
+    ],
+    [
+     "nomor",
+     54.49,
+     54.84
+    ],
+    [
+     "WhatsApp.",
+     54.84,
+     55.66
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "baris-3",
+   "text": "Baris ketiga, Dewi Lestari strip nomor WhatsApp strip Sahabat strip 2, lengkap empat-empatnya.",
+   "mulai": 55.76,
+   "selesai": 63.7,
+   "kata": [
+    [
+     "Baris",
+     55.76,
+     56.11
+    ],
+    [
+     "ketiga,",
+     56.11,
+     56.82
+    ],
+    [
+     "Dewi",
+     56.82,
+     57.19
+    ],
+    [
+     "Lestari",
+     57.19,
+     58.01
+    ],
+    [
+     "strip",
+     58.01,
+     58.46
+    ],
+    [
+     "nomor",
+     58.46,
+     58.9
+    ],
+    [
+     "WhatsApp",
+     58.9,
+     60.08
+    ],
+    [
+     "strip",
+     60.08,
+     60.25
+    ],
+    [
+     "Sahabat",
+     60.25,
+     61.05
+    ],
+    [
+     "strip",
+     61.05,
+     61.71
+    ],
+    [
+     "2,",
+     61.71,
+     62.08
+    ],
+    [
+     "lengkap",
+     62.5,
+     62.6
+    ],
+    [
+     "empat-empatnya.",
+     62.6,
+     63.7
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "guna",
+   "text": "Apa gunanya masing-masing?",
+   "mulai": 64.02,
+   "selesai": 65.26,
+   "kata": [
+    [
+     "Apa",
+     64.02,
+     64.06
+    ],
+    [
+     "gunanya",
+     64.06,
+     64.29
+    ],
+    [
+     "masing-masing?",
+     64.29,
+     65.26
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "nomor",
+   "text": "Nomor WhatsApp membuat chat tamu langsung terbuka saat undangan dikirim.",
+   "mulai": 65.72,
+   "selesai": 69.82,
+   "kata": [
+    [
+     "Nomor",
+     65.72,
+     65.82
+    ],
+    [
+     "WhatsApp",
+     65.82,
+     66.17
+    ],
+    [
+     "membuat",
+     66.17,
+     66.66
+    ],
+    [
+     "chat",
+     66.66,
+     66.87
+    ],
+    [
+     "tamu",
+     66.87,
+     67.15
+    ],
+    [
+     "langsung",
+     67.15,
+     67.71
+    ],
+    [
+     "terbuka",
+     67.71,
+     68.2
+    ],
+    [
+     "saat",
+     68.2,
+     68.52
+    ],
+    [
+     "undangan",
+     68.52,
+     69.04
+    ],
+    [
+     "dikirim.",
+     69.04,
+     69.82
+    ]
+   ],
+   "sama": 0.9
+  },
+  {
+   "id": "tanpa-nomor",
+   "text": "Tanpa nomor, pengantin memilih kontaknya sendiri di WhatsApp.",
+   "mulai": 70.2,
+   "selesai": 73.38,
+   "kata": [
+    [
+     "Tanpa",
+     70.2,
+     70.3
+    ],
+    [
+     "nomor,",
+     70.3,
+     70.54
+    ],
+    [
+     "pengantin",
+     70.54,
+     71.09
+    ],
+    [
+     "memilih",
+     71.09,
+     71.54
+    ],
+    [
+     "kontaknya",
+     71.54,
+     72.06
+    ],
+    [
+     "sendiri",
+     72.06,
+     72.55
+    ],
+    [
+     "di",
+     72.55,
+     72.61
+    ],
+    [
+     "WhatsApp.",
+     72.61,
+     73.38
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "kategori",
+   "text": "Kategori tampil di bawah nama tamu dan bisa dicari, misalnya Keluarga, Kantor, atau Sahabat.",
+   "mulai": 73.82,
+   "selesai": 80.6,
+   "kata": [
+    [
+     "Kategori",
+     73.82,
+     74.28
+    ],
+    [
+     "tampil",
+     74.28,
+     74.68
+    ],
+    [
+     "di",
+     74.68,
+     74.81
+    ],
+    [
+     "bawah",
+     74.81,
+     75.14
+    ],
+    [
+     "nama",
+     75.14,
+     75.4
+    ],
+    [
+     "tamu",
+     75.4,
+     75.66
+    ],
+    [
+     "dan",
+     75.66,
+     76.11
+    ],
+    [
+     "bisa",
+     76.11,
+     76.13
+    ],
+    [
+     "dicari,",
+     76.13,
+     76.8
+    ],
+    [
+     "misalnya",
+     77.2,
+     77.7
+    ],
+    [
+     "Keluarga,",
+     77.7,
+     78.6
+    ],
+    [
+     "Kantor,",
+     78.6,
+     79.55
+    ],
+    [
+     "atau",
+     79.55,
+     79.68
+    ],
+    [
+     "Sahabat.",
+     79.68,
+     80.6
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "jumlah",
+   "text": "Jumlah orang adalah catatan berapa orang yang diundang, misalnya 2 untuk tamu yang datang berpasangan.",
+   "mulai": 80.88,
+   "selesai": 87.28,
+   "kata": [
+    [
+     "Jumlah",
+     80.88,
+     80.98
+    ],
+    [
+     "orang",
+     80.98,
+     81.32
+    ],
+    [
+     "adalah",
+     81.32,
+     81.7
+    ],
+    [
+     "catatan",
+     81.7,
+     82.15
+    ],
+    [
+     "berapa",
+     82.15,
+     82.53
+    ],
+    [
+     "orang",
+     82.53,
+     82.86
+    ],
+    [
+     "yang",
+     82.86,
+     83.23
+    ],
+    [
+     "diundang,",
+     83.23,
+     83.92
+    ],
+    [
+     "misalnya",
+     84.32,
+     84.63
+    ],
+    [
+     "2",
+     84.63,
+     84.84
+    ],
+    [
+     "untuk",
+     84.84,
+     85.2
+    ],
+    [
+     "tamu",
+     85.2,
+     85.48
+    ],
+    [
+     "yang",
+     85.48,
+     85.77
+    ],
+    [
+     "datang",
+     85.77,
+     86.19
+    ],
+    [
+     "berpasangan.",
+     86.19,
+     87.28
+    ]
+   ],
+   "sama": 0.93
+  },
+  {
+   "id": "sumber",
+   "text": "Daftar bisa ditempel langsung dari catatan, dari daftar bernomor di WhatsApp, atau dari kolom yang disalin dari Excel.",
+   "mulai": 87.68,
+   "selesai": 94.7,
+   "kata": [
+    [
+     "Daftar",
+     87.68,
+     87.78
+    ],
+    [
+     "bisa",
+     87.78,
+     87.94
+    ],
+    [
+     "ditempel",
+     87.94,
+     88.47
+    ],
+    [
+     "langsung",
+     88.47,
+     89.02
+    ],
+    [
+     "dari",
+     89.02,
+     89.32
+    ],
+    [
+     "catatan,",
+     89.32,
+     90.03
+    ],
+    [
+     "dari",
+     90.03,
+     90.29
+    ],
+    [
+     "daftar",
+     90.29,
+     90.65
+    ],
+    [
+     "bernomor",
+     90.65,
+     91.17
+    ],
+    [
+     "di",
+     91.17,
+     91.3
+    ],
+    [
+     "WhatsApp,",
+     91.3,
+     92.02
+    ],
+    [
+     "atau",
+     92.54,
+     92.6
+    ],
+    [
+     "dari",
+     92.6,
+     92.64
+    ],
+    [
+     "kolom",
+     92.64,
+     92.98
+    ],
+    [
+     "yang",
+     92.98,
+     93.25
+    ],
+    [
+     "disalin",
+     93.25,
+     93.75
+    ],
+    [
+     "dari",
+     93.75,
+     94.07
+    ],
+    [
+     "Excel.",
+     94.07,
+     94.7
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "csv",
+   "text": "Kalau daftarnya sudah dalam file CSV, pakai tombol Impor CSV di sebelahnya.",
+   "mulai": 94.8,
+   "selesai": 100.56,
+   "kata": [
+    [
+     "Kalau",
+     94.8,
+     95.14
+    ],
+    [
+     "daftarnya",
+     95.14,
+     95.84
+    ],
+    [
+     "sudah",
+     95.84,
+     96.25
+    ],
+    [
+     "dalam",
+     96.25,
+     96.66
+    ],
+    [
+     "file",
+     96.66,
+     97.05
+    ],
+    [
+     "CSV,",
+     97.05,
+     97.5
+    ],
+    [
+     "pakai",
+     97.5,
+     97.86
+    ],
+    [
+     "tombol",
+     97.86,
+     98.39
+    ],
+    [
+     "Impor",
+     98.39,
+     99.12
+    ],
+    [
+     "CSV",
+     99.12,
+     99.18
+    ],
+    [
+     "di",
+     99.18,
+     99.47
+    ],
+    [
+     "sebelahnya.",
+     99.47,
+     100.56
+    ]
+   ],
+   "sama": 0.92
+  },
+  {
+   "id": "batas",
+   "text": "Satu daftar bisa berisi sampai 1.000 tamu.",
+   "mulai": 100.94,
+   "selesai": 103.86,
+   "kata": [
+    [
+     "Satu",
+     100.94,
+     101.04
+    ],
+    [
+     "daftar",
+     101.04,
+     101.38
+    ],
+    [
+     "bisa",
+     101.38,
+     101.7
+    ],
+    [
+     "berisi",
+     101.7,
+     102.2
+    ],
+    [
+     "sampai",
+     102.2,
+     102.7
+    ],
+    [
+     "1.000",
+     102.7,
+     103.29
+    ],
+    [
+     "tamu.",
+     103.29,
+     103.86
+    ]
+   ],
+   "sama": 0.86
+  },
+  {
+   "id": "simpan",
+   "text": "Setelah itu ketuk Simpan daftar, dan tamu langsung siap dikirimi undangan.",
+   "mulai": 104.28,
+   "selesai": 109.2,
+   "kata": [
+    [
+     "Setelah",
+     104.28,
+     104.39
+    ],
+    [
+     "itu",
+     104.39,
+     104.77
+    ],
+    [
+     "ketuk",
+     104.77,
+     105.15
+    ],
+    [
+     "Simpan",
+     105.15,
+     105.62
+    ],
+    [
+     "daftar,",
+     105.62,
+     106.21
+    ],
+    [
+     "dan",
+     106.21,
+     106.63
+    ],
+    [
+     "tamu",
+     106.63,
+     106.74
+    ],
+    [
+     "langsung",
+     106.74,
+     107.34
+    ],
+    [
+     "siap",
+     107.34,
+     107.64
+    ],
+    [
+     "dikirimi",
+     107.64,
+     108.24
+    ],
+    [
+     "undangan.",
+     108.24,
+     109.2
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "penting",
+   "text": "Satu hal penting: daftar tamu dan status terkirimnya hanya tersimpan di HP yang dipakai.",
+   "mulai": 109.6,
+   "selesai": 115.1,
+   "kata": [
+    [
+     "Satu",
+     109.6,
+     109.7
+    ],
+    [
+     "hal",
+     109.7,
+     109.73
+    ],
+    [
+     "penting:",
+     109.73,
+     110.44
+    ],
+    [
+     "daftar",
+     110.44,
+     110.94
+    ],
+    [
+     "tamu",
+     110.94,
+     111.24
+    ],
+    [
+     "dan",
+     111.24,
+     111.4
+    ],
+    [
+     "status",
+     111.4,
+     111.95
+    ],
+    [
+     "terkirimnya",
+     111.95,
+     112.66
+    ],
+    [
+     "hanya",
+     112.66,
+     113.03
+    ],
+    [
+     "tersimpan",
+     113.03,
+     113.69
+    ],
+    [
+     "di",
+     113.69,
+     113.99
+    ],
+    [
+     "HP",
+     113.99,
+     114.02
+    ],
+    [
+     "yang",
+     114.02,
+     114.37
+    ],
+    [
+     "dipakai.",
+     114.37,
+     115.1
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "satu-hp",
+   "text": "Jadi kirim undangan dari HP dan browser yang sama, dan simpan juga daftar tamunya di catatan.",
+   "mulai": 115.2,
+   "selesai": 121.34,
+   "kata": [
+    [
+     "Jadi",
+     115.2,
+     115.55
+    ],
+    [
+     "kirim",
+     115.55,
+     115.92
+    ],
+    [
+     "undangan",
+     115.92,
+     116.51
+    ],
+    [
+     "dari",
+     116.51,
+     116.81
+    ],
+    [
+     "HP",
+     116.81,
+     116.96
+    ],
+    [
+     "dan",
+     116.96,
+     117.45
+    ],
+    [
+     "browser",
+     117.45,
+     117.71
+    ],
+    [
+     "yang",
+     117.71,
+     118.01
+    ],
+    [
+     "sama,",
+     118.01,
+     118.52
+    ],
+    [
+     "dan",
+     118.52,
+     118.74
+    ],
+    [
+     "simpan",
+     118.74,
+     119.18
+    ],
+    [
+     "juga",
+     119.18,
+     119.52
+    ],
+    [
+     "daftar",
+     119.52,
+     119.89
+    ],
+    [
+     "tamunya",
+     119.89,
+     120.49
+    ],
+    [
+     "di",
+     120.49,
+     120.54
+    ],
+    [
+     "catatan.",
+     120.54,
+     121.34
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "pilih-tamu",
+   "text": "Ketuk nama tamunya.",
+   "mulai": 121.66,
+   "selesai": 122.72,
+   "kata": [
+    [
+     "Ketuk",
+     121.66,
+     121.76
+    ],
+    [
+     "nama",
+     121.76,
+     121.97
+    ],
+    [
+     "tamunya.",
+     121.97,
+     122.72
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "pesan",
+   "text": "Pesannya sudah berisi nama tamu dan link pribadinya.",
+   "mulai": 123.08,
+   "selesai": 125.94,
+   "kata": [
+    [
+     "Pesannya",
+     123.08,
+     123.25
+    ],
+    [
+     "sudah",
+     123.25,
+     123.59
+    ],
+    [
+     "berisi",
+     123.59,
+     123.99
+    ],
+    [
+     "nama",
+     123.99,
+     124.24
+    ],
+    [
+     "tamu",
+     124.24,
+     124.51
+    ],
+    [
+     "dan",
+     124.51,
+     124.72
+    ],
+    [
+     "link",
+     124.72,
+     124.98
+    ],
+    [
+     "pribadinya.",
+     124.98,
+     125.94
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "link",
+   "text": "Link ini menampilkan nama tamu di sampul undangan, dan tercatat di Pelacakan saat dibuka.",
+   "mulai": 126.36,
+   "selesai": 131.76,
+   "kata": [
+    [
+     "Link",
+     126.36,
+     126.46
+    ],
+    [
+     "ini",
+     126.46,
+     126.46
+    ],
+    [
+     "menampilkan",
+     126.46,
+     127.27
+    ],
+    [
+     "nama",
+     127.27,
+     127.57
+    ],
+    [
+     "tamu",
+     127.57,
+     127.89
+    ],
+    [
+     "di",
+     127.89,
+     128
+    ],
+    [
+     "sampul",
+     128,
+     128.67
+    ],
+    [
+     "undangan,",
+     128.67,
+     129.04
+    ],
+    [
+     "dan",
+     129.04,
+     129.26
+    ],
+    [
+     "tercatat",
+     129.26,
+     129.85
+    ],
+    [
+     "di",
+     129.85,
+     130
+    ],
+    [
+     "Pelacakan",
+     130,
+     130.78
+    ],
+    [
+     "saat",
+     130.78,
+     130.97
+    ],
+    [
+     "dibuka.",
+     130.97,
+     131.76
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "khusus",
+   "text": "Untuk undangan khusus, hanya link pribadi seperti ini yang bisa membukanya.",
+   "mulai": 132.14,
+   "selesai": 136.18,
+   "kata": [
+    [
+     "Untuk",
+     132.14,
+     132.24
+    ],
+    [
+     "undangan",
+     132.24,
+     132.58
+    ],
+    [
+     "khusus,",
+     132.58,
+     133.07
+    ],
+    [
+     "hanya",
+     133.07,
+     133.39
+    ],
+    [
+     "link",
+     133.39,
+     133.66
+    ],
+    [
+     "pribadi",
+     133.66,
+     134.09
+    ],
+    [
+     "seperti",
+     134.09,
+     134.54
+    ],
+    [
+     "ini",
+     134.54,
+     134.75
+    ],
+    [
+     "yang",
+     134.75,
+     134.99
+    ],
+    [
+     "bisa",
+     134.99,
+     135.25
+    ],
+    [
+     "membukanya.",
+     135.25,
+     136.18
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "teks",
+   "text": "Pilih teks pengantar yang cocok, misalnya muslim, formal, nasrani, atau hindu.",
+   "mulai": 136.58,
+   "selesai": 142.66,
+   "kata": [
+    [
+     "Pilih",
+     136.58,
+     136.63
+    ],
+    [
+     "teks",
+     136.63,
+     136.76
+    ],
+    [
+     "pengantar",
+     136.76,
+     137.36
+    ],
+    [
+     "yang",
+     137.36,
+     137.63
+    ],
+    [
+     "cocok,",
+     137.63,
+     138.24
+    ],
+    [
+     "misalnya",
+     138.6,
+     139.16
+    ],
+    [
+     "muslim,",
+     139.16,
+     139.94
+    ],
+    [
+     "formal,",
+     139.94,
+     140.63
+    ],
+    [
+     "nasrani,",
+     140.63,
+     141.46
+    ],
+    [
+     "atau",
+     141.46,
+     141.83
+    ],
+    [
+     "hindu.",
+     141.83,
+     142.66
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "ubah",
+   "text": "Isi pesan boleh diubah, asal tulisan nama dan link undangan dalam kurung siku tidak dihapus.",
+   "mulai": 142.76,
+   "selesai": 149.1,
+   "kata": [
+    [
+     "Isi",
+     142.76,
+     142.88
+    ],
+    [
+     "pesan",
+     142.88,
+     143.26
+    ],
+    [
+     "boleh",
+     143.26,
+     143.65
+    ],
+    [
+     "diubah,",
+     143.65,
+     144.3
+    ],
+    [
+     "asal",
+     144.3,
+     144.55
+    ],
+    [
+     "tulisan",
+     144.55,
+     145.09
+    ],
+    [
+     "nama",
+     145.09,
+     145.46
+    ],
+    [
+     "dan",
+     145.46,
+     145.63
+    ],
+    [
+     "link",
+     145.63,
+     145.94
+    ],
+    [
+     "undangan",
+     145.94,
+     146.57
+    ],
+    [
+     "dalam",
+     146.57,
+     147.08
+    ],
+    [
+     "kurung",
+     147.08,
+     147.43
+    ],
+    [
+     "siku",
+     147.43,
+     147.73
+    ],
+    [
+     "tidak",
+     147.73,
+     148.11
+    ],
+    [
+     "dihapus.",
+     148.11,
+     149.1
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "siap",
+   "text": "Kalau sudah tertulis Siap dikirim, ketuk tombol kirim hijau.",
+   "mulai": 149.4,
+   "selesai": 153,
+   "kata": [
+    [
+     "Kalau",
+     149.4,
+     149.5
+    ],
+    [
+     "sudah",
+     149.5,
+     149.84
+    ],
+    [
+     "tertulis",
+     149.84,
+     150.36
+    ],
+    [
+     "Siap",
+     150.36,
+     150.64
+    ],
+    [
+     "dikirim,",
+     150.64,
+     151.27
+    ],
+    [
+     "ketuk",
+     151.27,
+     151.75
+    ],
+    [
+     "tombol",
+     151.75,
+     152.04
+    ],
+    [
+     "kirim",
+     152.04,
+     152.39
+    ],
+    [
+     "hijau.",
+     152.39,
+     153
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "terkirim",
+   "text": "Tamu langsung ditandai Terkirim.",
+   "mulai": 153.34,
+   "selesai": 155.5,
+   "kata": [
+    [
+     "Tamu",
+     153.34,
+     153.44
+    ],
+    [
+     "langsung",
+     153.44,
+     153.96
+    ],
+    [
+     "ditandai",
+     153.96,
+     154.6
+    ],
+    [
+     "Terkirim.",
+     154.6,
+     155.5
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "batal",
+   "text": "Kalau ternyata batal mengirim, buka titik tiga di kanan atas lalu pilih Tandai belum dikirim.",
+   "mulai": 155.82,
+   "selesai": 162.02,
+   "kata": [
+    [
+     "Kalau",
+     155.82,
+     155.92
+    ],
+    [
+     "ternyata",
+     155.92,
+     156.49
+    ],
+    [
+     "batal",
+     156.49,
+     156.86
+    ],
+    [
+     "mengirim,",
+     156.86,
+     157.63
+    ],
+    [
+     "buka",
+     157.63,
+     158.16
+    ],
+    [
+     "titik",
+     158.16,
+     158.31
+    ],
+    [
+     "tiga",
+     158.31,
+     158.61
+    ],
+    [
+     "di",
+     158.61,
+     158.69
+    ],
+    [
+     "kanan",
+     158.69,
+     159.07
+    ],
+    [
+     "atas",
+     159.07,
+     159.7
+    ],
+    [
+     "lalu",
+     159.7,
+     159.93
+    ],
+    [
+     "pilih",
+     159.93,
+     160.31
+    ],
+    [
+     "Tandai",
+     160.31,
+     160.77
+    ],
+    [
+     "belum",
+     160.77,
+     161.21
+    ],
+    [
+     "dikirim.",
+     161.21,
+     162.02
+    ]
+   ],
+   "sama": 0.93
+  },
+  {
+   "id": "wa",
+   "text": "WhatsApp terbuka.",
+   "mulai": 162.38,
+   "selesai": 163.44,
+   "kata": [
+    [
+     "WhatsApp",
+     162.38,
+     162.82
+    ],
+    [
+     "terbuka.",
+     162.82,
+     163.44
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "kontak",
+   "text": "Karena tamu ini belum punya nomor, WhatsApp meminta kita memilih kontaknya.",
+   "mulai": 163.82,
+   "selesai": 168.26,
+   "kata": [
+    [
+     "Karena",
+     163.82,
+     163.92
+    ],
+    [
+     "tamu",
+     163.92,
+     164.14
+    ],
+    [
+     "ini",
+     164.14,
+     164.35
+    ],
+    [
+     "belum",
+     164.35,
+     164.7
+    ],
+    [
+     "punya",
+     164.7,
+     165.05
+    ],
+    [
+     "nomor,",
+     165.05,
+     165.54
+    ],
+    [
+     "WhatsApp",
+     165.54,
+     166.17
+    ],
+    [
+     "meminta",
+     166.17,
+     166.62
+    ],
+    [
+     "kita",
+     166.62,
+     166.87
+    ],
+    [
+     "memilih",
+     166.87,
+     167.38
+    ],
+    [
+     "kontaknya.",
+     167.38,
+     168.26
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "cari",
+   "text": "Cari nama atau nomornya, lalu pilih.",
+   "mulai": 168.6,
+   "selesai": 171.06,
+   "kata": [
+    [
+     "Cari",
+     168.6,
+     168.66
+    ],
+    [
+     "nama",
+     168.66,
+     168.9
+    ],
+    [
+     "atau",
+     168.9,
+     169.22
+    ],
+    [
+     "nomornya,",
+     169.22,
+     170.02
+    ],
+    [
+     "lalu",
+     170.02,
+     170.34
+    ],
+    [
+     "pilih.",
+     170.34,
+     171.06
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "lewati",
+   "text": "Kalau nomor tamu sudah diisi, chat-nya langsung terbuka dan langkah ini terlewati.",
+   "mulai": 171.16,
+   "selesai": 176.4,
+   "kata": [
+    [
+     "Kalau",
+     171.16,
+     171.5
+    ],
+    [
+     "nomor",
+     171.5,
+     171.79
+    ],
+    [
+     "tamu",
+     171.79,
+     172.08
+    ],
+    [
+     "sudah",
+     172.08,
+     172.45
+    ],
+    [
+     "diisi,",
+     172.45,
+     172.95
+    ],
+    [
+     "chat-nya",
+     172.95,
+     173.41
+    ],
+    [
+     "langsung",
+     173.41,
+     173.97
+    ],
+    [
+     "terbuka",
+     173.97,
+     174.48
+    ],
+    [
+     "dan",
+     174.48,
+     174.7
+    ],
+    [
+     "langkah",
+     174.7,
+     175.43
+    ],
+    [
+     "ini",
+     175.43,
+     175.48
+    ],
+    [
+     "terlewati.",
+     175.48,
+     176.4
+    ]
+   ],
+   "sama": 0.92
+  },
+  {
+   "id": "kartu",
+   "text": "Pesannya sudah terisi lengkap, dengan kartu tautan undangan di atasnya.",
+   "mulai": 176.92,
+   "selesai": 180.98,
+   "kata": [
+    [
+     "Pesannya",
+     176.92,
+     177.02
+    ],
+    [
+     "sudah",
+     177.02,
+     177.36
+    ],
+    [
+     "terisi",
+     177.36,
+     177.73
+    ],
+    [
+     "lengkap,",
+     177.73,
+     178.36
+    ],
+    [
+     "dengan",
+     178.36,
+     178.78
+    ],
+    [
+     "kartu",
+     178.78,
+     179.2
+    ],
+    [
+     "tautan",
+     179.2,
+     179.55
+    ],
+    [
+     "undangan",
+     179.55,
+     180.11
+    ],
+    [
+     "di",
+     180.11,
+     180.25
+    ],
+    [
+     "atasnya.",
+     180.25,
+     180.98
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "kirim",
+   "text": "Tinggal tekan kirim.",
+   "mulai": 181.48,
+   "selesai": 182.42,
+   "kata": [
+    [
+     "Tinggal",
+     181.48,
+     181.58
+    ],
+    [
+     "tekan",
+     181.58,
+     181.82
+    ],
+    [
+     "kirim.",
+     181.82,
+     182.42
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "selesai",
+   "text": "Selesai.",
+   "mulai": 182.9,
+   "selesai": 183.46,
+   "kata": [
+    [
+     "Selesai.",
+     182.9,
+     183.46
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "kembali",
+   "text": "Kembali ke dashboard, tamu ini sudah tercatat Terkirim.",
+   "mulai": 183.94,
+   "selesai": 187.34,
+   "kata": [
+    [
+     "Kembali",
+     183.94,
+     184.04
+    ],
+    [
+     "ke",
+     184.04,
+     184.12
+    ],
+    [
+     "dashboard,",
+     184.12,
+     184.95
+    ],
+    [
+     "tamu",
+     184.95,
+     185.28
+    ],
+    [
+     "ini",
+     185.28,
+     185.47
+    ],
+    [
+     "sudah",
+     185.47,
+     185.84
+    ],
+    [
+     "tercatat",
+     185.84,
+     186.43
+    ],
+    [
+     "Terkirim.",
+     186.43,
+     187.34
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "saringan",
+   "text": "Ketuk saringan Belum dikirim supaya yang tampil tinggal tamu yang belum dikirimi.",
+   "mulai": 187.88,
+   "selesai": 192.5,
+   "kata": [
+    [
+     "Ketuk",
+     187.88,
+     187.88
+    ],
+    [
+     "saringan",
+     187.88,
+     188.21
+    ],
+    [
+     "Belum",
+     188.21,
+     188.55
+    ],
+    [
+     "dikirim",
+     188.55,
+     189.14
+    ],
+    [
+     "supaya",
+     189.14,
+     189.54
+    ],
+    [
+     "yang",
+     189.54,
+     189.81
+    ],
+    [
+     "tampil",
+     189.81,
+     190.23
+    ],
+    [
+     "tinggal",
+     190.23,
+     190.68
+    ],
+    [
+     "tamu",
+     190.68,
+     190.94
+    ],
+    [
+     "yang",
+     190.94,
+     191.21
+    ],
+    [
+     "belum",
+     191.21,
+     191.55
+    ],
+    [
+     "dikirimi.",
+     191.55,
+     192.5
+    ]
+   ],
+   "sama": 1
+  },
+  {
+   "id": "ulangi",
+   "text": "Ulangi untuk tamu berikutnya!",
+   "mulai": 193.08,
+   "selesai": 194.58,
+   "kata": [
+    [
+     "Ulangi",
+     193.08,
+     193.18
+    ],
+    [
+     "untuk",
+     193.18,
+     193.3
+    ],
+    [
+     "tamu",
+     193.3,
+     193.59
+    ],
+    [
+     "berikutnya!",
+     193.59,
+     194.58
+    ]
+   ],
+   "sama": 1
+  }
+ ]
+}

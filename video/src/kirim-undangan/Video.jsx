@@ -1,0 +1,473 @@
+// Video panduan "Cara kirim undangan ke tamu" (tegak 1080x1920). Layar dashboard = tangkapan layar asli (rekam-layar.mjs,
+// layar.json); WhatsApp digambar ulang (ui/wa). Semua waktu dijangkarkan ke kata narasi (waktu.json dari naskah.js), jadi
+// narasi baru cukup `npm run waktu` lalu render ulang; kata jangkar yang hilang dari naskah langsung jadi galat.
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
+import { Audio } from "@remotion/media";
+import { antara, BINGKAI, FPS, halus, HP, HURUF, lepas, PONSEL, PUSAT, S, W, WARNA, WEB_Y, ZONA } from "../ui/dasar";
+import { Ikon } from "../ui/ikon";
+import { Judul } from "../ui/Judul";
+import { Ketuk } from "../ui/Ketuk";
+import { Alamat, Ponsel } from "../ui/Ponsel";
+import { Sorot } from "../ui/Sorot";
+import { Tanda } from "../ui/Tanda";
+import { potong, Teks } from "../ui/Teks";
+import { BulatKirim, format, Gelembung, KartuTautan, Kontak, WA, WaKepala, WaLayar, WaPilih, WaTulis } from "../ui/wa/Wa";
+import layar from "./layar.json";
+import waktu from "./waktu.json";
+
+// ---- Jangkar waktu dan kotak ----
+const K = Object.fromEntries(waktu.kalimat.map((k) => [k.id, k]));
+const norm = (w) => w.toLowerCase().replace(/[^a-z0-9]/g, "");
+// Detik saat `kata` (awalan, kemunculan pertama) mulai diucapkan di kalimat `id`; `akhir` = saat kata itu selesai.
+// Tanpa kata: awal (atau akhir) kalimat.
+function t(id, kata, akhir) {
+  const k = K[id];
+  if (!k) throw new Error(`kalimat "${id}" tidak ada di waktu.json`);
+  if (!kata) return akhir ? k.selesai : k.mulai;
+  const w = k.kata.find(([x]) => norm(x).startsWith(norm(kata)));
+  if (!w) throw new Error(`kata "${kata}" tidak ada di kalimat "${id}"`);
+  return akhir ? w[2] : w[1];
+}
+const fr = (s) => Math.round(s * FPS);
+// Kotak elemen dari layar.json dalam px CSS layar ponsel (isi web mulai di bawah bilah alamat).
+function kotak(nama, kunci) {
+  const b = layar.layar[nama] && layar.layar[nama].kotak[kunci];
+  if (!b) throw new Error(`kotak ${nama}.${kunci} tidak ada di layar.json`);
+  return [b[0], b[1] + WEB_Y, b[2], b[3]];
+}
+const gabung = (...bs) => {
+  const x = Math.min(...bs.map((b) => b[0])), y = Math.min(...bs.map((b) => b[1]));
+  return [x, y, Math.max(...bs.map((b) => b[0] + b[2])) - x, Math.max(...bs.map((b) => b[1] + b[3])) - y];
+};
+const tengah = (b) => [b[0] + b[2] / 2, b[1] + b[3] / 2];
+
+const KELOLA = layar.layar.gerbang.url;
+const LINK_TAMU = layar.layar["undangan-sampul"].url.replace(/^https:\/\//, "");
+const PESAN = layar.layar["chat-terkirim-bawah"].pesan;
+const OG = staticFile("kirim-undangan/layar/pratinjau.jpg");
+const SERAH = [
+  "Undangan siap: https://tokomu.myscalev.com/rani-dimas",
+  "Kelola undangan (kirim ke tamu, RSVP, ucapan, check-in): https://tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas",
+  "PIN: `482913`",
+];
+
+// ---- Urutan layar ----
+const PIN_MULAI = t("masuk", "mengetik"), PIN_AKHIR = t("masuk", "lalu");
+const TEMPEL = t("sumber") + 0.05, TEMPEL_KETUK = TEMPEL + 0.95;
+const LAYAR = [
+  [0, "wa:serah"],
+  [t("masuk", "kedua", true) + 0.25, "gerbang", "pudar"],
+  ...[1, 2, 3, 4, 5, 6].map((i) => [PIN_MULAI + 0.1 + ((i - 1) * (PIN_AKHIR - PIN_MULAI - 0.15)) / 6, "gerbang-pin-" + i]),
+  [t("masuk", "Masuk", true) + 0.15, "beranda", "pudar"],
+  [t("tab-kirim", "Kirim") + 0.25, "kirim-kosong"],
+  [t("panel") + 0.15, "tambah-kosong", "geser"],
+  [TEMPEL_KETUK + 0.12, "tambah-isi", "pudar"],
+  [t("simpan", "Simpan") + 0.3, "daftar-toast", "pudar"],
+  [t("penting") - 0.3, "daftar", "pudar"],
+  [t("pilih-tamu", "nama") + 0.25, "chat", "geser"],
+  [t("pesan", "link") - 0.3, "chat-link", "gulir"],
+  [t("link", "menampilkan"), "undangan-sampul", "geser"],
+  [t("teks") - 0.25, "chat-bawah", "kembali"],
+  [t("siap", "kirim") + 0.3, "chat-terkirim-bawah"],
+  [t("terkirim", "ditandai") - 0.25, "chat-terkirim", "gulir"],
+  [t("batal", "titik") + 0.35, "chat-menu"],
+  [t("wa") - 0.15, "wa:pilih", "naik"],
+  [t("cari", "Cari") - 0.05, "wa:cari"],
+  [t("cari", "pilih") + 0.3, "wa:chat", "geser"],
+  [t("kirim", "kirim") + 0.3, "wa:terkirim"],
+  [t("kembali") - 0.1, "daftar-terkirim", "naik"],
+  [t("saringan", "Belum") + 0.3, "daftar-belum"],
+];
+
+// ---- Kamera: [mulai, lama (detik), perbesaran, titik fokus px CSS layar] ----
+const TENGAH = [HP.w / 2, HP.h / 2];
+const CONTOH = gabung(kotak("tambah-kosong", "baris-1"), kotak("tambah-kosong", "baris-3"));
+const KAMERA = [
+  [PIN_MULAI - 0.45, 0.6, 1.35, tengah(kotak("gerbang", "kartu"))],
+  [t("beranda") - 0.35, 0.6, 1, TENGAH],
+  [t("format") - 0.5, 0.8, 1.6, [HP.w / 2, CONTOH[1] + CONTOH[3] / 2 + 18]],
+  [t("sumber") - 0.45, 0.7, 1.22, tengah(kotak("tambah-kosong", "kolom"))],
+  [t("simpan", "ketuk") - 0.3, 0.6, 1, TENGAH],
+  [t("teks") - 0.35, 0.6, 1.22, tengah(gabung(kotak("chat-bawah", "pilihan"), kotak("chat-bawah", "kirim")))],
+  [t("terkirim") - 0.35, 0.6, 1, TENGAH],
+  [t("batal", "titik") - 0.1, 0.6, 1.32, [HP.w - 120, tengah(kotak("chat-menu", "menu-buka"))[1] + 30]],
+  [t("wa") - 0.35, 0.5, 1, TENGAH],
+  [t("kartu") - 0.35, 0.6, 1.3, [HP.w / 2, 600]],
+  [t("selesai") - 0.25, 0.5, 1, TENGAH],
+];
+function kamera(f) {
+  let k = 1, fx = TENGAH[0], fy = TENGAH[1];
+  for (const [mulai, lama, k2, [x2, y2]] of KAMERA) {
+    const a = fr(mulai);
+    if (f < a) break;
+    const p = antara(f, a, a + fr(lama), 0, 1, halus);
+    k += (k2 - k) * p; fx += (x2 - fx) * p; fy += (y2 - fy) * p;
+  }
+  // Titik fokus ke kanvas sebelum diperbesar, lalu digeser ke tengah ponsel.
+  const px = PONSEL.x + (BINGKAI + fx) * S, py = PONSEL.y + (BINGKAI + fy) * S;
+  return `translate(${PUSAT.x - k * px}px, ${PUSAT.y - k * py}px) scale(${k})`;
+}
+
+// ---- Sorotan dan ketukan di layar dashboard ----
+const B = (k) => kotak("tambah-kosong", k);
+const SOROT = [
+  [kotak("gerbang", "pin"), "Ketik PIN 6 angka", PIN_MULAI - 0.1, PIN_AKHIR],
+  [kotak("gerbang", "masuk"), "Masuk", t("masuk", "menekan") - 0.15, t("masuk", "Masuk", true) + 0.1],
+  [kotak("beranda", "tab-kirim"), "Tab Kirim", t("tab-kirim", "buka") - 0.1, t("tab-kirim", "Kirim") + 0.2],
+  [kotak("kirim-kosong", "fab"), "Tombol tambah", t("tab-kirim", "ketuk") - 0.1, t("laptop") - 0.2],
+  [kotak("tambah-kosong", "kolom"), "Daftar tamu, satu per baris", t("tempel", "kolom") - 0.2, t("format") - 0.15],
+  [B("baris-3"), "Satu baris, satu tamu", t("format"), t("format", "dipisah") - 0.05],
+  [B("baris-3"), "Dipisah tanda strip ( - )", t("format", "dipisah"), t("format", "nama") - 0.05],
+  [B("baris-3-1"), "nama", t("format", "nama"), t("format", "nomor") - 0.05],
+  [B("baris-3-2"), "nomor WhatsApp", t("format", "nomor"), t("format", "kategori") - 0.05],
+  [B("baris-3-3"), "kategori", t("format", "kategori"), t("format", "jumlah") - 0.05],
+  [B("baris-3-4"), "jumlah orang", t("format", "jumlah"), t("format", null, true) + 0.15],
+  [B("baris-3-1"), "Wajib diisi", t("wajib"), t("wajib", "sisanya") - 0.05],
+  [gabung(B("baris-3-2"), B("baris-3-4")), "Boleh dikosongkan", t("wajib", "sisanya"), t("wajib", null, true) + 0.15],
+  [CONTOH, "Contoh di kolom", t("contoh"), t("contoh", null, true) + 0.15],
+  [B("baris-1"), "Hanya nama", t("baris-1"), t("baris-1", null, true) + 0.15],
+  [B("baris-2-1"), "nama", t("baris-2"), t("baris-2", "strip") - 0.05],
+  [B("baris-2-2"), "nomor WhatsApp", t("baris-2", "strip"), t("baris-2", null, true) + 0.15],
+  [B("baris-3-1"), "nama", t("baris-3"), t("baris-3", "nomor") - 0.45],
+  [B("baris-3-2"), "nomor WhatsApp", t("baris-3", "nomor") - 0.4, t("baris-3", "Sahabat") - 0.4],
+  [B("baris-3-3"), "kategori", t("baris-3", "Sahabat") - 0.35, t("baris-3", "2") - 0.4],
+  [B("baris-3-4"), "jumlah orang", t("baris-3", "2") - 0.35, t("baris-3", "lengkap") - 0.05],
+  [B("baris-3"), "Lengkap empat-empatnya", t("baris-3", "lengkap"), t("baris-3", null, true) + 0.2],
+  [B("baris-2-2"), "Chat tamu langsung terbuka", t("nomor"), t("nomor", null, true) + 0.15],
+  [B("baris-1"), "Tanpa nomor: pilih kontak sendiri", t("tanpa-nomor"), t("tanpa-nomor", null, true) + 0.15],
+  [B("baris-3-3"), "Kategori", t("kategori"), t("kategori", null, true) + 0.15],
+  [B("baris-3-4"), "Jumlah orang", t("jumlah"), t("jumlah", null, true) + 0.15],
+  [kotak("tambah-isi", "csv"), "Impor CSV", t("csv", "pakai") - 0.1, t("csv", null, true) + 0.15],
+  [kotak("tambah-isi", "kolom"), "Sampai 1.000 tamu per daftar", t("batas"), t("batas", null, true) + 0.15],
+  [kotak("tambah-isi", "simpan"), "Simpan daftar", t("simpan", "ketuk") - 0.2, t("simpan", "Simpan") + 0.25],
+  [gabung(kotak("daftar", "tamu-1"), kotak("daftar", "tamu-6")), "Tamu siap dikirimi", t("simpan", "siap") - 0.2, t("simpan", null, true) + 0.25],
+  [kotak("daftar", "tamu-1"), "Ketuk nama tamu", t("pilih-tamu") - 0.1, t("pilih-tamu", "nama") + 0.2],
+  [kotak("chat", "nama-tamu"), "Nama tamu", t("pesan", "nama") - 0.1, t("pesan", "link") - 0.35],
+  [kotak("chat-link", "link-tamu"), "Link pribadi tamu ini", t("pesan", "link"), t("link") - 0.05],
+  [kotak("undangan-sampul", "nama"), "Nama tamu di sampul", t("link", "nama") - 0.1, t("khusus") - 0.1],
+  [kotak("chat-bawah", "pilihan"), "Pilih teks pengantar", t("teks", "Pilih") - 0.05, t("teks", null, true) + 0.15],
+  [gabung(kotak("chat-bawah", "periksa-link"), kotak("chat-bawah", "periksa-nama")), "Pesan boleh diubah, asal [nama] dan [link-undangan] tetap ada", t("ubah"), t("ubah", null, true) + 0.15],
+  [kotak("chat-bawah", "status"), "Siap dikirim", t("siap", "Siap") - 0.1, t("siap", "ketuk") - 0.05],
+  [kotak("chat-bawah", "kirim"), "Kirim", t("siap", "ketuk"), t("siap", "kirim") + 0.25],
+  [kotak("chat-terkirim", "hari"), "Langsung ditandai Terkirim", t("terkirim", "ditandai") - 0.1, t("terkirim", null, true) + 0.25],
+  [kotak("chat-menu", "belum-dikirim"), "Kalau batal mengirim", t("batal", "pilih") - 0.2, t("batal", null, true) - 0.1],
+  [kotak("daftar-terkirim", "tamu-1"), "Sudah tercatat Terkirim", t("kembali", "tamu") - 0.1, t("kembali", null, true) + 0.25],
+  [kotak("daftar-terkirim", "belum"), "Belum dikirim", t("saringan") - 0.05, t("saringan", "Belum") + 0.3],
+  [gabung(kotak("daftar-belum", "tamu-2"), kotak("daftar-belum", "tamu-6")), "Tinggal tamu yang belum dikirimi", t("saringan", "supaya"), t("ulangi", null, true) + 0.6],
+];
+const KETUK = [
+  [kotak("gerbang", "masuk"), t("masuk", "Masuk") + 0.05],
+  [kotak("beranda", "tab-kirim"), t("tab-kirim", "Kirim") + 0.05],
+  [kotak("kirim-kosong", "fab"), t("panel") - 0.05],
+  [kotak("tambah-isi", "simpan"), t("simpan", "Simpan") + 0.05],
+  [kotak("daftar", "tamu-1"), t("pilih-tamu", "nama")],
+  [kotak("chat-bawah", "teks-muslim"), t("teks", "muslim")],
+  [kotak("chat-bawah", "kirim"), t("siap", "kirim") + 0.05],
+  [kotak("chat-terkirim", "menu"), t("batal", "titik") + 0.1],
+  [kotak("daftar-terkirim", "belum"), t("saringan", "Belum") + 0.05],
+];
+// Tempel: tekan lama di kolom, gelembung "Tempel" Android muncul, diketuk, daftar terisi.
+const KOLOM = kotak("tambah-kosong", "kolom");
+const TITIK_TEMPEL = [KOLOM[0] + 110, KOLOM[1] + 120];
+const Tempel = () => {
+  const f = useCurrentFrame();
+  const a = fr(TEMPEL + 0.45), b = fr(TEMPEL_KETUK) + 4;
+  if (f < a || f > b) return null;
+  const o = antara(f, a, a + 5, 0, 1, lepas) * (1 - antara(f, b - 4, b, 0, 1));
+  const [x, y] = TITIK_TEMPEL;
+  return (
+    <div style={{ position: "absolute", left: x - 58, top: y - 62, zIndex: 7, opacity: o, transform: `scale(${0.9 + 0.1 * o})` }}>
+      <div style={{ padding: "11px 18px", borderRadius: 10, background: "#2b2d31", color: "#fff", font: `500 15px ${HURUF}`, boxShadow: "0 6px 16px rgba(0,0,0,.3)" }}>Tempel</div>
+    </div>
+  );
+};
+
+// ---- Layar WhatsApp tiruan ----
+const Hari = ({ children }) => (
+  <div style={{ alignSelf: "center", margin: "10px 0 6px", padding: "5px 12px", borderRadius: 8, background: "#fff", color: "#54656f", font: `500 12.5px ${HURUF}`, boxShadow: "0 1px .5px rgba(11,20,26,.13)" }}>{children}</div>
+);
+const Kolom = ({ children, bawah = 66, atas }) => (
+  <div style={{ position: "absolute", left: 0, right: 0, top: 60, bottom: bawah, display: "flex", flexDirection: "column", justifyContent: atas ? "flex-start" : "flex-end", padding: "4px 0 8px" }}>{children}</div>
+);
+function WaSerah() {
+  const a = fr(t("masuk", "link") - 0.25), b = fr(t("masuk", "kedua", true) + 0.2);
+  return (
+    <WaLayar>
+      <WaKepala nama="Rina WO" sub="online" />
+      <Kolom>
+        <Hari>Hari ini</Hari>
+        <Gelembung jam="19.34">{"Halo Kak Rani & Mas Dimas 🤍 Undangan digitalnya sudah jadi. Ini link undangan, link untuk kirim ke tamu, dan PIN-nya:"}</Gelembung>
+        <Gelembung jam="19.35" ekor={false} rapat>
+          {format(SERAH[0])}{"\n"}
+          <Tanda dari={a} sampai={b} label="Link kedua" ketuk={fr(t("masuk", "kedua") + 0.1)} radius={6} block>{format(SERAH[1])}</Tanda>
+          {"\n"}{format(SERAH[2])}
+        </Gelembung>
+      </Kolom>
+      <WaTulis />
+    </WaLayar>
+  );
+}
+const KONTAK = [
+  ["Rina WO", "Sama-sama Kak, semoga lancar ya 🤍"], ["Mama", "Jangan lupa makan ya"], ["Keluarga Besar Rani", "Tante Lia: Siap, ditunggu undangannya"],
+  ["Om Surya", "Sehat selalu ya, Nak"], ["Dewi Lestari", "Wah selamat yaa!"], ["Om Hendra", "👍"], ["Sari Wulandari", "Oke siap"],
+];
+const KONTAK_CARI = [["Om Surya", "+62 812-7788-1020"], ["Surya Pratama", "+62 813-2244-5566"], ["Sari Wulandari", "+62 857-1122-3344"], ["Dewi Lestari", "+62 821-9876-5432"]];
+function WaPilihLayar() {
+  const a = fr(t("kontak", "meminta") - 0.2), b = fr(t("kontak", null, true) + 0.2);
+  return (
+    <WaPilih cari={null} bungkus={(n) => <Tanda dari={a} sampai={b} label="Pilih kontak tamu" di="bawah" rata="kiri" radius={6}>{n}</Tanda>}
+      kontak={KONTAK.map(([n, s]) => <Kontak key={n} nama={n} sub={s} />)} />
+  );
+}
+function WaCari() {
+  const f = useCurrentFrame();
+  const mulai = fr(t("cari", "Cari") + 0.2), huruf = Math.max(0, Math.min(5, Math.floor((f - mulai) / 4) + 1));
+  const cari = "Surya".slice(0, f < mulai ? 0 : huruf);
+  const hasil = KONTAK_CARI.filter(([n]) => n.toLowerCase().includes(cari.toLowerCase()));
+  const a = fr(t("cari", "lalu") - 0.15), pilih = fr(t("cari", "pilih") + 0.05);
+  return (
+    <WaPilih cari={cari} caret={(f >> 3) % 2 === 0} kontak={hasil.map(([n, s]) => (
+      n === "Om Surya" && cari.length === 5
+        ? <Tanda key={n} dari={a} sampai={pilih + 8} label="Pilih kontaknya" di="bawah" ketuk={pilih} radius={0} block><Kontak nama={n} sub={s} /></Tanda>
+        : <Kontak key={n} nama={n} sub={s} />))} />
+  );
+}
+const KARTU = { gambar: OG, judul: "Undangan Pernikahan Rani & Dimas", deskripsi: "Minggu, 14 Februari 2027. Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberi doa restu.", domain: "tokomu.myscalev.com" };
+const ChatLama = () => (
+  <>
+    <Hari>Kemarin</Hari>
+    <Gelembung jam="20.11">Rani, nanti kabari ya kalau undangannya sudah jadi 😊</Gelembung>
+    <Gelembung keluar jam="20.15" centang="biru">Siap Om, nanti Rani kirim 🙏</Gelembung>
+  </>
+);
+function WaChat() {
+  const a = fr(t("kartu", "kartu") - 0.15), b = fr(t("kartu", null, true) + 0.2);
+  const k = fr(t("kirim", "kirim") + 0.02);
+  return (
+    <WaLayar>
+      <WaKepala nama="Om Surya" sub="terakhir dilihat hari ini pukul 18.20" />
+      <Kolom bawah={262}><ChatLama /></Kolom>
+      <WaTulis teks={PESAN} baris={6}
+        kartu={<Tanda dari={a} sampai={b} label="Kartu tautan undangan" radius={8} block><KartuTautan kecil tutup {...KARTU} /></Tanda>}
+        tombol={<Tanda dari={fr(t("kirim") - 0.1)} sampai={k + 8} label="Kirim" rata="kanan" ketuk={k} radius={24}><BulatKirim ada /></Tanda>} />
+    </WaLayar>
+  );
+}
+function WaTerkirim() {
+  const f = useCurrentFrame(), a = fr(t("kirim", "kirim") + 0.3);
+  const o = antara(f, a, a + 7, 0, 1, lepas);
+  return (
+    <WaLayar>
+      <WaKepala nama="Om Surya" sub="online" />
+      <Kolom atas bawah={66}>
+        <ChatLama />
+        <Hari>Hari ini</Hari>
+        <div style={{ display: "flex", flexDirection: "column", opacity: o, transform: `translateY(${(1 - o) * 24}px)` }}>
+          <Gelembung keluar jam="19.42" centang="abu"><KartuTautan {...KARTU} />{format(PESAN)}</Gelembung>
+        </div>
+      </Kolom>
+      <WaTulis />
+    </WaLayar>
+  );
+}
+const WA_LAYAR = { "wa:serah": WaSerah, "wa:pilih": WaPilihLayar, "wa:cari": WaCari, "wa:chat": WaChat, "wa:terkirim": WaTerkirim };
+
+// ---- Pergantian layar ----
+const Isi = ({ nama }) => {
+  if (WA_LAYAR[nama]) { const L = WA_LAYAR[nama]; return <L />; }
+  return (
+    <>
+      <Alamat url={nama === "undangan-sampul" ? LINK_TAMU : KELOLA} />
+      <Img src={staticFile(`kirim-undangan/layar/${nama}.png`)} style={{ position: "absolute", left: 0, top: WEB_Y, width: HP.w, height: HP.h - WEB_Y - HP.nav }} />
+    </>
+  );
+};
+const LAMA = { pudar: 8, geser: 10, kembali: 10, gulir: 9, naik: 12 };
+function Layar() {
+  const f = useCurrentFrame();
+  const i = Math.max(0, LAYAR.findLastIndex(([s]) => fr(s) <= f));
+  const [s, nama, efek] = LAYAR[i];
+  const p = LAMA[efek] ? antara(f, fr(s), fr(s) + LAMA[efek], 0, 1, efek === "pudar" ? halus : lepas) : 1;
+  const lama = i > 0 && p < 1 ? LAYAR[i - 1][1] : null;
+  const gaya = {
+    pudar: [{}, { opacity: p }],
+    geser: [{ transform: `translateX(${-p * 90}px)` }, { transform: `translateX(${(1 - p) * HP.w}px)`, boxShadow: "-10px 0 24px rgba(0,0,0,.18)" }],
+    kembali: [{ transform: `translateX(${p * HP.w}px)`, boxShadow: "-10px 0 24px rgba(0,0,0,.18)", zIndex: 1 }, { transform: `translateX(${-(1 - p) * 90}px)` }],
+    gulir: [{ transform: `translateY(${-p * 60}px)`, opacity: 1 - p }, { transform: `translateY(${(1 - p) * 60}px)`, opacity: p }],
+    naik: [{}, { transform: `translateY(${(1 - p) * HP.h}px)` }],
+  }[efek] || [{}, {}];
+  return (
+    <>
+      {lama ? <div style={{ position: "absolute", inset: 0, background: "#fff", ...gaya[0] }}><Isi nama={lama} /></div> : null}
+      <div style={{ position: "absolute", inset: 0, background: "#fff", ...(lama ? gaya[1] : {}) }}><Isi nama={nama} /></div>
+    </>
+  );
+}
+
+// ---- Sisipan di kanvas (di luar ponsel) ----
+const muncul = (f, dari, sampai) => antara(f, fr(dari), fr(dari) + 8, 0, 1, lepas) * (1 - antara(f, fr(sampai), fr(sampai) + 7, 0, 1));
+// Kartu di atas ponsel; `redup` menyamarkan ponsel di belakangnya supaya pesan kartu yang dibaca.
+const Kartu = ({ dari, sampai, y = 1210, children, lebar = 1000, redup }) => {
+  const f = useCurrentFrame();
+  if (f < fr(dari) || f > fr(sampai) + 8) return null;
+  const o = muncul(f, dari, sampai);
+  return (
+    <>
+      {redup ? <div style={{ position: "absolute", inset: 0, background: `rgba(243,241,236,${0.72 * o})` }} /> : null}
+      <div style={{ position: "absolute", left: (W - lebar) / 2, top: y, width: lebar, opacity: o, transform: `translateY(${(1 - o) * 30}px) scale(${0.96 + 0.04 * o})`,
+        borderRadius: 34, background: "#fff", boxShadow: "0 24px 60px rgba(15,23,42,.25), 0 4px 12px rgba(15,23,42,.12)", padding: "30px 34px" }}>{children}</div>
+    </>
+  );
+};
+const Pil = ({ ikon, teks, dari, sampai, x, y }) => {
+  const f = useCurrentFrame();
+  if (f < fr(dari) || f > fr(sampai) + 8) return null;
+  const o = muncul(f, dari, sampai);
+  return (
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 14, padding: "18px 26px", borderRadius: 999, background: WARNA.gelap, color: "#fff",
+      font: `700 34px ${HURUF}`, opacity: o, transform: `translateX(-50%) translateY(${(1 - o) * 20}px) scale(${0.9 + 0.1 * o})`, boxShadow: "0 14px 30px rgba(15,23,42,.3)", whiteSpace: "nowrap" }}>
+      <Ikon n={ikon} s={40} c={WARNA.sorot} />{teks}
+    </div>
+  );
+};
+// Potongan tangkapan layar lain (px CSS sumbernya), diperbesar ke `lebar` px kanvas.
+const Potongan = ({ nama, kotak: [x, y, w, h], lebar }) => {
+  const k = lebar / w, vw = (layar.layar[nama].viewport || layar.viewport)[0];
+  return (
+    <div style={{ width: lebar, height: h * k, overflow: "hidden", position: "relative", borderRadius: 18 }}>
+      <Img src={staticFile(`kirim-undangan/layar/${nama}.png`)} style={{ position: "absolute", left: -x * k, top: -y * k, width: vw * k }} />
+    </div>
+  );
+};
+const Teks2 = ({ children, kecil }) => <div style={{ font: `${kecil ? 600 : 800} ${kecil ? 30 : 40}px/1.25 ${HURUF}`, color: kecil ? WARNA.abu : WARNA.teks }}>{children}</div>;
+function Laptop() {
+  const f = useCurrentFrame(), dari = t("laptop") - 0.15, sampai = t("panel") - 0.3;
+  if (f < fr(dari) || f > fr(sampai) + 8) return null;
+  const o = muncul(f, dari, sampai), lebar = 940, k = lebar / 1280, [x, y, w, h] = layar.layar["kirim-laptop"].kotak.tambah;
+  return (
+    <div style={{ position: "absolute", inset: 0, background: `rgba(243,241,236,${0.82 * o})` }}>
+      <div style={{ position: "absolute", left: (W - lebar - 40) / 2, top: 470, opacity: o, transform: `translateY(${(1 - o) * 40}px)` }}>
+        <div style={{ padding: 20, borderRadius: "28px 28px 10px 10px", background: "#1b1c20", boxShadow: "0 30px 70px rgba(15,23,42,.35)" }}>
+          <div style={{ position: "relative", width: lebar, height: 800 * k, overflow: "hidden", borderRadius: 6 }}>
+            <Img src={staticFile("kirim-undangan/layar/kirim-laptop.png")} style={{ width: lebar, height: 800 * k }} />
+            <Sorot kotak={[x * k, y * k, w * k, h * k]} label="Di laptop: di atas daftar" dari={fr(dari) + 6} sampai={fr(sampai)} sisi="bawah" pad={8} radius={999} lebar={lebar} ukuran={30} />
+          </div>
+        </div>
+        <div style={{ width: lebar + 140, height: 26, marginLeft: -50, borderRadius: "0 0 26px 26px", background: "linear-gradient(#d4d6db,#a9acb3)" }} />
+      </div>
+    </div>
+  );
+}
+function Sisipan() {
+  const lapRow = layar.layar["daftar-laptop"].kotak["tamu-3"], lapSub = layar.layar["daftar-laptop"].kotak["tamu-3-sub"];
+  const BARIS = [lapRow[0], lapRow[1], lapSub[0] + lapSub[2] - lapRow[0] + 14, lapRow[3]];
+  const cariTop = layar.layar["daftar-cari"].kotak.cari;
+  const baris5 = layar.layar["daftar-cari"].kotak["tamu-5"];
+  return (
+    <>
+      <Laptop />
+      <Kartu dari={t("kategori", "tampil") - 0.1} sampai={t("kategori", "dicari") - 0.15} y={1250}>
+        <Teks2 kecil>Di daftar tamu, tampil di bawah nama:</Teks2>
+        <div style={{ height: 16 }} />
+        <Potongan nama="daftar-laptop" kotak={BARIS} lebar={930} />
+      </Kartu>
+      <Kartu dari={t("kategori", "dicari") - 0.1} sampai={t("kategori", null, true) + 0.2} y={1110}>
+        <Teks2 kecil>Bisa dicari, misalnya Sahabat:</Teks2>
+        <div style={{ height: 16 }} />
+        <Potongan nama="daftar-cari" kotak={[0, cariTop[1] - 12, HP.w, baris5[1] + baris5[3] - cariTop[1] + 18]} lebar={930} />
+      </Kartu>
+      <Kartu dari={t("jumlah", "catatan") - 0.1} sampai={t("jumlah", null, true) + 0.2} y={1250}>
+        <Teks2 kecil>Hanya catatan, tampil sebagai "2 orang":</Teks2>
+        <div style={{ height: 16 }} />
+        <Potongan nama="daftar-laptop" kotak={BARIS} lebar={930} />
+      </Kartu>
+      <Pil ikon="catatan" teks="Catatan" dari={t("sumber", "catatan")} sampai={t("csv") - 0.2} x={270} y={1500} />
+      <Pil ikon="chat" teks="Daftar bernomor WhatsApp" dari={t("sumber", "bernomor")} sampai={t("csv") - 0.2} x={W / 2} y={1600} />
+      <Pil ikon="tabel" teks="Kolom Excel" dari={t("sumber", "kolom")} sampai={t("csv") - 0.2} x={810} y={1500} />
+      <Kartu dari={t("penting") - 0.05} sampai={t("pilih-tamu") - 0.35} y={620} redup>
+        <div style={{ display: "flex", gap: 22, alignItems: "flex-start" }}>
+          <div style={{ flex: "none", width: 84, height: 84, borderRadius: 24, background: "#fff4d6", display: "grid", placeItems: "center" }}><Ikon n="hp" s={52} c="#b7791f" /></div>
+          <div>
+            <Teks2>Daftar tamu dan status terkirim hanya tersimpan di HP yang dipakai</Teks2>
+            <div style={{ height: 22 }} />
+            <Cek dari={t("satu-hp", "HP")} teks="Kirim dari HP dan browser yang sama" />
+            <Cek dari={t("satu-hp", "simpan")} teks="Simpan juga daftar tamunya di catatan" />
+          </div>
+        </div>
+      </Kartu>
+      <Pil ikon="lihat" teks="Tercatat di Pelacakan saat dibuka" dari={t("link", "tercatat") - 0.1} sampai={t("khusus") - 0.15} x={W / 2} y={1520} />
+      <Pil ikon="gembok" teks="Undangan khusus: hanya lewat link pribadi" dari={t("khusus") - 0.05} sampai={t("teks") - 0.35} x={W / 2} y={1520} />
+      <Kartu dari={t("lewati") - 0.05} sampai={t("kartu") - 0.3} y={1100} redup>
+        <div style={{ display: "flex", gap: 22, alignItems: "center" }}>
+          <div style={{ flex: "none", width: 84, height: 84, borderRadius: 24, background: "#dff6e8", display: "grid", placeItems: "center" }}><Ikon n="telepon" s={46} c={WARNA.hijauTua} /></div>
+          <Teks2>Tamu sudah punya nomor? Chat-nya langsung terbuka, langkah ini terlewati.</Teks2>
+        </div>
+      </Kartu>
+      <Selesai />
+    </>
+  );
+}
+const Cek = ({ dari, teks }) => {
+  const f = useCurrentFrame(), o = antara(f, fr(dari), fr(dari) + 8, 0, 1, lepas);
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "10px 0", opacity: o, transform: `translateX(${(1 - o) * 16}px)` }}>
+      <Ikon n="selesai" s={40} c={WARNA.hijau} /><span style={{ font: `700 33px/1.25 ${HURUF}`, color: WARNA.teks }}>{teks}</span>
+    </div>
+  );
+};
+function Selesai() {
+  const f = useCurrentFrame(), a = fr(t("selesai") - 0.05), b = fr(t("kembali") - 0.2);
+  if (f < a || f > b + 8) return null;
+  const o = antara(f, a, a + 10, 0, 1, lepas) * (1 - antara(f, b, b + 8, 0, 1));
+  return (
+    <div style={{ position: "absolute", left: W / 2 - 150, top: PUSAT.y - 150, width: 300, height: 300, borderRadius: "50%", background: WARNA.hijau, display: "grid", placeItems: "center",
+      opacity: o, transform: `scale(${0.6 + 0.4 * o})`, boxShadow: "0 30px 70px rgba(29,170,97,.45)" }}>
+      <svg width="170" height="170" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="22" strokeDashoffset={22 * (1 - antara(f, a + 4, a + 16, 0, 1))} /></svg>
+    </div>
+  );
+}
+
+// ---- Komposisi ----
+const JUDUL = [
+  [0, null, "Cara kirim undangan ke tamu"],
+  [t("masuk"), 1, "Masuk dashboard"],
+  [t("tab-kirim"), 2, "Buka tab Kirim"],
+  [t("tempel"), 3, "Tempel daftar tamu"],
+  [t("guna"), 3, "Gunanya tiap bagian"],
+  [t("sumber"), 3, "Tempel lalu simpan"],
+  [t("penting"), null, "Penting"],
+  [t("pilih-tamu"), 4, "Kirim ke tamu"],
+  [t("wa"), 5, "Di WhatsApp"],
+  [t("selesai"), null, "Selesai!"],
+  [t("saringan"), null, "Tamu berikutnya"],
+];
+const POTONGAN = potong(waktu.kalimat);
+export const DURASI = Math.ceil((waktu.durasi + 1.2) * FPS);
+
+export const KirimUndangan = () => {
+  const f = useCurrentFrame();
+  const awal = antara(f, 0, 16, 0, 1, lepas);
+  return (
+    <AbsoluteFill style={{ background: WARNA.latar, fontFamily: HURUF }}>
+      <Audio src={staticFile("kirim-undangan/narasi.mp3")} />
+      <div style={{ position: "absolute", left: W / 2 - 520, top: 420, width: 1040, height: 1040, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(29,170,97,.16), rgba(29,170,97,0))" }} />
+      <div style={{ position: "absolute", inset: 0, transformOrigin: "0 0", transform: kamera(f), opacity: awal }}>
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - awal) * 80}px)` }}>
+          <Ponsel>
+            <Layar />
+            {SOROT.map(([k, label, a, b], i) => <Sorot key={i} kotak={k} label={label} dari={fr(a)} sampai={fr(b)} />)}
+            {KETUK.map(([k, pada], i) => { const [x, y] = tengah(k); return <Ketuk key={i} x={x} y={y} pada={fr(pada)} />; })}
+            <Ketuk x={TITIK_TEMPEL[0]} y={TITIK_TEMPEL[1]} pada={fr(TEMPEL)} tahan={fr(0.45)} />
+            <Tempel />
+            <Ketuk x={TITIK_TEMPEL[0]} y={TITIK_TEMPEL[1] - 40} pada={fr(TEMPEL_KETUK)} />
+          </Ponsel>
+        </div>
+      </div>
+      <Sisipan />
+      <div style={{ position: "absolute", left: 0, top: 0, width: W, height: ZONA.atas, background: `linear-gradient(${WARNA.latar} 82%, rgba(243,241,236,0))` }} />
+      <div style={{ position: "absolute", left: 0, top: ZONA.bawah - 30, width: W, height: 1920 - ZONA.bawah + 30, background: `linear-gradient(rgba(243,241,236,0), ${WARNA.latar} 30px)` }} />
+      <Judul daftar={JUDUL} total={5} />
+      <Teks potongan={POTONGAN} />
+    </AbsoluteFill>
+  );
+};
