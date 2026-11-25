@@ -1,7 +1,7 @@
 {
  "viewport": [
-  393,
-  744
+  402,
+  728
  ],
  "scale": 3,
  "sekarang": "2026-11-25T12:42:00.000Z",
@@ -9,61 +9,61 @@
   "undangan-sampul": {
    "kotak": {
     "nama": [
-     75.6,
-     504.5,
-     241.8,
-     62.1
+     80.4,
+     493.5,
+     241.2,
+     61.6
     ],
     "kepada": [
-     90.4,
-     511.9,
+     94.9,
+     500.8,
      212.2,
      18
     ]
    },
-   "url": "https://tokomu.myscalev.com/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB"
+   "url": "https://nikahin.id/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB"
   },
   "gerbang": {
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    },
-   "url": "tokomu.myscalev.com/kelola?w=365671&link=https%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas"
+   "url": "nikahin.id/dashboard?w=365671&link=https%3A%2F%2Fnikahin.id%2Frani-dimas"
   },
   "gerbang-pin-1": {
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -72,20 +72,20 @@
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -94,20 +94,20 @@
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -116,20 +116,20 @@
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -138,20 +138,20 @@
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -160,20 +160,20 @@
    "kotak": {
     "pin": [
      36,
-     347.6,
-     321,
+     339.6,
+     330,
      44
     ],
     "masuk": [
      36,
-     407.6,
-     321,
+     399.6,
+     330,
      40
     ],
     "kartu": [
      16,
-     199.5,
-     361,
+     191.5,
+     370,
      304.2
     ]
    }
@@ -181,26 +181,26 @@
   "beranda": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ]
@@ -209,40 +209,40 @@
   "kirim-kosong": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ],
     "fab": [
-     320,
-     601,
+     329,
+     585,
      56,
      56
     ],
     "kosong": [
      0,
      154,
-     392,
-     519
+     401,
+     503
     ]
    }
   },
@@ -258,12 +258,12 @@
      64,
      0,
      486.4,
-     800
+     751
     ]
    },
    "viewport": [
     1280,
-    800
+    751
    ]
   },
   "tambah-kosong": {
@@ -271,31 +271,31 @@
     "kolom": [
      20,
      100.2,
-     352,
+     361,
      180
     ],
     "label": [
      20,
      76,
-     352,
+     361,
      18.2
     ],
     "petunjuk": [
      20,
-     292,
-     352,
+     291,
+     361,
      68
     ],
     "simpan": [
      20,
-     376,
-     134.8,
+     375,
+     137.5,
      40
     ],
     "csv": [
-     162.8,
-     376,
-     111.9,
+     165.5,
+     375,
+     114.5,
      40
     ],
     "kembali": [
@@ -306,63 +306,63 @@
     ],
     "baris-1": [
      33,
-     111.2,
-     151.5,
-     19
+     112.2,
+     154.5,
+     18
     ],
     "baris-1-1": [
      33,
-     111.2,
-     151.5,
-     19
+     112.2,
+     154.5,
+     18
     ],
     "baris-2": [
      33,
-     132,
-     276.2,
-     19
+     133,
+     282.5,
+     18
     ],
     "baris-2-1": [
      33,
-     132,
-     155.9,
-     19
+     133,
+     160.6,
+     18
     ],
     "baris-2-2": [
-     201.3,
-     132,
-     107.9,
-     19
+     208.8,
+     133,
+     106.8,
+     18
     ],
     "baris-3": [
      33,
-     152.8,
-     300.1,
-     19
+     153.8,
+     308.6,
+     18
     ],
     "baris-3-1": [
      33,
-     152.8,
-     87.5,
-     19
+     153.8,
+     88,
+     18
     ],
     "baris-3-2": [
-     132.8,
-     152.8,
-     107.9,
-     19
+     136.1,
+     153.8,
+     106.8,
+     18
     ],
     "baris-3-3": [
-     253.1,
-     152.8,
-     58.6,
-     19
+     258,
+     153.8,
+     59.6,
+     18
     ],
     "baris-3-4": [
-     324.1,
-     152.8,
-     9,
-     19
+     332.7,
+     153.8,
+     8.9,
+     18
     ]
    }
   },
@@ -371,31 +371,31 @@
     "kolom": [
      20,
      100.2,
-     352,
+     361,
      180
     ],
     "label": [
      20,
      76,
-     352,
+     361,
      18.2
     ],
     "petunjuk": [
      20,
-     292,
-     352,
+     291,
+     361,
      68
     ],
     "simpan": [
      20,
-     376,
-     134.8,
+     375,
+     137.5,
      40
     ],
     "csv": [
-     162.8,
-     376,
-     111.9,
+     165.5,
+     375,
+     114.5,
      40
     ],
     "kembali": [
@@ -409,99 +409,105 @@
   "daftar-toast": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ],
     "fab": [
-     320,
-     601,
+     329,
+     585,
      56,
      56
     ],
     "cari": [
      68,
      74.6,
-     288,
+     297,
      22.8
     ],
     "semua": [
      20,
      116,
-     83.3,
+     84.5,
      32
     ],
     "belum": [
-     111.3,
+     112.5,
      116,
-     127.5,
+     129.4,
      32
     ],
     "terkirim": [
-     246.8,
+     249.9,
      116,
-     92.2,
+     91,
      32
     ],
     "tamu-1": [
      10,
      158,
-     372,
+     381,
      72
     ],
     "tamu-2": [
      10,
      230,
-     372,
+     381,
      72
     ],
     "tamu-3": [
      10,
      302,
-     372,
+     381,
      72
     ],
     "tamu-4": [
      10,
      374,
-     372,
+     381,
      72
     ],
     "tamu-5": [
      10,
      446,
-     372,
+     381,
      72
     ],
     "tamu-6": [
      10,
      518,
-     372,
+     381,
+     72
+    ],
+    "tamu-7": [
+     10,
+     590,
+     381,
      72
     ],
     "toast": [
-     138.1,
-     537,
-     116.8,
+     142.5,
+     521,
+     117,
      48
     ]
    }
@@ -509,121 +515,127 @@
   "daftar": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ],
     "fab": [
-     320,
-     601,
+     329,
+     585,
      56,
      56
     ],
     "cari": [
      68,
      74.6,
-     288,
+     297,
      22.8
     ],
     "semua": [
      20,
      116,
-     83.3,
+     84.5,
      32
     ],
     "belum": [
-     111.3,
+     112.5,
      116,
-     127.5,
+     129.4,
      32
     ],
     "terkirim": [
-     246.8,
+     249.9,
      116,
-     92.2,
+     91,
      32
     ],
     "tamu-1": [
      10,
      158,
-     372,
+     381,
      72
     ],
     "tamu-2": [
      10,
      230,
-     372,
+     381,
      72
     ],
     "tamu-3": [
      10,
      302,
-     372,
+     381,
      72
     ],
     "tamu-4": [
      10,
      374,
-     372,
+     381,
      72
     ],
     "tamu-5": [
      10,
      446,
-     372,
+     381,
      72
     ],
     "tamu-6": [
      10,
      518,
-     372,
+     381,
+     72
+    ],
+    "tamu-7": [
+     10,
+     590,
+     381,
      72
     ],
     "toast": [
-     138.1,
-     545,
-     116.8,
+     142.5,
+     529,
+     117,
      48
     ]
    }
   },
   "daftar-laptop": {
    "kotak": {
-    "tamu-3": [
+    "dewi": [
      74,
-     302,
+     374,
      465.4,
      72
     ],
-    "tamu-3-sub": [
+    "dewi-sub": [
      150,
-     339.5,
+     411.5,
      374.4,
      20
     ]
    },
    "viewport": [
     1280,
-    800
+    751
    ]
   },
   "daftar-cari": {
@@ -631,19 +643,19 @@
     "cari": [
      68,
      74.6,
-     288,
+     297,
      22.8
     ],
-    "tamu-3": [
+    "dewi": [
      10,
      158,
-     372,
+     381,
      72
     ],
-    "tamu-5": [
+    "sari": [
      10,
      230,
-     372,
+     381,
      72
     ]
    }
@@ -659,139 +671,139 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     147.5,
+     151.1,
      80,
-     98.1,
+     99.8,
      24
     ],
     "gelembung": [
-     70,
+     71.6,
      116,
-     307.3,
-     1148.3
+     314.4,
+     1155.4
     ],
     "kartu": [
-     73,
+     74.6,
      119,
-     301.3,
-     389.3
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
+     74.6,
      119,
-     301.3,
-     301.3
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     420.3,
-     301.3,
+     74.6,
+     427.4,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     553.3,
-     137.2,
-     16
+     80.6,
+     560.4,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     876.3,
-     267.4,
-     35
+     80.6,
+     883.4,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
-     1288.3,
-     377,
+     1295.4,
+     386,
      42
     ],
     "status": [
      12,
-     1326.3,
-     369,
-     32.2
+     1333.4,
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     1371.5,
-     321,
+     1379.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     1372.5,
+     348,
+     1380.5,
      40,
      40
     ],
     "periksa": [
      16,
-     2194.5,
-     361,
+     2202.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     2216,
-     361,
+     2224,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     2237.5,
-     361,
+     2245.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     2194.5,
-     361,
+     2202.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
-     1288.3,
-     65.2,
+     1295.4,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
-     1288.3,
-     70.2,
+     83,
+     1295.4,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
-     1288.3,
-     70,
+     159.1,
+     1295.4,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
-     1288.3,
-     59.1,
+     236,
+     1295.4,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
-     1288.3,
-     70.6,
+     302.3,
+     1295.4,
+     71.8,
      30
     ]
    }
@@ -807,139 +819,139 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     147.5,
-     -308,
-     98.1,
+     151.1,
+     -323,
+     99.8,
      24
     ],
     "gelembung": [
-     70,
-     -272,
-     307.3,
-     1148.3
+     71.6,
+     -287,
+     314.4,
+     1155.4
     ],
     "kartu": [
-     73,
-     -269,
-     301.3,
-     389.3
+     74.6,
+     -284,
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
-     -269,
-     301.3,
-     301.3
+     74.6,
+     -284,
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     32.3,
-     301.3,
+     74.6,
+     24.4,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     165.3,
-     137.2,
-     16
+     80.6,
+     157.4,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     488.3,
-     267.4,
-     35
+     80.6,
+     480.4,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
-     900.3,
-     377,
+     892.4,
+     386,
      42
     ],
     "status": [
      12,
-     938.3,
-     369,
-     32.2
+     930.4,
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     983.5,
-     321,
+     976.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     984.5,
+     348,
+     977.5,
      40,
      40
     ],
     "periksa": [
      16,
-     1806.5,
-     361,
+     1799.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     1828,
-     361,
+     1821,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     1849.5,
-     361,
+     1842.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     1806.5,
-     361,
+     1799.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
-     900.3,
-     65.2,
+     892.4,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
-     900.3,
-     70.2,
+     83,
+     892.4,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
-     900.3,
-     70,
+     159.1,
+     892.4,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
-     900.3,
-     59.1,
+     236,
+     892.4,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
-     900.3,
-     70.6,
+     302.3,
+     892.4,
+     71.8,
      30
     ]
    }
@@ -955,139 +967,139 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     147.5,
-     -1500,
-     98.1,
+     151.1,
+     -1524,
+     99.8,
      24
     ],
     "gelembung": [
-     70,
-     -1464,
-     307.3,
-     1148.3
+     71.6,
+     -1488,
+     314.4,
+     1155.4
     ],
     "kartu": [
-     73,
-     -1461,
-     301.3,
-     389.3
+     74.6,
+     -1485,
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
-     -1461,
-     301.3,
-     301.3
+     74.6,
+     -1485,
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     -1159.7,
-     301.3,
+     74.6,
+     -1176.6,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     -1026.7,
-     137.2,
-     16
+     80.6,
+     -1043.6,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     -703.7,
-     267.4,
-     35
+     80.6,
+     -720.6,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
      72,
-     377,
+     386,
      42
     ],
     "status": [
      12,
      110,
-     369,
-     32.2
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     -208.5,
-     321,
+     -224.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     560.5,
+     348,
+     544.5,
      40,
      40
     ],
     "periksa": [
      16,
-     614.5,
-     361,
+     598.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     636,
-     361,
+     620,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     657.5,
-     361,
+     641.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     614.5,
-     361,
+     598.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
      72,
-     65.2,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
+     83,
      72,
-     70.2,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
+     159.1,
      72,
-     70,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
+     236,
      72,
-     59.1,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
+     302.3,
      72,
-     70.6,
+     71.8,
      30
     ]
    }
@@ -1103,151 +1115,151 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     124.1,
-     -714,
-     144.8,
+     128.3,
+     -738,
+     145.4,
      24
     ],
     "gelembung": [
-     70,
-     -678,
-     307.3,
-     1130.3
+     71.6,
+     -702,
+     314.4,
+     1137.4
     ],
     "kartu": [
-     73,
-     -675,
-     301.3,
-     389.3
+     74.6,
+     -699,
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
-     -675,
-     301.3,
-     301.3
+     74.6,
+     -699,
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     -373.7,
-     301.3,
+     74.6,
+     -390.6,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     -240.7,
-     137.2,
-     16
+     80.6,
+     -257.6,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     82.3,
-     267.4,
-     35
+     80.6,
+     65.4,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
-     476.3,
-     377,
+     459.4,
+     386,
      42
     ],
     "status": [
      12,
-     514.3,
-     369,
-     32.2
+     497.4,
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     559.5,
-     321,
+     543.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     698,
+     348,
+     682,
      40,
      40
     ],
     "periksa": [
      16,
-     1382.5,
-     361,
+     1366.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     1404,
-     361,
+     1388,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     1425.5,
-     361,
+     1409.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     1382.5,
-     361,
+     1366.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
-     476.3,
-     65.2,
+     459.4,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
-     476.3,
-     70.2,
+     83,
+     459.4,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
-     476.3,
-     70,
+     159.1,
+     459.4,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
-     476.3,
-     59.1,
+     236,
+     459.4,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
-     476.3,
-     70.6,
+     302.3,
+     459.4,
+     71.8,
      30
     ],
     "toast": [
-     98.3,
-     588,
-     196.5,
+     100.5,
+     572,
+     201,
      68
     ]
    },
-   "wa": "https://api.whatsapp.com/send?text=Kepada%20Yth.%0ABapak%2FIbu%2FSaudara%2Fi%0A*Keluarga%20Besar%20Surya*%0A______%0A%0ABismillahirrahmanirrahim%2C%0AAssalamualaikum%20Warahmatullahi%20Wabarakatuh%0A%0ATanpa%20mengurangi%20rasa%20hormat%2C%20dengan%20segenap%20hati%2C%20izinkan%20kami%20mengundang%20Bapak%2FIbu%2FSaudara%2Fi%20untuk%20hadir%20dan%20memberikan%20doa%20restu%20pada%20acara%20pernikahan%20kami%3A%0A%0A%F0%9F%A4%8D%20Rani%20%26%20Dimas%20%F0%9F%A4%8D%0A%0A*Untuk%20melihat%20info%20acara%20lebih%20lengkap%20klik%20link%20berikut%3A*%0Ahttps%3A%2F%2Ftokomu.myscalev.com%2Frani-dimas%3Fto%3DKeluarga%2BBesar%2BSurya%26u%3D8GRPTB%0A%0AUndangan%20digital%20ini%20merupakan%20undangan%20resmi%20dari%20kami%20dan%20keluarga.%20Semoga%20maksud%20dan%20tujuan%20kami%20dapat%20tersampaikan.%0A%0AMerupakan%20suatu%20kehormatan%20dan%20kebahagiaan%20bagi%20kami%20apabila%20Bapak%2FIbu%2FSaudara%2Fi%20dan%20teman-teman%20dapat%20berkenan%20hadir%20dan%20memberikan%20doa%20restu%20pada%20acara%20pernikahan%20kami.%0A%0ATerimakasih%0AWassalamualaikum%20Warahmatullahi%20Wabarakatuh%0A%0AKami%20yang%20berbahagia%2C%0A*Keluarga%20Besar%20Kedua%20Mempelai*",
-   "pesan": "Kepada Yth.\nBapak/Ibu/Saudara/i\n*Keluarga Besar Surya*\n______\n\nBismillahirrahmanirrahim,\nAssalamualaikum Warahmatullahi Wabarakatuh\n\nTanpa mengurangi rasa hormat, dengan segenap hati, izinkan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n🤍 Rani & Dimas 🤍\n\n*Untuk melihat info acara lebih lengkap klik link berikut:*\nhttps://tokomu.myscalev.com/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB\n\nUndangan digital ini merupakan undangan resmi dari kami dan keluarga. Semoga maksud dan tujuan kami dapat tersampaikan.\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i dan teman-teman dapat berkenan hadir dan memberikan doa restu pada acara pernikahan kami.\n\nTerimakasih\nWassalamualaikum Warahmatullahi Wabarakatuh\n\nKami yang berbahagia,\n*Keluarga Besar Kedua Mempelai*",
-   "link": "https://tokomu.myscalev.com/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB"
+   "wa": "https://api.whatsapp.com/send?text=Kepada%20Yth.%0ABapak%2FIbu%2FSaudara%2Fi%0A*Keluarga%20Besar%20Surya*%0A______%0A%0ABismillahirrahmanirrahim%2C%0AAssalamualaikum%20Warahmatullahi%20Wabarakatuh%0A%0ATanpa%20mengurangi%20rasa%20hormat%2C%20dengan%20segenap%20hati%2C%20izinkan%20kami%20mengundang%20Bapak%2FIbu%2FSaudara%2Fi%20untuk%20hadir%20dan%20memberikan%20doa%20restu%20pada%20acara%20pernikahan%20kami%3A%0A%0A%F0%9F%A4%8D%20Rani%20%26%20Dimas%20%F0%9F%A4%8D%0A%0A*Untuk%20melihat%20info%20acara%20lebih%20lengkap%20klik%20link%20berikut%3A*%0Ahttps%3A%2F%2Fnikahin.id%2Frani-dimas%3Fto%3DKeluarga%2BBesar%2BSurya%26u%3D8GRPTB%0A%0AUndangan%20digital%20ini%20merupakan%20undangan%20resmi%20dari%20kami%20dan%20keluarga.%20Semoga%20maksud%20dan%20tujuan%20kami%20dapat%20tersampaikan.%0A%0AMerupakan%20suatu%20kehormatan%20dan%20kebahagiaan%20bagi%20kami%20apabila%20Bapak%2FIbu%2FSaudara%2Fi%20dan%20teman-teman%20dapat%20berkenan%20hadir%20dan%20memberikan%20doa%20restu%20pada%20acara%20pernikahan%20kami.%0A%0ATerimakasih%0AWassalamualaikum%20Warahmatullahi%20Wabarakatuh%0A%0AKami%20yang%20berbahagia%2C%0A*Keluarga%20Besar%20Kedua%20Mempelai*",
+   "pesan": "Kepada Yth.\nBapak/Ibu/Saudara/i\n*Keluarga Besar Surya*\n______\n\nBismillahirrahmanirrahim,\nAssalamualaikum Warahmatullahi Wabarakatuh\n\nTanpa mengurangi rasa hormat, dengan segenap hati, izinkan kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada acara pernikahan kami:\n\n🤍 Rani & Dimas 🤍\n\n*Untuk melihat info acara lebih lengkap klik link berikut:*\nhttps://nikahin.id/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB\n\nUndangan digital ini merupakan undangan resmi dari kami dan keluarga. Semoga maksud dan tujuan kami dapat tersampaikan.\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i dan teman-teman dapat berkenan hadir dan memberikan doa restu pada acara pernikahan kami.\n\nTerimakasih\nWassalamualaikum Warahmatullahi Wabarakatuh\n\nKami yang berbahagia,\n*Keluarga Besar Kedua Mempelai*",
+   "link": "https://nikahin.id/rani-dimas?to=Keluarga+Besar+Surya&u=8GRPTB"
   },
   "chat-terkirim": {
    "kotak": {
@@ -1260,139 +1272,139 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     124.1,
+     128.3,
      80,
-     144.8,
+     145.4,
      24
     ],
     "gelembung": [
-     70,
+     71.6,
      116,
-     307.3,
-     1130.3
+     314.4,
+     1137.4
     ],
     "kartu": [
-     73,
+     74.6,
      119,
-     301.3,
-     389.3
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
+     74.6,
      119,
-     301.3,
-     301.3
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     420.3,
-     301.3,
+     74.6,
+     427.4,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     553.3,
-     137.2,
-     16
+     80.6,
+     560.4,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     876.3,
-     267.4,
-     35
+     80.6,
+     883.4,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
-     1270.3,
-     377,
+     1277.4,
+     386,
      42
     ],
     "status": [
      12,
-     1308.3,
-     369,
-     32.2
+     1315.4,
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     1353.5,
-     321,
+     1361.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     1354.5,
+     348,
+     1362.5,
      40,
      40
     ],
     "periksa": [
      16,
-     2176.5,
-     361,
+     2184.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     2198,
-     361,
+     2206,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     2219.5,
-     361,
+     2227.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     2176.5,
-     361,
+     2184.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
-     1270.3,
-     65.2,
+     1277.4,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
-     1270.3,
-     70.2,
+     83,
+     1277.4,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
-     1270.3,
-     70,
+     159.1,
+     1277.4,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
-     1270.3,
-     59.1,
+     236,
+     1277.4,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
-     1270.3,
-     70.6,
+     302.3,
+     1277.4,
+     71.8,
      30
     ]
    }
@@ -1408,151 +1420,151 @@
     "nama": [
      44,
      13,
-     301,
+     310,
      21
     ],
     "sub": [
      44,
      34,
-     301,
+     310,
      17
     ],
     "menu": [
-     347,
+     356,
      12,
      38,
      40
     ],
     "hari": [
-     124.1,
+     128.3,
      80,
-     144.8,
+     145.4,
      24
     ],
     "gelembung": [
-     70,
+     71.6,
      116,
-     307.3,
-     1130.3
+     314.4,
+     1137.4
     ],
     "kartu": [
-     73,
+     74.6,
      119,
-     301.3,
-     389.3
+     308.4,
+     396.4
     ],
     "gambar": [
-     73,
+     74.6,
      119,
-     301.3,
-     301.3
+     308.4,
+     308.4
     ],
     "kartu-teks": [
-     73,
-     420.3,
-     301.3,
+     74.6,
+     427.4,
+     308.4,
      88
     ],
     "nama-tamu": [
-     79,
-     553.3,
-     137.2,
-     16
+     80.6,
+     560.4,
+     146.6,
+     17
     ],
     "link-tamu": [
-     79,
-     876.3,
-     267.4,
-     35
+     80.6,
+     883.4,
+     248.3,
+     36
     ],
     "pilihan": [
      8,
-     1270.3,
-     377,
+     1277.4,
+     386,
      42
     ],
     "status": [
      12,
-     1308.3,
-     369,
-     32.2
+     1315.4,
+     378,
+     33.2
     ],
     "pesan": [
      13,
-     1353.5,
-     321,
+     1361.5,
+     330,
      810
     ],
     "kirim": [
-     339,
-     1354.5,
+     348,
+     1362.5,
      40,
      40
     ],
     "periksa": [
      16,
-     2176.5,
-     361,
+     2184.5,
+     370,
      121
     ],
     "periksa-link": [
      16,
-     2198,
-     361,
+     2206,
+     370,
      17.5
     ],
     "periksa-nama": [
      16,
-     2219.5,
-     361,
+     2227.5,
+     370,
      17.5
     ],
     "periksa-bebas": [
      16,
-     2176.5,
-     361,
+     2184.5,
+     370,
      17.5
     ],
     "teks-formal": [
      12,
-     1270.3,
-     65.2,
+     1277.4,
+     65,
      30
     ],
     "teks-muslim": [
-     83.2,
-     1270.3,
-     70.2,
+     83,
+     1277.4,
+     70.1,
      30
     ],
     "teks-nasrani": [
-     159.3,
-     1270.3,
-     70,
+     159.1,
+     1277.4,
+     71,
      30
     ],
     "teks-hindu": [
-     235.3,
-     1270.3,
-     59.1,
+     236,
+     1277.4,
+     60.3,
      30
     ],
     "teks-custom": [
-     300.5,
-     1270.3,
-     70.6,
+     302.3,
+     1277.4,
+     71.8,
      30
     ],
     "menu-buka": [
-     142.1,
+     149.1,
      60,
-     234.9,
+     236.9,
      213.5
     ],
     "belum-dikirim": [
-     150.1,
+     157.1,
      186.5,
-     218.9,
+     220.9,
      39.5
     ]
    }
@@ -1560,99 +1572,105 @@
   "daftar-terkirim": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ],
     "fab": [
-     320,
-     601,
+     329,
+     585,
      56,
      56
     ],
     "cari": [
      68,
      74.6,
-     288,
+     297,
      22.8
     ],
     "semua": [
      20,
      116,
-     83.3,
+     84.5,
      32
     ],
     "belum": [
-     111.3,
+     112.5,
      116,
-     127.5,
+     129.4,
      32
     ],
     "terkirim": [
-     246.8,
+     249.9,
      116,
-     92.2,
+     91,
      32
     ],
     "tamu-1": [
      10,
      158,
-     372,
+     381,
      72
     ],
     "tamu-2": [
      10,
      230,
-     372,
+     381,
      72
     ],
     "tamu-3": [
      10,
      302,
-     372,
+     381,
      72
     ],
     "tamu-4": [
      10,
      374,
-     372,
+     381,
      72
     ],
     "tamu-5": [
      10,
      446,
-     372,
+     381,
      72
     ],
     "tamu-6": [
      10,
      518,
-     372,
+     381,
+     72
+    ],
+    "tamu-7": [
+     10,
+     590,
+     381,
      72
     ],
     "toast": [
-     98.3,
-     525,
-     196.5,
+     100.5,
+     509,
+     201,
      68
     ]
    }
@@ -1660,93 +1678,99 @@
   "daftar-belum": {
    "kotak": {
     "tab-beranda": [
-     4.8,
-     680,
+     5.5,
+     664,
      64,
      58
     ],
     "tab-kirim": [
-     70.3,
-     680,
+     72.5,
+     664,
      64,
      58
     ],
     "tab-tamu": [
-     135.8,
-     680,
+     139.5,
+     664,
      64,
      58
     ],
     "akun": [
-     332.3,
-     687,
+     340.5,
+     671,
      56,
      44
     ],
     "fab": [
-     320,
-     601,
+     329,
+     585,
      56,
      56
     ],
     "cari": [
      68,
      74.6,
-     288,
+     297,
      22.8
     ],
     "semua": [
      20,
      116,
-     83.3,
+     84.5,
      32
     ],
     "belum": [
-     111.3,
+     112.5,
      116,
-     127.5,
+     129.4,
      32
     ],
     "terkirim": [
-     246.8,
+     249.9,
      116,
-     92.2,
+     91,
      32
     ],
-    "tamu-2": [
+    "tamu-1": [
      10,
      158,
-     372,
+     381,
      72
     ],
     "tamu-3": [
      10,
      230,
-     372,
+     381,
      72
     ],
     "tamu-4": [
      10,
      302,
-     372,
+     381,
      72
     ],
     "tamu-5": [
      10,
      374,
-     372,
+     381,
      72
     ],
     "tamu-6": [
      10,
      446,
-     372,
+     381,
+     72
+    ],
+    "tamu-7": [
+     10,
+     518,
+     381,
      72
     ],
     "toast": [
-     98.3,
-     525,
-     196.5,
+     100.5,
+     509,
+     201,
      68
     ]
    }
@@ -1755,18 +1779,18 @@
  "gulir": {
   "atas": [
    0,
-   2324,
-   744
+   2332,
+   728
   ],
   "link": [
-   388,
-   2324,
-   744
+   403,
+   2332,
+   728
   ],
   "bawah": [
-   1580,
-   2324,
-   744
+   1604,
+   2332,
+   728
   ]
  }
 }

@@ -1,7 +1,10 @@
-// npm run layar  →  public/kirim-undangan/layar/*.png (layar HP 393x744, 3x) dan layar.json (kotak elemen per layar).
-// Tampilan asli: halaman dashboard hasil build (server/pages/panel/scalev_panel.html, berisi Beranda, Kirim, Hari-H) dibuka
-// di Chrome tanpa jendela. API worker diganti tiruan lokal (data contoh, tanpa menyentuh produksi); sampul undangan dari
-// demo template di R2. Urutan langkah = alur di naskah.js. Jalankan ulang bila halaman Kirim berubah.
+// npm run layar  →  public/kirim-undangan/layar/*.png (isi Safari iPhone 402x728, 3x; MacBook 1280x751, 2x) dan
+// layar.json (kotak elemen per layar). Tampilan asli: halaman dashboard hasil build (server/pages/panel/scalev_panel.html,
+// berisi Beranda, Kirim, Hari-H) dibuka di Chrome tanpa jendela dengan profil Safari iPhone. API worker diganti tiruan
+// lokal (data contoh, tanpa menyentuh produksi); sampul undangan dari demo template di R2. Urutan langkah = alur di
+// naskah.js. Jalankan ulang bila halaman Kirim berubah.
+// npm run uji  →  uji daftar tamu dengan data terburuk (break-ui): out/uji/*.png, temuan di konsol, lalu server tetap
+// jalan dengan pengalih data di bawah tengah layar (?data=demo|terburuk|kosong|satu|seribu). Hanya ada di alat ini.
 import { spawn, execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -15,12 +18,13 @@ const OUT = path.join(here, "..", "..", "public", "kirim-undangan", "layar");
 const PANEL = path.join(REPO, "server", "pages", "panel", "scalev_panel.html");
 const WORKER = "https://wedding-guestbook.nikahin.workers.dev";
 
-// Data contoh panduan: Rani & Dimas di tokomu.myscalev.com, demo template Garden Stroll.
-const W = "365671", LINK = "https://tokomu.myscalev.com/rani-dimas", PIN = "482913", COUPLE = "Rani & Dimas";
+// Data contoh panduan: Rani & Dimas di nikahin.id, demo template Garden Stroll.
+const W = "365671", LINK = "https://nikahin.id/rani-dimas", PIN = "482913", COUPLE = "Rani & Dimas";
 const DEMO = "https://assets.nikahin.workers.dev/brand-assets/templates/garden-stroll/demo.html";
-const OG = "https://tokomu.myscalev.com/og/rani-dimas.jpg";
+const OG = "https://nikahin.id/og/rani-dimas.jpg";
 const SEKARANG = Date.parse("2026-11-25T19:42:00+07:00");
 const TAMU = [
+  "Budi",
   "Keluarga Besar Surya",
   "Bapak Andi & Ibu Rina - 081234567890",
   "Dewi Lestari - 082198765432 - Sahabat - 2",
@@ -29,8 +33,92 @@ const TAMU = [
   "Tim Marketing PT Sinar Jaya - Kantor - 5",
 ].join("\n");
 const PILIH = "Keluarga Besar Surya";
-const HP = { width: 393, height: 744, deviceScaleFactor: 3, mobile: true };
-const UA_HP = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36";
+// Safari iPhone (layar 402x874 pt): isi web di antara bilah status (62) dan bilah Safari bawah (84).
+const HP = { width: 402, height: 728, deviceScaleFactor: 3, mobile: true };
+const UA_HP = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1";
+// MacBook (layar 1280x828 pt, "teks lebih besar"): isi web di bawah bilah menu (25) dan bilah Safari (52).
+const MAC = { width: 1280, height: 751, deviceScaleFactor: 2, mobile: false };
+const UA_MAC = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15";
+const UJI = process.argv.includes("--uji");
+// Data uji daftar tamu: nilai yang masuk akal dari pengantin sungguhan, termasuk yang paling buruk.
+const DATA = {
+  demo: TAMU,
+  terburuk: [
+    "Budi",
+    "Keluarga Besar Bapak H. Muhammad Ridwan Syahputra, S.E., M.M. beserta Istri dan Anak-anak - 0812 3456 7890 - Keluarga Besar dari Pihak Mempelai Wanita (Bandung) - 10",
+    "🌸 Bude Sri",
+    "Ma'ruf & Nur'aini",
+    "dr. Andreas Wijaya Kusuma, Sp.OG - +62 811-2233-4455 - Rekan Kerja RS - 2",
+    "Dewi Lestari - 0821 9876 5432 - Sahabat - 2 orang",
+    "081298765432",
+    "Andi - 081111111111",
+    "Andi - 082222222222",
+    "Tim Marketing PT Sinar Jaya Abadi Sentosa Tbk. - Kantor - 150",
+    "Muhammadrizkyalfarizipratamaputra",
+    "Ibu Hj. Siti Nurhaliza binti Abdullah - 0857-1122-3344 - Pengajian Ibu-ibu Al-Hikmah Perumahan Griya Asri Blok C - 25",
+  ].join("\n"),
+  kosong: "",
+  satu: "Budi",
+  seribu: Array.from({ length: 1200 }, (_, i) => `Tamu Undangan ${i + 1} - 0812${String(10000000 + i).slice(-8)} - ${["Keluarga", "Kantor", "Sahabat"][i % 3]} - ${1 + (i % 4)}`).join("\n"),
+};
+// Tamu yang ditandai terkirim lewat menu percakapan (awal nama).
+const TERKIRIM = { terburuk: ["Budi", "Keluarga Besar Bapak"], seribu: ["Tamu Undangan 1"] };
+// Skrip uji di halaman (hanya bila ?data=): pengalih data di bawah tengah, lalu data dimasukkan lewat jalur pengguna:
+// PIN, tab Kirim, tempel di panel Tambah tamu, Simpan daftar, menu titik tiga > Tandai terkirim. &tangkap=1 menyembunyikan
+// pengalihnya untuk tangkapan layar.
+const UJI_HALAMAN = `(() => {
+  const DATA = ${JSON.stringify(DATA)}, TERKIRIM = ${JSON.stringify(TERKIRIM)}, PIN = ${JSON.stringify(PIN)};
+  const q = new URLSearchParams(location.search), kunci = q.get("data");
+  if (!(kunci in DATA)) return;
+  if (!q.get("tangkap")) addEventListener("DOMContentLoaded", () => {
+    const bar = document.createElement("div");
+    bar.setAttribute("role", "group"); bar.setAttribute("aria-label", "Data uji daftar tamu");
+    bar.style.cssText = "position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:2147483647;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(17,17,17,.9);box-shadow:0 4px 14px rgba(0,0,0,.3);font:600 12px/1 system-ui,sans-serif";
+    for (const [k, label] of [["demo", "Demo"], ["terburuk", "Terburuk"], ["kosong", "Kosong"], ["satu", "Satu"], ["seribu", "1.000+"]]) {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = label; b.setAttribute("aria-pressed", String(k === kunci));
+      b.style.cssText = "border:0;border-radius:999px;padding:9px 12px;cursor:pointer;color:#fff;font:inherit;background:" + (k === kunci ? "#b8460d" : "transparent");
+      b.onclick = () => { localStorage.clear(); sessionStorage.clear(); const u = new URL(location.href); u.searchParams.set("data", k); location.href = u.toString(); };
+      bar.append(b);
+    }
+    document.body.append(bar);
+  });
+  const tunggu = async (f, ms = 30000) => {
+    for (const t = Date.now() + ms; Date.now() < t; await new Promise((r) => setTimeout(r, 80))) { try { const v = f(); if (v) return v; } catch (e) {} }
+    throw new Error("uji: tidak muncul " + f);
+  };
+  const terlihat = (el) => !!el && el.getClientRects().length > 0 && el.ownerDocument.defaultView.getComputedStyle(el).visibility !== "hidden";
+  (async () => {
+    const pin = await tunggu(() => document.getElementById("pinInput"));
+    await tunggu(() => !document.getElementById("gate").hidden || document.getElementById("loading").hidden);
+    if (!document.getElementById("gate").hidden) {
+      pin.value = PIN; pin.dispatchEvent(new Event("input", { bubbles: true }));
+      document.getElementById("gateSubmit").click();
+    }
+    await tunggu(() => document.getElementById("gate").hidden && document.getElementById("loading").hidden);
+    document.querySelector('.tab[data-tab="kirim"]').click();
+    const d = await tunggu(() => { const f = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan" && !f.hidden); return f && f.contentDocument.getElementById("guestBody") && !f.contentDocument.getElementById("empty").hidden && f.contentDocument; });
+    if (DATA[kunci]) {
+      (terlihat(d.getElementById("fabAdd")) ? d.getElementById("fabAdd") : d.getElementById("addBtn")).click();
+      await tunggu(() => !d.getElementById("addDrawer").hidden);
+      const ta = d.getElementById("guests");
+      ta.value = DATA[kunci]; ta.dispatchEvent(new Event("input", { bubbles: true }));
+      d.getElementById("generate").click();
+      await tunggu(() => d.getElementById("addDrawer").hidden && /tamu siap/.test(d.getElementById("status").textContent));
+      for (const awal of TERKIRIM[kunci] || []) {
+        [...d.querySelectorAll("#guestBody .row")].find((r) => { const n = r.querySelector(".nm").textContent; return n === awal || n.startsWith(awal + " "); }).click();
+        await tunggu(() => !d.getElementById("chat").hidden);
+        d.querySelector('#chatBar [aria-controls="chatMenu"]').click();
+        await tunggu(() => !d.getElementById("chatMenu").hidden);
+        d.querySelector('#chatMenu [data-act="toggle-sent"]').click();
+        await tunggu(() => d.querySelector("#thread .day").textContent.startsWith("Terkirim"));
+        const kembali = d.querySelector("#chatBar [data-back]");
+        if (terlihat(kembali)) { kembali.click(); await tunggu(() => d.getElementById("chat").hidden || !terlihat(d.getElementById("chat"))); }
+      }
+    }
+    window.__ujiSiap = true;
+  })().catch((e) => { window.__ujiGagal = String(e); });
+})();`;
 
 // Kode tautan seperti worker (6 huruf dari HMAC); di sini dari SHA-256 nama, cukup untuk tampilan.
 const ABJAD = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -74,9 +162,10 @@ const server = http.createServer((req, res) => {
     req.on("end", () => { res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify(api(url.pathname.slice(4), raw ? JSON.parse(raw) : {}))); });
     return;
   }
-  if (url.pathname === "/kelola") {
+  if (url.pathname === "/dashboard") {
+    const html = fs.readFileSync(PANEL, "utf8").split(WORKER).join(`http://127.0.0.1:${server.address().port}/api`);
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(fs.readFileSync(PANEL, "utf8").split(WORKER).join(`http://127.0.0.1:${server.address().port}/api`));
+    res.end(url.searchParams.has("data") ? html.replace(/<\/body>/i, `<script>${UJI_HALAMAN}</script></body>`) : html);
     return;
   }
   res.writeHead(404); res.end();
@@ -89,7 +178,7 @@ const PW = path.join(process.env.HOME, "Library/Caches/ms-playwright");
 const newest = fs.existsSync(PW) ? fs.readdirSync(PW).filter((d) => /^chromium-\d+$/.test(d)).sort((a, b) => b.split("-")[1] - a.split("-")[1])[0] : null;
 const CHROME = process.env.CHROME || path.join(PW, newest ?? "chromium-missing", "chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing");
 const prof = fs.mkdtempSync("/tmp/layar-prof-");
-const chrome = spawn(CHROME, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${prof}`, "--hide-scrollbars", "--force-color-profile=srgb", "--lang=id-ID", "--window-size=393,744", "about:blank"], { stdio: "ignore" });
+const chrome = spawn(CHROME, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${prof}`, "--hide-scrollbars", "--force-color-profile=srgb", "--lang=id-ID", `--window-size=${HP.width},${HP.height}`, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let target;
 for (let i = 0; i < 300 && !target; i++) {
@@ -124,22 +213,19 @@ const until = async (expr, what, ms = 20000) => {
   throw new Error(`tidak muncul: ${what}`);
 };
 
-// Semua dokumen (juga iframe srcdoc): jam tetap 25 Nov 2026 19.42 WIB, huruf Roboto seperti HP Android.
+// Semua dokumen (juga iframe srcdoc): jam tetap 25 Nov 2026 19.42 WIB. Huruf sistem = SF Pro, seperti Safari di iPhone.
 await send("Page.enable");
 await send("Page.addScriptToEvaluateOnNewDocument", { source: `(() => {
   const D = Date, shift = ${SEKARANG} - D.now();
   class F extends D { constructor(...a) { if (a.length) super(...a); else super(D.now() + shift); } static now() { return D.now() + shift; } }
   globalThis.Date = F;
-  const font = () => { if (!document.head || document.getElementById("nk-roboto")) return; const l = document.createElement("link"); l.id = "nk-roboto"; l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300..700;1,400&display=block"; document.head.appendChild(l); };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", font); else font();
 })();` });
 await send("Emulation.setTimezoneOverride", { timezoneId: "Asia/Jakarta" });
 await send("Emulation.setLocaleOverride", { locale: "id-ID" });
 const hp = async () => {
   await send("Emulation.setDeviceMetricsOverride", HP);
   await send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
-  await send("Emulation.setUserAgentOverride", { userAgent: UA_HP, platform: "Android" });
+  await send("Emulation.setUserAgentOverride", { userAgent: UA_HP, platform: "iPhone" });
 };
 await hp();
 
@@ -172,8 +258,6 @@ const settle = () => js(`(async () => {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   return true;
 })()`);
-fs.rmSync(OUT, { recursive: true, force: true });
-fs.mkdirSync(OUT, { recursive: true });
 async function shot(name, spec = {}, extra = {}) {
   await settle();
   await sleep(250);
@@ -184,6 +268,97 @@ async function shot(name, spec = {}, extra = {}) {
 }
 const share = (expr) => js(`(() => { const d = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan").contentDocument; return (${expr})(d); })()`);
 const tap = (sel) => js(`document.querySelector(${JSON.stringify(sel)}).click()`);
+// Tampilan laptop (MacBook, tetikus) untuk sisipan dan uji; sesudahnya kembali ke HP dengan hp().
+const laptop = async (vp = MAC) => {
+  await send("Emulation.setTouchEmulationEnabled", { enabled: false });
+  await send("Emulation.setUserAgentOverride", { userAgent: UA_MAC, platform: "MacIntel" });
+  await send("Emulation.setDeviceMetricsOverride", vp);
+  await sleep(800);
+};
+
+// ---- npm run uji: daftar tamu dengan data terburuk di empat lebar, fakta dari DOM ke out/uji/temuan.json ----
+if (UJI) {
+  const keluar = path.join(here, "..", "..", "out", "uji");
+  fs.rmSync(keluar, { recursive: true, force: true });
+  fs.mkdirSync(keluar, { recursive: true });
+  const foto = async (nama) => {
+    await settle();
+    await sleep(250);
+    fs.writeFileSync(path.join(keluar, nama + ".png"), Buffer.from((await send("Page.captureScreenshot", { format: "png" })).data, "base64"));
+  };
+  const ukur = (w, h, s) => async () => { await hp(); await send("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: s, mobile: true }); };
+  // 320 = HP kecil, 402 = iPhone, zoom200 = iPhone diperbesar 200% (201 px CSS), 1280 = laptop.
+  const LEBAR = [["320", ukur(320, 640, 2)], ["402", hp], ["zoom200", ukur(201, 364, 6)], ["1280", () => laptop({ ...MAC, height: 800 })]];
+  const chatTerbuka = `(() => { const d = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan").contentDocument; return !d.getElementById("chat").hidden && d.querySelector("#thread .bubble"); })()`;
+  const temuan = {};
+  for (const kunci of Object.keys(DATA)) for (const [lebar, atur] of LEBAR) {
+    await js("localStorage.clear(); sessionStorage.clear(); true").catch(() => {});
+    await atur();
+    await send("Page.navigate", { url: `http://127.0.0.1:${PORT}/dashboard?w=${W}&link=${encodeURIComponent(LINK)}&data=${kunci}&tangkap=1` });
+    await until("window.__ujiSiap || window.__ujiGagal", `uji ${kunci} ${lebar}`, 120000);
+    const gagal = await js("window.__ujiGagal || ''");
+    if (gagal) throw new Error(`${kunci} ${lebar}: ${gagal}`);
+    await sleep(2800);
+    await foto(`${kunci}-${lebar}-daftar`);
+    const f = temuan[`${kunci}-${lebar}`] = await share(`(d) => {
+      const rows = [...d.querySelectorAll("#guestBody .row")], luap = (el) => Math.round(el.scrollWidth - el.clientWidth);
+      // Tombol tambah (FAB) vs baris terakhir saat daftar digulir sampai habis: lebar yang tertutup (px).
+      const list = d.getElementById("guestBody"), fab = d.getElementById("fabAdd");
+      list.scrollTop = list.scrollHeight;
+      const akhir = rows.at(-1) && rows.at(-1).getBoundingClientRect(), fb = fab.getBoundingClientRect();
+      const tutup = akhir && fb.width ? Math.max(0, Math.min(akhir.right, fb.right) - Math.max(akhir.left, fb.left)) * (Math.min(akhir.bottom, fb.bottom) > Math.max(akhir.top, fb.top) ? 1 : 0) : 0;
+      list.scrollTop = 0;
+      return { baris: rows.length, semua: d.getElementById("countAll").textContent, luapKirim: luap(d.documentElement), luapDashboard: luap(document.documentElement),
+        namaTerpotong: rows.filter((r) => luap(r.querySelector(".nm")) > 0).length, subTerpotong: rows.filter((r) => luap(r.querySelector(".pv")) > 0).length, fabMenutupiBarisAkhir: Math.round(tutup),
+        tamu: rows.slice(0, 14).map((r) => ({ nama: r.querySelector(".nm").textContent, inisial: [...r.querySelector(".av").textContent].map((c) => c.codePointAt(0).toString(16)).join(" "),
+          sub: r.querySelector(".pv").textContent, waktu: r.querySelector(".tm").textContent })) };
+    }`);
+    if (lebar !== "402") delete f.tamu;
+    if (kunci === "terburuk") {
+      await share(`(d) => [...d.querySelectorAll("#guestBody .row")].find((r) => r.querySelector(".nm").textContent.startsWith("Keluarga Besar Bapak")).click()`);
+      await until(chatTerbuka, "percakapan nama panjang");
+      await foto(`terburuk-${lebar}-chat`);
+      f.kepalaTerpotong = await share(`(d) => { const n = d.getElementById("chatName"); return n.scrollWidth > n.clientWidth; }`);
+      if (lebar === "402") {
+        // Dua tamu bernama sama dengan nomor berbeda: link pribadinya.
+        f.linkAndi = [];
+        for (const i of [0, 1]) {
+          await share(`(d) => { const b = d.querySelector("#chatBar [data-back]"); if (!d.getElementById("chat").hidden && b.getClientRects().length) b.click(); }`);
+          await sleep(300);
+          await share(`(d) => [...d.querySelectorAll("#guestBody .row")].filter((r) => r.querySelector(".nm").textContent === "Andi")[${i}].click()`);
+          await until(chatTerbuka, "percakapan Andi");
+          f.linkAndi.push(await share(`(d) => [d.getElementById("chatSub").textContent, d.querySelector("#thread .bubble a").href]`));
+        }
+        await share(`(d) => { const b = d.querySelector("#chatBar [data-back]"); if (b.getClientRects().length) b.click(); }`);
+        await sleep(300);
+        // Mencari nomor seperti yang diketik orang Indonesia (0812...) dan seperti yang tersimpan (62812...).
+        f.cari = {};
+        for (const kata of ["0812", "62812", "Sahabat", "orang"]) {
+          f.cari[kata] = await share(`(d) => { const s = d.getElementById("search"); s.value = ${JSON.stringify(kata)}; s.dispatchEvent(new Event("input", { bubbles: true })); return d.querySelectorAll("#guestBody .row").length; }`);
+        }
+        await share(`(d) => { const s = d.getElementById("search"); s.value = "0812"; s.dispatchEvent(new Event("input", { bubbles: true })); s.blur(); }`);
+        await foto(`terburuk-${lebar}-cari-0812`);
+      }
+    }
+    if (kunci === "seribu") {
+      f.masukan = DATA.seribu.split("\n").length;
+      f.cariMs = await share(`(d) => { const s = d.getElementById("search"), t = performance.now(); s.value = "Tamu Undangan 99"; s.dispatchEvent(new Event("input", { bubbles: true })); return Math.round(performance.now() - t); }`);
+    }
+    console.log("uji", kunci, lebar, JSON.stringify({ ...f, tamu: undefined }));
+  }
+  fs.writeFileSync(path.join(keluar, "temuan.json"), JSON.stringify(temuan, null, 1) + "\n");
+  ws.close(); chrome.kill();
+  fs.rmSync(prof, { recursive: true, force: true, maxRetries: 5 });
+  console.log(`selesai: ${Object.keys(temuan).length} tangkapan → ${path.relative(REPO, keluar)}`);
+  if (process.argv.includes("--sekali")) { server.close(); process.exit(0); }
+  console.log(`Pengalih data (Ctrl+C untuk berhenti): http://127.0.0.1:${PORT}/dashboard?w=${W}&link=${encodeURIComponent(LINK)}&data=terburuk`);
+  await new Promise(() => {});
+}
+
+fs.rmSync(OUT, { recursive: true, force: true });
+fs.mkdirSync(OUT, { recursive: true });
+// Ikon aplikasi WhatsApp (App Store) untuk adegan buka aplikasi.
+fs.writeFileSync(path.join(OUT, "whatsapp.webp"), Buffer.from(await (await fetch("https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/34/f8/4c/34f84cc3-89ca-8fa9-03c4-cef1327edd31/Placeholder.mill/400x400Icon.ApSiOS01-75.webp")).arrayBuffer()));
 
 // 1. Sampul undangan dengan nama tamu, dan potongan persegi sampul tanpa nama untuk gambar pratinjau tautan.
 await send("Page.navigate", { url: DEMO });
@@ -207,11 +382,11 @@ await shot("undangan-sampul", { nama: `.inv-cover__guest|${PILIH}`, kepada: ".in
 
 // 2. Masuk dashboard: link kedua dari pesan serah terima (?w= dan link), PIN, Masuk.
 await send("Fetch.enable", { patterns: [{ urlPattern: OG.replace(/[^/]*$/, "*") }] });
-const KELOLA = `/kelola?w=${W}&link=${encodeURIComponent(LINK)}`;
+const KELOLA = `/dashboard?w=${W}&link=${encodeURIComponent(LINK)}`;
 await send("Page.navigate", { url: `http://127.0.0.1:${PORT}${KELOLA}` });
 await until(`!!document.getElementById("pinInput") && !document.getElementById("gate").hidden`, "gerbang PIN");
 const GERBANG = { pin: "#pinInput", masuk: "#gateSubmit", kartu: "#gate .card" };
-await shot("gerbang", GERBANG, { url: `tokomu.myscalev.com${KELOLA}` });
+await shot("gerbang", GERBANG, { url: `nikahin.id${KELOLA}` });
 await js(`document.getElementById("pinInput").focus()`);
 for (let i = 1; i <= 6; i++) {
   await send("Input.insertText", { text: PIN[i - 1] });
@@ -222,21 +397,14 @@ await until(`document.getElementById("gate").hidden && document.getElementById("
 const TAB = { "tab-beranda": '.tab[data-tab="beranda"]', "tab-kirim": '.tab[data-tab="kirim"]', "tab-tamu": '.tab[data-tab="tamu"]', akun: "#meBtn" };
 await shot("beranda", TAB);
 
-// 3. Tab Kirim: daftar kosong, tombol tambah hijau kanan bawah; tampilan laptop untuk tombol di kepala daftar.
+// 3. Tab Kirim: daftar kosong, tombol tambah hijau kanan bawah; tampilan MacBook untuk tombol di kepala daftar.
 await tap('.tab[data-tab="kirim"]');
 await until(`(() => { const f = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan" && !f.hidden); const e = f && f.contentDocument.getElementById("empty"); return e && !e.hidden && e.textContent.includes("Belum ada tamu") && document.getElementById("loading").hidden; })()`, "Kirim kosong");
 // Tunggu toast "Berhasil masuk." hilang (2,5 detik) supaya layar bersih.
 await sleep(2800);
 await shot("kirim-kosong", { ...TAB, fab: "share:#fabAdd", kosong: "share:#empty" });
-// Tampilan laptop (1280x800, mouse) untuk sisipan; sesudahnya kembali ke HP.
-const laptop = async () => {
-  await send("Emulation.setTouchEmulationEnabled", { enabled: false });
-  await send("Emulation.setUserAgentOverride", { userAgent: UA_HP.replace("Linux; Android 14; Pixel 8", "Windows NT 10.0; Win64; x64").replace(" Mobile", ""), platform: "Win32" });
-  await send("Emulation.setDeviceMetricsOverride", { width: 1280, height: 800, deviceScaleFactor: 2, mobile: false });
-  await sleep(800);
-};
 await laptop();
-await shot("kirim-laptop", { tambah: "share:#addBtn", daftar: "share:.side" }, { viewport: [1280, 800] });
+await shot("kirim-laptop", { tambah: "share:#addBtn", daftar: "share:.side" }, { viewport: [MAC.width, MAC.height] });
 await hp();
 await sleep(800);
 
@@ -272,22 +440,22 @@ await shot("tambah-isi", PANEL_TAMBAH);
 
 // 5. Simpan daftar: link pribadi tiap tamu dibuat, daftar seperti daftar chat.
 await share(`(d) => d.getElementById("generate").click()`);
-await until(`(() => { const d = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan").contentDocument; return d.querySelectorAll("#guestBody .row").length === 6 && d.getElementById("addDrawer").hidden; })()`, "daftar tamu");
+await until(`(() => { const d = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan").contentDocument; return d.querySelectorAll("#guestBody .row").length === 7 && d.getElementById("addDrawer").hidden; })()`, "daftar tamu");
 const names = TAMU.split("\n").map((l) => l.split(" - ")[0]);
 const DAFTAR = { ...TAB, fab: "share:#fabAdd", cari: "share:#search", semua: 'share:[data-filter="all"]', belum: 'share:[data-filter="pending"]', terkirim: 'share:[data-filter="sent"]',
   ...Object.fromEntries(names.map((n, i) => ["tamu-" + (i + 1), `share:#guestBody .row|${n}`])), toast: "share:#status" };
 await shot("daftar-toast", DAFTAR);
 await sleep(2800);
 await shot("daftar", DAFTAR);
-// Di HP baris tamu terpotong ("Sahabat…"); di laptop terlihat utuh (nomor · kategori · jumlah orang) untuk sisipan.
+// Di HP baris tamu terpotong ("Sahabat…"); di MacBook terlihat utuh (nomor · kategori · jumlah orang) untuk sisipan.
 await laptop();
-await shot("daftar-laptop", { "tamu-3": "share:#guestBody .row|Dewi Lestari", "tamu-3-sub": "share:#guestBody .row .l2|Sahabat · 2 orang" }, { viewport: [1280, 800] });
+await shot("daftar-laptop", { dewi: "share:#guestBody .row|Dewi Lestari", "dewi-sub": "share:#guestBody .row .l2|Sahabat · 2 orang" }, { viewport: [MAC.width, MAC.height] });
 await hp();
 await sleep(800);
 // Kategori bisa dicari: kolom Cari tamu berisi "Sahabat".
 const cari = (teks) => share(`(d) => { const s = d.getElementById("search"); s.value = ${JSON.stringify(teks)}; s.dispatchEvent(new Event("input", { bubbles: true })); s.blur(); }`);
 await cari("Sahabat");
-await shot("daftar-cari", { cari: "share:#search", "tamu-3": "share:#guestBody .row|Dewi Lestari", "tamu-5": "share:#guestBody .row|Sari Wulandari" });
+await shot("daftar-cari", { cari: "share:#search", dewi: "share:#guestBody .row|Dewi Lestari", sari: "share:#guestBody .row|Sari Wulandari" });
 await cari("");
 await sleep(300);
 

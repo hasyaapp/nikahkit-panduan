@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "layar": "node src/kirim-undangan/rekam-layar.mjs",
+    "uji": "node src/kirim-undangan/rekam-layar.mjs --uji",
     "waktu": "node alat/waktu.mjs kirim-undangan",
     "studio": "remotion studio src/index.jsx",
     "render": "remotion render src/index.jsx KirimUndangan out/kirim-undangan.mp4"
   },
   "dependencies": {
     "@remotion/cli": "4.0.547",
+    "@remotion/fonts": "4.0.547",
     "@remotion/google-fonts": "4.0.547",
     "@remotion/media": "4.0.547",
     "react": "19.3.1",

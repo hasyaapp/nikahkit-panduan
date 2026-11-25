@@ -1,34 +1,55 @@
-// Sorotan berkoordinat: sekeliling digelapkan, bingkai kuning berdenyut, label gelap dengan panah. Koordinat dan ukuran
-// huruf memakai satuan wadahnya (px CSS layar ponsel, atau px kanvas bila `lebar`/`ukuran` diberikan). Muncul di bingkai
-// `dari`, hilang di `sampai`.
+// Sorotan berkoordinat (pt layar): sekeliling diredupkan, bingkai oranye merek dengan ruang lega di sekitar elemen, label
+// coklat dengan panah. Ukuran garis, huruf, dan jarak tetap di kanvas walau kamera memperbesar; label dijaga tetap di
+// bagian layar yang tampak. Muncul sekali di bingkai `dari` (tanpa denyut berulang), hilang di `sampai`.
 import { useCurrentFrame } from "remotion";
-import { antara, FPS, HP, HURUF, lepas, WARNA } from "./dasar";
+import { antara, HP, HURUF, lepas, WARNA } from "./dasar";
+import { useKamera } from "./kamera";
 
-export const Sorot = ({ kotak, label, dari, sampai, redup = true, sisi, pad = 6, radius = 12, lebar = HP.w, ukuran = 18 }) => {
+let ctx;
+// Lebar teks label di kanvas (px), diukur dengan huruf yang sama.
+export function lebarTeks(teks, font) {
+  ctx = ctx || document.createElement("canvas").getContext("2d");
+  ctx.font = font;
+  return ctx.measureText(teks).width;
+}
+// Gaya label dalam px kanvas; Tanda.jsx memakai yang sama.
+export const LABEL = { huruf: 28, padY: 14, padX: 22, jarak: 20, maks: 600, radius: 16 };
+
+export const Sorot = ({ kotak, label, dari, sampai, sisi, pad = 9, radius = 14, redup = true }) => {
   const f = useCurrentFrame();
+  const { s, lihat, ukuran = [HP.w, HP.h] } = useKamera();
   if (!kotak || f < dari || f > sampai + 8) return null;
-  const a = antara(f, dari, dari + 7, 0, 1) * (1 - antara(f, sampai, sampai + 7, 0, 1));
-  const [x, y, w, h] = kotak;
-  const u = ukuran / 16.5;
+  const a = antara(f, dari, dari + 8, 0, 1, lepas) * (1 - antara(f, sampai, sampai + 7, 0, 1));
+  const u = 1 / s, [x, y, w, h] = kotak;
   const box = { left: x - pad, top: y - pad, width: w + 2 * pad, height: h + 2 * pad };
-  const tumbuh = antara(f, dari, dari + 10, 1.14, 1, lepas);
-  const denyut = 0.55 + 0.45 * Math.sin(((f - dari) / FPS) * Math.PI * 2.2);
-  const lw = label ? Math.min(330 * u, label.length * 9.4 * u + 32 * u) : 0;
-  const di = sisi || (box.top > 150 * u ? "atas" : "bawah");
-  const lx = Math.max(10 * u, Math.min(lebar - 10 * u - lw, x + w / 2 - lw / 2));
-  const ly = di === "atas" ? box.top - 14 * u : box.top + box.height + 14 * u;
-  const panah = Math.max(14 * u, Math.min(lw - 14 * u, x + w / 2 - lx));
+  // Cincin tumbuh sekali saat muncul, lalu diam.
+  const masuk = antara(f, dari, dari + 12, 0, 1, lepas);
+  let lw = 0, lh = 0, lx = 0, ly = 0, panah = 0, di = "atas";
+  const font = `800 ${LABEL.huruf}px ${HURUF}`;
+  if (label) {
+    const t = lebarTeks(label, font), baris = Math.ceil(t / (LABEL.maks - 2 * LABEL.padX));
+    lw = Math.min(t + 2 * LABEL.padX + 2, LABEL.maks) * u;
+    lh = (baris * LABEL.huruf * 1.25 + 2 * LABEL.padY) * u;
+    const tepi = 14 * u, x0 = Math.max(lihat[0], 0) + tepi, x1 = Math.min(lihat[2], ukuran[0]) - tepi;
+    const y0 = Math.max(lihat[1], 0) + tepi, y1 = Math.min(lihat[3], ukuran[1]) - tepi;
+    const jarak = LABEL.jarak * u;
+    di = sisi || (box.top - jarak - lh >= y0 ? "atas" : box.top + box.height + jarak + lh <= y1 ? "bawah" : "atas");
+    lx = Math.max(x0, Math.min(x1 - lw, x + w / 2 - lw / 2));
+    ly = di === "atas" ? box.top - jarak - lh : box.top + box.height + jarak;
+    panah = Math.max(LABEL.radius * u + 8 * u, Math.min(lw - LABEL.radius * u - 8 * u, x + w / 2 - lx));
+  }
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 6, pointerEvents: "none", opacity: a }}>
-      <div style={{ position: "absolute", ...box, borderRadius: radius, boxShadow: redup ? "0 0 0 4000px rgba(15,23,42,.52)" : "none" }} />
-      <div style={{ position: "absolute", ...box, borderRadius: radius, transform: `scale(${tumbuh})`,
-        border: `${3 * u}px solid ${WARNA.sorot}`, boxShadow: `0 0 ${(10 + 10 * denyut) * u}px rgba(255,200,61,${0.55 + 0.35 * denyut})` }} />
+      <div style={{ position: "absolute", ...box, borderRadius: radius, boxShadow: redup ? "0 0 0 4000px rgba(43,26,7,.46)" : "none" }} />
+      <div style={{ position: "absolute", ...box, borderRadius: radius, border: `${3 * u}px solid ${WARNA.oranye}`, transform: `scale(${1.06 - 0.06 * masuk})` }} />
+      <div style={{ position: "absolute", left: box.left - 9 * u * masuk, top: box.top - 9 * u * masuk, width: box.width + 18 * u * masuk, height: box.height + 18 * u * masuk,
+        borderRadius: radius + 9 * u * masuk, border: `${2 * u}px solid ${WARNA.oranye}`, opacity: 0.55 * (1 - masuk) }} />
       {label ? (
-        <div style={{ position: "absolute", left: lx, top: ly, width: lw, transform: `translateY(${di === "atas" ? "-100%" : "0"}) translateY(${(1 - a) * (di === "atas" ? 6 : -6) * u}px)` }}>
-          <div style={{ position: "relative", padding: `${8 * u}px ${12 * u}px`, borderRadius: 11 * u, background: WARNA.gelap, color: "#fff",
-            font: `700 ${ukuran}px/1.25 ${HURUF}`, textAlign: "center", boxShadow: "0 6px 16px rgba(0,0,0,.25)" }}>
+        <div style={{ position: "absolute", left: lx, top: ly, width: lw, transform: `translateY(${(1 - masuk) * (di === "atas" ? 10 : -10) * u}px)` }}>
+          <div style={{ position: "relative", padding: `${LABEL.padY * u}px ${LABEL.padX * u}px`, borderRadius: LABEL.radius * u, background: WARNA.coklat, color: "#fff",
+            font: `800 ${LABEL.huruf * u}px/1.25 ${HURUF}`, textAlign: "center", boxShadow: `0 ${8 * u}px ${22 * u}px rgba(43,26,7,.28)` }}>
             {label}
-            <div style={{ position: "absolute", left: panah - 7 * u, [di === "atas" ? "bottom" : "top"]: -6 * u, width: 14 * u, height: 14 * u, background: WARNA.gelap, transform: "rotate(45deg)", borderRadius: 2 }} />
+            <div style={{ position: "absolute", left: panah - 8 * u, [di === "atas" ? "bottom" : "top"]: -7 * u, width: 16 * u, height: 16 * u, background: WARNA.coklat, transform: "rotate(45deg)", borderRadius: 3 * u }} />
           </div>
         </div>
       ) : null}

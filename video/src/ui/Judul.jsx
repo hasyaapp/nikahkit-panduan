@@ -1,24 +1,25 @@
-// Judul langkah di atas ponsel. `daftar` = [[detik, langkah | null, judul], ...]; judul baru masuk dari bawah.
-import { useCurrentFrame } from "remotion";
-import { antara, detik, HURUF, lepas, W, WARNA, ZONA } from "./dasar";
+// Judul langkah di atas ponsel, di dalam zona aman. `daftar` = [[detik, langkah | null, judul], ...]; judul baru masuk dari
+// bawah. Selama layar WhatsApp (`wa`), ikon aplikasinya tampil di baris kecil supaya jelas sedang di aplikasi WhatsApp.
+import { Img, staticFile, useCurrentFrame } from "remotion";
+import { AMAN, antara, detik, HURUF, JUDUL, lepas, WARNA } from "./dasar";
 
-export const Judul = ({ daftar, total }) => {
+export const Judul = ({ daftar, total, wa }) => {
   const f = useCurrentFrame();
   const i = daftar.findLastIndex(([t]) => detik(t) <= f);
   if (i < 0) return null;
   const [t, langkah, judul] = daftar[i];
   const mulai = detik(t);
-  const a = antara(f, mulai, mulai + 9, 0, 1, lepas);
+  const a = antara(f, mulai, mulai + 10, 0, 1, lepas);
+  const kecil = [wa ? "WhatsApp" : null, langkah ? `Langkah ${langkah} dari ${total}` : null].filter(Boolean).join(" · ");
   return (
-    <div style={{ position: "absolute", left: 0, top: 0, width: W, height: ZONA.atas, display: "flex", alignItems: "center", gap: 22, padding: "26px 60px 0" }}>
-      {langkah ? (
-        <div style={{ flex: "none", width: 76, height: 76, borderRadius: 24, background: WARNA.hijau, color: "#fff", display: "grid", placeItems: "center",
-          font: `800 40px ${HURUF}`, transform: `scale(${0.7 + 0.3 * a})`, opacity: a, boxShadow: "0 8px 20px rgba(29,170,97,.35)" }}>{langkah}</div>
+    <div style={{ position: "absolute", left: AMAN.x0, top: AMAN.y0, width: AMAN.x1 - AMAN.x0, height: 108, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
+      {kecil ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, height: 32, font: `900 24px/1 ${HURUF}`, color: WARNA.oranyeTua, letterSpacing: "0.12em", textTransform: "uppercase", opacity: a }}>
+          {wa ? <Img src={staticFile("kirim-undangan/layar/whatsapp.webp")} style={{ width: 32, height: 32, borderRadius: 8, display: "block" }} /> : null}
+          {kecil}
+        </div>
       ) : null}
-      <div style={{ minWidth: 0, opacity: a, transform: `translateY(${(1 - a) * 18}px)` }}>
-        {langkah ? <div style={{ font: `700 24px ${HURUF}`, color: WARNA.hijauTua, letterSpacing: "0.06em", textTransform: "uppercase" }}>Langkah {langkah} dari {total}</div> : null}
-        <div style={{ font: `800 ${langkah ? 50 : 56}px/1.12 ${HURUF}`, color: WARNA.teks, letterSpacing: "-0.02em" }}>{judul}</div>
-      </div>
+      <div style={{ font: `700 52px/1.1 ${JUDUL}`, color: WARNA.coklat, letterSpacing: "-0.01em", textAlign: "center", whiteSpace: "nowrap", opacity: a, transform: `translateY(${(1 - a) * 16}px)` }}>{judul}</div>
     </div>
   );
 };

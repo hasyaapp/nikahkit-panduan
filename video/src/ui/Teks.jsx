@@ -1,9 +1,10 @@
-// Teks narasi di bawah ponsel, dari waktu.json: per potongan (paling banyak 2 baris), kata yang sudah diucapkan gelap,
-// kata yang sedang diucapkan hijau, sisanya abu. Potongan pindah tepat saat kata pertamanya diucapkan.
+// Teks narasi di bawah ponsel, di dalam zona aman, dari waktu.json: per potongan (paling banyak 2 baris), kata yang sudah
+// diucapkan coklat, kata yang sedang diucapkan oranye merek, sisanya samar. Potongan pindah tepat saat kata pertamanya
+// diucapkan.
 import { useCurrentFrame } from "remotion";
-import { FPS, HURUF, W, WARNA, ZONA } from "./dasar";
+import { AMAN, FPS, HURUF, PANGGUNG, WARNA } from "./dasar";
 
-const MAKS = 70, BELAH = 34;
+const MAKS = 58, BELAH = 28;
 export function potong(kalimat) {
   const out = [];
   for (const k of kalimat) {
@@ -23,11 +24,11 @@ export const Teks = ({ potongan }) => {
   const t = useCurrentFrame() / FPS;
   const p = potongan.find((c) => t >= c.mulai - 0.12 && t < c.sampai);
   return (
-    <div style={{ position: "absolute", left: 0, top: ZONA.bawah, width: W, height: 1920 - ZONA.bawah, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 56px 40px" }}>
+    <div style={{ position: "absolute", left: AMAN.x0, top: PANGGUNG.y1 + 12, width: AMAN.x1 - AMAN.x0, height: AMAN.y1 - PANGGUNG.y1 - 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
       {p ? (
-        <p style={{ margin: 0, maxWidth: 960, textAlign: "center", font: `700 44px/1.32 ${HURUF}`, letterSpacing: "-0.01em", textWrap: "balance" }}>
+        <p style={{ margin: 0, textAlign: "center", font: `800 39px/1.3 ${HURUF}`, letterSpacing: "-0.005em", textWrap: "balance" }}>
           {p.kata.map(([w, a, b], i) => (
-            <span key={i} style={{ color: t >= a && t < b ? "#138a4f" : t >= a ? WARNA.teks : "#a3adbb" }}>{w + (i < p.kata.length - 1 ? " " : "")}</span>
+            <span key={i} style={{ color: t >= a && t < b ? WARNA.oranyeTua : t >= a ? WARNA.coklat : WARNA.samar }}>{w + (i < p.kata.length - 1 ? " " : "")}</span>
           ))}
         </p>
       ) : null}
