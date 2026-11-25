@@ -473,11 +473,12 @@ function Laptop() {
   const f = useCurrentFrame(), dari = t("laptop") - 0.15, sampai = t("panel") - 0.3;
   if (f < fr(dari) || f > fr(sampai) + 8) return null;
   const o = muncul(f, dari, sampai);
-  const s0 = LEBAR / (MB.w / MB_PT), tinggi = (MB.h / MB_PT) * s0;
+  // Laptop utuh selebar kanvas (boleh keluar zona aman, keputusan pemilik), di tengah panggung.
+  const lebarLaptop = W - 24, s0 = lebarLaptop / (MB.w / MB_PT), tinggi = (MB.h / MB_PT) * s0;
   const [bx, by, bw, bh] = layar.layar["kirim-laptop"].kotak.tambah;
   return (
     <div style={{ position: "absolute", inset: 0, background: `rgba(251,247,242,${o})` }}>
-      <div style={{ position: "absolute", left: AMAN.x0, top: (PANGGUNG.y0 + PANGGUNG.y1) / 2 - tinggi / 2 + (1 - o) * 40, width: MB.w / MB_PT, height: MB.h / MB_PT,
+      <div style={{ position: "absolute", left: (W - lebarLaptop) / 2, top: (PANGGUNG.y0 + PANGGUNG.y1) / 2 - tinggi / 2 + (1 - o) * 40, width: MB.w / MB_PT, height: MB.h / MB_PT,
         transform: `scale(${s0})`, transformOrigin: "0 0", opacity: o }}>
         <div style={{ position: "absolute", left: MAC.x, top: MAC.y, width: MAC.w, height: MAC.h, overflow: "hidden", borderRadius: MAC.r, background: "#fff" }}>
           <MenuMac />

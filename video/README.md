@@ -41,13 +41,15 @@ masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
   Shorts/TikTok/Reels). Dari atas, dengan jarak lega di antaranya: garis langkah 1-5, judul (`JUDUL_Y`), panggung ponsel
   (`PANGGUNG`), teks narasi. Ponsel selalu di tengah dan perbesaran paling besar `KMAKS` (bingkai utuh selebar zona
   aman), jadi sisi kiri-kanan ponsel tidak pernah terpotong; hanya atas dan bawah panggung yang memudar lembut saat
-  diperbesar. Kartu dan pil diletakkan sebagai bagian dari tinggi panggung. Laptop tidak diperbesar.
+  diperbesar. Kartu dan pil diletakkan sebagai bagian dari tinggi panggung. Laptop utuh selebar kanvas (boleh keluar
+  zona aman, keputusan pemilik) dan tidak diperbesar.
 - Ikon: SF Symbols untuk bilah status iOS, Safari, macOS, dan WhatsApp (`swift alat/simbol.swift` → `public/simbol/`,
   ukurannya di `src/ui/simbol.json`); Lucide (`lucide-react`) untuk kartu, pil, dan garis langkah.
 - `swift alat/mockup.swift`: merender model 3D Apple (.usdz, disalin ke `~/Library/Caches/nikahin-mockup/`) jadi
   `public/mockup/iphone.png` dan `macbook.png` dengan layar transparan, kotak layarnya ke `src/ui/mockup.json`. iPhone 18
-  Pro dari apple.com; laptop = MacBook Neo dari pustaka model 3D Apple di Mac ini (pilihan pemilik, layar 1280x802 pt
-  tanpa takik).
+  Pro dari apple.com (kamera ortografis, tampak depan); laptop = MacBook Neo dari pustaka model 3D Apple di Mac ini
+  (pilihan pemilik, layar 1280x802 pt tanpa takik), dirender apa adanya seperti foto produk: kamera perspektif (sudut
+  pandang 22°) tegak lurus layar, jadi layar tetap persegi panjang dan badan serta papan ketiknya tidak gepeng.
 - `node alat/sfx.mjs`: menyalin efek suara di `src/ui/sfx.json` dari pustaka Boombox Studio di Mac ini ke `public/sounds/`
   (lisensi pengguna; hanya berkas yang dipakai, tidak masuk git).
 - `npm run layar`: membuka halaman dashboard hasil build (`server/pages/panel/scalev_panel.html`) di Chrome tanpa jendela

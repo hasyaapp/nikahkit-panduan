@@ -15,12 +15,15 @@ struct Model {
   let nama, berkas, sumber, layar: String  // berkas = nama di cache; sumber = URL unduhan atau jalur berkas lokal
   let sembunyi: [String]  // simpul yang tidak ikut (iPhone: model kedua yang tampak belakang)
   let tinggi: Int?, lebar: Int?  // ukuran gambar keluaran
+  let fov: Double?  // sudut pandang kamera perspektif (derajat); nil = ortografis
 }
 let MODEL = [
   Model(nama: "iphone", berkas: "iphone.usdz", sumber: "https://www.apple.com/105/media/us/iphone-18-pro/2026/591df885-5ee2-4173-86e6-401021249f7c/ar/iphone-18-pro-e-sim.usdz",
-        layar: "EHjrGDHNHzgNjtE", sembunyi: ["wUOhcMgiBmCgGaw"], tinggi: 2600, lebar: nil),
+        layar: "EHjrGDHNHzgNjtE", sembunyi: ["wUOhcMgiBmCgGaw"], tinggi: 2600, lebar: nil, fov: nil),
+  // Laptop apa adanya seperti foto produk: kamera perspektif, bukan ortografis (ortografis membuat badan dan papan ketik
+  // tampak gepeng).
   Model(nama: "macbook", berkas: "macbook-neo.usdz", sumber: "/Users/hasyaapp/orca/projects/full-visual/doc/keyframes/workspace/library/apple-3d/macbook-neo.usdz",
-        layar: "rvnQqsVlUxgRHpf", sembunyi: [], tinggi: nil, lebar: 2600),
+        layar: "rvnQqsVlUxgRHpf", sembunyi: [], tinggi: nil, lebar: 2600, fov: 22),
 ]
 
 func unduh(_ m: Model) throws -> URL {
@@ -69,9 +72,8 @@ for m in MODEL {
   let pusat = SCNVector3((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2)
   let kamera = SCNNode()
   kamera.camera = SCNCamera()
-  kamera.camera!.usesOrthographicProjection = true
   kamera.camera!.zNear = 1
-  kamera.camera!.zFar = 400
+  kamera.camera!.zFar = 2000
   var maju: SCNVector3  // dari layar ke arah kamera
   if m.nama == "iphone" {
     maju = SCNVector3(0, 0, -1)  // layar iPhone menghadap -z
@@ -81,16 +83,32 @@ for m in MODEL {
     maju = SCNVector3(0, sin(miring), cos(miring))
     kamera.eulerAngles = SCNVector3(-miring, 0, 0)
   }
-  kamera.position = SCNVector3(pusat.x + maju.x * 150, pusat.y + maju.y * 150, pusat.z + maju.z * 150)
   scene.rootNode.addChildNode(kamera)
 
-  // Luas pandang dari semua sudut model di bidang kamera, sedikit longgar; tepi kosong dipangkas sesudah render.
+  // Sudut-sudut model relatif ke pusat layar dalam sumbu kamera (x kanan, y atas, z ke arah kamera). Luas pandang sedikit
+  // longgar; tepi kosong dipangkas sesudah render.
   let kanan = kamera.convertVector(SCNVector3(1, 0, 0), to: nil), atas = kamera.convertVector(SCNVector3(0, 1, 0), to: nil)
-  let titik = sudut(scene.rootNode).map { p in (p.x * kanan.x + p.y * kanan.y + p.z * kanan.z, p.x * atas.x + p.y * atas.y + p.z * atas.z) }
-  let c = (pusat.x * kanan.x + pusat.y * kanan.y + pusat.z * kanan.z, pusat.x * atas.x + pusat.y * atas.y + pusat.z * atas.z)
-  let lx = titik.map { abs($0.0 - c.0) }.max()! * 1.04, ly = titik.map { abs($0.1 - c.1) }.max()! * 1.04
-  kamera.camera!.orthographicScale = Double(ly)
-  let W = m.lebar ?? Int((Double(m.tinggi!) * Double(lx / ly)).rounded()), H = m.tinggi ?? Int((Double(m.lebar!) * Double(ly / lx)).rounded())
+  let titik = sudut(scene.rootNode).map { p -> (CGFloat, CGFloat, CGFloat) in
+    let v = SCNVector3(p.x - pusat.x, p.y - pusat.y, p.z - pusat.z)
+    return (v.x * kanan.x + v.y * kanan.y + v.z * kanan.z, v.x * atas.x + v.y * atas.y + v.z * atas.z, v.x * maju.x + v.y * maju.y + v.z * maju.z)
+  }
+  var W: Int, H: Int, jarak: CGFloat = 150
+  if let fov = m.fov {
+    // Kamera tetap tegak lurus layar, jadi layar tetap persegi panjang; jaraknya secukupnya agar seluruh model masuk.
+    kamera.camera!.usesOrthographicProjection = false
+    kamera.camera!.fieldOfView = CGFloat(fov)
+    let t = CGFloat(tan(fov / 2 * .pi / 180)) / 1.04
+    jarak = titik.map { $0.2 + max(abs($0.0), abs($0.1)) / t }.max()!
+    W = m.lebar ?? m.tinggi!
+    H = W
+  } else {
+    kamera.camera!.usesOrthographicProjection = true
+    let lx = titik.map { abs($0.0) }.max()! * 1.04, ly = titik.map { abs($0.1) }.max()! * 1.04
+    kamera.camera!.orthographicScale = Double(ly)
+    W = m.lebar ?? Int((Double(m.tinggi!) * Double(lx / ly)).rounded())
+    H = m.tinggi ?? Int((Double(m.lebar!) * Double(ly / lx)).rounded())
+  }
+  kamera.position = SCNVector3(pusat.x + maju.x * jarak, pusat.y + maju.y * jarak, pusat.z + maju.z * jarak)
 
   let r = SCNRenderer(device: MTLCreateSystemDefaultDevice(), options: nil)
   r.scene = scene
