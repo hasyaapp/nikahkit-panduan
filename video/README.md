@@ -8,9 +8,9 @@ npm run video -- panduan-kreator-nikahin ~/Desktop
 ```
 
 Hasil: `<folder>/<slug>.mp4` (1920x1080) dan `<slug>-bab.txt` (daftar bab). Tanpa folder, hasilnya di `video/out/`.
-Video yang sudah diunggah disimpan di `~/Movies/Nikahin Video Panduan/` (`1 Member`, `2 Kreator` bernomor sesuai urutan
-playlist, `3 Ringkasan`, `9 Arsip`), dengan `Daftar video.csv` berisi judul, ID YouTube, playlist, dan status. Render baru
-masuk ke `_baru/` di folder itu. `video/out/frames` dan `video/out/seg` hanya berkas sementara dan boleh dihapus;
+Video final yang sudah diunggah tidak disimpan lokal (dihapus 25 Nov atas permintaan pemilik; render ulang dari repo bila
+perlu). Katalog `Daftar video.csv` (judul, ID YouTube, playlist, status), uji suara, rekaman mentah, dan video tidak publik
+ada di `video/arsip/` (tidak masuk git). Render baru menunggu dicek di `video/out/`. `video/out/frames` dan `video/out/seg` hanya berkas sementara dan boleh dihapus;
 `video/cache` jangan dihapus (narasi yang sudah dibayar).
 
 - Narasi tiap langkah = teks langkah di `<desc>` SVG animasinya, dibaca ElevenLabs (suara Sarah, model eleven_v4, bahasa
@@ -64,7 +64,7 @@ masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
   `~/Library/Caches/whisper.cpp/`) mencari waktu tiap kata `naskah.js` di `public/kirim-undangan/narasi.*`, hasilnya
   `src/kirim-undangan/waktu.json`. Narasi diganti: jalankan ini dulu. Bandingkan dua rekaman tanpa menulis:
   `node alat/waktu.mjs kirim-undangan <file> --cek`.
-- `npm run studio` untuk melihat di browser, `npm run render` untuk `out/kirim-undangan.mp4`. Hasil yang dipakai disalin
-  ke `~/Movies/Nikahin Video Panduan/_baru/`.
+- `npm run studio` untuk melihat di browser, `npm run render` untuk `out/kirim-undangan.mp4`; berkas itu yang dicek dan
+  diunggah.
 - Narasi ElevenLabs dibuat di akun yang kuncinya di Keychain `nikahin-elevenlabs-6` (akun `api`). `narasi.mp3` sudah
   dinormalkan ke -16 LUFS (ffmpeg loudnorm); rekaman aslinya `narasi-asli.mp3` di folder yang sama.
