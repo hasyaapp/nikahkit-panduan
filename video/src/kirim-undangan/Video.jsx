@@ -430,11 +430,11 @@ const Butir = ({ dari, Ikon, teks, warna = WARNA.oranyeTua }) => {
   );
 };
 
-// MacBook: bingkai dari model AR Apple (public/mockup/macbook.png), layar 1280x828 pt: bilah menu macOS, bilah Safari,
-// lalu tangkapan layar dashboard 1280x751. Ikon bilah dari SF Symbols seperti macOS asli. Tidak diperbesar, jadi bingkai
-// laptop selalu utuh.
+// MacBook Neo: bingkai dari model 3D Apple (public/mockup/macbook.png), layar 1280x802 pt tanpa takik: bilah menu macOS,
+// bilah Safari, lalu tangkapan layar dashboard 1280x726. Ikon bilah dari SF Symbols seperti macOS asli. Tidak diperbesar,
+// jadi bingkai laptop selalu utuh.
 const MB = mockup.macbook, MB_PT = MB.layar.w / 1280;
-const MAC = { w: 1280, h: MB.layar.h / MB_PT, menu: 25, safari: 52, x: MB.layar.x / MB_PT, y: MB.layar.y / MB_PT, r: MB.layar.r / MB_PT };
+const MAC = { w: 1280, h: MB.layar.h / MB_PT, menu: 24, safari: 52, x: MB.layar.x / MB_PT, y: MB.layar.y / MB_PT, r: MB.layar.r / MB_PT };
 const MAC_IKON = "#1d1d1f";
 const MenuMac = () => (
   <div style={{ position: "absolute", left: 0, top: 0, width: MAC.w, height: MAC.menu, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 14px 0 20px",
@@ -498,32 +498,34 @@ function Sisipan() {
   const cariTop = layar.layar["daftar-cari"].kotak.cari;
   const sari = layar.layar["daftar-cari"].kotak.sari;
   const dalam = LEBAR - 68;
+  // Posisi atas kartu dan pil sebagai bagian dari tinggi panggung, jadi ikut bila zona aman berubah.
+  const py = (v) => Math.round(PANGGUNG.y0 + v * (PANGGUNG.y1 - PANGGUNG.y0));
   return (
     <>
       <Laptop />
-      <Kartu dari={t("kategori", "tampil") - 0.1} sampai={t("kategori", "dicari") - 0.15} y={900}>
+      <Kartu dari={t("kategori", "tampil") - 0.1} sampai={t("kategori", "dicari") - 0.15} y={py(0.54)}>
         <Teks2 kecil>Di daftar tamu, tampil di bawah nama:</Teks2>
         <div style={{ height: 16 }} />
         <Potongan nama="daftar-laptop" kotak={BARIS} lebar={dalam} />
       </Kartu>
-      <Kartu dari={t("kategori", "dicari") - 0.1} sampai={t("kategori", null, true) + 0.2} y={780}>
+      <Kartu dari={t("kategori", "dicari") - 0.1} sampai={t("kategori", null, true) + 0.2} y={py(0.42)}>
         <Teks2 kecil>Bisa dicari, misalnya Sahabat:</Teks2>
         <div style={{ height: 16 }} />
         <Potongan nama="daftar-cari" kotak={[0, cariTop[1] - 12, HP.w, sari[1] + sari[3] - cariTop[1] + 18]} lebar={dalam} />
       </Kartu>
-      <Kartu dari={t("jumlah", "catatan") - 0.1} sampai={t("jumlah", null, true) + 0.2} y={900}>
+      <Kartu dari={t("jumlah", "catatan") - 0.1} sampai={t("jumlah", null, true) + 0.2} y={py(0.54)}>
         <Teks2 kecil>Hanya catatan, tampil sebagai "2 orang":</Teks2>
         <div style={{ height: 16 }} />
         <Potongan nama="daftar-laptop" kotak={BARIS} lebar={dalam} />
       </Kartu>
-      <Kartu dari={SUMBER} sampai={t("csv") - 0.2} y={640} redup>
+      <Kartu dari={SUMBER} sampai={t("csv") - 0.2} y={py(0.275)} redup>
         <Teks2 kecil>Bisa ditempel langsung dari:</Teks2>
         <div style={{ height: 6 }} />
         <Butir dari={t("sumber", "catatan")} Ikon={NotebookPen} teks="Catatan di HP" />
         <Butir dari={t("sumber", "bernomor")} Ikon={MessageSquareText} teks="Daftar bernomor di WhatsApp" />
         <Butir dari={t("sumber", "kolom")} Ikon={Sheet} teks="Kolom yang disalin dari Excel" />
       </Kartu>
-      <Kartu dari={t("penting") - 0.05} sampai={t("pilih-tamu") - 0.35} y={520} redup>
+      <Kartu dari={t("penting") - 0.05} sampai={t("pilih-tamu") - 0.35} y={py(0.155)} redup>
         <KotakIkon Ikon={Smartphone} />
         <div style={{ height: 22 }} />
         <Teks2>Daftar tamu dan status terkirim hanya tersimpan di HP yang dipakai</Teks2>
@@ -531,9 +533,9 @@ function Sisipan() {
         <Butir dari={t("satu-hp", "HP")} Ikon={CircleCheck} warna={WARNA.hijau} teks="Kirim dari HP dan browser yang sama" />
         <Butir dari={t("satu-hp", "simpan")} Ikon={CircleCheck} warna={WARNA.hijau} teks="Simpan juga daftar tamunya di catatan" />
       </Kartu>
-      <Pil Ikon={Eye} teks="Tercatat di Pelacakan saat dibuka" dari={t("link", "tercatat") - 0.1} sampai={t("khusus") - 0.15} y={1196} />
-      <Pil Ikon={LockKeyhole} teks="Undangan khusus: hanya lewat link pribadi" dari={t("khusus") - 0.05} sampai={t("teks") - 0.35} y={1196} />
-      <Kartu dari={t("lewati") - 0.05} sampai={t("kartu") - 0.3} y={720} redup>
+      <Pil Ikon={Eye} teks="Tercatat di Pelacakan saat dibuka" dari={t("link", "tercatat") - 0.1} sampai={t("khusus") - 0.15} y={py(0.84)} />
+      <Pil Ikon={LockKeyhole} teks="Undangan khusus: hanya lewat link pribadi" dari={t("khusus") - 0.05} sampai={t("teks") - 0.35} y={py(0.84)} />
+      <Kartu dari={t("lewati") - 0.05} sampai={t("kartu") - 0.3} y={py(0.36)} redup>
         <KotakIkon Ikon={Phone} />
         <div style={{ height: 22 }} />
         <Teks2>Tamu sudah punya nomor? Chat-nya langsung terbuka, langkah ini terlewati.</Teks2>

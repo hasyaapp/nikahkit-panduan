@@ -4,7 +4,7 @@
 // ikon aplikasinya tampil di depan judul.
 import { Img, staticFile, useCurrentFrame } from "remotion";
 import { Check } from "lucide-react";
-import { AMAN, antara, detik, halus, HURUF, JUDUL, lepas, WARNA } from "./dasar";
+import { AMAN, antara, detik, halus, HURUF, JUDUL, JUDUL_Y, lepas, WARNA } from "./dasar";
 
 const LANGKAH = ["Masuk", "Tab Kirim", "Tempel", "Kirim", "WhatsApp"];
 const LEBAR = AMAN.x1 - AMAN.x0, JARAK = LEBAR / LANGKAH.length, Y = 20;
@@ -19,7 +19,7 @@ export const Judul = ({ daftar, wa }) => {
   const pr = antara(f, mulai, mulai + 18, dari, tahap, halus);
   const a = antara(f, mulai, mulai + 10, 0, 1, lepas);
   return (
-    <div style={{ position: "absolute", left: AMAN.x0, top: AMAN.y0, width: LEBAR, height: 140 }}>
+    <div style={{ position: "absolute", left: AMAN.x0, top: AMAN.y0, width: LEBAR, height: JUDUL_Y - AMAN.y0 + 60 }}>
       {[1, 2, 3, 4].map((k) => (
         <div key={k} style={{ position: "absolute", left: cx(k) + 24, top: Y - 2, width: JARAK - 48, height: 4, borderRadius: 2, background: "#ecdfd4", overflow: "hidden" }}>
           <div style={{ width: `${Math.max(0, Math.min(1, pr - k)) * 100}%`, height: "100%", background: WARNA.oranyeTua }} />
@@ -39,9 +39,9 @@ export const Judul = ({ daftar, wa }) => {
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: 0, right: 0, top: 80, display: "flex", alignItems: "center", justifyContent: "center", gap: 14, opacity: a, transform: `translateY(${(1 - a) * 14}px)` }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: JUDUL_Y - AMAN.y0, display: "flex", alignItems: "center", justifyContent: "center", gap: 14, opacity: a, transform: `translateY(${(1 - a) * 14}px)` }}>
         {wa ? <Img src={staticFile("kirim-undangan/layar/whatsapp.webp")} style={{ width: 42, height: 42, borderRadius: 10, display: "block" }} /> : null}
-        <div style={{ font: `700 48px/1.1 ${JUDUL}`, color: WARNA.coklat, letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>{judul}</div>
+        <div style={{ font: `700 50px/1.1 ${JUDUL}`, color: WARNA.coklat, letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>{judul}</div>
       </div>
     </div>
   );

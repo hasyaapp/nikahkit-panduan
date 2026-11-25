@@ -1,7 +1,8 @@
 // swift alat/mockup.swift  →  public/mockup/{iphone,macbook}.png (bingkai perangkat, layar bolong transparan) dan
-// src/ui/mockup.json (kotak layar dalam px gambar itu, jari-jari sudutnya). Model AR resmi Apple (.usdz) dirender lewat
+// src/ui/mockup.json (kotak layar dalam px gambar itu, jari-jari sudutnya). Model AR Apple (.usdz) dirender lewat
 // SceneKit dari depan, tegak lurus layar. Gambar tidak masuk git (public/ diabaikan); model disimpan di cache.
-// Halaman MacBook Pro tidak punya .usdz, jadi bingkai laptop memakai model MacBook Air 15 inci (tampak depan serupa).
+// iPhone 18 Pro dari apple.com; laptop = MacBook Neo dari pustaka model 3D Apple milik pemilik (berkas lokal, disalin ke
+// cache), pilihan pemilik 25 Nov.
 import AppKit
 import Foundation
 import SceneKit
@@ -11,22 +12,23 @@ let cache = FileManager.default.homeDirectoryForCurrentUser.appendingPathCompone
 let keluar = akar.appendingPathComponent("public/mockup")
 
 struct Model {
-  let nama, url, layar: String
+  let nama, berkas, sumber, layar: String  // berkas = nama di cache; sumber = URL unduhan atau jalur berkas lokal
   let sembunyi: [String]  // simpul yang tidak ikut (iPhone: model kedua yang tampak belakang)
   let tinggi: Int?, lebar: Int?  // ukuran gambar keluaran
 }
 let MODEL = [
-  Model(nama: "iphone", url: "https://www.apple.com/105/media/us/iphone-18-pro/2026/591df885-5ee2-4173-86e6-401021249f7c/ar/iphone-18-pro-e-sim.usdz",
+  Model(nama: "iphone", berkas: "iphone.usdz", sumber: "https://www.apple.com/105/media/us/iphone-18-pro/2026/591df885-5ee2-4173-86e6-401021249f7c/ar/iphone-18-pro-e-sim.usdz",
         layar: "EHjrGDHNHzgNjtE", sembunyi: ["wUOhcMgiBmCgGaw"], tinggi: 2600, lebar: nil),
-  Model(nama: "macbook", url: "https://www.apple.com/105/media/us/macbook-air/2025/0833fe28-c438-4dc4-8edc-e39ef30df5f9/ar/macbook-air-15in-midnight.usdz",
-        layar: "IcBMnlsGrUWaSql", sembunyi: [], tinggi: nil, lebar: 2600),
+  Model(nama: "macbook", berkas: "macbook-neo.usdz", sumber: "/Users/hasyaapp/orca/projects/full-visual/doc/keyframes/workspace/library/apple-3d/macbook-neo.usdz",
+        layar: "rvnQqsVlUxgRHpf", sembunyi: [], tinggi: nil, lebar: 2600),
 ]
 
 func unduh(_ m: Model) throws -> URL {
-  let f = cache.appendingPathComponent(m.nama + ".usdz")
+  let f = cache.appendingPathComponent(m.berkas)
   if !FileManager.default.fileExists(atPath: f.path) {
     try FileManager.default.createDirectory(at: cache, withIntermediateDirectories: true)
-    try Data(contentsOf: URL(string: m.url)!).write(to: f)
+    if m.sumber.hasPrefix("/") { try FileManager.default.copyItem(at: URL(fileURLWithPath: m.sumber), to: f) }
+    else { try Data(contentsOf: URL(string: m.sumber)!).write(to: f) }
   }
   return f
 }

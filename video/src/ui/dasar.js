@@ -6,12 +6,14 @@ import { loadFont as nunito } from "@remotion/google-fonts/Nunito";
 import mockup from "./mockup.json";
 
 export const FPS = 30, W = 1080, H = 1920;
-// Zona aman feed Shorts, TikTok, dan Reels: bebas dari kepala aplikasi di atas, keterangan dan tombol di bawah, serta kolom
-// tombol suka/komentar di kanan. Semua isi (langkah, judul, ponsel, sorotan, kartu, teks narasi) di dalamnya.
-export const AMAN = { x0: 110, y0: 220, x1: 970, y1: 1480 };
-// Panggung ponsel: di bawah garis langkah dan judul, di atas teks narasi. Ponsel utuh pas setinggi panggung; saat
-// diperbesar hanya bagian atas dan bawahnya yang memudar lembut, sisi kiri dan kanan ponsel tidak pernah terpotong.
-export const PANGGUNG = { x0: AMAN.x0, x1: AMAN.x1, y0: 368, y1: 1356 };
+// Zona aman feed Shorts, TikTok, dan Reels (longgar): bebas dari kepala aplikasi di atas, keterangan dan tombol di bawah.
+// Semua isi (garis langkah, judul, ponsel, sorotan, kartu, teks narasi) di dalamnya.
+export const AMAN = { x0: 80, y0: 170, x1: 1000, y1: 1590 };
+// Susunan dari atas, dengan jarak lega di antaranya: garis langkah (AMAN.y0 + 0..70), judul (JUDUL_Y), panggung ponsel,
+// lalu teks narasi di bawah panggung. Ponsel utuh pas setinggi panggung; saat diperbesar hanya atas dan bawahnya yang
+// memudar lembut, sisi kiri dan kanan ponsel tidak pernah terpotong.
+export const JUDUL_Y = AMAN.y0 + 102;
+export const PANGGUNG = { x0: AMAN.x0, x1: AMAN.x1, y0: AMAN.y0 + 190, y1: AMAN.y1 - 150 };
 
 // iPhone: layar 402x874 pt, bilah status 62 (Dynamic Island), bilah Safari bawah 84; isi web 402x728 = tangkapan layar.
 export const HP = { w: 402, h: 874, status: 62, safari: 84 };

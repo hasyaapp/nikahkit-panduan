@@ -1,4 +1,4 @@
-// npm run layar  →  public/kirim-undangan/layar/*.png (isi Safari iPhone 402x728, 3x; MacBook 1280x751, 2x) dan
+// npm run layar  →  public/kirim-undangan/layar/*.png (isi Safari iPhone 402x728, 3x; MacBook 1280x726, 2x) dan
 // layar.json (kotak elemen per layar). Tampilan asli: halaman dashboard hasil build (server/pages/panel/scalev_panel.html,
 // berisi Beranda, Kirim, Hari-H) dibuka di Chrome tanpa jendela dengan profil Safari iPhone. API worker diganti tiruan
 // lokal (data contoh, tanpa menyentuh produksi); sampul undangan dari demo template di R2. Urutan langkah = alur di
@@ -36,8 +36,10 @@ const PILIH = "Keluarga Besar Surya";
 // Safari iPhone (layar 402x874 pt): isi web di antara bilah status (62) dan bilah Safari bawah (84).
 const HP = { width: 402, height: 728, deviceScaleFactor: 3, mobile: true };
 const UA_HP = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1";
-// MacBook (layar 1280x828 pt, "teks lebih besar"): isi web di bawah bilah menu (25) dan bilah Safari (52).
-const MAC = { width: 1280, height: 751, deviceScaleFactor: 2, mobile: false };
+// MacBook Neo (layar 1280 pt lebar, tingginya dari bingkai di ui/mockup.json): isi web di bawah bilah menu (24) dan bilah
+// Safari (52).
+const MB = JSON.parse(fs.readFileSync(path.join(here, "..", "ui", "mockup.json"), "utf8")).macbook.layar;
+const MAC = { width: 1280, height: Math.round((MB.h * 1280) / MB.w) - 24 - 52, deviceScaleFactor: 2, mobile: false };
 const UA_MAC = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15";
 const UJI = process.argv.includes("--uji");
 // Data uji daftar tamu: nilai yang masuk akal dari pengantin sungguhan, termasuk yang paling buruk.

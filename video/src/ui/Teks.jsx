@@ -4,7 +4,7 @@
 import { useCurrentFrame } from "remotion";
 import { AMAN, FPS, HURUF, PANGGUNG, WARNA } from "./dasar";
 
-const MAKS = 62, BELAH = 30;
+const MAKS = 66, BELAH = 32;
 export function potong(kalimat) {
   const out = [];
   for (const k of kalimat) {
@@ -24,9 +24,9 @@ export const Teks = ({ potongan }) => {
   const t = useCurrentFrame() / FPS;
   const p = potongan.find((c) => t >= c.mulai - 0.12 && t < c.sampai);
   return (
-    <div style={{ position: "absolute", left: AMAN.x0, top: PANGGUNG.y1 + 12, width: AMAN.x1 - AMAN.x0, height: AMAN.y1 - PANGGUNG.y1 - 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ position: "absolute", left: AMAN.x0, top: PANGGUNG.y1 + 34, width: AMAN.x1 - AMAN.x0, height: AMAN.y1 - PANGGUNG.y1 - 34, display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
       {p ? (
-        <p style={{ margin: 0, textAlign: "center", font: `800 39px/1.3 ${HURUF}`, letterSpacing: "-0.005em", textWrap: "balance" }}>
+        <p style={{ margin: 0, textAlign: "center", font: `800 40px/1.3 ${HURUF}`, letterSpacing: "-0.005em", textWrap: "balance" }}>
           {p.kata.map(([w, a, b], i) => (
             <span key={i} style={{ color: t >= a && t < b ? WARNA.oranyeTua : t >= a ? WARNA.coklat : WARNA.samar }}>{w + (i < p.kata.length - 1 ? " " : "")}</span>
           ))}

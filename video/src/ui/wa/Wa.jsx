@@ -186,19 +186,30 @@ export const Baris = ({ nama, sub, avatar, dipilih, titik, akhir }) => (
     </div>
   </div>
 );
-// Ikon baris atas lembar: Status saya (lingkaran berbingkai dengan +) dan Meta AI (cincin titik ungu-biru).
+// Ikon baris atas lembar, diukur dari tangkapan layar WhatsApp iOS. Status saya: bulatan abu muda, cincin luar terputus tiga
+// (celah lebar di kanan atas tempat tanda +), cincin dalam berlubang, + kecil di kanan atas. Meta AI: bulatan putih bergaris
+// tipis, tujuh kelopak miring melingkar, gradasi magenta (atas) ke biru (bawah).
+const busur = (r, a0, a1) => {
+  const p = (d) => `${(20 + r * Math.sin((d * Math.PI) / 180)).toFixed(2)} ${(20 - r * Math.cos((d * Math.PI) / 180)).toFixed(2)}`;
+  return `M${p(a0)}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${p(a1)}`;
+};
 export const IkonStatus = () => (
   <svg width="39" height="39" viewBox="0 0 40 40" style={{ flex: "none", display: "block" }}>
-    <circle cx="20" cy="20" r="20" fill="#f0f0f2" />
-    <circle cx="19" cy="21" r="7.5" fill="none" stroke="#1c1c1e" strokeWidth="2" strokeDasharray="38 9" transform="rotate(-50 19 21)" />
-    <circle cx="19" cy="21" r="3.2" fill="#1c1c1e" />
-    <path d="M26.5 9.5v6M23.5 12.5h6" stroke="#1c1c1e" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="20" cy="20" r="20" fill="#f4f4f5" />
+    <g fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round">
+      <path d={busur(9.3, 76, 150) + busur(9.3, 170, 272) + busur(9.3, 292, 376)} />
+      <circle cx="20" cy="20" r="5.3" />
+      <path d="M29.1 8.5v4M27.1 10.5h4" />
+    </g>
   </svg>
 );
 export const IkonMetaAI = () => (
   <svg width="39" height="39" viewBox="0 0 40 40" style={{ flex: "none", display: "block" }}>
-    <defs><linearGradient id="metaai" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#c86bff" /><stop offset="1" stopColor="#4f6bff" /></linearGradient></defs>
-    <circle cx="20" cy="20" r="19.5" fill="#fff" stroke="#e5e5ea" />
-    {[0, 1, 2, 3, 4, 5].map((i) => <ellipse key={i} cx="20" cy="12.2" rx="2.6" ry="4.4" fill="url(#metaai)" transform={`rotate(${i * 60} 20 20)`} />)}
+    <defs><linearGradient id="metaai" gradientUnits="userSpaceOnUse" x1="20" y1="10.5" x2="20" y2="28.6"><stop offset="0" stopColor="#d470f2" /><stop offset="1" stopColor="#7861ee" /></linearGradient></defs>
+    <circle cx="20" cy="20" r="19.6" fill="#fff" stroke="#e3e3e6" strokeWidth=".8" />
+    {Array.from({ length: 7 }, (_, i) => {
+      const d = (i * 360) / 7, x = 20 + 9.5 * Math.sin((d * Math.PI) / 180), y = 20 - 9.5 * Math.cos((d * Math.PI) / 180);
+      return <ellipse key={i} cx={x} cy={y} rx="3.2" ry="4.7" fill="url(#metaai)" transform={`rotate(${d - 36} ${x} ${y})`} />;
+    })}
   </svg>
 );
