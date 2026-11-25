@@ -320,6 +320,14 @@ if (UJI) {
       await foto(`terburuk-${lebar}-chat`);
       f.kepalaTerpotong = await share(`(d) => { const n = d.getElementById("chatName"); return n.scrollWidth > n.clientWidth; }`);
       if (lebar === "402") {
+        // Peringatan tempel di panel Tambah tamu: baris tanpa nama dilewati, nama kembar satu link.
+        await share(`(d) => { const b = d.querySelector("#chatBar [data-back]"); if (b.getClientRects().length) b.click(); d.getElementById("fabAdd").click(); }`);
+        await until(`(() => { const d = [...document.querySelectorAll("iframe")].find((f) => f.title === "Kirim undangan").contentDocument; return !d.getElementById("addDrawer").hidden; })()`, "panel Tambah tamu");
+        await share(`(d) => d.getElementById("guests").blur()`);
+        await foto(`terburuk-${lebar}-tempel`);
+        f.peringatanTempel = await share(`(d) => d.getElementById("pasteWarn").hidden ? "" : d.getElementById("pasteWarn").textContent`);
+        await share(`(d) => d.querySelector("#addDrawer [data-close]").click()`);
+        await sleep(300);
         // Dua tamu bernama sama dengan nomor berbeda: link pribadinya.
         f.linkAndi = [];
         for (const i of [0, 1]) {
