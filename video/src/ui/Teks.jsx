@@ -4,7 +4,7 @@
 import { useCurrentFrame } from "remotion";
 import { AMAN, FPS, HURUF, PANGGUNG, WARNA } from "./dasar";
 
-const MAKS = 58, BELAH = 28;
+const MAKS = 62, BELAH = 30;
 export function potong(kalimat) {
   const out = [];
   for (const k of kalimat) {

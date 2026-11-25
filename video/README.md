@@ -33,12 +33,16 @@ masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
 
 - `src/kirim-undangan/`: cara kirim undangan ke tamu, tegak 1080x1920. `naskah.js` = teks narasi per kalimat (id dipakai
   adegan), `Video.jsx` = adegan yang dijangkarkan ke kata narasi, `rekam-layar.mjs` = perekam layar asli.
-- Tampilan: iPhone 18 Pro (layar 402x874 pt, Safari iOS 26, WhatsApp iOS digambar ulang di `src/ui/wa/`) dan MacBook
-  untuk adegan laptop. Warna dan huruf merek Nikahin (Gelica, Nunito, coklat `#2b1a07`, oranye `#ff6f1e`/`#b8460d`, krem)
-  di `src/ui/dasar.js`. Domain contoh di video ini `nikahin.id` (keputusan pemilik, 25 Nov), bukan `tokomu.myscalev.com`.
-- Zona aman: semua isi (judul, ponsel, sorotan, kartu, teks narasi) di dalam `AMAN` x 150-930, y 270-1420 (bebas dari
-  kepala, keterangan, dan kolom tombol TikTok/Reels/Shorts). Saat kamera memperbesar, bagian ponsel di luar panggung
-  memudar.
+- Tampilan: iPhone 18 Pro (layar 402x874 pt, Safari iOS 26, WhatsApp iOS digambar ulang di `src/ui/wa/`: lembar Kirim ke,
+  foto profil bawaan pastel) dan MacBook untuk adegan laptop. Warna dan huruf merek Nikahin (Gelica, Nunito, coklat
+  `#2b1a07`, oranye `#ff6f1e`/`#b8460d`, krem) di `src/ui/dasar.js`. Domain contoh di video ini `nikahin.id` (keputusan
+  pemilik, 25 Nov), bukan `tokomu.myscalev.com`. Ringkasan undangan di Beranda serba 0 (undangan baru diserahkan).
+- Zona aman: semua isi (garis langkah 1-5, judul, ponsel, sorotan, kartu, teks narasi) di dalam `AMAN` x 110-970,
+  y 220-1480 (bebas dari kepala, keterangan, dan kolom tombol Shorts/TikTok/Reels). Ponsel selalu di tengah dan perbesaran
+  paling besar `KMAKS` (bingkai utuh selebar zona aman), jadi sisi kiri-kanan ponsel tidak pernah terpotong; hanya atas
+  dan bawah panggung yang memudar lembut saat diperbesar. Laptop tidak diperbesar.
+- Ikon: SF Symbols untuk bilah status iOS, Safari, macOS, dan WhatsApp (`swift alat/simbol.swift` → `public/simbol/`,
+  ukurannya di `src/ui/simbol.json`); Lucide (`lucide-react`) untuk kartu, pil, dan garis langkah.
 - `swift alat/mockup.swift`: merender model AR resmi Apple (.usdz, disimpan di `~/Library/Caches/nikahin-mockup/`) jadi
   `public/mockup/iphone.png` dan `macbook.png` dengan layar transparan, kotak layarnya ke `src/ui/mockup.json`. Halaman
   MacBook Pro Apple tidak menyediakan .usdz, jadi bingkai laptop dari model MacBook Air 15 inci (tampak depan serupa).

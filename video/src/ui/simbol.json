@@ -1,0 +1,142 @@
+{
+  "apple" : {
+    "h" : 111,
+    "simbol" : "apple.logo",
+    "w" : 90
+  },
+  "bagikan" : {
+    "h" : 132,
+    "simbol" : "square.and.arrow.up",
+    "w" : 112
+  },
+  "baterai" : {
+    "h" : 81,
+    "simbol" : "battery.100",
+    "w" : 170
+  },
+  "bilah-samping" : {
+    "h" : 104,
+    "simbol" : "sidebar.left",
+    "w" : 141
+  },
+  "cari" : {
+    "h" : 111,
+    "simbol" : "magnifyingglass",
+    "w" : 118
+  },
+  "cari-tebal" : {
+    "h" : 115,
+    "simbol" : "magnifyingglass",
+    "w" : 119
+  },
+  "centang" : {
+    "h" : 104,
+    "simbol" : "checkmark",
+    "w" : 116
+  },
+  "dipilih" : {
+    "h" : 114,
+    "simbol" : "checkmark.circle.fill",
+    "w" : 117
+  },
+  "halaman" : {
+    "h" : 119,
+    "simbol" : "text.page",
+    "w" : 108
+  },
+  "hapus-isian" : {
+    "h" : 114,
+    "simbol" : "xmark.circle.fill",
+    "w" : 117
+  },
+  "kamera" : {
+    "h" : 108,
+    "simbol" : "camera",
+    "w" : 145
+  },
+  "kembali" : {
+    "h" : 99,
+    "simbol" : "chevron.backward",
+    "w" : 73
+  },
+  "kembali-tebal" : {
+    "h" : 105,
+    "simbol" : "chevron.backward",
+    "w" : 77
+  },
+  "kirim" : {
+    "h" : 117,
+    "simbol" : "paperplane.fill",
+    "w" : 123
+  },
+  "lainnya" : {
+    "h" : 38,
+    "simbol" : "ellipsis",
+    "w" : 111
+  },
+  "maju" : {
+    "h" : 99,
+    "simbol" : "chevron.forward",
+    "w" : 73
+  },
+  "mik" : {
+    "h" : 119,
+    "simbol" : "mic",
+    "w" : 100
+  },
+  "muat-ulang" : {
+    "h" : 120,
+    "simbol" : "arrow.clockwise",
+    "w" : 104
+  },
+  "perisai" : {
+    "h" : 113,
+    "simbol" : "shield.lefthalf.filled",
+    "w" : 107
+  },
+  "pusat-kontrol" : {
+    "h" : 107,
+    "simbol" : "switch.2",
+    "w" : 119
+  },
+  "segitiga" : {
+    "h" : 92,
+    "simbol" : "arrowtriangle.backward.fill",
+    "w" : 103
+  },
+  "sinyal" : {
+    "h" : 105,
+    "simbol" : "cellularbars",
+    "w" : 163
+  },
+  "tab" : {
+    "h" : 117,
+    "simbol" : "square.on.square",
+    "w" : 129
+  },
+  "tambah" : {
+    "h" : 95,
+    "simbol" : "plus",
+    "w" : 106
+  },
+  "telepon" : {
+    "h" : 110,
+    "simbol" : "phone",
+    "w" : 118
+  },
+  "tutup" : {
+    "h" : 98,
+    "simbol" : "xmark",
+    "w" : 105
+  },
+  "video" : {
+    "h" : 95,
+    "simbol" : "video",
+    "w" : 143
+  },
+  "wifi" : {
+    "h" : 101,
+    "simbol" : "wifi",
+    "w" : 133
+  }
+}

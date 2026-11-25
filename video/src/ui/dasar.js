@@ -6,12 +6,12 @@ import { loadFont as nunito } from "@remotion/google-fonts/Nunito";
 import mockup from "./mockup.json";
 
 export const FPS = 30, W = 1080, H = 1920;
-// Zona aman bersama TikTok, Reels, dan Shorts (feed): bebas dari judul/kamera aplikasi di atas, keterangan dan tombol di
-// bawah, serta kolom tombol suka/komentar di kanan. Semua isi (judul, ponsel, sorotan, kartu, teks narasi) di dalamnya.
-export const AMAN = { x0: 150, y0: 270, x1: 930, y1: 1420 };
-// Panggung ponsel: di bawah judul, di atas teks narasi. Ponsel utuh pas setinggi panggung; saat diperbesar, bagian di luar
-// panggung memudar.
-export const PANGGUNG = { x0: AMAN.x0, x1: AMAN.x1, y0: 392, y1: 1282 };
+// Zona aman feed Shorts, TikTok, dan Reels: bebas dari kepala aplikasi di atas, keterangan dan tombol di bawah, serta kolom
+// tombol suka/komentar di kanan. Semua isi (langkah, judul, ponsel, sorotan, kartu, teks narasi) di dalamnya.
+export const AMAN = { x0: 110, y0: 220, x1: 970, y1: 1480 };
+// Panggung ponsel: di bawah garis langkah dan judul, di atas teks narasi. Ponsel utuh pas setinggi panggung; saat
+// diperbesar hanya bagian atas dan bawahnya yang memudar lembut, sisi kiri dan kanan ponsel tidak pernah terpotong.
+export const PANGGUNG = { x0: AMAN.x0, x1: AMAN.x1, y0: 368, y1: 1356 };
 
 // iPhone: layar 402x874 pt, bilah status 62 (Dynamic Island), bilah Safari bawah 84; isi web 402x728 = tangkapan layar.
 export const HP = { w: 402, h: 874, status: 62, safari: 84 };
@@ -20,6 +20,8 @@ export const WEB_Y = HP.status, WEB_H = HP.h - HP.status - HP.safari;
 const I = mockup.iphone, PT = I.layar.w / HP.w;
 export const BINGKAI = { x: I.layar.x / PT, y: I.layar.y / PT, w: I.w / PT, h: I.h / PT, r: I.layar.r / PT };
 export const S = (PANGGUNG.y1 - PANGGUNG.y0) / BINGKAI.h;
+// Perbesaran paling besar: bingkai ponsel (termasuk tombol samping) tetap utuh di dalam lebar zona aman.
+export const KMAKS = (AMAN.x1 - AMAN.x0) / (BINGKAI.w * S);
 // Titik 0,0 layar di kanvas, dan titik tengah layar (kamera menaruh titik fokus di sini).
 export const PONSEL = { x: W / 2 - (HP.w / 2) * S, y: PANGGUNG.y0 + BINGKAI.y * S };
 export const PUSAT = { x: W / 2, y: PONSEL.y + (HP.h / 2) * S };

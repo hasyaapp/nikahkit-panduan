@@ -123,33 +123,19 @@ const UJI_HALAMAN = `(() => {
 // Kode tautan seperti worker (6 huruf dari HMAC); di sini dari SHA-256 nama, cukup untuk tampilan.
 const ABJAD = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const kode = (name) => [...crypto.createHash("sha256").update(name.toLowerCase()).digest()].slice(0, 6).map((b) => ABJAD[b % ABJAD.length]).join("");
-const jam = (h) => new Date(SEKARANG - h * 36e5).toISOString();
-const RSVP = [
-  ["Bude Ratna", "hadir", 2, "Selamat ya Rani & Dimas, semoga sakinah mawaddah warahmah.", 5],
-  ["Fajar Nugroho", "hadir", 1, "Barakallah! Ditunggu kabar bahagianya.", 9],
-  ["Mbak Tari", "ragu", 0, "Insyaallah datang, masih cek jadwal.", 20],
-  ["Keluarga Pak Darmo", "hadir", 4, "Semoga lancar sampai hari-H.", 30],
-  ["Nadia Putri", "hadir", 2, "Happy wedding! 🤍", 50],
-  ["Yoga Pratama", "tidak", 0, "Maaf belum bisa hadir, doa terbaik untuk kalian.", 70],
-  ["Tante Wulan", "hadir", 2, "Selamat menempuh hidup baru.", 96],
-  ["Rizky Ananda", "hadir", 1, "", 120],
-  ["Om Bagus", "hadir", 3, "Semoga menjadi keluarga yang bahagia.", 150],
-  ["Lina Marlina", "ragu", 0, "", 180],
-  ["Dimas Arya", "hadir", 2, "Mantap, selamat ya!", 220],
-  ["Sinta Maharani", "hadir", 2, "Bahagia selalu.", 260],
-].map(([name, attendance, guests_count, message, h], i) => ({ id: "rsvp-" + i, name, attendance, guests_count, message, created_at: jam(h), is_visible: 1 }));
+// Undangan baru diserahkan: belum ada RSVP, ucapan, tamu yang membuka, atau check-in, jadi Ringkasan undangan serba 0.
 const REKAP = {
-  rsvp: RSVP, comments: RSVP.filter((r) => r.message).map((r) => ({ id: "c-" + r.id, name: r.name, message: r.message, created_at: r.created_at, is_visible: 1 })),
-  guest_views: [], checkins: [], event: { title: "Akad Nikah", start: "2027-02-14T08:00", tz: "+07:00" },
-  summary: { total_orang: 19, hadir: 9, ragu: 2, tidak: 1, total: 12, checkin: 0, ucapan: 10, guests_opened: 0, views_total: 0 },
+  rsvp: [], comments: [], guest_views: [], checkins: [], event: { title: "Akad Nikah", start: "2027-02-14T08:00", tz: "+07:00" },
+  summary: { total_orang: 0, hadir: 0, ragu: 0, tidak: 0, total: 0, checkin: 0, ucapan: 0, guests_opened: 0, views_total: 0 },
 };
+let rekapDiminta = 0;
 const PREVIEW = { image: OG, title: "Undangan Pernikahan Rani & Dimas", description: "Minggu, 14 Februari 2027. Kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberi doa restu." };
 function api(route, body) {
   if (route === "/sign-tokens") {
     const names = Array.isArray(body.names) ? body.names : [];
     return { ok: true, weddingId: W, tokens: Object.fromEntries(names.map((n) => [n, kode(n)])), ...(body.link && !names.length ? { couple: COUPLE, preview: PREVIEW } : {}) };
   }
-  if (route === "/rekap") return { ok: true, ...REKAP };
+  if (route === "/rekap") { rekapDiminta++; return { ok: true, ...REKAP }; }
   return { ok: true };
 }
 
@@ -401,7 +387,10 @@ for (let i = 1; i <= 6; i++) {
   await shot("gerbang-pin-" + i, GERBANG);
 }
 await tap("#gateSubmit");
-await until(`document.getElementById("gate").hidden && document.getElementById("loading").hidden && (() => { const f = [...document.querySelectorAll("iframe")].find((f) => !f.hidden); const v = f && f.contentDocument.getElementById("homeView"); return v && !v.hidden && f.contentDocument.getElementById("attendanceTotal").textContent !== "0"; })()`, "Beranda");
+await until(`document.getElementById("gate").hidden && document.getElementById("loading").hidden && (() => { const f = [...document.querySelectorAll("iframe")].find((f) => !f.hidden); const v = f && f.contentDocument.getElementById("homeView"); return v && !v.hidden; })()`, "Beranda");
+for (let i = 0; i < 100 && !rekapDiminta; i++) await sleep(100);
+if (!rekapDiminta) throw new Error("Beranda tidak meminta /rekap");
+await sleep(1200);
 const TAB = { "tab-beranda": '.tab[data-tab="beranda"]', "tab-kirim": '.tab[data-tab="kirim"]', "tab-tamu": '.tab[data-tab="tamu"]', akun: "#meBtn" };
 await shot("beranda", TAB);
 
