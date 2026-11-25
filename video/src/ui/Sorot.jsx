@@ -27,11 +27,12 @@ export const Sorot = ({ kotak, label, dari, sampai, sisi, pad = 9, radius = 14, 
   let lw = 0, lh = 0, lx = 0, ly = 0, panah = 0, di = "atas";
   const font = `800 ${LABEL.huruf}px ${HURUF}`;
   if (label) {
-    const t = lebarTeks(label, font), baris = Math.ceil(t / (LABEL.maks - 2 * LABEL.padX));
-    lw = Math.min(t + 2 * LABEL.padX + 2, LABEL.maks) * u;
-    lh = (baris * LABEL.huruf * 1.25 + 2 * LABEL.padY) * u;
     const tepi = 14 * u, x0 = Math.max(lihat[0], 0) + tepi, x1 = Math.min(lihat[2], ukuran[0]) - tepi;
     const y0 = Math.max(lihat[1], 0) + tepi, y1 = Math.min(lihat[3], ukuran[1]) - tepi;
+    // Lebar label paling banyak selebar bagian layar yang tampak; lebih panjang dari itu, teksnya turun baris.
+    const maks = Math.min(LABEL.maks, (x1 - x0) / u), t = lebarTeks(label, font), baris = Math.ceil(t / (maks - 2 * LABEL.padX));
+    lw = Math.min(t + 2 * LABEL.padX + 2, maks) * u;
+    lh = (baris * LABEL.huruf * 1.25 + 2 * LABEL.padY) * u;
     const jarak = LABEL.jarak * u;
     di = sisi || (box.top - jarak - lh >= y0 ? "atas" : box.top + box.height + jarak + lh <= y1 ? "bawah" : "atas");
     lx = Math.max(x0, Math.min(x1 - lw, x + w / 2 - lw / 2));

@@ -42,9 +42,14 @@ const T = { accent: "#1daa61", strong: "#15603e", soft: "#d9fdd3", text: "#0a0a0
 // Warna foto profil tanpa gambar (AVATAR + avatarStyle di dashboard/share/checkin).
 const AV = [["#cbf2ee", "#028377"], ["#ffdae7", "#d42a66"], ["#e8e0ff", "#5e47de"], ["#fee2d8", "#c4532d"], ["#d2e8fe", "#0063cb"], ["#fff0d4", "#9d6c2c"], ["#d9fdd3", "#1b8755"], ["#caecfa", "#027eb5"], ["#f4ded1", "#855538"], ["#fbd8dc", "#b80531"]];
 const avc = (name) => { let h = 0; for (const c of String(name)) h = (h * 31 + c.charCodeAt(0)) % 997; return AV[h % AV.length]; };
-// Inisial: Rekap (dua kata pertama) dan Kirim/Check-in (sapaan Bapak/Ibu/Keluarga dibuang).
+// Inisial: Rekap (dua kata pertama) dan Kirim/Check-in (sapaan dan gelar seperti Bapak, Ibu, Keluarga Besar dibuang).
 const iniR = (n) => n.trim().split(/\s+/).filter((p) => p !== "&").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-const iniS = (n) => { const w = n.replace(/^(bapak|ibu|bpk\.?|kel\.?|keluarga)\s+/i, "").trim().split(/\s+/).filter((x) => x && x !== "&"); return ((w[0] || "?")[0] + (w[1] ? w[1][0] : "")).toUpperCase(); };
+const SAPAAN = /^(bapak|bpk|ibu|bu|pak|kel|keluarga|besar|beserta|om|tante|mas|mbak|kak|h|hj|dr|drs|dra|ir|prof|sdr|sdri)\.?,?$/i;
+const iniS = (n) => {
+  const huruf = (x) => /[\p{L}\p{N}]/u.test(x), kata = n.split(/[\s&]+/).filter(huruf), w = kata.filter((x) => !SAPAAN.test(x));
+  const v = w.length ? w : kata, awal = (x) => [...x].filter(huruf)[0];
+  return ((v[0] ? awal(v[0]) : "?") + (v[1] ? awal(v[1]) : "")).toUpperCase();
+};
 
 // ---- Layar HP (390x844, tanpa bingkai perangkat) ----------------------------------------------------------------------
 const PX = PHONE.x, PY = PHONE.y;
