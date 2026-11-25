@@ -20,3 +20,10 @@ masuk ke `_baru/` di folder itu. `video/out/frames` dan `video/out/seg` hanya be
 - Kunci API dari Keychain macOS: layanan `nikahin-elevenlabs`, akun `api`. Kuota akun itu habis? Pakai kunci lain yang
   tersimpan dengan `ELEVEN_KEYCHAIN=<nama layanan>` (mis. `nikahin-elevenlabs-2`); suara Sarah sama di semua akun.
 - Perlu `ffmpeg`/`ffprobe` dan Chrome seperti `anim/frames.mjs` (`CHROME=<path>` untuk browser lain).
+
+## Remotion
+
+Video panduan berikutnya dibuat dengan [Remotion](https://www.remotion.dev) dari audio narasi dan skripnya; `build.mjs`
+tetap untuk seri yang sudah ada. Versi dipaku di `package.json` folder ini (Remotion 4.0.547, React 19.3.1): pasang dengan
+`npm ci` di `panduan/video`. Render pertama mengunduh Chrome Headless Shell ke `node_modules/.remotion`; FFmpeg ikut paket
+Remotion. Hasil render ke `out/`.
