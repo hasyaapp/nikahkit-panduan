@@ -1,11 +1,12 @@
-// Video panduan "Cara kirim undangan ke tamu" (tegak 1080x1920). Layar dashboard = tangkapan layar asli Safari iPhone
-// (rekam-layar.mjs, layar.json) di bingkai iPhone 18 Pro; WhatsApp iOS digambar ulang (ui/wa). Semua isi di zona aman
-// (ui/dasar.js AMAN). Waktu dijangkarkan ke kata narasi (waktu.json dari naskah.js), jadi narasi baru cukup `npm run waktu`
-// lalu render ulang; kata jangkar yang hilang dari naskah langsung jadi galat.
+// Video panduan "Cara kirim undangan ke tamu", tegak 1080x1920 (KirimUndangan) dan lanskap 1920x1080
+// (KirimUndanganLanskap); tata letaknya di ui/dasar.js TATA. Layar dashboard = tangkapan layar asli Safari iPhone
+// (rekam-layar.mjs, layar.json) di bingkai iPhone 18 Pro; WhatsApp iOS digambar ulang (ui/wa). Semua isi di zona aman.
+// Waktu dijangkarkan ke kata narasi (waktu.json dari naskah.js), jadi narasi baru cukup `npm run waktu` lalu render ulang;
+// kata jangkar yang hilang dari naskah langsung jadi galat.
 import { AbsoluteFill, Img, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { Audio } from "@remotion/media";
 import { CircleCheck, Eye, LockKeyhole, MessageSquareText, NotebookPen, Phone, Sheet, Smartphone } from "lucide-react";
-import { AMAN, antara, BINGKAI, FPS, halus, HP, HURUF, IOS, KMAKS, lepas, PANGGUNG, PONSEL, PUSAT, S, W, WARNA, WEB_H, WEB_Y } from "../ui/dasar";
+import { antara, BINGKAI, FPS, halus, HP, HURUF, IOS, lepas, TATA, TataLetak, useTata, WARNA, WEB_H, WEB_Y } from "../ui/dasar";
 import { Safari, StatusIOS } from "../ui/ios";
 import { Judul } from "../ui/Judul";
 import { Kamera } from "../ui/kamera";
@@ -89,8 +90,9 @@ const LAYAR = [
 ];
 const layarPada = (f) => LAYAR[Math.max(0, LAYAR.findLastIndex(([s]) => fr(s) <= f))][1];
 
-// ---- Kamera: [mulai, lama (detik), perbesaran, fokus y (pt layar)]. Perbesaran 1 = ponsel utuh di panggung. Ponsel selalu
-// di tengah mendatar dan perbesaran paling besar KMAKS, jadi sisi kiri dan kanan ponsel tidak pernah terpotong. ----
+// ---- Kamera: [mulai, lama (detik), perbesaran, fokus y (pt layar)]. Perbesaran 1 = ponsel utuh di panggung, Infinity =
+// sebesar yang boleh. Ponsel selalu di tengah panggung dan perbesaran paling besar kmaks (tata letak), jadi sisi kiri dan
+// kanan ponsel tidak pernah terpotong. ----
 const TENGAH = HP.h / 2;
 const ty = (b) => b[1] + b[3] / 2;
 const CONTOH = gabung(kotak("tambah-kosong", "baris-1"), kotak("tambah-kosong", "baris-3"));
@@ -100,7 +102,7 @@ const KAMERA = [
   [t("beranda") - 0.35, 0.6, 1, TENGAH],
   [t("tab-kirim", "buka") - 0.3, 0.6, 1.55, 660],
   [t("panel") - 0.1, 0.6, 1.7, ty(kotak("tambah-kosong", "kolom"))],
-  [t("format") - 0.5, 0.8, KMAKS, ty(CONTOH) + 10],
+  [t("format") - 0.5, 0.8, Infinity, ty(CONTOH) + 10],
   [t("csv") - 0.4, 0.6, 1.6, ty(gabung(kotak("tambah-isi", "kolom"), kotak("tambah-isi", "simpan")))],
   [t("simpan", "siap") - 0.4, 0.6, 1.25, ty(gabung(kotak("daftar", "tamu-1"), kotak("daftar", "tamu-7")))],
   [t("penting") - 0.3, 0.5, 1, TENGAH],
@@ -122,27 +124,26 @@ const KAMERA = [
   [t("saringan", "supaya") - 0.1, 0.6, 1.25, ty(gabung(kotak("daftar-belum", "tamu-1"), kotak("daftar-belum", "tamu-7")))],
   [t("ulangi") + 0.3, 0.8, 1, TENGAH],
 ];
-const SETENGAH = [(PANGGUNG.x1 - PANGGUNG.x0) / 2, (PANGGUNG.y1 - PANGGUNG.y0) / 2];
 // Tinggi pudaran atas-bawah panggung (px kanvas): 0 saat ponsel utuh, lembut saat diperbesar.
 const pudar = (k) => 90 * Math.max(0, Math.min(1, (k - 1) / 0.25));
-function kamera(f) {
+function kamera(f, L) {
   let k = 1, fy = TENGAH;
   for (const [mulai, lama, k2, y2] of KAMERA) {
     const a = fr(mulai);
     if (f < a) break;
     const p = antara(f, a, a + fr(lama), 0, 1, halus);
-    k += (Math.min(k2, KMAKS) - k) * p; fy += (y2 - fy) * p;
+    k += (Math.min(k2, L.kmaks) - k) * p; fy += (y2 - fy) * p;
   }
   // Panggung tidak menampilkan lewat dari tepi atas/bawah ponsel: titik fokus dijepit. Label sorotan dijaga di luar pudaran.
-  const s = S * k, hw = SETENGAH[0] / s, hh = SETENGAH[1] / s, fx = HP.w / 2, tepi = pudar(k) / s;
+  const g = L.panggung, s = L.s * k, hw = (g.x1 - g.x0) / 2 / s, hh = (g.y1 - g.y0) / 2 / s, fx = HP.w / 2, tepi = pudar(k) / s;
   fy = BINGKAI.h > 2 * hh ? Math.max(-BINGKAI.y + hh, Math.min(BINGKAI.h - BINGKAI.y - hh, fy)) : HP.h / 2;
-  const px = PONSEL.x + fx * S, py = PONSEL.y + fy * S;
-  return { k, s, lihat: [fx - hw, fy - hh + tepi, fx + hw, fy + hh - tepi], transform: `translate(${PUSAT.x - k * px}px, ${PUSAT.y - k * py}px) scale(${k})` };
+  const px = L.ponsel.x + fx * L.s, py = L.ponsel.y + fy * L.s;
+  return { k, s, lihat: [fx - hw, fy - hh + tepi, fx + hw, fy + hh - tepi], transform: `translate(${L.pusat.x - k * px}px, ${L.pusat.y - k * py}px) scale(${k})` };
 }
 // Hanya atas dan bawah panggung yang memudar (lembut, dan hanya saat diperbesar); sisi kiri dan kanan tidak pernah dimask.
-const masker = (k) => {
-  const g = `linear-gradient(to bottom, transparent ${PANGGUNG.y0 - 24}px, #000 ${PANGGUNG.y0 + pudar(k)}px, #000 ${PANGGUNG.y1 - pudar(k)}px, transparent ${PANGGUNG.y1 + 40}px)`;
-  return { WebkitMaskImage: g, maskImage: g };
+const masker = (k, { panggung: g }) => {
+  const m = `linear-gradient(to bottom, transparent ${g.y0 - 24}px, #000 ${g.y0 + pudar(k)}px, #000 ${g.y1 - pudar(k)}px, transparent ${g.y1 + 40}px)`;
+  return { WebkitMaskImage: m, maskImage: m };
 };
 
 // ---- Sorotan dan ketukan di layar dashboard ----
@@ -379,28 +380,27 @@ function Layar() {
 }
 
 // ---- Sisipan di kanvas (di luar ponsel, di dalam zona aman) ----
-const LEBAR = AMAN.x1 - AMAN.x0;
 const muncul = (f, dari, sampai) => antara(f, fr(dari), fr(dari) + 9, 0, 1, lepas) * (1 - antara(f, fr(sampai), fr(sampai) + 7, 0, 1));
-// Kartu di atas ponsel; `redup` menyamarkan ponsel di belakangnya supaya pesan kartu yang dibaca.
+// Kartu di atas ponsel, selebar panggung; `redup` menyamarkan ponsel di belakangnya supaya pesan kartu yang dibaca.
 const Kartu = ({ dari, sampai, y, children, redup }) => {
-  const f = useCurrentFrame();
+  const f = useCurrentFrame(), { panggung: g } = useTata();
   if (f < fr(dari) || f > fr(sampai) + 8) return null;
   const o = muncul(f, dari, sampai);
   return (
     <>
       {redup ? <div style={{ position: "absolute", inset: 0, background: `rgba(251,247,242,${0.78 * o})` }} /> : null}
-      <div style={{ position: "absolute", left: AMAN.x0, top: y, width: LEBAR, opacity: o, transform: `translateY(${(1 - o) * 24}px) scale(${0.97 + 0.03 * o})`,
+      <div style={{ position: "absolute", left: g.x0, top: y, width: g.x1 - g.x0, opacity: o, transform: `translateY(${(1 - o) * 24}px) scale(${0.97 + 0.03 * o})`,
         borderRadius: 30, background: WARNA.kertas, border: `1.5px solid ${WARNA.garis}`, boxShadow: "0 24px 56px rgba(43,26,7,.16), 0 4px 12px rgba(43,26,7,.08)", padding: "32px 34px" }}>{children}</div>
     </>
   );
 };
 // Pil keterangan (ikon Lucide) di bawah panggung.
 const Pil = ({ Ikon, teks, dari, sampai, y }) => {
-  const f = useCurrentFrame();
+  const f = useCurrentFrame(), { pusat } = useTata();
   if (f < fr(dari) || f > fr(sampai) + 8) return null;
   const o = muncul(f, dari, sampai);
   return (
-    <div style={{ position: "absolute", left: W / 2, top: y, display: "flex", alignItems: "center", gap: 14, padding: "18px 26px 18px 20px", borderRadius: 999, background: WARNA.kertas,
+    <div style={{ position: "absolute", left: pusat.x, top: y, display: "flex", alignItems: "center", gap: 14, padding: "18px 26px 18px 20px", borderRadius: 999, background: WARNA.kertas,
       border: `1.5px solid ${WARNA.garis}`, color: WARNA.coklat, font: `800 28px ${HURUF}`, opacity: o, transform: `translateX(-50%) translateY(${(1 - o) * 18}px) scale(${0.94 + 0.06 * o})`,
       boxShadow: "0 14px 32px rgba(43,26,7,.16)", whiteSpace: "nowrap" }}>
       <Ikon size={34} color={WARNA.oranyeTua} strokeWidth={2.2} />{teks}
@@ -470,15 +470,15 @@ const SafariMac = () => (
   </div>
 );
 function Laptop() {
-  const f = useCurrentFrame(), dari = t("laptop") - 0.15, sampai = t("panel") - 0.3;
+  const f = useCurrentFrame(), { panggung: g, pusat, laptop } = useTata(), dari = t("laptop") - 0.15, sampai = t("panel") - 0.3;
   if (f < fr(dari) || f > fr(sampai) + 8) return null;
   const o = muncul(f, dari, sampai);
-  // Laptop utuh selebar kanvas (boleh keluar zona aman, keputusan pemilik), di tengah panggung.
-  const lebarLaptop = W - 24, s0 = lebarLaptop / (MB.w / MB_PT), tinggi = (MB.h / MB_PT) * s0;
+  // Laptop utuh selebar `laptop` tata letak (boleh keluar zona aman, keputusan pemilik), di tengah panggung.
+  const s0 = laptop / (MB.w / MB_PT), tinggi = (MB.h / MB_PT) * s0;
   const [bx, by, bw, bh] = layar.layar["kirim-laptop"].kotak.tambah;
   return (
     <div style={{ position: "absolute", inset: 0, background: `rgba(251,247,242,${o})` }}>
-      <div style={{ position: "absolute", left: (W - lebarLaptop) / 2, top: (PANGGUNG.y0 + PANGGUNG.y1) / 2 - tinggi / 2 + (1 - o) * 40, width: MB.w / MB_PT, height: MB.h / MB_PT,
+      <div style={{ position: "absolute", left: pusat.x - laptop / 2, top: (g.y0 + g.y1) / 2 - tinggi / 2 + (1 - o) * 40, width: MB.w / MB_PT, height: MB.h / MB_PT,
         transform: `scale(${s0})`, transformOrigin: "0 0", opacity: o }}>
         <div style={{ position: "absolute", left: MAC.x, top: MAC.y, width: MAC.w, height: MAC.h, overflow: "hidden", borderRadius: MAC.r, background: "#fff" }}>
           <MenuMac />
@@ -498,9 +498,9 @@ function Sisipan() {
   const BARIS = [lapRow[0], lapRow[1], lapSub[0] + lapSub[2] - lapRow[0] + 14, lapRow[3]];
   const cariTop = layar.layar["daftar-cari"].kotak.cari;
   const sari = layar.layar["daftar-cari"].kotak.sari;
-  const dalam = LEBAR - 68;
-  // Posisi atas kartu dan pil sebagai bagian dari tinggi panggung, jadi ikut bila zona aman berubah.
-  const py = (v) => Math.round(PANGGUNG.y0 + v * (PANGGUNG.y1 - PANGGUNG.y0));
+  const { panggung: g } = useTata(), dalam = g.x1 - g.x0 - 68;
+  // Posisi atas kartu dan pil sebagai bagian dari tinggi panggung, jadi ikut tata letak dan zona aman.
+  const py = (v) => Math.round(g.y0 + v * (g.y1 - g.y0));
   return (
     <>
       <Laptop />
@@ -546,11 +546,11 @@ function Sisipan() {
   );
 }
 function Selesai() {
-  const f = useCurrentFrame(), a = fr(t("selesai") - 0.05), b = fr(BALIK - 0.1);
+  const f = useCurrentFrame(), { pusat } = useTata(), a = fr(t("selesai") - 0.05), b = fr(BALIK - 0.1);
   if (f < a || f > b + 8) return null;
   const o = antara(f, a, a + 10, 0, 1, lepas) * (1 - antara(f, b, b + 8, 0, 1));
   return (
-    <div style={{ position: "absolute", left: W / 2 - 130, top: PUSAT.y - 130, width: 260, height: 260, borderRadius: "50%", background: WARNA.hijau, display: "grid", placeItems: "center",
+    <div style={{ position: "absolute", left: pusat.x - 130, top: pusat.y - 130, width: 260, height: 260, borderRadius: "50%", background: WARNA.hijau, display: "grid", placeItems: "center",
       opacity: o, transform: `scale(${0.6 + 0.4 * o})`, boxShadow: "0 26px 60px rgba(31,122,63,.35)" }}>
       <svg width="150" height="150" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="22" strokeDashoffset={22 * (1 - antara(f, a + 4, a + 16, 0, 1))} /></svg>
     </div>
@@ -599,34 +599,36 @@ const Bunyi = () => BUNYI.map(([s, jenis], i) => (
 const POTONGAN = potong(waktu.kalimat);
 export const DURASI = Math.ceil((waktu.durasi + 1.2) * FPS);
 
-export const KirimUndangan = () => {
+export const KirimUndangan = ({ format = "tegak" }) => {
   const f = useCurrentFrame();
-  const awal = antara(f, 0, 16, 0, 1, lepas);
-  const kam = kamera(f);
+  const L = TATA[format], awal = antara(f, 0, 16, 0, 1, lepas);
+  const kam = kamera(f, L);
   return (
-    <AbsoluteFill style={{ background: WARNA.latar, fontFamily: HURUF }}>
-      <Audio src={staticFile("kirim-undangan/narasi.mp3")} />
-      <Bunyi />
-      <div style={{ position: "absolute", left: W / 2 - 520, top: PUSAT.y - 520, width: 1040, height: 1040, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,111,30,.10), rgba(255,111,30,0))" }} />
-      <div style={{ position: "absolute", inset: 0, ...masker(kam.k) }}>
-        <div style={{ position: "absolute", inset: 0, transformOrigin: "0 0", transform: kam.transform, opacity: awal }}>
-          <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - awal) * 60}px)` }}>
-            <Kamera.Provider value={{ s: kam.s, lihat: kam.lihat, ukuran: [HP.w, HP.h] }}>
-              <Ponsel>
-                <Layar />
-                {SOROT.map(([k, label, a, b], i) => <Sorot key={i} kotak={k} label={label} dari={fr(a)} sampai={fr(b)} />)}
-                {KETUK.map(([k, pada], i) => { const [x, y] = tengah(k); return <Ketuk key={i} x={x} y={y} pada={fr(pada)} />; })}
-                <Ketuk x={TITIK_TEMPEL[0]} y={TITIK_TEMPEL[1]} pada={fr(TEMPEL)} tahan={fr(0.45)} />
-                <Tempel />
-                <Ketuk x={TITIK_TEMPEL[0] - 6} y={TITIK_TEMPEL[1] - 43} pada={fr(TEMPEL_KETUK)} />
-              </Ponsel>
-            </Kamera.Provider>
+    <TataLetak.Provider value={L}>
+      <AbsoluteFill style={{ background: WARNA.latar, fontFamily: HURUF }}>
+        <Audio src={staticFile("kirim-undangan/narasi.mp3")} />
+        <Bunyi />
+        <div style={{ position: "absolute", left: L.pusat.x - 520, top: L.pusat.y - 520, width: 1040, height: 1040, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,111,30,.10), rgba(255,111,30,0))" }} />
+        <div style={{ position: "absolute", inset: 0, ...masker(kam.k, L) }}>
+          <div style={{ position: "absolute", inset: 0, transformOrigin: "0 0", transform: kam.transform, opacity: awal }}>
+            <div style={{ position: "absolute", inset: 0, transform: `translateY(${(1 - awal) * 60}px)` }}>
+              <Kamera.Provider value={{ s: kam.s, lihat: kam.lihat, ukuran: [HP.w, HP.h] }}>
+                <Ponsel>
+                  <Layar />
+                  {SOROT.map(([k, label, a, b], i) => <Sorot key={i} kotak={k} label={label} dari={fr(a)} sampai={fr(b)} />)}
+                  {KETUK.map(([k, pada], i) => { const [x, y] = tengah(k); return <Ketuk key={i} x={x} y={y} pada={fr(pada)} />; })}
+                  <Ketuk x={TITIK_TEMPEL[0]} y={TITIK_TEMPEL[1]} pada={fr(TEMPEL)} tahan={fr(0.45)} />
+                  <Tempel />
+                  <Ketuk x={TITIK_TEMPEL[0] - 6} y={TITIK_TEMPEL[1] - 43} pada={fr(TEMPEL_KETUK)} />
+                </Ponsel>
+              </Kamera.Provider>
+            </div>
           </div>
         </div>
-      </div>
-      <Sisipan />
-      <Judul daftar={JUDUL} wa={layarPada(f).startsWith("wa:")} />
-      <Teks potongan={POTONGAN} />
-    </AbsoluteFill>
+        <Sisipan />
+        <Judul daftar={JUDUL} wa={layarPada(f).startsWith("wa:")} />
+        <Teks potongan={POTONGAN} />
+      </AbsoluteFill>
+    </TataLetak.Provider>
   );
 };

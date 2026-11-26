@@ -31,17 +31,21 @@ Remotion. Hasil render ke `out/`.
 Satu video = `src/<video>/` (naskah, adegan, waktu, kotak layar) dan `public/<video>/` (narasi dan gambar layar, tidak
 masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
 
-- `src/kirim-undangan/`: cara kirim undangan ke tamu, tegak 1080x1920. `naskah.js` = teks narasi per kalimat (id dipakai
-  adegan), `Video.jsx` = adegan yang dijangkarkan ke kata narasi, `rekam-layar.mjs` = perekam layar asli.
+- `src/kirim-undangan/`: cara kirim undangan ke tamu, satu adegan dalam dua tata letak (`TATA` di `src/ui/dasar.js`):
+  tegak 1080x1920 (`KirimUndangan`, Shorts/TikTok/Reels) dan lanskap 1920x1080 (`KirimUndanganLanskap`, YouTube dan
+  sematan panduan). `naskah.js` = teks narasi per kalimat (id dipakai adegan), `Video.jsx` = adegan yang dijangkarkan ke
+  kata narasi, `rekam-layar.mjs` = perekam layar asli.
 - Tampilan: iPhone 18 Pro (layar 402x874 pt, Safari iOS 26, WhatsApp iOS digambar ulang di `src/ui/wa/`: lembar Kirim ke,
   foto profil bawaan pastel) dan MacBook Neo untuk adegan laptop. Warna dan huruf merek Nikahin (Gelica, Nunito, coklat
   `#2b1a07`, oranye `#ff6f1e`/`#b8460d`, krem) di `src/ui/dasar.js`. Domain contoh di video ini `nikahin.id` (keputusan
   pemilik, 25 Nov), bukan `tokomu.myscalev.com`. Ringkasan undangan di Beranda serba 0 (undangan baru diserahkan).
-- Zona aman (longgar): semua isi di dalam `AMAN` x 80-1000, y 170-1590 (bebas dari kepala dan keterangan
-  Shorts/TikTok/Reels). Dari atas, dengan jarak lega di antaranya: garis langkah 1-5, judul (`JUDUL_Y`), panggung ponsel
-  (`PANGGUNG`), teks narasi. Ponsel selalu di tengah dan perbesaran paling besar `KMAKS` (bingkai utuh selebar zona
-  aman), jadi sisi kiri-kanan ponsel tidak pernah terpotong; hanya atas dan bawah panggung yang memudar lembut saat
-  diperbesar. Kartu dan pil diletakkan sebagai bagian dari tinggi panggung. Laptop utuh selebar kanvas (boleh keluar
+- Tegak, zona aman (longgar): semua isi di dalam `aman` x 80-1000, y 170-1590 (bebas dari kepala dan keterangan
+  Shorts/TikTok/Reels). Dari atas, dengan jarak lega di antaranya: garis langkah 1-5, judul, panggung ponsel, teks narasi.
+- Lanskap: ponsel di kiri (panggung x 100-940, y 60-1020), di kolom kanan (x 1020-1820) garis langkah, judul, dan teks
+  narasi berkelompok di tengah tinggi kanvas. Kartu dan pil tetap di atas ponsel, seperti versi tegak.
+- Keduanya: ponsel selalu di tengah panggung dan perbesaran paling besar `kmaks` (bingkai utuh selebar panggung), jadi
+  sisi kiri-kanan ponsel tidak pernah terpotong; hanya atas dan bawah panggung yang memudar lembut saat diperbesar. Kartu
+  dan pil diletakkan sebagai bagian dari tinggi panggung. Laptop utuh (tegak selebar kanvas, lanskap 920 px; boleh keluar
   zona aman, keputusan pemilik) dan tidak diperbesar.
 - Ikon: SF Symbols untuk bilah status iOS, Safari, macOS, dan WhatsApp (`swift alat/simbol.swift` → `public/simbol/`,
   ukurannya di `src/ui/simbol.json`); Lucide (`lucide-react`) untuk kartu, pil, dan garis langkah.
@@ -64,7 +68,7 @@ masuk git; narasi jangan dihapus). Semua perintah dijalankan di `panduan/video`.
   `~/Library/Caches/whisper.cpp/`) mencari waktu tiap kata `naskah.js` di `public/kirim-undangan/narasi.*`, hasilnya
   `src/kirim-undangan/waktu.json`. Narasi diganti: jalankan ini dulu. Bandingkan dua rekaman tanpa menulis:
   `node alat/waktu.mjs kirim-undangan <file> --cek`.
-- `npm run studio` untuk melihat di browser, `npm run render` untuk `out/kirim-undangan.mp4`; berkas itu yang dicek dan
-  diunggah.
+- `npm run studio` untuk melihat di browser, `npm run render` untuk `out/kirim-undangan.mp4` (tegak) dan
+  `npm run render:lanskap` untuk `out/kirim-undangan-lanskap.mp4`; berkas itu yang dicek dan diunggah.
 - Narasi ElevenLabs dibuat di akun yang kuncinya di Keychain `nikahin-elevenlabs-6` (akun `api`). `narasi.mp3` sudah
   dinormalkan ke -16 LUFS (ffmpeg loudnorm); rekaman aslinya `narasi-asli.mp3` di folder yang sama.
